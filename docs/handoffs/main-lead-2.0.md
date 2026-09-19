@@ -1,6 +1,6 @@
 # Main Lead 2.0 — authorized leadership transfer
 
-**User-authorized on 2026-09-19:** transfer overall project leadership to a new task, Main Lead 2.0. This is a replacement lead, not Stage 6 or another implementation worker. Outgoing task `01a0b845-6c8d-7021-a5c9-15e673db07c9` (Main Lead) becomes reference-only after publishing this record. Receiver ID is pending; register your actual task ID before coordinating workers or editing global acceptance. Do not invent it or ask the user to reconstruct the history.
+**User-authorized on 2026-09-19:** transfer overall project leadership to a new task, Main Lead 2.0. This is a replacement lead, not Stage 6 or another implementation worker. Outgoing task `01a0b845-6c8d-7021-a5c9-15e673db07c9` (Main Lead) becomes reference-only after publishing this record. Receiver **`01a0bb80-cf0d-7f60-8e46-1e825f42d276` (Main Lead 2.0), host `local`, registered 2026-09-19** from the actual runtime task ID and matching app registry. Registration branch: `codex/main-lead-2-registration`, isolated checkout `Ip_inventory-lead-2`. The transfer is active. The first-action checklist below is retained as the transfer procedure. Do not invent it or ask the user to reconstruct the history.
 
 This explicit decision supersedes earlier statements that the original lead must remain. Existing ownership, accepted evidence and permissions carry forward. The transfer grants no additional runtime or infrastructure authority.
 
@@ -87,6 +87,8 @@ Commit each coherent change; push after three or earlier at handoff. Separate fe
 First response: confirm takeover, say what is accepted versus pending, and name the next concrete deliverable. Then continue authorized lead work autonomously, without a planning interview. Final acceptance still needs actual integrated/portable evidence and disclosed gaps.
 
 ## Monitor transfer and old-task retirement
+
+**Receiver completion, 2026-09-19:** the existing `ipam-project-oversight` heartbeat was updated through the app tool and its saved configuration reread. It is ACTIVE, targets registered receiver `01a0bb80-cf0d-7f60-8e46-1e825f42d276`, retains every 30 minutes and expiry September 21, 2026, 17:00 UTC, and preserves read-only operation and unchanged-state silence. No duplicate was created. The following paragraphs retain the transfer-time state and procedure.
 
 Heartbeat **`ipam-project-oversight` is PAUSED**, updated through the app tool and verified in saved configuration. It still targets outgoing task `01a0b845-6c8d-7021-a5c9-15e673db07c9`; its prompt names that old lead and older checkpoints. Do not resume it unchanged.
 
