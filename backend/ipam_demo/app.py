@@ -20,6 +20,7 @@ from . import __version__, inventory, inventory_commands, reconciliation, report
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
 from .models import Allocation, Page, Pool, Prefix, PrefixDetail, Scope
+from .scheduler import SyntheticScheduler
 from .store import (CONTRACT_REVISION, SCHEMA_VERSION, connect, data_directory,
                     exclusive_data_access, initialize_schema, require_initialized,
                     require_schema, static_directory)
@@ -40,10 +41,18 @@ def create_app() -> FastAPI:
         with ExitStack() as stack:
             app.state.startup_error = None
             app.state.database = None
+            app.state.scheduler = None
             try:
                 path = stack.enter_context(exclusive_data_access(directory))
                 initialize_schema(path)
                 app.state.database = path
+                with connect(path) as connection:
+                    initialized = bool(connection.execute("SELECT initialized FROM app_meta WHERE singleton=1").fetchone()[0])
+                    if initialized:
+                        require_initialized(connection)
+                if initialized:
+                    app.state.scheduler = SyntheticScheduler(path, run_lock)
+                    app.state.scheduler.start()
             except AppError as exc:
                 app.state.startup_error = exc
                 logger.error("%s: %s %s", exc.code, exc.message, exc.details)
@@ -52,7 +61,12 @@ def create_app() -> FastAPI:
                 app.state.startup_error = (store_error(exc) if isinstance(exc, sqlite3.Error) else
                     AppError("DATA_PATH_UNAVAILABLE", "Cannot access app data. Check the configured path and permissions.",
                              details={"data_dir": str(directory), "runtime_uid": os.getuid()}))
-            yield
+            try:
+                yield
+            finally:
+                if app.state.scheduler is not None:
+                    # Finish the single timer before ExitStack releases data ownership.
+                    await run_in_threadpool(app.state.scheduler.stop)
 
     app = FastAPI(title="Synthetic IPAM inventory", version=__version__, lifespan=lifespan,
                   docs_url="/api/docs", redoc_url=None, openapi_url="/api/openapi.json")
@@ -206,6 +220,35 @@ def create_app() -> FastAPI:
     @app.get("/api/actors")
     def actors(connection=Depends(database)):
         return workflow.actors()
+
+    def schedule_service(request):
+        if request.app.state.startup_error:
+            raise request.app.state.startup_error
+        if request.app.state.scheduler is None:
+            raise AppError("SETUP_NEEDED", "Stop the service, seed the rich inventory, then restart before using acquisition.")
+        return request.app.state.scheduler
+
+    @app.get("/api/schedule")
+    def get_schedule(request: Request):
+        return schedule_service(request).status()
+
+    @app.post("/api/schedule")
+    def configure_schedule(request: Request, payload: dict):
+        service = schedule_service(request)
+        if not run_lock.acquire(blocking=False):
+            raise AppError("RUN_IN_PROGRESS", "Another acquisition or reconciliation is in progress. Retry after it completes.", 409)
+        try:
+            audited_write(request, payload, "schedule.configure", lambda connection: service.configure(connection, payload), "synthetic-schedule")
+            service.configuration_committed()
+        finally:
+            run_lock.release()
+        return service.status()
+
+    @app.post("/api/schedule/run", status_code=201)
+    def acquire_now(request: Request, payload: dict):
+        result = schedule_service(request).run_now(payload)
+        return JSONResponse(result, status_code=200 if result["replay"] else 201,
+                            headers={"X-Acquisition-Replay": str(result["replay"]).lower()})
 
     @app.get("/api/prefixes/{object_id}/edit-context")
     def prefix_edit_context(object_id: UUID, connection=Depends(database)):

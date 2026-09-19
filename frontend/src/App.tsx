@@ -6,6 +6,7 @@ import FirstPath from "./FirstPath";
 import CapacityReports from "./CapacityReports";
 import InventoryEditor from "./InventoryEditor";
 import Workflow from "./Workflow";
+import Schedule from "./Schedule";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 type Bootstrap =
@@ -161,7 +162,7 @@ function PrefixContents({ prefix, onSelect }: { prefix: PrefixDetail; onSelect: 
 }
 
 export default function App() {
-  const [view, setView] = useState<"inventory" | "first-path" | "planning" | "capacity" | "workflow">("inventory");
+  const [view, setView] = useState<"inventory" | "first-path" | "planning" | "capacity" | "workflow" | "schedule">("inventory");
   const [bootstrap, setBootstrap] = useState<Bootstrap>({ status: "loading" });
   const [evidenceScopes, setEvidenceScopes] = useState<Scope[] | null>(null);
   const [revision, setRevision] = useState(0);
@@ -260,6 +261,7 @@ export default function App() {
           <button className="secondary" aria-current={view === "planning" ? "page" : undefined} onClick={() => setView("planning")}>Prefix planning</button>
           <button className="secondary" aria-current={view === "capacity" ? "page" : undefined} onClick={() => setView("capacity")}>Capacity and reports</button>
           <button className="secondary" aria-current={view === "workflow" ? "page" : undefined} onClick={() => setView("workflow")}>Requests and exceptions</button>
+          <button className="secondary" aria-current={view === "schedule" ? "page" : undefined} onClick={() => setView("schedule")}>Synthetic acquisition</button>
         </nav>
         <div hidden={view !== "inventory"}>
         <div className="page-heading">
@@ -316,6 +318,7 @@ export default function App() {
         {evidenceScopes && <div hidden={view !== "first-path"}><FirstPath scopes={evidenceScopes} /></div>}
         {/* Preserve unresolved workflow retries after initial readiness, including refresh failures. */}
         {evidenceScopes && <div hidden={view !== "workflow" || bootstrap.status !== "ready"}><Workflow /></div>}
+        {evidenceScopes && <div hidden={view !== "schedule" || bootstrap.status !== "ready"}><Schedule /></div>}
         {bootstrap.status === "ready" && <>
           <div hidden={view !== "planning"}><InventoryEditor scopes={bootstrap.scopes} onChanged={() => { setListRevision((value) => value + 1); setSelectedId(null); }} /></div>
           <div hidden={view !== "capacity"}><CapacityReports scopes={bootstrap.scopes} /></div>
