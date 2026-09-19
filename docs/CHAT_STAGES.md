@@ -1,5 +1,7 @@
 # When to start a fresh implementation chat
 
+**User-authorized lead replacement, 2026-09-19:** [Main Lead 2.0 transfer](handoffs/main-lead-2.0.md). Receiver task ID is pending registration; the outgoing lead becomes reference-only. This is an explicit exception to the ordinary stage-transition rules below, not a new implementation stage. Existing worker ownership and accepted evidence carry forward.
+
 The existing project-lead chat remains responsible for oversight across the whole build. The user wants fresh implementation chats for the stages, not a replacement lead each time. See [PROJECT_OVERSIGHT.md](PROJECT_OVERSIGHT.md). Agents must surface checkpoints themselves and generate handoff prompts; do not wait for the user to reconstruct context.
 
 **Find the active implementation boundary and generated prompt in [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md).** The first boundary is planning → Stage 1. Keep this original chat as persistent project lead; it reviews worker reports and updates global status/handoff pointers.

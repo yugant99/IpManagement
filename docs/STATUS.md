@@ -2,7 +2,7 @@
 
 ## Authorization and evidence
 
-- Persistent lead remains task `01a0b845-6c8d-7021-a5c9-15e673db07c9`, regardless of its sidebar title.
+- **User-authorized lead replacement:** Main Lead 2.0 takes over via [the transfer record](handoffs/main-lead-2.0.md); receiver task ID pending registration. Outgoing `01a0b845-6c8d-7021-a5c9-15e673db07c9` becomes reference-only after publication. Its monitor is paused. All existing worker ownership and acceptance limits remain unchanged.
 - Stage 3 PR #18 is accepted as a **source checkpoint at `009e80197ab610e5a365d1e3dd4462588754d646`**, after three independent reviews and owner fixes for three findings. Subsequent bounded runtime evidence is accepted through the pinned Stage 5 candidate below, with explicit limits. See [Stage 3 lead review](handoffs/stage-03-lead-review.md).
 - User scope change: evolving synthetic feed, **every six hours configurable, with manual Run now**. RFP-068 is required. Follow [SCHEDULING_CONTRACT.md](SCHEDULING_CONTRACT.md); original fixtures stay unchanged. Producer PR #19 at `3218daade8de3fe61bd6df36da431411add4a3ad` is [source accepted](handoffs/evolving-feed-lead-review.md), unmerged as a GitHub PR; it has now executed through the pinned Stage 5 candidate. Stage 4 and Stage 5 tasks remain available for scoped fixes/evidence follow-ups.
 - Stage 4 [PR #25](https://github.com/yugant99/IpManagement/pull/25) is **source accepted at `54f8f8168108733d40d842263218f16b33df5868`**, with reviewed API/report-only publication `117d05295473cf25d362adb320e6fef26ecdd74c`. Both source-review findings were corrected and independently closed. See [Stage 4 lead review](handoffs/stage-04-lead-review.md); later bounded runtime acceptance is recorded below.
@@ -17,7 +17,8 @@ Repository: `yugant99/IpManagement`. Main contains documentation only. All regis
 
 | Owner / task | Branch / checkpoint / PR | Actual state |
 |---|---|---|
-| Persistent lead, Main Lead, `01a0b845-6c8d-7021-a5c9-15e673db07c9` | Lead documentation branches into main | Global status/contracts, acceptance and main integration stay here |
+| Incoming lead, Main Lead 2.0, task ID pending | Register actual receiver ID via a new documentation branch | User-authorized replacement; inherits global status/contracts, acceptance and integration |
+| Outgoing Main Lead, `01a0b845-6c8d-7021-a5c9-15e673db07c9` | `codex/main-lead-2-handoff` | Publishes transfer, then reference-only; monitor paused |
 | Foundation 1, `01a0b8ae-bd65-7331-b548-da5dca1e0d5e` | `codex/part-1-foundation`, `c6131c38a460c13c3a189ee64a530042b2a2bf0f`, [#5](https://github.com/yugant99/IpManagement/pull/5) | Source reviewed; open/draft, inherited by Stage 2/3, outside main |
 | Implement Stage 2 first path, `01a0b8c2-f283-7cf1-9128-85e9164f5fe9` | `codex/part-2-first-path`, `8a1a122737618748c58c5a8fc31b58a3b5f6f37e`, [#8](https://github.com/yugant99/IpManagement/pull/8) | Source accepted; open/draft, inherited by Stage 3; retained for assigned fixes |
 | Overseer / data, `01a0b8b9-82fb-7a11-bc50-ec3a5b234729` | Frozen data `907f6e7bf32f23f36d270da49c3177b015c8bfae`, [#7](https://github.com/yugant99/IpManagement/pull/7); evolving `codex/part-2-evolving-feed`, `3218daade8de3fe61bd6df36da431411add4a3ad`, [#19](https://github.com/yugant99/IpManagement/pull/19) | #7/#19 source accepted and open; inherited producer/data exercised through the accepted Stage 5 run; retained data owner |
@@ -68,7 +69,7 @@ Exact PR #22 is now normally integrated into Stage 4; see [core review](handoffs
 
 Denominator **111**. Historical 65/67/68 bundles are planning arithmetic, not fully satisfied-row counts. RFP-043's general import callback stays deferred; 081 now has observed fixed-team transfer/acknowledgement and 068 has bounded controlled timer evidence. Neither earns live discovery, scale, external team integration or provider credit. A 60% fully satisfied-row claim is not established.
 
-The read-only heartbeat inspects meaningful progress every 30 minutes through Monday morning, 2026-09-21; the app automation is the schedule source. It does not implement, test, merge or assign work. Preserve the original weekend budget and integration reserve: freeze unrelated additions. Next: [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md).
+The read-only heartbeat is **paused for lead transfer**. Main Lead 2.0 must register and reattach the existing automation before resuming its unchanged every-30-minute cadence and September 21, 2026 expiry; see the transfer record. It does not implement, test, merge or assign work. Preserve the original weekend budget and integration reserve: freeze unrelated additions. Next: [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md).
 
 The lead owns eventual application main merges. Historical preparation `46c225defea8c933363354fe2d5bb6492ee67073` was corrected at `7e37dde6ba18a08717b0ce56c4438522fc5f7008`; those documents supplied no runtime credit. The later accepted run at `fe50cd6` supplies the bounded observations now recorded above. PR #27 remains open; no application main merge follows automatically from this acceptance.
 

@@ -1,6 +1,6 @@
 # Persistent project oversight
 
-**The original task `01a0b845-6c8d-7021-a5c9-15e673db07c9` remains the project lead across all stages.** Its current title is "Main Lead"; earlier titles were "Build synthetic inventory demo" and "Synthetic data builder". Titles may change; they do not reassign ownership. In particular, the current task titled "Overseer" (`01a0b8b9-82fb-7a11-bc50-ec3a5b234729`) is the assigned synthetic-data worker. Use the task registry in `STATUS.md` to route work. Fresh stage tasks implement assigned work and do not replace overall project ownership.
+**Leadership transfer authorized on 2026-09-19: Main Lead 2.0 replaces the outgoing lead.** Follow [the exact-state transfer](handoffs/main-lead-2.0.md). Receiver task ID is pending registration; the receiving task registers its actual ID before assuming coordination/global acceptance. Outgoing task `01a0b845-6c8d-7021-a5c9-15e673db07c9`, titled "Main Lead", becomes reference-only after publishing the transfer. Its heartbeat is paused pending reattachment. Titles alone never reassign ownership: "Overseer" (`01a0b8b9-82fb-7a11-bc50-ec3a5b234729`) remains the synthetic-data worker. Use STATUS.md for routing. Ordinary stage tasks remain workers and do not replace the lead.
 
 ## Ownership
 
