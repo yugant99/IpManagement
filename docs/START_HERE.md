@@ -2,6 +2,8 @@
 
 Canonical repository: https://github.com/yugant99/IpManagement
 
+Start with [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md) for the current stage and generated pickup prompt. [CHAT_STAGES.md](CHAT_STAGES.md) tells each lead agent when to highlight the next fresh-chat boundary. Do not replay the completed architecture interview at pickup.
+
 ## Read only what your lane needs
 
 1. `AGENTS.md` and `DEVELOPMENT_RULES.md`.

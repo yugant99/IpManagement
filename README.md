@@ -6,6 +6,8 @@ A planned portable IP address inventory and reconciliation demonstration using s
 
 ## Agent pickup
 
+**Next: [current stage and generated pickup prompt](docs/CURRENT_HANDOFF.md).** The [chat-stage guide](docs/CHAT_STAGES.md) makes each lead generate a fresh-chat prompt at the next milestone and keeps prior chats available for branch follow-ups.
+
 Read [AGENTS.md](AGENTS.md), [development rules](DEVELOPMENT_RULES.md), and [the pickup guide](docs/START_HERE.md). The lead owns integration; contributors own bounded parts on separate branches.
 
 | Part | Outcome | Task |

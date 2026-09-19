@@ -85,3 +85,7 @@ These rules apply to every human and agent working on this repository. The goal 
 ## 8. Finish the slice
 
 For every completed slice, report goal IDs, changed behavior, commit/branch, pushed status, validation actually performed, known limitations and next owner. Freeze features early enough to preserve integration and recipient handoff time. Prefer fewer complete paths to many disconnected screens.
+
+## 9. Change chats at stage boundaries
+
+Follow `docs/CHAT_STAGES.md`. The agent must notice the completed stage, checkpoint/push, update current status and generate the next prompt. Show **START A NEW CHAT — Stage N: title**, the exact pushed checkpoint, handoff link and complete copyable prompt. The user should not have to ask for or reconstruct context. Keep old chats for explicit feature fixes; fixes to merged work use a new branch. No chat per commit and no automatic task creation/archive. A stage checkpoint never implies runtime verification or broader infrastructure permission.
