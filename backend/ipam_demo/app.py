@@ -300,8 +300,15 @@ def create_app() -> FastAPI:
             if len(body) + len(chunk) > MAX_IMPORT_BYTES:
                 raise AppError("UPLOAD_LIMIT", "Source envelope exceeds the 10 MiB limit.", 413)
             body.extend(chunk)
-        receipt, replay = await run_in_threadpool(
-            write_operation, request, lambda connection: import_envelope(connection, bytes(body)))
+        def save_import(connection):
+            receipt, replay = import_envelope(connection, bytes(body))
+            if not replay:
+                workflow.audit_event(connection, actor_id="system", action="source.import", outcome=receipt["application_status"],
+                    reason="Synthetic source receipt and immutable input rows saved.", subject_id=receipt["id"],
+                    details={key: receipt[key] for key in ("source_id", "source_run_id", "source_kind", "application_status",
+                             "input_rows", "accepted_rows", "rejected_rows", "duplicate_rows", "coverage")})
+            return receipt, replay
+        receipt, replay = await run_in_threadpool(write_operation, request, save_import)
         return JSONResponse(receipt, status_code=200 if replay else 201,
                             headers={"X-Import-Replay": "true" if replay else "false"})
 
