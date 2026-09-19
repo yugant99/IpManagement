@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { ApiError, loadScopes, request } from "./api";
 import type { Health, Origin, Page, Prefix, PrefixDetail, Scope } from "./api";
+import FirstPath from "./FirstPath";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 type Bootstrap =
@@ -157,7 +158,9 @@ function PrefixContents({ prefix, onSelect }: { prefix: PrefixDetail; onSelect: 
 }
 
 export default function App() {
+  const [view, setView] = useState<"inventory" | "first-path">("inventory");
   const [bootstrap, setBootstrap] = useState<Bootstrap>({ status: "loading" });
+  const [evidenceScopes, setEvidenceScopes] = useState<Scope[] | null>(null);
   const [revision, setRevision] = useState(0);
   const [inventory, setInventory] = useState<Resource<Page<Prefix>>>({ status: "loading" });
   const [listRevision, setListRevision] = useState(0);
@@ -179,7 +182,10 @@ export default function App() {
           return;
         }
         const scopes = await loadScopes(controller.signal);
-        if (!controller.signal.aborted) setBootstrap({ status: "ready", health, scopes });
+        if (!controller.signal.aborted) {
+          setEvidenceScopes(scopes);
+          setBootstrap({ status: "ready", health, scopes });
+        }
       } catch (error) {
         if (!controller.signal.aborted) setBootstrap({ status: "error", error: asError(error) });
       }
@@ -239,17 +245,23 @@ export default function App() {
 
   return (
     <>
-      <a className="skip-link" href="#inventory-main">Skip to inventory</a>
+      <a className="skip-link" href="#inventory-main">Skip to main content</a>
       <header className="app-header">
         <div className="brand"><span className="brand-mark" aria-hidden="true">IP</span><span>IP inventory</span><span className="demo-label">Synthetic demo</span></div>
-        <span className="header-context">Stage 1 · Foundation</span>
+        <span className="header-context">Stage 2 · First complete path</span>
       </header>
       <main id="inventory-main">
+        <nav className="view-navigation" aria-label="Inventory views">
+          <button className="secondary" aria-current={view === "inventory" ? "page" : undefined} onClick={() => setView("inventory")}>Intended inventory</button>
+          <button className="secondary" aria-current={view === "first-path" ? "page" : undefined} onClick={() => setView("first-path")}>Source evidence</button>
+        </nav>
+        <div hidden={view !== "inventory"}>
         <div className="page-heading">
           <div><p className="eyebrow">Intended network state</p><h1>Scoped inventory</h1><p className="intro">Browse IPv4 and IPv6 prefixes, their owners, and intended assignments.</p></div>
           <button className="secondary" onClick={refresh} disabled={bootstrap.status === "loading"}>Refresh inventory</button>
         </div>
         <div className="evidence-banner"><strong>Synthetic intended inventory</strong><span>Data comes from the local inventory API. No live discovery, traffic measurements, or current-use evidence is included.</span></div>
+        </div>
 
         {bootstrap.status === "loading" && <div className="notice loading-line" role="status">Checking API readiness and loading network scopes…</div>}
         {bootstrap.status === "error" && <ErrorState error={bootstrap.error} onRetry={refresh} />}
@@ -265,7 +277,7 @@ export default function App() {
         )}
 
         {bootstrap.status === "ready" && (
-          <>
+          <div hidden={view !== "inventory"}>
             <form className="filters" onSubmit={search} aria-label="Filter intended prefixes">
               <label>Network scope<select value={filters.scope} onChange={(event) => updateFilters({ ...filters, scope: event.target.value })}><option value="">All network scopes</option>{bootstrap.scopes.map((scope) => <option value={scope.id} key={scope.id}>{scope.name} · {scope.namespace}</option>)}</select></label>
               <label>Address family<select value={filters.family} onChange={(event) => updateFilters({ ...filters, family: event.target.value })}><option value="">IPv4 and IPv6</option><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
@@ -293,10 +305,11 @@ export default function App() {
               </section>
               {selectedId && <PrefixPanel key={selectedId} id={selectedId} onSelect={setSelectedId} onClose={() => { setSelectedId(null); selectedButton.current?.focus(); }} />}
             </div>
-          </>
+          </div>
         )}
+        {evidenceScopes && <div hidden={view !== "first-path"}><FirstPath scopes={evidenceScopes} /></div>}
         {health && <Readiness health={health} />}
-        <footer className="page-footer">Intended records only · Read-only foundation · Data and readiness are reported by the API</footer>
+        <footer className="page-footer">Synthetic inventory and evidence · Saved calculations are pinned to their run · Data and readiness are reported by the API</footer>
       </main>
     </>
   );

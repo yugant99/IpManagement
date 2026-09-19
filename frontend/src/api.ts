@@ -94,7 +94,11 @@ export class ApiError extends Error {
 }
 
 // A bounded request keeps an unavailable local backend from leaving a loading screen forever.
-export async function request<T>(path: string, signal: AbortSignal, readHealth = false): Promise<T> {
+export async function request<T>(path: string, signal: AbortSignal, readHealth = false, options: {
+  method?: "GET" | "POST";
+  body?: string;
+  onResponse?: (response: Response) => void;
+} = {}): Promise<T> {
   const controller = new AbortController();
   let timedOut = false;
   const abort = () => controller.abort();
@@ -105,15 +109,23 @@ export async function request<T>(path: string, signal: AbortSignal, readHealth =
     controller.abort();
   }, 12000);
   try {
-    const response = await fetch(path, { signal: controller.signal, headers: { Accept: "application/json" } });
+    const response = await fetch(path, {
+      signal: controller.signal,
+      method: options.method ?? "GET",
+      body: options.body,
+      headers: { Accept: "application/json", ...(options.body !== undefined ? { "Content-Type": "application/json" } : {}) },
+    });
     const requestId = response.headers.get("X-Request-ID") ?? undefined;
     if (!response.headers.get("content-type")?.includes("application/json")) {
       throw new ApiError("The API did not return JSON. Check that the backend is running and the API proxy is configured.", "INVALID_RESPONSE", requestId);
     }
     const body = await response.json();
     if (!response.ok && !(readHealth && response.status === 503 && typeof body?.status === "string")) {
-      throw new ApiError(body?.error?.message ?? `Request failed (HTTP ${response.status}).`, body?.error?.code ?? "REQUEST_FAILED", body?.error?.request_id ?? requestId);
+      const message = body?.error?.message ?? `Request failed (HTTP ${response.status}).`;
+      const reason = body?.error?.details?.reason;
+      throw new ApiError(typeof reason === "string" ? `${message} ${reason}` : message, body?.error?.code ?? "REQUEST_FAILED", body?.error?.request_id ?? requestId);
     }
+    options.onResponse?.(response);
     return body as T;
   } catch (error) {
     if (signal.aborted) throw error;
