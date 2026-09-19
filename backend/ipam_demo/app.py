@@ -1,9 +1,11 @@
 """Single-process FastAPI runtime with explicit readiness and relative UI APIs."""
 
 from contextlib import ExitStack, asynccontextmanager
+import json
 import logging
 import os
 import sqlite3
+from threading import Lock
 from typing import Annotated
 from uuid import UUID, uuid4
 
@@ -11,9 +13,11 @@ from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import __version__, inventory
+from . import __version__, inventory, reconciliation
+from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
 from .models import Allocation, Page, Pool, Prefix, PrefixDetail, Scope
 from .store import (CONTRACT_REVISION, SCHEMA_VERSION, connect, data_directory,
@@ -29,6 +33,7 @@ TextFilter = Annotated[str | None, Query(max_length=200)]
 def create_app() -> FastAPI:
     directory = data_directory()
     static = static_directory()
+    run_lock = Lock()
 
     @asynccontextmanager
     async def lifespan(app):
@@ -148,6 +153,111 @@ def create_app() -> FastAPI:
                          q: TextFilter = None, limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
         return inventory.page(inventory.allocations(connection, scope_id=str(scope_id) if scope_id else None,
                               prefix_id=str(prefix_id) if prefix_id else None, pool_id=str(pool_id) if pool_id else None, q=q), limit, offset)
+
+    def write_operation(request, operation):
+        if request.app.state.startup_error:
+            raise request.app.state.startup_error
+        with connect(request.app.state.database) as connection, connection:
+            connection.execute("BEGIN IMMEDIATE")
+            require_initialized(connection)
+            return operation(connection)
+
+    def import_receipt(connection, batch_id):
+        row = connection.execute("SELECT receipt_json FROM source_batches WHERE id=?", (batch_id,)).fetchone()
+        if row is None:
+            raise AppError("NOT_FOUND", "Source import does not exist.", 404)
+        return json.loads(row["receipt_json"])
+
+    @app.post("/api/imports", status_code=201)
+    async def create_import(request: Request):
+        if request.headers.get("content-type", "").split(";", 1)[0].strip().lower() != "application/json":
+            raise AppError("INVALID_INPUT", "Upload a versioned source envelope as application/json.", 422)
+        body = bytearray()
+        async for chunk in request.stream():
+            if len(body) + len(chunk) > MAX_IMPORT_BYTES:
+                raise AppError("UPLOAD_LIMIT", "Source envelope exceeds the 10 MiB limit.", 413)
+            body.extend(chunk)
+        receipt, replay = await run_in_threadpool(
+            write_operation, request, lambda connection: import_envelope(connection, bytes(body)))
+        return JSONResponse(receipt, status_code=200 if replay else 201,
+                            headers={"X-Import-Replay": "true" if replay else "false"})
+
+    @app.get("/api/imports")
+    def list_imports(limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+        total = connection.execute("SELECT COUNT(*) FROM source_batches").fetchone()[0]
+        items = [json.loads(row[0]) for row in connection.execute(
+            "SELECT receipt_json FROM source_batches ORDER BY sequence DESC LIMIT ? OFFSET ?", (limit, offset))]
+        return {"items": items, "total": total, "limit": limit, "offset": offset}
+
+    @app.get("/api/imports/{batch_id}")
+    def get_import(batch_id: UUID, connection=Depends(database)):
+        return import_receipt(connection, str(batch_id))
+
+    @app.get("/api/imports/{batch_id}/envelope")
+    def get_import_envelope(batch_id: UUID, connection=Depends(database)):
+        import_receipt(connection, str(batch_id))
+        return json.loads(connection.execute("SELECT envelope_json FROM source_batches WHERE id=?", (str(batch_id),)).fetchone()[0])
+
+    @app.get("/api/imports/{batch_id}/records")
+    def get_import_records(batch_id: UUID, status: str | None = None, limit: Limit = 50,
+                           offset: Offset = 0, connection=Depends(database)):
+        import_receipt(connection, str(batch_id))
+        if status is not None and status not in {"accepted", "rejected", "duplicate"}:
+            raise AppError("INVALID_INPUT", "Record status must be accepted, rejected or duplicate.", 422)
+        where = "batch_id=?" + (" AND status=?" if status is not None else "")
+        args = [str(batch_id)] + ([status] if status is not None else [])
+        total = connection.execute(f"SELECT COUNT(*) FROM source_records WHERE {where}", args).fetchone()[0]
+        items = [record_payload(row) for row in connection.execute(
+            f"SELECT * FROM source_records WHERE {where} ORDER BY row_number LIMIT ? OFFSET ?", [*args, limit, offset])]
+        return {"items": items, "total": total, "limit": limit, "offset": offset}
+
+    @app.get("/api/source-records/{record_id}")
+    def get_source_record(record_id: UUID, connection=Depends(database)):
+        row = connection.execute("SELECT * FROM source_records WHERE id=?", (str(record_id),)).fetchone()
+        if row is None:
+            raise AppError("NOT_FOUND", "Source record does not exist.", 404)
+        return record_payload(row)
+
+    @app.post("/api/runs", status_code=201)
+    def compute_run(request: Request):
+        if not run_lock.acquire(blocking=False):
+            raise AppError("RUN_IN_PROGRESS", "Another reconciliation run is in progress. Retry after it completes.", 409)
+        try:
+            return write_operation(request, reconciliation.create_run)
+        finally:
+            run_lock.release()
+
+    @app.get("/api/runs")
+    def list_runs(limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+        total = connection.execute("SELECT COUNT(*) FROM calculation_runs").fetchone()[0]
+        items = []
+        for row in connection.execute(
+            "SELECT result_json FROM calculation_runs ORDER BY created_at DESC, id LIMIT ? OFFSET ?", (limit, offset)):
+            result = json.loads(row[0])
+            del result["findings"]
+            items.append(result)
+        return {"items": items, "total": total, "limit": limit, "offset": offset}
+
+    @app.get("/api/runs/{run_id}")
+    def get_saved_run(run_id: UUID, connection=Depends(database)):
+        return reconciliation.get_run(connection, str(run_id))
+
+    @app.get("/api/runs/{run_id}/findings")
+    def list_findings(run_id: UUID, scope_id: UUID | None = None, evidence_state: str | None = None,
+                       limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+        if evidence_state is not None and evidence_state not in {"anomalous", "healthy", "unknown", "not_applicable"}:
+            raise AppError("INVALID_INPUT", "Unknown finding evidence state.", 422)
+        items = [finding for finding in reconciliation.get_run(connection, str(run_id))["findings"]
+                 if (scope_id is None or finding["subject"]["scope_id"] == str(scope_id))
+                 and (evidence_state is None or finding["evidence_state"] == evidence_state)]
+        return inventory.page(items, limit, offset)
+
+    @app.get("/api/runs/{run_id}/findings/{finding_id}")
+    def get_finding(run_id: UUID, finding_id: UUID, connection=Depends(database)):
+        for finding in reconciliation.get_run(connection, str(run_id))["findings"]:
+            if finding["id"] == str(finding_id):
+                return finding
+        raise AppError("NOT_FOUND", "Finding does not belong to this saved run.", 404)
 
     @app.api_route("/api/{unmatched:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"], include_in_schema=False)
     def missing_api(unmatched: str):

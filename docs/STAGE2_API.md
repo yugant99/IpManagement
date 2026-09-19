@@ -1,6 +1,6 @@
 # Stage 2 first-path contract
 
-Implementation contract for `demo-v2-questionnaire`; source authored, runtime evidence pending. Foundation dependency: PR #5 at `c6131c38a460c13c3a189ee64a530042b2a2bf0f`, accepted by persistent lead for dependent development. Existing inventory is unchanged. The sole rule is `missing_expected_route`, version `1` (G14), with import/provenance and detail contributions to G05/G06/G15. RFP contributions: 007/012/013/033/034/037/062/063/069/077/087/089, all pending demonstration.
+Implementation contract for `demo-v2-questionnaire`; source authored, runtime evidence pending. Foundation dependency: PR #5 at `c6131c38a460c13c3a189ee64a530042b2a2bf0f`, accepted by persistent lead for dependent development. Existing inventory is unchanged. The sole rule is `missing_expected_route`, version `1` (G13), with import/provenance and detail contributions to G05/G06/G07/G15/G18. RFP contributions: 007/012/013/033/034/037/062/063/069/077/087/089, all pending demonstration.
 
 ## Ownership and storage
 
@@ -13,7 +13,7 @@ Four additive tables in schema version 2:
 - `source_records`: UUID `id`, `batch_id`, one-based `row_number`, nullable `source_record_id`, `status` (`accepted`, `rejected`, `duplicate`), nullable `reason`, `raw_json`, nullable `typed_json`. Unique `(batch_id,row_number)`. Raw input is immutable; accepted typed payload retains normalized route/policy fields.
 - `calculation_runs`: UUID `id`, `created_at`, `demo_clock_at`, `result_json` (immutable full result with subject snapshots).
 
-`python -m ipam_demo migrate` is an explicit stopped-service v1→v2 command under the existing exclusive data lock. Existing v1 startup refuses the schema with migration guidance; new databases include v2 tables. No speculative upgrade or data reset. Command is authored, not executed here.
+`python -m ipam_demo migrate` is an explicit stopped-service v1→v2 command under the existing exclusive data lock. Startup refuses existing v1 stores with migration guidance; new databases include v2 tables. No speculative upgrade or data reset. Command is authored, not executed here.
 
 ## Imports
 
