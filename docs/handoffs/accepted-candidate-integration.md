@@ -7,10 +7,10 @@ Main Lead 2.0, task `01a0bb80-cf0d-7f60-8e46-1e825f42d276`, 2026-09-19. This rec
 | Area | Current evidence | Remaining gate / owner |
 |---|---|---|
 | Local application | Accepted pickup `117d05295473cf25d362adb320e6fef26ecdd74c`; Stage 5 report `fe50cd6828016a25fee9086f499e2e865b4a16e4`: 14 passes, two partial, zero observed application defects | Retain all bounded local/synthetic limits; existing workers own scoped fixes |
-| Main integration | Prepared history-preserving merge `12384916152be635bea1087540a7cb7d59898360` on registered-lead main `b6616a72d72d2b55659da796944e0a6fda46db7f`; [PR #34](https://github.com/yugant99/IpManagement/pull/34) | Lead's bounded review and main merge; no code substitution or new runtime run |
-| Questionnaire | 111-row denominator; 51 unique candidate IDs in the worker ledger | Lead's final row adjudication; candidate IDs are not completed requirements |
+| Main integration | History-preserving merge `12384916152be635bea1087540a7cb7d59898360` on registered-lead main `b6616a72d72d2b55659da796944e0a6fda46db7f`; [PR #34](https://github.com/yugant99/IpManagement/pull/34) | Accepted and merged via #34 at `e0ba2d99440c84c90ebe449f7442e247e2828b3f`; no code substitution or new runtime run |
+| Questionnaire | 111-row denominator; 51 unique candidate IDs in the worker ledger | [Final accounting](../QUESTIONNAIRE_ROW_MAP.md): 29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing; candidate IDs are not completed requirements |
 | Customer phases | [Phase coverage](../PHASE_COVERAGE.md) retained alongside questionnaire | Customer Phase 1 assessment and Phase 2 rollout/adoption outcomes remain incomplete |
-| Delivery-method document | PR #9 exact `c3e45fa43a1e9f59e6c9af298b14e2c0857ebaa2` is separate | NO MERGE; proposed documentary support only |
+| Delivery-method document | PR #9 exact `c3e45fa43a1e9f59e6c9af298b14e2c0857ebaa2` is separate | [Reviewed documentary-only](delivery-method-lead-review.md); OPEN / NO MERGE, unadopted |
 | Core packaging inputs | Runtime module/locks/UI build path, state CLI, feed module/assets and local prerequisite evidence available | Spencer packages this candidate and reports exact artifacts |
 | Portable delivery | No registered package checkpoint, target-host or recipient result | `PART6_READY=no`; Spencer owns package/operator handoff, lead owns acceptance |
 
@@ -28,6 +28,8 @@ Refreshed GitHub before integration. All eight heads below are ancestors of `fe5
 | #19 | `3218daade8de3fe61bd6df36da431411add4a3ad` |
 | #25 | `117d05295473cf25d362adb320e6fef26ecdd74c` |
 | #27 | `fe50cd6828016a25fee9086f499e2e865b4a16e4` |
+
+Main integration was confirmed at `e0ba2d99440c84c90ebe449f7442e247e2828b3f`. GitHub automatically marked #5/#7 MERGED; #8/#10/#18/#19/#25/#27 were then CLOSED as superseded only after each current head exactly matched the table and was confirmed as an ancestor of main. No historical worker branch was changed/deleted.
 
 The merge had no conflicts. Git identity comparison against the tested pickup found no change in backend, frontend, fixtures, build metadata or locks. Matching objects:
 

@@ -1,6 +1,6 @@
 # Questionnaire-first delivery plan
 
-Status: planning revision, 2026-09-19. Supersedes the 22-of-30 internal-goal percentage as the success headline. The original 30 goals remain useful work references. Application source now exists on feature branches; demonstrated evidence remains pending. Use STATUS.md for actual checkpoints. This revision follows the user's request to maximize useful coverage of the actual 111 questionnaire rows, including architecture, deployment and delivery artifacts.
+Status: **historical planning priorities, with final current-candidate accounting on 2026-09-19.** The controlling [111-row evidence table](QUESTIONNAIRE_ROW_MAP.md) records **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing** from the accepted local candidate. The unchanged application is integrated in main through PR #34. These classes are not a percentage of fully satisfied customer requirements. Use [status](STATUS.md) and the separate [DOCX phase gaps](PHASE_COVERAGE.md) for current acceptance. The original 30 goals and planning bundles below remain work references, not achievement totals.
 
 ## What the 111 rows require
 

@@ -2,7 +2,7 @@
 
 An IP address inventory and reconciliation demonstration using synthetic data, with real local calculations and persistence.
 
-**Current state:** Stage 5 bounded local acceptance is complete: **14 observed passes, two partial scenarios, no observed application defects**. [Application integration PR #34](https://github.com/yugant99/IpManagement/pull/34) carries the exact tested lineage into the current lead documentation. Portable packaging and recipient proof remain pending with Spencer. Read [current status](docs/STATUS.md), [readiness and integration](docs/handoffs/accepted-candidate-integration.md), and [accepted evidence limits](docs/handoffs/stage-05-lead-review.md).
+**Current state:** Stage 5 bounded local acceptance is complete: **14 observed passes, two partial scenarios, no observed application defects**. [Application integration PR #34](https://github.com/yugant99/IpManagement/pull/34) is merged and brings the exact tested lineage into main with current lead documentation. Portable packaging and recipient proof remain pending with Spencer. Read [current status](docs/STATUS.md), [readiness and integration](docs/handoffs/accepted-candidate-integration.md), and [accepted evidence limits](docs/handoffs/stage-05-lead-review.md).
 
 ## Agent pickup
 
@@ -23,7 +23,7 @@ Spencer's agent first reads the [current candidate addendum](docs/handoffs/accep
 
 ## Planning references
 
-- **Current scope:** [questionnaire priorities](docs/QUESTIONNAIRE_PRIORITIES.md), [all 111 rows and gaps](docs/QUESTIONNAIRE_ROW_MAP.md), and [scope changes](docs/QUESTIONNAIRE_SCOPE_DELTA.md). The denominator is 111; historical 65/67/68 planning bundles and the 51 candidate evidence IDs are not fully satisfied-row counts. Retain the separate [customer phase gaps](docs/PHASE_COVERAGE.md).
+- **Current scope:** [questionnaire priorities](docs/QUESTIONNAIRE_PRIORITIES.md), [all 111 rows and gaps](docs/QUESTIONNAIRE_ROW_MAP.md), and [scope changes](docs/QUESTIONNAIRE_SCOPE_DELTA.md). Final current-candidate accounting: **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing = 111**. Historical 65/67/68 planning bundles and the 51 candidate evidence IDs are not fully satisfied-row counts. Retain the separate [customer phase gaps](docs/PHASE_COVERAGE.md).
 - [Architecture decisions](docs/ARCHITECTURE.md) and [shared contracts](docs/CONTRACTS.md).
 - [75-question agent review](docs/GRILL_75.md) and [adopted implementation details](docs/IMPLEMENTATION_DECISIONS.md).
 - [Original twenty-hour coverage baseline](docs/COVERAGE.md), [original goal manifest](docs/GOALS.csv), and [original requirement links](docs/REQUIREMENT_COVERAGE.csv). These preserve the 53-row baseline; the current row map takes precedence for priority.
