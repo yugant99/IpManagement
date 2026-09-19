@@ -18,10 +18,15 @@ These rules apply to every human and agent working on this repository. The goal 
 - Make one descriptive commit per coherent change. After the third commit, push the working branch before starting the next slice. Three changes normally means three commits and one push.
 - Push earlier before handing work to another agent, pausing, or ending a session. Do not wait to accumulate three if work is about to stop.
 - Never create empty commits, split inseparable edits, or add cosmetic churn to inflate counts. More real checkpoints improve recovery; raw commit count is not the delivery metric.
-- Use `codex/part-N-description` or another clear `codex/` branch. The initial documentation bootstrap may establish the repository's default branch; subsequent feature work stays on topic branches.
+- **Different features use different branches, then merge.** Use `codex/part-N-feature-name`, for example `codex/part-3-ghost-scope` or `codex/part-6-container-startup`. A part is an ownership area, not permission to put unrelated features on one long-lived branch.
+- Start each feature from the current integration baseline on `main`. If it depends on an unmerged feature, coordinate the dependency with the lead instead of copying code between branches. Concurrent agents use separate worktrees/checkouts; never switch the branch beneath another active agent.
+- The initial documentation bootstrap may establish the default branch directly. After bootstrap, no feature implementation goes directly onto `main`.
 - Stage explicit owned paths. Inspect the staged content before pushing. Never include source attachments, credentials, local databases or another agent's unrelated edits.
 - WIP checkpoints may be pushed with their limitations clearly stated. A push is not a claim that checks passed or a release is ready.
 - Do not force-push shared history, reset another contributor's work, or merge your own lane into the integration branch without the lead's coordination. Preserve coherent commits when integrating rather than automatically squashing them away.
+- Open a PR for a ready feature. State goal IDs, behavior, focused validation actually performed, simulations/unverified limits and any contract changes. The lead arranges a bounded independent review, resolves relevant conflicts and merges; do not trigger a full test suite just because a PR exists.
+- Use a merge that preserves the feature's coherent commits by default. Do not squash or rewrite a contributor's history solely to tidy the graph. After merge, use a new branch for the next feature.
+- A branch may be checkpointed before release readiness. Only merge feature behavior whose required correctness/integration evidence is recorded, or clearly identified documentation-only changes. Do not use commit count as a merge criterion.
 - If a push fails, record the error and the local branch/commit. Fix the actual cause; never report it as pushed.
 
 ## 3. Small code and one owner per boundary

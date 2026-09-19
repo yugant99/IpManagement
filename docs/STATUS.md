@@ -16,7 +16,7 @@
 
 ## Decisions and ownership
 
-- Architecture is being resolved through a bounded real exchange between the architecture and coverage agents, under the user's explicit delegation. No user questionnaire is pending as a gate.
+- Architecture was resolved in two actual agent-to-agent rounds: three initial question groups and two follow-up challenges. The user explicitly delegated this discussion. No user questionnaire or confirmation gate remains.
 - Lead: contracts, integration, Part 1 and coordination.
 - Data lane: Part 2. Rules lane: Part 3. UI/calculation lane: Part 4. Core workflow lane: Part 5.
 - Spencer: **Part 6, portable delivery**, approximately 6–8 hours. Earlier Part 5 assignments are superseded.
@@ -25,7 +25,7 @@
 
 | Gate | State | What is missing |
 |---|---|---|
-| Architecture decisions | In progress | Finish agent exchange and record bounded decisions |
+| Architecture decisions | Recorded | See architecture and actual discussion record; implementation evidence remains absent |
 | Application build | Not started | Implementation turn and first integrated source-to-finding path |
 | PART6_READY | No | Real app command, dependency locks, compiled UI path, seed/reset/backup commands and health endpoint |
 | Portable release | Not built | Implemented application, packaging and recorded startup/persistence evidence |

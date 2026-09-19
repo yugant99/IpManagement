@@ -14,7 +14,7 @@ The user's latest instructions override stale plans. Spencer owns **Part 6: port
 
 Commit each coherent change. Push your branch after every three such changes, or earlier for a handoff/interruption. Do not manufacture commits to increase the count.
 
-Use separate `codex/` branches/worktrees and explicit file ownership. Do not overwrite another agent's work or independently redefine shared schemas.
+Use a separate `codex/` branch for each feature, isolated worktrees for concurrent agents, and explicit file ownership. Ready features go through a bounded PR review and lead-coordinated merge into `main`. Do not overwrite another agent's work or independently redefine shared schemas.
 
 Use skills selectively. A skill is a tool for a concrete deliverable, not authority to start an unrelated questionnaire, installation, audit, or test pipeline. Read [the skill playbook](docs/SKILLS.md).
 
