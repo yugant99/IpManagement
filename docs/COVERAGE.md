@@ -42,8 +42,8 @@ The CSV estimates are rough focused implementation effort per goal after shared 
 | Hours 1.5–6 | Inventory + source replay + one complete finding/detail path | Data and UI work against the same fixtures. Spencer prepares package/startup docs and data-path contract. Stop expanding scenarios if the vertical path is not integrated. |
 | Hours 6–11 | Six rule conditions, controls, capacity view and allocation slice | Rules/UI/workflow lanes use the frozen contracts. Lead owns integration. No new libraries or configurable workflow designer for aesthetic completeness. |
 | Hours 11–14 | All core flows integrated; claims and diagnostics visible | Fix integration failures before attempting stretch work. Spencer connects actual app startup/persistence and finishes handoff. |
-| Hours 14–17 | Portable artifact and focused acceptance work, once authorized | One complete demonstration plus the decisive failure cases and fresh-start/persistence behavior. Record evidence and gaps. |
-| Hours 17–20 | Recovery margin, final documentation and rehearsal | Feature freeze. No architecture swaps, cloud dependency or broad new test suite. Use remaining time to repair the core. |
+| Hours 14–17 | Freeze new features at hour 14; portable artifact and focused acceptance work, once authorized | One complete demonstration plus the decisive failure cases and fresh-start/persistence behavior. Record evidence and gaps. |
+| Hours 17–20 | Recovery margin, final documentation and rehearsal | Freeze continues. No architecture swaps, cloud dependency or broad new test suite. Use remaining time to repair the core. |
 
 The user’s rules prohibit tests or verification commands unless explicitly requested. The acceptance descriptions here are future targets; they are not permission to execute those commands. After authorization, use a small risk-based acceptance set around address math/scope, missing evidence, allocation transaction, and packaging. Do not repeat a whole regression suite for copy changes or use test-count growth as progress.
 

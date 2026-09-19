@@ -10,6 +10,8 @@ Request one address from a designated synthetic IPv4 pool, approve or reject it,
 
 Use Part 1's pool/allocation schema, actor mapping and shared database access. Own assigned workflow API/service/UI modules. Do not independently change schema or identity conventions.
 
+Use one static IPv4 pool with an authoritative local ledger. Approval also consumes Part 2's current eligible contradictory observations, not saved findings or DHCP silence. Imports/reruns do not automatically increment pool or baseline versions. Read the workflow version/retry/error rules in `docs/IMPLEMENTATION_DECISIONS.md`.
+
 ## Fixed flow
 
 Request records the exact candidate and reviewed pool/baseline version. Pending requests do not reserve inventory. On approval, the server checks actor permission and prohibits self-approval, then atomically rechecks eligibility and writes allocation plus successful audit. Repeated approval is safe. A changed baseline or occupied address fails visibly and requires renewed review; do not silently allocate a different address. Rejection leaves inventory unchanged.

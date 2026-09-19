@@ -15,6 +15,7 @@ During the present planning stage, this document is a handoff specification, not
 1. `AGENTS.md` and `DEVELOPMENT_RULES.md`.
 2. `docs/STATUS.md` and `docs/ARCHITECTURE.md`.
 3. `docs/CONTRACTS.md`, especially runtime, file ownership and readiness.
+   Its companion `docs/IMPLEMENTATION_DECISIONS.md` has a short **Core and Part 6** section; no need to reread the full grill transcript.
 4. `docs/parts/06-portability.md` and goals G26–G28/G30 in `docs/GOALS.csv`.
 5. The Part 6 row in `docs/SKILLS.md`.
 
@@ -49,9 +50,10 @@ These are planned interfaces until status marks them implemented. A placeholder 
 - One app image with compiled UI; no frontend development server at runtime.
 - Compose configuration for ordinary Docker hosts, local published port bound to loopback and explicit persistent writable volume/path.
 - Dependency installation follows committed locks. No developer absolute paths, bundled credentials or accidental source-document copies.
-- Initial data setup is explicit and deterministic. Normal restart must retain requests, allocations, findings and audit.
-- Reset requires the explicit confirmation flag and targets only configured demo state.
-- Wrap/document the core's consistent backup/restore entrypoints. Do not implement a competing schema-aware persistence layer or naïvely copy a live SQLite file.
+- Initial data setup is explicit and deterministic. Unseeded readiness is 503 with setup-needed UI; do not create health-driven restart loops before seed. Normal restart must retain requests, allocations, findings and audit.
+- Reset requires the explicit confirmation flag, stopped service and exclusive app-data access; touch only recognized app state. Never delete the entire mounted directory.
+- Wrap/document core's SQLite-backup-API entrypoint and validated stopped-service restore. Core implements app identity/schema/integrity checks and database correctness. Do not implement a competing persistence layer or copy a live SQLite main file.
+- Support local filesystem mounts/volumes only; fail visibly for unwritable data without silent ephemeral fallback. State unsupported schema and target-platform limits plainly.
 - `docs/RUNNING.md` gives supported target, prerequisites, exact startup/shutdown/state commands, data location, errors, dependency/license list and next-agent pickup.
 - Record what was actually run and observed, and what remains unverified. Runtime checks follow current user authorization and lean-verification rules.
 
@@ -61,7 +63,7 @@ These are planned interfaces until status marks them implemented. A placeholder 
 2. Implement package/startup files against the declared interfaces. Report missing paths/commands to the lead, without renaming the core app to fit your template.
 3. Connect persistence and explicit state commands. Keep the app operationally simple.
 4. Add diagnostics and short recipient documentation; use the remaining time for integration repairs.
-5. When the core is ready and runtime checks are authorized, obtain the decisive startup/restart/state evidence on the declared target. Do not repeatedly run broad application suites.
+5. When the core is ready and runtime checks are authorized, obtain the decisive startup/restart/state evidence on the declared target. G27 needs actual G21/G22 allocation/audit records for persistence evidence; a successful seed-only restart is insufficient. Do not repeatedly run broad application suites.
 
 If blocked around 15 minutes, send the lead: missing interface, expected contract, observed state, impact, and work you can continue. Do not rent infrastructure, pull an unrelated platform or create a mock success to remove the blocker.
 
@@ -73,4 +75,4 @@ Second CPU architecture, second host or Sunday VM are stretch. No cloud resource
 
 ## Current lane handoff
 
-Owner: Spencer / Part 6. Branch/commit: not started; choose the current integration baseline at pickup. Pushed implementation: none. Working application: none yet. Next action: read status and contracts, then take the first authorized packaging feature once assigned. This line must be replaced with actual branch/commit/results when work starts.
+Owner: Spencer / Part 6. Branch/commit: not started; choose current `origin/main` at pickup. Contract revision: `demo-v1-planning-75q`. Pushed implementation: none. Working application: none yet. Next action: read status and contracts, then take the first authorized packaging feature once assigned. Replace this line with exact pushed SHA, integration base SHA, contract revision, dependencies and results when work starts.

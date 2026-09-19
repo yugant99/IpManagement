@@ -2,6 +2,8 @@
 
 Date: 2026-09-19. This summarizes actual collaboration messages, not a fictional roleplay. Interviewer: `/root/grill_architecture`; architect/proposer: `/root/coverage_20h`; lead: `/root`.
 
+Historical initial exchange. The subsequent [75-question review](GRILL_75.md) deepened these choices; current contracts and implementation decisions take precedence over this initial summary.
+
 The user explicitly corrected the workflow: agents should interview each other instead of questioning the user. The lead delegated architecture decisions and limited the discussion to two rounds / ten minutes. No user confirmation gate was applied.
 
 ## Round 1: three frontier questions

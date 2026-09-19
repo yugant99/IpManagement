@@ -33,12 +33,14 @@ Record in your handoff file:
 ```text
 Owner / part:
 Branch and commit:
+Integration base SHA / contract revision:
 Pushed: yes / no, with reason
 Goal IDs:
 Works now:
 Simulated:
 Unverified:
 Changed files / interfaces:
+Merged / unmerged dependencies and missing entrypoints:
 Checks actually performed:
 Blocker:
 Next exact action:

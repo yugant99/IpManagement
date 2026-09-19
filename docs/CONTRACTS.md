@@ -2,6 +2,8 @@
 
 Status: agent-decided design contract. **Not implemented.** The lead records any change here before another lane depends on it. These interfaces remove guesswork; they do not require generic adapter or workflow frameworks.
 
+Contract revision: `demo-v1-planning-75q`. [Implementation decisions](IMPLEMENTATION_DECISIONS.md) supplies the adopted identity, import, calculation, API, workflow and state-operation details. Read your lane's sections. The [75-question record](GRILL_75.md) preserves rationale and corrected proposals; superseded answers never override this contract.
+
 ## Repository ownership
 
 | Surface | Owner |
@@ -24,10 +26,11 @@ Paths are reserved ownership boundaries; application files do not exist yet. Con
 - Container port: `8000`; local host binding defaults to `127.0.0.1`. A public URL is a later deployment decision.
 - `IPAM_DATA_DIR` identifies writable app data, including `ipam_demo.sqlite3`. Native default: local `./data`; image default: `/data`, mounted outside the image.
 - `IPAM_STATIC_DIR` identifies built UI assets. Packaging sets it to the image's static directory. No hardcoded developer paths.
-- `/healthz`: lightweight readiness with status, schema readiness and data readiness; no secrets. The source catalog API supplies detailed source freshness. Part 6 consumes these results; it does not implement reconciliation health itself.
+- `/healthz`: readiness returns 200 for process/schema/initialized data ready, otherwise 503 with separate readiness booleans and a safe reason. An unseeded app serves setup-needed UI. The source catalog API supplies freshness separately. Part 6 consumes these results and avoids restart loops before explicit seed.
 - Deterministic setup: `python -m ipam_demo seed --scenario baseline`. Existing initialized data must not be silently overwritten.
-- Explicit destructive demo reset: `python -m ipam_demo reset --confirm`. Operates only on the configured demo data location and reports what changed. Never resets on every startup.
-- Consistent snapshot: `python -m ipam_demo backup --output PATH`; restore: `python -m ipam_demo restore --input PATH --confirm`, with the application stopped for restore. Core implements database correctness; Part 6 documents/wraps the commands. Do not copy an active SQLite main file without accounting for its journal.
+- Explicit destructive demo reset: `python -m ipam_demo reset --confirm`. Requires stopped service and exclusive app-data access; touches only the recognized app database and its own sidecars inside the configured location, reports changes and never recursively deletes the data directory. Never resets on startup.
+- Consistent snapshot: `python -m ipam_demo backup --output PATH`, using SQLite's backup API to a new destination. Restore: `python -m ipam_demo restore --input PATH --confirm`, with stopped service and exclusive app-data access. Validate app identity/schema/integrity before replacing and preserve the old database. Core implements correctness; Part 6 documents/wraps the commands.
+- Data resides on supported local filesystems/local Docker volumes, not network mounts. Missing/unwritable paths fail visibly without an ephemeral fallback. Unsupported schema preserves data and fails with a clear reason.
 - Core chooses and pins actual runtime/dependency versions at implementation start. Part 6 consumes the committed locks rather than selecting a second set.
 
 Every command above is a required future entrypoint, not an instruction to run it now. `PART6_READY` is false until they and their dependency/build artifacts actually exist.
@@ -40,13 +43,19 @@ Common identity: `scope_id`, address family, address/prefix, and applicable time
 
 Each finding response includes ID, rule/version, run ID, scoped subject, severity/state, explanation, input references, evaluated window, limitations and proposed next action. A saved run supplies both overview and detail/export values. Expected fixture labels never select findings.
 
+The immutable saved run also carries capacity, occupancy, p95 value/status/window/sample counts and forecast value/status/basis. Retain old runs and source references for pinned `run_id` reads. Part 4's backend calculation is delivered before Part 3 pressure rules; UI and export only display its saved output. Historical comparison UI remains stretch.
+
+Core input is versioned JSON, limited to 10 MiB/10,000 records. Receipts use exclusive accepted/rejected/duplicate counts that sum to input; identical batch replay has no new effects. Effective completeness accounts for validation failures. See the companion decision sections for batch selection, scope and time rules.
+
 Initial seed creates the intended inventory baseline. Changed intended-inventory imports are visibly staged and cannot overwrite later approved allocations. Accepted DHCP/routing imports become eligible evidence for reruns. Promotion of a changed intended baseline is deferred; disclose that limitation.
 
 ## Allocation boundary
 
-One designated IPv4 pool; fixed request → review → local allocation flow. A request stores the exact candidate and reviewed pool/baseline version. Pending requests do not reserve or change inventory.
+One designated static IPv4 pool with authoritative local intended ledger; fixed request → review → local allocation flow. A request stores the exact candidate and reviewed pool/baseline version. Pending requests do not reserve or change inventory.
 
 The server maps two demo actor identities to permissions and blocks self-approval. On approval it rechecks the exact candidate/version, persists allocation and successful audit together, and rejects conflicts/stale requests visibly. Repeated approval must not allocate twice. Rejection leaves inventory unchanged. Failed transactions remain visible; record failed-attempt audit after rollback when possible.
+
+Approval checks current ledger and eligible contradictory observations, not saved findings. Imports/reruns do not themselves increment allocation concurrency tokens. Pool versions track relevant policy/range/assignment changes; baseline version tracks intended authority. Creation and decision retries are idempotent, terminal requests immutable, and lost audit writes visible. See the companion workflow section.
 
 Downstream provisioning is explicitly simulated. Demo identity is not enterprise authentication. The UI may switch between labeled demo actors; it may not supply an arbitrary trusted role for a decision.
 
