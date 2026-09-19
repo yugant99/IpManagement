@@ -1,10 +1,12 @@
 # Current implementation-chat handoff
 
-**START A NEW IMPLEMENTATION CHAT — Stage 3: main capabilities**
+**ACTIVE — Stage 3: main capabilities**
 
 PR #7 and Stage 2 PR #8 are accepted **unmerged source checkpoints** after three bounded independent reviews. No actionable defects were found in the reviewed surfaces. Runtime acceptance and questionnaire demonstration remain pending. See the [lead review](handoffs/stage-02-lead-review.md).
 
-**Paste the complete approved [Stage 3 kickoff prompt](handoffs/stage-03-kickoff.md).** It supersedes the worker draft on PR #8. No Stage 3 task is registered at publication. Keep earlier workers for assigned fixes and the original task as persistent project lead.
+Stage 3 has started in task `01a0b8f0-7036-74d1-81c1-e388d17b4cf4` under the [approved kickoff](handoffs/stage-03-kickoff.md). Do not create another Stage 3 worker. Its isolated worktree is `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-3`, branch `codex/stage-3-main-capabilities`. Pushed dependency integration `5578431c85ffa18071d6262d08a49a251b072afd` combines the approved inputs below and lead docs `1cde8dd7df0e3e0cf3a55b3d771843a1e4dd9a25`. Keep earlier workers for assigned fixes and this original task as persistent lead.
+
+Intermediate source `01550ab8b84936e289b4bbb74dfbfce9d6272940` publishes schema v3, the rich seed helper, API wiring/interface documentation and shared migratable-version policy. Dependent module integration remains pending; this is not an accepted Stage 3 or runnable candidate. Rich-seed CLI PR #12 at `d7b1fd580b88f875883dbde975c9504ead58a6a9` passed bounded independent source review and remains unmerged/runtime-unverified. See [review and exact state-compatibility pickup](handoffs/rich-seed-cli-lead-review.md).
 
 ## Exact dependencies
 
@@ -23,6 +25,7 @@ All registered tasks use host `local`. Titles may change; task IDs identify owne
 | Role | Task ID | Reserved scope |
 |---|---|---|
 | Persistent lead | `01a0b845-6c8d-7021-a5c9-15e673db07c9` | Global contracts/status, acceptance, main integration |
+| Stage 3 implementation | `01a0b8f0-7036-74d1-81c1-e388d17b4cf4` | Assigned application modules; coordinator owns store/schema/app/common UI |
 | Foundation 1 / core state commands | `01a0b8ae-bd65-7331-b548-da5dca1e0d5e` | `state_ops.py`, `__main__.py`, state-command docs; PR #10 awaiting lead review |
 | Implement Stage 2 first path | `01a0b8c2-f283-7cf1-9128-85e9164f5fe9` | Assigned Stage 2 fixes |
 | Overseer / synthetic data | `01a0b8b9-82fb-7a11-bc50-ec3a5b234729` | Fixtures and data docs |

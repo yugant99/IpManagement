@@ -1,6 +1,6 @@
 # Approved Stage 3 kickoff: main capabilities
 
-**START A NEW IMPLEMENTATION CHAT — Stage 3.** Approved by persistent lead `01a0b845-6c8d-7021-a5c9-15e673db07c9` after the [source review](stage-02-lead-review.md). Permission covers assigned source implementation, not runtime acceptance or application merges. No Stage 3 task is registered yet.
+**Stage 3 is now active in task `01a0b8f0-7036-74d1-81c1-e388d17b4cf4`. Do not create a duplicate worker.** This is the approved original kickoff, retained for scope and handoff context. See [current status](../STATUS.md) for later checkpoints. Persistent lead `01a0b845-6c8d-7021-a5c9-15e673db07c9` remains responsible after the [source review](stage-02-lead-review.md). Permission covers assigned source implementation, not runtime acceptance or application PR merges.
 
 This supersedes the PR #8 worker draft `stage-03-main-capabilities.md`. Use the final PR #8 commit below, not the earlier code-only commit. The original task remains overseer; prior workers remain available for assigned fixes.
 
