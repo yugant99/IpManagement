@@ -8,7 +8,7 @@ from uuid import uuid4
 from .errors import AppError
 
 RULE_ID = "missing_expected_route"
-RULE_VERSION = "1"
+RULE_VERSION = 1
 
 
 def _instant(value):
