@@ -30,6 +30,90 @@ _ASSETS = (
     ("observations/routing-lab.json", "synthetic-routing-lab", "ed6b7bdfb7dffc811c75871f431fad7a5439a399045efb2d1c142ab0c14cd050"),
 )
 
+# Structural identity copied from the immutable fixtures/v1/inventory.json at
+# 907f6e7bf32f23f36d270da49c3177b015c8bfae. Supplied seed content is not authority
+# for these fields. Keep this small adapter pin independent of metadata and of
+# the nine runtime input files; no inventory file or expected labels are loaded.
+_NORTH = "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001"
+_LAB = "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002"
+_COASTAL = "6d3bb4b0-ce20-5d83-b609-c09e3468d891"
+_CENTRAL = "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c"
+_RICH_SCOPES = {
+    _NORTH: ("vrf-north", ["10.40.0.0/16", "2001:db8:40::/48"]),
+    _LAB: ("vrf-lab", ["10.40.0.0/16"]),
+    _COASTAL: ("vrf-coastal", ["10.60.0.0/16", "2001:db8:60::/48"]),
+    _CENTRAL: ("vrf-central", ["10.80.0.0/16", "2001:db8:80::/48"]),
+}
+_NORTH_V4 = "41aca2b0-ec1d-4f64-8d21-c5af0ab0b001"
+_NORTH_V6 = "41aca2b0-ec1d-4f64-8d21-c5af0ab0b004"
+_COASTAL_V4 = "e18e837e-510f-5b09-a851-a51087a87489"
+_COASTAL_V6 = "23e6edda-6196-5302-97a6-c19e99d04ef0"
+_CENTRAL_V4 = "f0546fd0-2ea3-58dd-830b-cb463de81b60"
+_CENTRAL_V6 = "233afa7e-31ca-550e-8dbc-c821303ccace"
+# prefix ID -> (scope ID, family, CIDR, parent ID), including original parents.
+_RICH_PREFIXES = {
+    _NORTH_V4: (_NORTH, 4, "10.40.0.0/16", None),
+    "41aca2b0-ec1d-4f64-8d21-c5af0ab0b002": (_NORTH, 4, "10.40.1.0/24", _NORTH_V4),
+    "41aca2b0-ec1d-4f64-8d21-c5af0ab0b003": (_NORTH, 4, "10.40.2.0/28", _NORTH_V4),
+    _NORTH_V6: (_NORTH, 6, "2001:db8:40::/48", None),
+    "41aca2b0-ec1d-4f64-8d21-c5af0ab0b005": (_NORTH, 6, "2001:db8:40:1::/64", _NORTH_V6),
+    "41aca2b0-ec1d-4f64-8d21-c5af0ab0b006": (_LAB, 4, "10.40.1.0/24", None),
+    "6bb56af5-eb62-53f1-9703-66dce7d33623": (_NORTH, 4, "10.40.3.0/24", _NORTH_V4),
+    "06b7ca61-9adc-5865-a142-61fc9f38a00a": (_NORTH, 4, "10.40.4.0/24", _NORTH_V4),
+    "b848db8c-200b-56d9-b083-7d2a81d8dda2": (_NORTH, 4, "10.40.5.0/24", _NORTH_V4),
+    "3faaa46b-8fff-53c9-b5ad-56c89c455cae": (_NORTH, 4, "10.40.6.0/24", _NORTH_V4),
+    "50053b51-2916-5469-8944-b5f32d1b7063": (_NORTH, 4, "10.40.7.0/24", _NORTH_V4),
+    "6b5f7933-c2cc-5fd0-ad59-e7d822927058": (_NORTH, 4, "10.40.8.0/24", _NORTH_V4),
+    "cec9cbde-44fa-5725-a1a3-45727d4573f7": (_NORTH, 4, "10.40.9.0/24", _NORTH_V4),
+    "7897c78f-f727-5bf4-9686-247e1fa6a34e": (_NORTH, 4, "10.40.10.0/24", _NORTH_V4),
+    "28508a12-24a9-5681-b33b-237a67a3bff4": (_NORTH, 4, "10.40.11.0/24", _NORTH_V4),
+    "fee3c85a-b68e-5100-b57d-d3eeb3e2b1ac": (_NORTH, 6, "2001:db8:40:2::/64", _NORTH_V6),
+    "4ab4b10a-db2b-56c2-abac-a99e7a87f1c6": (_LAB, 4, "10.40.2.0/24", None),
+    "14b140fe-307e-5365-adaf-bac676e0b6e3": (_LAB, 4, "10.40.3.0/24", None),
+    "2af5a941-2902-5f6f-bcfe-e5b97a47515f": (_LAB, 4, "10.40.4.0/24", None),
+    "7aa49ec7-4344-51ca-99bd-e5a39fe49947": (_LAB, 4, "10.40.5.0/24", None),
+    "c91da1c9-2907-5ea5-8c81-9e70b0f2a82d": (_LAB, 4, "10.40.6.0/24", None),
+    "6fd2ea53-99bc-56bb-bc61-32a3247450f7": (_LAB, 4, "10.40.7.0/24", None),
+    "09650578-5d3e-522d-86f3-7edfed65607c": (_LAB, 4, "10.40.8.0/24", None),
+    "36a12e50-6ab3-5b36-994b-33294d06ab4d": (_LAB, 4, "10.40.9.0/24", None),
+    "d24f9864-e836-5d64-aefb-acd93f365feb": (_LAB, 4, "10.40.10.0/24", None),
+    "f83eba1b-08b5-52cc-bb77-95385124d6f6": (_LAB, 4, "10.40.11.0/24", None),
+    "0d42da3c-f014-5bb5-b479-5b3001121ee4": (_LAB, 4, "10.40.12.0/24", None),
+    "7c1c9878-2946-516c-92d5-f58f078563d3": (_LAB, 4, "10.40.13.0/24", None),
+    "bc947f6d-6508-5344-ac33-4d2b7ad2708a": (_LAB, 4, "10.40.14.0/24", None),
+    "a1526294-9c3c-5588-98b5-c0fa7cae2aa9": (_LAB, 4, "10.40.15.0/24", None),
+    _COASTAL_V4: (_COASTAL, 4, "10.60.0.0/20", None),
+    "bf2c1be9-80c5-52e1-948d-182bdab92c26": (_COASTAL, 4, "10.60.1.0/24", _COASTAL_V4),
+    "60fe3174-a94e-5a5c-9858-8180c49bb697": (_COASTAL, 4, "10.60.2.0/24", _COASTAL_V4),
+    "3a642afc-33a8-5d77-974d-dd6d3ce62a1c": (_COASTAL, 4, "10.60.3.0/24", _COASTAL_V4),
+    "fdcf07d5-2059-5358-a0a7-8349a3478748": (_COASTAL, 4, "10.60.4.0/24", _COASTAL_V4),
+    "6d4ca11a-c17b-52ce-b75f-6ac3023c4e08": (_COASTAL, 4, "10.60.5.0/24", _COASTAL_V4),
+    "f541b894-e689-581e-b321-81cb37ce79a4": (_COASTAL, 4, "10.60.6.0/24", _COASTAL_V4),
+    "5ef476fa-209d-52d1-b61a-3cff0c60c1bb": (_COASTAL, 4, "10.60.7.0/24", _COASTAL_V4),
+    "a6692c89-bff9-56e6-b09f-25b04cf8e997": (_COASTAL, 4, "10.60.8.0/24", _COASTAL_V4),
+    "31f48ebb-2f5f-5cbe-8a79-87adac622dc7": (_COASTAL, 4, "10.60.9.0/24", _COASTAL_V4),
+    "4369b798-6e2f-5df3-a5fb-29ad14d49b5d": (_COASTAL, 4, "10.60.10.0/24", _COASTAL_V4),
+    "3eb2272d-8d3e-5f5e-bb5c-7fc1045e6b48": (_COASTAL, 4, "10.60.11.0/24", _COASTAL_V4),
+    _COASTAL_V6: (_COASTAL, 6, "2001:db8:60::/48", None),
+    "67d86406-2318-5d3e-9a20-e0643dde85d2": (_COASTAL, 6, "2001:db8:60:1::/64", _COASTAL_V6),
+    "8bcce75a-7b7b-56ec-a983-20791d3b10b4": (_COASTAL, 6, "2001:db8:60:2::/64", _COASTAL_V6),
+    _CENTRAL_V4: (_CENTRAL, 4, "10.80.0.0/20", None),
+    "484db9de-6c03-5998-bb7b-8e1f00381e24": (_CENTRAL, 4, "10.80.1.0/24", _CENTRAL_V4),
+    "960382d9-7a52-5e17-bac9-881bd3015fdc": (_CENTRAL, 4, "10.80.2.0/24", _CENTRAL_V4),
+    "501c0ce4-d2ac-5891-9cee-ddf1c89715e8": (_CENTRAL, 4, "10.80.3.0/24", _CENTRAL_V4),
+    "309785ae-eb3d-5321-817b-beaae08fa67f": (_CENTRAL, 4, "10.80.4.0/24", _CENTRAL_V4),
+    "2fc276c3-d7b4-5cff-9762-b8e507bb961a": (_CENTRAL, 4, "10.80.5.0/24", _CENTRAL_V4),
+    "b864da07-2a6c-5350-8ded-299deaf916e2": (_CENTRAL, 4, "10.80.6.0/24", _CENTRAL_V4),
+    "d5bcfabc-adde-5031-9e22-2e5a6a8bb10f": (_CENTRAL, 4, "10.80.7.0/24", _CENTRAL_V4),
+    "110ce1e7-a1b3-5ef8-b861-627fbc91f597": (_CENTRAL, 4, "10.80.8.0/24", _CENTRAL_V4),
+    "35eaf4d9-cb15-5679-9d75-0151b01213e1": (_CENTRAL, 4, "10.80.9.0/24", _CENTRAL_V4),
+    "04eff3c4-2af3-5410-a013-7c68c8d9613d": (_CENTRAL, 4, "10.80.10.0/24", _CENTRAL_V4),
+    "05f85012-e83e-5eed-83e1-2283b45a41a9": (_CENTRAL, 4, "10.80.11.0/24", _CENTRAL_V4),
+    _CENTRAL_V6: (_CENTRAL, 6, "2001:db8:80::/48", None),
+    "dea2b92f-aa4f-5943-9900-82cf6bf7c638": (_CENTRAL, 6, "2001:db8:80:1::/64", _CENTRAL_V6),
+    "09cb9c18-2aad-5ac1-9ba7-cdaa08ae87c8": (_CENTRAL, 6, "2001:db8:80:2::/64", _CENTRAL_V6),
+}
+
 
 def _clock(index):
     if type(index) is not int or not 0 <= index <= MAX_CYCLE_INDEX:
@@ -160,23 +244,28 @@ def require_compatible(connection, baseline: list[dict], cycle_index: int) -> No
         policy = sources["synthetic-inventory-policy"]
         expected_scopes = {row["scope_id"] for row in policy["coverage"]}
         seed_scopes = {row["id"]: row for row in seed["scopes"]}
-        if set(seed_scopes) != expected_scopes or len(seed_scopes) != len(seed["scopes"]):
+        if set(seed_scopes) != expected_scopes or set(seed_scopes) != set(_RICH_SCOPES) or len(seed_scopes) != len(seed["scopes"]):
             raise ValueError("Rich seed scopes differ from the pinned feed.")
         current_scopes = {row["id"]: row for row in connection.execute("SELECT * FROM scopes")}
-        for scope_id, original in seed_scopes.items():
+        for scope_id, structure in _RICH_SCOPES.items():
+            original = seed_scopes[scope_id]
             current = current_scopes.get(scope_id)
-            if (current is None or current["namespace"] != original["namespace"]
-                    or json.loads(current["managed_cidrs"]) != original["managed_cidrs"]):
+            if ((original["namespace"], original["managed_cidrs"]) != structure or current is None
+                    or (current["namespace"], json.loads(current["managed_cidrs"])) != structure):
                 raise ValueError("A feed scope or its managed perimeter changed: " + scope_id)
         seed_prefixes = {row["id"]: row for row in seed["prefixes"]}
         if (set(seed_prefixes) != {row["prefix_id"] for row in policy["records"]}
+                or set(seed_prefixes) != set(_RICH_PREFIXES)
                 or len(seed_prefixes) != len(seed["prefixes"])
                 or any(seed_prefixes[row["prefix_id"]]["scope_id"] != row["scope_id"] for row in policy["records"])):
             raise ValueError("Rich seed prefixes differ from the pinned intended-policy coverage.")
         current_prefixes = {row["id"]: row for row in connection.execute("SELECT * FROM prefixes")}
-        for prefix_id, original in seed_prefixes.items():
+        for prefix_id, structure in _RICH_PREFIXES.items():
+            original = seed_prefixes[prefix_id]
             current = current_prefixes.get(prefix_id)
-            if current is None or any(current[field] != original[field] for field in ("scope_id", "family", "cidr", "parent_id")):
+            fields = ("scope_id", "family", "cidr", "parent_id")
+            if (tuple(original[field] for field in fields) != structure or current is None
+                    or tuple(current[field] for field in fields) != structure):
                 raise ValueError("An original feed prefix changed identity, scope, bounds or hierarchy: " + prefix_id)
 
         # Only transactionally committed scheduler operations can authorize later runs.
