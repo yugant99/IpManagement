@@ -1,6 +1,6 @@
 # Persistent project oversight
 
-**The existing chat titled "Build synthetic inventory demo" remains the project lead across all stages.** Fresh stage chats are implementation workers. They do not inherit or replace overall project ownership. This corrects the earlier wording that rotated the lead chat at each milestone.
+**The original task `01a0b845-6c8d-7021-a5c9-15e673db07c9` remains the project lead across all stages.** It was titled "Build synthetic inventory demo" and is currently titled "Synthetic data builder". Titles may change; they do not reassign ownership. In particular, the current task titled "Overseer" (`01a0b8b9-82fb-7a11-bc50-ec3a5b234729`) is the assigned synthetic-data worker. Use the task registry in `STATUS.md` to route work. Fresh stage tasks implement assigned work and do not replace overall project ownership.
 
 ## Ownership
 
