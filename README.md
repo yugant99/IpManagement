@@ -2,7 +2,7 @@
 
 A planned portable IP address inventory and reconciliation demonstration using synthetic data.
 
-**Current state:** planning is complete; Stage 1 foundation is in progress and a separate synthetic-data lane is prepared for parallel pickup. No application runtime or portable release is accepted yet. Start with [current status](docs/STATUS.md).
+**Current state:** Stage 1 source is submitted in [draft PR #5](https://github.com/yugant99/IpManagement/pull/5); the separate synthetic-data task is active. Main still contains documentation only. No application runtime or portable release is accepted yet. Start with [current status](docs/STATUS.md).
 
 ## Agent pickup
 
