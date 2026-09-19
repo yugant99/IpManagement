@@ -8,6 +8,7 @@ import json
 
 from .errors import AppError
 from .reconciliation import get_run
+from .rules import comparable_findings
 from .workflow import audit_event, require_actor
 
 COLUMNS = ("run_id", "rule_id", "scope_id", "subject", "severity", "evidence_state", "explanation", "proposed_action")
@@ -37,8 +38,9 @@ def compare_runs(connection, before_id, after_id):
         old_state, new_state = (old or {}).get("evidence_state"), (new or {}).get("evidence_state")
         transition = "unchanged" if old_state == new_state else "changed"
         if old_state == "anomalous":
-            transition = "resolved_by_evidence" if new_state == "healthy" else (
-                "still_anomalous" if new_state == "anomalous" else "resolution_unknown")
+            transition = "resolution_unknown" if not comparable_findings(old, new) else (
+                "resolved_by_evidence" if new_state == "healthy" else (
+                    "still_anomalous" if new_state == "anomalous" else "resolution_unknown"))
         elif new_state == "anomalous":
             transition = "new_anomaly"
         changes.append({"rule_id": key[0], "scope_id": key[1], "subject_id": key[2],
