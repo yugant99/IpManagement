@@ -1,0 +1,30 @@
+# Local source analysis and confidential attachments are not public repository content.
+/assessment/
+/private/
+/source_documents/
+*.pptx
+*.xlsx
+*.docx
+
+# Local credentials, state and generated output.
+.env
+.env.*
+!.env.example
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
+/data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+/artifacts/
+/tmp/
+.pytest_cache/
+.ruff_cache/
+coverage/
+.coverage
