@@ -2,7 +2,7 @@
 
 Status: agent-decided design contract. **Not implemented.** The lead records any change here before another lane depends on it. These interfaces remove guesswork; they do not require generic adapter or workflow frameworks.
 
-Contract revision: `demo-v1-planning-75q`. [Implementation decisions](IMPLEMENTATION_DECISIONS.md) supplies the adopted identity, import, calculation, API, workflow and state-operation details. Read your lane's sections. The [75-question record](GRILL_75.md) preserves rationale and corrected proposals; superseded answers never override this contract.
+Contract revision: `demo-v2-questionnaire`. [Implementation decisions](IMPLEMENTATION_DECISIONS.md) supplies identity, import, calculation, API, workflow and state-operation details, with explicit scope changes in [QUESTIONNAIRE_SCOPE_DELTA.md](QUESTIONNAIRE_SCOPE_DELTA.md). The scope delta takes precedence only where it changes earlier exclusions, such as bounded inventory editing, history and the exception queue. The [75-question record](GRILL_75.md) preserves historical rationale; superseded answers never override current contracts.
 
 ## Repository ownership
 
@@ -43,7 +43,7 @@ Common identity: `scope_id`, address family, address/prefix, and applicable time
 
 Each finding response includes ID, rule/version, run ID, scoped subject, severity/state, explanation, input references, evaluated window, limitations and proposed next action. A saved run supplies both overview and detail/export values. Expected fixture labels never select findings.
 
-The immutable saved run also carries capacity, occupancy, p95 value/status/window/sample counts and forecast value/status/basis. Retain old runs and source references for pinned `run_id` reads. Part 4's backend calculation is delivered before Part 3 pressure rules; UI and export only display its saved output. Historical comparison UI remains stretch.
+The immutable saved run also carries capacity, occupancy, p95 value/status/window/sample counts and forecast value/status/basis. Retain old runs and source references for pinned `run_id` reads. Part 4's backend calculation is delivered before Part 3 pressure rules; UI and export only display its saved output. The questionnaire revision prioritizes a bounded two-run comparison using those existing records.
 
 Core input is versioned JSON, limited to 10 MiB/10,000 records. Receipts use exclusive accepted/rejected/duplicate counts that sum to input; identical batch replay has no new effects. Effective completeness accounts for validation failures. See the companion decision sections for batch selection, scope and time rules.
 

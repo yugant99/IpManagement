@@ -1,5 +1,7 @@
 # Coverage target and the 20-hour plan
 
+**Historical baseline, retained for traceability.** The user subsequently made the 111-row questionnaire the primary scorecard. [QUESTIONNAIRE_PRIORITIES.md](QUESTIONNAIRE_PRIORITIES.md) and [QUESTIONNAIRE_ROW_MAP.md](QUESTIONNAIRE_ROW_MAP.md) now control scope: the original 22 goals link to 53 unique requirements; prioritized additions target 65, with two conditional additions to 67 and optional scheduling to 68. All include partial/documentary rows; none is full-compliance credit. The 22/30 percentage below is historical and must not headline progress.
+
 Planning proposal only. No application has been built, tested, or demonstrated. This file contains generic planning identifiers and paraphrases; the private source workbook remains outside the public repository.
 
 ## Two denominators; neither replaces the other

@@ -21,9 +21,10 @@ Spencer's agent starts at [the Part 6 handoff](docs/handoffs/part-6.md). No prio
 
 ## Planning references
 
+- **Current scope:** [questionnaire priorities](docs/QUESTIONNAIRE_PRIORITIES.md), [all 111 rows and gaps](docs/QUESTIONNAIRE_ROW_MAP.md), and [scope changes](docs/QUESTIONNAIRE_SCOPE_DELTA.md). Target 65 addressed rows, two conditional additions to reach 67; these totals include partial and document evidence.
 - [Architecture decisions](docs/ARCHITECTURE.md) and [shared contracts](docs/CONTRACTS.md).
 - [75-question agent review](docs/GRILL_75.md) and [adopted implementation details](docs/IMPLEMENTATION_DECISIONS.md).
-- [Twenty-hour plan and coverage](docs/COVERAGE.md), [demo goals](docs/GOALS.csv), and [full requirement tracking](docs/REQUIREMENT_COVERAGE.csv).
+- [Original twenty-hour coverage baseline](docs/COVERAGE.md), [original goal manifest](docs/GOALS.csv), and [original requirement links](docs/REQUIREMENT_COVERAGE.csv). These preserve the 53-row baseline; the current row map takes precedence for priority.
 - [Work sequence](docs/PLAN.md) and [bounded skill playbook](docs/SKILLS.md).
 
 The demo scorecard and full external questionnaire have different denominators. Neither a planning target nor a simulated integration is proof of delivered requirement coverage.

@@ -1,6 +1,6 @@
 # Part 3: reconciliation and evidence
 
-Owner: rules agent. Core goals: G09–G15. Stretch: G16. Branch: `codex/part-3-reconciliation`.
+Owner: rules agent. Original core: G09–G15. Current questionnaire priority also includes G16's bounded run-history comparison for 071; scheduling 068 remains a later option. Branch: `codex/part-3-reconciliation`, with separate branches per distinct feature.
 
 ## Win
 
@@ -22,4 +22,4 @@ Pressure is p95 occupancy >=80% OR a valid forecast <60 days to full; oversized 
 
 All conditions have evidence, healthy controls and insufficient-evidence controls. Changing eligible inputs changes actual rule outputs. No reclaim/withdraw execution, traffic inference from leases, event bus, collector fleet or broad policy engine.
 
-Handoff: rule definitions/version, run/finding examples, coverage assumptions, calculated sample outputs and actual verification status. Historical comparison UI remains stretch; retaining immutable saved runs and their source references for pinned reads is core.
+Handoff: rule definitions/version, run/finding examples, coverage assumptions, calculated sample outputs and actual verification status. Retain immutable saved runs/source references and prioritize a simple two-run comparison. Unknown evidence cannot resolve a prior anomaly. Import-triggered reconciliation is conditional and calls the same runner; no new engine/service. See `docs/QUESTIONNAIRE_SCOPE_DELTA.md`.
