@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-dhcp-central",
+  "source_run_id": "rich-v1-invalid",
+  "source_kind": "dhcp",
+  "source": {
+    "name": "Fictional Central DHCP export",
+    "owner": "Central Network Team",
+    "authority": "observed",
+    "required_for": [
+      "dhcp_history"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "id": "d99c8136-a15a-56db-843f-403a9f7bebfa",
+      "source_record_id": "dhcp-central-valid-control",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_end_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "8bad8982-e8b3-542e-a581-aef5e1183af0",
+      "source_record_id": "dhcp-central-invalid-1",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": null,
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_end_at": null,
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c89f99c4-7b22-5f8b-a097-4d50e2333c2f",
+      "source_record_id": "dhcp-central-invalid-2",
+      "scope_id": "30a88cec-4639-58d5-9e8c-b849ee7230c2",
+      "family": 4,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_end_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ec1e3adb-540f-5c7c-a4fb-5c1c5b9a1edd",
+      "source_record_id": "dhcp-central-invalid-3",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "address": "10.80.2.999",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_end_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "94de4a14-6782-561d-84ff-8aad988b7cee",
+      "source_record_id": "dhcp-central-invalid-4",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00",
+      "lease_end_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00",
+        "lease_end_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ad425c80-5a41-50cf-b2a3-34cee15e78e4",
+      "source_record_id": "dhcp-central-invalid-5",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-09-02T00:00:00.000Z",
+      "lease_end_at": "2026-09-03T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-09-02T00:00:00.000Z",
+        "lease_end_at": "2026-09-03T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e8edc17f-c11c-5d51-97e5-b45fb3218487",
+      "source_record_id": "dhcp-central-invalid-6",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": "2026-08-01T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_end_at": "2026-08-01T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "72941744-3ac7-5ed2-94ae-14b180665d56",
+      "source_record_id": "dhcp-central-invalid-7",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_end_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d99c8136-a15a-56db-843f-403a9f7bebfa",
+      "source_record_id": "dhcp-central-valid-control",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "address": "10.80.2.10",
+      "client_id": "central-2-client-001",
+      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_end_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    }
+  ]
+}

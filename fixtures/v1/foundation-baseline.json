@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "scenario": "baseline",
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-baseline",
+  "source_run_id": "baseline-v1",
+  "scopes": [
+    {
+      "id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "name": "North",
+      "namespace": "vrf-north",
+      "domain": "demo-core",
+      "region": "North",
+      "managed_cidrs": ["10.40.0.0/16", "2001:db8:40::/48"],
+      "source_record_id": "scope-north"
+    },
+    {
+      "id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "name": "Lab",
+      "namespace": "vrf-lab",
+      "domain": "demo-lab",
+      "region": "Lab",
+      "managed_cidrs": ["10.40.0.0/16"],
+      "source_record_id": "scope-lab"
+    }
+  ],
+  "prefixes": [
+    {
+      "id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b001",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.0.0/16",
+      "parent_id": null,
+      "owner": "North Network Team",
+      "purpose": "Regional IPv4 intended inventory",
+      "tags": ["regional", "ipv4"],
+      "custom_fields": {"planning_region": "North"},
+      "version": 1,
+      "source_record_id": "prefix-north-ipv4-parent"
+    },
+    {
+      "id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b002",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "parent_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b001",
+      "owner": "North Access Team",
+      "purpose": "DHCP intended address pool",
+      "tags": ["access", "dhcp"],
+      "custom_fields": {"service_area": "North access"},
+      "version": 1,
+      "source_record_id": "prefix-north-dhcp"
+    },
+    {
+      "id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b003",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "parent_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b001",
+      "owner": "North Services Team",
+      "purpose": "Locally managed static assignments",
+      "tags": ["services", "static"],
+      "custom_fields": {"service_area": "North services"},
+      "version": 1,
+      "source_record_id": "prefix-north-static"
+    },
+    {
+      "id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b004",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40::/48",
+      "parent_id": null,
+      "owner": "North Network Team",
+      "purpose": "Regional IPv6 intended inventory",
+      "tags": ["regional", "ipv6"],
+      "custom_fields": {"planning_region": "North"},
+      "version": 1,
+      "source_record_id": "prefix-north-ipv6-parent"
+    },
+    {
+      "id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b005",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "parent_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b004",
+      "owner": "North Access Team",
+      "purpose": "Intended regional IPv6 child prefix",
+      "tags": ["access", "ipv6"],
+      "custom_fields": {"service_area": "North access"},
+      "version": 1,
+      "source_record_id": "prefix-north-ipv6-child"
+    },
+    {
+      "id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b006",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "parent_id": null,
+      "owner": "Lab Network Team",
+      "purpose": "Isolated lab intended inventory",
+      "tags": ["lab", "ipv4"],
+      "custom_fields": {"service_area": "Lab"},
+      "version": 1,
+      "source_record_id": "prefix-lab-ipv4"
+    }
+  ],
+  "pools": [
+    {
+      "id": "8821c420-18ea-4caa-9d97-83a331c0c001",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b002",
+      "name": "North DHCP",
+      "management_mode": "dhcp",
+      "allocation_authority": "external",
+      "ranges": [{"start": "10.40.1.1", "end": "10.40.1.254"}],
+      "exclusions": [{"start": "10.40.1.1", "end": "10.40.1.9"}],
+      "pool_version": 1,
+      "source_record_id": "pool-north-dhcp"
+    },
+    {
+      "id": "8821c420-18ea-4caa-9d97-83a331c0c002",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b003",
+      "name": "North static",
+      "management_mode": "static",
+      "allocation_authority": "local",
+      "ranges": [{"start": "10.40.2.1", "end": "10.40.2.14"}],
+      "exclusions": [{"start": "10.40.2.1", "end": "10.40.2.1"}],
+      "pool_version": 1,
+      "source_record_id": "pool-north-static"
+    }
+  ],
+  "allocations": [
+    {
+      "id": "9e855b40-cda4-46c7-99e1-00a8b770d001",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b003",
+      "pool_id": "8821c420-18ea-4caa-9d97-83a331c0c002",
+      "family": 4,
+      "address": "10.40.2.2",
+      "owner": "North Services Team",
+      "purpose": "Synthetic intended service assignment",
+      "source_record_id": "allocation-north-static-service"
+    }
+  ]
+}
