@@ -29,15 +29,15 @@
       "source_record_id": "dhcp-central-valid-control",
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 4,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
-      "lease_start_at": "2026-08-02T00:00:00.000Z",
-      "lease_end_at": "2026-08-08T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
+      "lease_start_at": "2026-08-31T00:00:00.000Z",
+      "lease_end_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
-        "lease_start_at": "2026-08-02T00:00:00.000Z",
-        "lease_end_at": "2026-08-08T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "lease_start_at": "2026-08-31T00:00:00.000Z",
+        "lease_end_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -45,15 +45,15 @@
       "source_record_id": "dhcp-central-invalid-1",
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 4,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
-      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
+      "lease_start_at": "2026-08-31T00:00:00.000Z",
       "lease_end_at": null,
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
-        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_start_at": "2026-08-31T00:00:00.000Z",
         "lease_end_at": null,
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -61,15 +61,15 @@
       "source_record_id": "dhcp-central-invalid-2",
       "scope_id": "30a88cec-4639-58d5-9e8c-b849ee7230c2",
       "family": 4,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
-      "lease_start_at": "2026-08-02T00:00:00.000Z",
-      "lease_end_at": "2026-08-08T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
+      "lease_start_at": "2026-08-31T00:00:00.000Z",
+      "lease_end_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
-        "lease_start_at": "2026-08-02T00:00:00.000Z",
-        "lease_end_at": "2026-08-08T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "lease_start_at": "2026-08-31T00:00:00.000Z",
+        "lease_end_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -78,14 +78,14 @@
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 4,
       "address": "10.80.2.999",
-      "client_id": "central-2-client-001",
-      "lease_start_at": "2026-08-02T00:00:00.000Z",
-      "lease_end_at": "2026-08-08T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "client_id": "central-validation-client",
+      "lease_start_at": "2026-08-31T00:00:00.000Z",
+      "lease_end_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
-        "lease_start_at": "2026-08-02T00:00:00.000Z",
-        "lease_end_at": "2026-08-08T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "lease_start_at": "2026-08-31T00:00:00.000Z",
+        "lease_end_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -93,15 +93,15 @@
       "source_record_id": "dhcp-central-invalid-4",
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 4,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
       "lease_start_at": "2026-08-02T00:00:00",
-      "lease_end_at": "2026-08-08T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "lease_end_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
         "lease_start_at": "2026-08-02T00:00:00",
-        "lease_end_at": "2026-08-08T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "lease_end_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -109,15 +109,15 @@
       "source_record_id": "dhcp-central-invalid-5",
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 4,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
       "lease_start_at": "2026-09-02T00:00:00.000Z",
       "lease_end_at": "2026-09-03T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
         "lease_start_at": "2026-09-02T00:00:00.000Z",
         "lease_end_at": "2026-09-03T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -125,15 +125,15 @@
       "source_record_id": "dhcp-central-invalid-6",
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 4,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
-      "lease_start_at": "2026-08-02T00:00:00.000Z",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
+      "lease_start_at": "2026-08-31T00:00:00.000Z",
       "lease_end_at": "2026-08-01T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
-        "lease_start_at": "2026-08-02T00:00:00.000Z",
+        "lease_start_at": "2026-08-31T00:00:00.000Z",
         "lease_end_at": "2026-08-01T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -141,15 +141,15 @@
       "source_record_id": "dhcp-central-invalid-7",
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 6,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
-      "lease_start_at": "2026-08-02T00:00:00.000Z",
-      "lease_end_at": "2026-08-08T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
+      "lease_start_at": "2026-08-31T00:00:00.000Z",
+      "lease_end_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
-        "lease_start_at": "2026-08-02T00:00:00.000Z",
-        "lease_end_at": "2026-08-08T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "lease_start_at": "2026-08-31T00:00:00.000Z",
+        "lease_end_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     },
     {
@@ -157,15 +157,15 @@
       "source_record_id": "dhcp-central-valid-control",
       "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
       "family": 4,
-      "address": "10.80.2.10",
-      "client_id": "central-2-client-001",
-      "lease_start_at": "2026-08-02T00:00:00.000Z",
-      "lease_end_at": "2026-08-08T00:00:00.000Z",
-      "observed_at": "2026-08-02T00:00:00.000Z",
+      "address": "10.80.2.90",
+      "client_id": "central-validation-client",
+      "lease_start_at": "2026-08-31T00:00:00.000Z",
+      "lease_end_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-31T00:00:00.000Z",
       "original_timestamps": {
-        "lease_start_at": "2026-08-02T00:00:00.000Z",
-        "lease_end_at": "2026-08-08T00:00:00.000Z",
-        "observed_at": "2026-08-02T00:00:00.000Z"
+        "lease_start_at": "2026-08-31T00:00:00.000Z",
+        "lease_end_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-31T00:00:00.000Z"
       }
     }
   ]

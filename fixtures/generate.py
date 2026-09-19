@@ -115,7 +115,7 @@ def envelope(name, scope, kind, records):
 
 def observations(scopes):
     leases = {name: [] for name in scopes}
-    # 410 persistent clients. 328 renew five times, 82 four times: 1,968 intervals.
+    # 410 persistent clients. 328 have five intervals, 82 have four: 1,968 intervals.
     # Stable renewals exercise half-open boundaries without altering occupancy.
     client_index = 0
     for name, octet, subnet, clients in (("North", 40, 1, 150), ("Coastal", 60, 1, 90),
@@ -187,6 +187,11 @@ def policies(data, scopes, prefixes):
         "schema_version": 1, "fixture_contract": "ipam-synthetic-v1", "synthetic": True,
         "demo_clock_at": stamp(CLOCK), "source_id": "synthetic-inventory-policy",
         "source_run_id": "rich-v1-policy", "effective_from_at": stamp(START),
+        "source_kind": "inventory_policy",
+        "source": {"name": "Fictional intended announcement policy", "owner": "Demo Inventory Team",
+                   "authority": "intended_policy", "required_for": ["route_policy"]},
+        "coverage": [{"scope_id": s["id"], "kind": "snapshot", "window_start_at": stamp(CLOCK),
+                      "window_end_at": stamp(CLOCK), "declared_complete": True} for s in data["scopes"]],
         "records": [{"source_record_id": "policy-" + p["source_record_id"],
                      "prefix_id": p["id"], "scope_id": p["scope_id"],
                      "expects_announcement": p["id"] in by_id,
@@ -224,9 +229,10 @@ def variants(batches):
     ):
         batch = deepcopy(batches[key])
         batch["source_run_id"] = "rich-v1-invalid"
-        good = deepcopy(batch["records"][0])
-        good["id"] = uid(f"{key}-valid-control")
-        good["source_record_id"] = f"{key}-valid-control"
+        fields = ({"address": "10.80.2.90", "client_id": "central-validation-client"}
+                  if key == "dhcp-central" else {"cidr": "10.80.5.0/24", "router_id": "central-validation-router"})
+        good = evidence_row(f"{key}-valid-control", batch["coverage"][0]["scope_id"], 4,
+                            CLOCK - timedelta(days=1), CLOCK + timedelta(days=1), batch["source_kind"], **fields)
         batch["records"] = [good]
         for index, changes in enumerate(mutations, 1):
             record = deepcopy(good)
@@ -242,14 +248,54 @@ def variants(batches):
     write("opt-in/dhcp-north-changed-replay.json", replay)
 
 
+def first_path(policy):
+    baseline = json.loads((ROOT / "foundation-baseline.json").read_text(encoding="utf-8"))
+    scopes = {s["name"]: s["id"] for s in baseline["scopes"]}
+    prefix_ids = {p["id"] for p in baseline["prefixes"]}
+    subset = deepcopy(policy)
+    subset.update(source_id="synthetic-first-path-policy", source_run_id="first-path-v1-policy")
+    subset["coverage"] = [c for c in subset["coverage"] if c["scope_id"] in scopes.values()]
+    subset["records"] = [r for r in subset["records"] if r["prefix_id"] in prefix_ids]
+    for record in subset["records"]:
+        record["expects_announcement"] = record["source_record_id"] in (
+            "policy-prefix-north-dhcp", "policy-prefix-lab-ipv4")
+        record["route_match_policy"] = "exact"
+    write("first-path/inventory-policy.json", subset)
+    for name in ("North", "Lab"):
+        route = evidence_row(f"first-path-route-{name.lower()}", scopes[name], 4,
+                             START, CLOCK + timedelta(days=1), "routing",
+                             cidr="10.40.1.0/24", router_id=f"{name.lower()}-first-path-router")
+        batch = envelope(name, scopes[name], "routing", [route] if name == "North" else [])
+        batch.update(source_id=f"synthetic-first-path-routing-{name.lower()}", source_run_id="first-path-v1-complete")
+        write(f"first-path/routing-{name.lower()}.json", batch)
+        if name == "Lab":
+            for variant in ("partial", "stale", "recovery"):
+                changed = deepcopy(batch)
+                changed["source_run_id"] = f"first-path-v1-{variant}"
+                if variant == "partial":
+                    changed["coverage"][0]["declared_complete"] = False
+                elif variant == "stale":
+                    changed["coverage"][0]["window_end_at"] = stamp(CLOCK - timedelta(minutes=10))
+                else:
+                    changed["records"] = [route]
+                write(f"first-path/routing-lab-{variant}.json", changed)
+    subset["source_run_id"] = "first-path-v1-policy-lab-partial"
+    subset["coverage"] = [c for c in subset["coverage"] if c["scope_id"] == scopes["Lab"]]
+    subset["coverage"][0]["declared_complete"] = False
+    subset["records"] = []
+    write("first-path/inventory-policy-lab-partial.json", subset)
+
+
 def main():
     data, scopes, prefixes = inventory()
     write("inventory.json", data)
-    write("inventory-policy.json", policies(data, scopes, prefixes))
+    policy = policies(data, scopes, prefixes)
+    write("inventory-policy.json", policy)
     batches = observations(scopes)
     for key, batch in batches.items():
         write(f"observations/{key}.json", batch)
     variants(batches)
+    first_path(policy)
     counts = {group: len(data[group]) for group in ("scopes", "prefixes", "pools", "allocations")}
     counts.update(dhcp_lease_intervals=sum(len(b["records"]) for b in batches.values() if b["source_kind"] == "dhcp"),
                   routing_observations=sum(len(b["records"]) for b in batches.values() if b["source_kind"] == "routing"))
@@ -262,6 +308,12 @@ def main():
         "default_inputs": ["inventory.json", "inventory-policy.json"] +
                           [f"observations/{key}.json" for key in batches],
         "opt_in_inputs": [name for name in FILES if name.startswith("opt-in/")],
+        "first_path": {
+            "inventory_dependency": "foundation-baseline.json",
+            "default_inputs": ["first-path/inventory-policy.json", "first-path/routing-north.json", "first-path/routing-lab.json"],
+            "opt_in_inputs": ["first-path/routing-lab-partial.json", "first-path/routing-lab-stale.json",
+                              "first-path/routing-lab-recovery.json", "first-path/inventory-policy-lab-partial.json"],
+        },
         "counts": counts, "generated_files": dict(FILES),
         "provenance": "Entirely fictional. Baseline rows copied unchanged; added IDs use fixed UUIDv5 names. No network or customer input.",
     })

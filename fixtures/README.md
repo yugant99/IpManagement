@@ -15,6 +15,7 @@ The default set has four scopes, 60 prefixes, eight pools, one preserved intende
 - [`../docs/SYNTHETIC_DATA.md`](../docs/SYNTHETIC_DATA.md): scenarios, numeric expectations, provenance and integration boundary.
 - [`v1/expected-outcomes.json`](v1/expected-outcomes.json): independently authored comparison oracle, **never a detection input**. The generator neither reads nor writes it.
 - [`v1/foundation-baseline.json`](v1/foundation-baseline.json): unchanged published Stage 1 seed snapshot; the generator reads it but never overwrites it.
+- [`v1/first-path/`](v1/first-path/): separate Stage 2 recipe for the existing foundation ledger: North route present, Lab route absent, and partial/stale/recovery controls. Use `pack.json.first_path`'s explicit lists.
 
 Do not glob every JSON file into an importer. Only `pack.json.default_inputs` describes the default source set. `opt-in/` contains intentional partial/stale/invalid variants and a changed-replay conflict. The preserved baseline is a provenance dependency, not an additional batch to apply alongside the richer inventory.
 

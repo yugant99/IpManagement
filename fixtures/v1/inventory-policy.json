@@ -6,6 +6,45 @@
   "source_id": "synthetic-inventory-policy",
   "source_run_id": "rich-v1-policy",
   "effective_from_at": "2026-08-02T00:00:00.000Z",
+  "source_kind": "inventory_policy",
+  "source": {
+    "name": "Fictional intended announcement policy",
+    "owner": "Demo Inventory Team",
+    "authority": "intended_policy",
+    "required_for": [
+      "route_policy"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "kind": "snapshot",
+      "window_start_at": "2026-09-01T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    },
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "kind": "snapshot",
+      "window_start_at": "2026-09-01T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    },
+    {
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "kind": "snapshot",
+      "window_start_at": "2026-09-01T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    },
+    {
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "kind": "snapshot",
+      "window_start_at": "2026-09-01T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
   "records": [
     {
       "source_record_id": "policy-prefix-north-ipv4-parent",
