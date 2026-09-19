@@ -54,7 +54,7 @@ def calculate_pools(connection, views, clock_text):
                   "scope_name": prefix["scope_name"], "family": pool["family"], "cidr": prefix["cidr"],
                   "name": pool["name"], "management_mode": pool["management_mode"],
                   "pool_version": pool["pool_version"], "capacity": pool["capacity"],
-                  "input_references": [reference(view) for view in candidates],
+                  "input_references": [{"kind": "inventory", **pool["origin"]}] + [reference(view) for view in candidates],
                   "coverage": [view["coverage"] for view in candidates],
                   "current": {"status": "unavailable", "at": clock_text, "occupied_addresses": None,
                               "utilization_pct": None, "positive_observed_addresses": None},
@@ -65,7 +65,7 @@ def calculate_pools(connection, views, clock_text):
                   "forecast": {"status": "unavailable", "days_to_full": None, "estimated_full_at": None,
                                "slope_addresses_per_day": None, "baseline_addresses": None,
                                "complete_days": 0, "daily_p95": [], "method": "ordinary_least_squares"},
-                  "history": [], "lease_overlap_30d": None,
+                  "history": [], "lease_overlap_30d": None, "out_of_range_observations": [],
                   "limitations": ["Synthetic lease occupancy is not traffic; hourly samples are an illustrative approximation.",
                                   "Counts use distinct assignable addresses; renewals and conflicting clients do not inflate occupancy."]}
         results.append(metric)
@@ -97,6 +97,12 @@ def calculate_pools(connection, views, clock_text):
                 continue
             address = int(ip_address(typed["address"]))
             if not any(left <= address <= right for left, right in intervals):
+                if (ip_address(typed["address"]) in ip_network(prefix["cidr"])
+                        and instant(typed["observed_at"]) <= clock
+                        and instant(typed["lease_start_at"]) <= clock < instant(typed["lease_end_at"])):
+                    metric["out_of_range_observations"].append({"address": typed["address"],
+                        "client_id": typed["client_id"], "input_reference": reference(view, record)})
+                    metric["input_references"].append(reference(view, record))
                 continue
             if instant(typed["observed_at"]) <= clock:
                 leases.append((address, instant(typed["lease_start_at"]), instant(typed["lease_end_at"])))
@@ -155,6 +161,8 @@ def calculate_pools(connection, views, clock_text):
             forecast["reason"] = "missing_complete_current_evidence"
         elif current >= capacity:
             forecast.update(status="exhausted", days_to_full=0, baseline_addresses=str(current))
+        elif daily and int(daily[-1]["occupied_addresses"]) >= capacity:
+            forecast.update(status="exhausted", days_to_full=0, baseline_addresses=daily[-1]["occupied_addresses"])
         elif len(daily) < 14:
             forecast["reason"] = "fewer_than_14_consecutive_complete_days"
         else:

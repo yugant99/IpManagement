@@ -52,14 +52,24 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
         pressure = _finding(run_id, clock_text, "pool_pressure", subject, list(metric["input_references"]), metric["coverage"])
         oversized = _finding(run_id, clock_text, "oversized_pool", subject, list(metric["input_references"]), metric["coverage"], "warning")
         zombie = _finding(run_id, clock_text, "zombie_candidate", subject, list(metric["input_references"]), metric["coverage"], "warning")
-        for finding in (pressure, oversized, zombie):
+        out_of_range = _finding(run_id, clock_text, "pool_assignment_discrepancy", subject,
+                                list(metric["input_references"]), metric["coverage"])
+        out_of_range["observations"] = metric["out_of_range_observations"]
+        for finding in (pressure, oversized, zombie, out_of_range):
             finding["calculation_pool_id"] = metric["pool_id"]
+        for finding in (pressure, oversized, zombie):
             finding["evaluated_window"].update(kind="interval", start_at=stamp(window_start))
-        findings.extend((pressure, oversized, zombie))
+        findings.extend((pressure, oversized, zombie, out_of_range))
         if metric["management_mode"] != "dhcp" or metric["family"] != 4:
-            for finding in (pressure, oversized, zombie):
+            for finding in (pressure, oversized, zombie, out_of_range):
                 _state(finding, "not_applicable", "This rule is limited to DHCP-managed IPv4 pools.")
             continue
+        if out_of_range["observations"]:
+            _state(out_of_range, "anomalous", "Fresh current DHCP claims lie inside this pool's intended prefix but outside its assignable ranges or within exclusions; they do not change the capacity denominator.")
+        elif metric["current"]["status"] == "available":
+            _state(out_of_range, "healthy", "The complete fresh view has no current DHCP claims outside this pool's assignable ranges within its prefix.")
+        else:
+            out_of_range["explanation"] = "No positive out-of-range claim is accepted; complete fresh unambiguous evidence and valid capacity are required for a healthy control."
         p95_warning = p95["utilization_pct"] >= 80 if p95["status"] == "available" else None
         forecast_warning = (forecast["days_to_full"] < 60 if forecast["status"] in ("available", "beyond_horizon", "exhausted")
                             else False if forecast["status"] == "no_positive_growth" else None)
