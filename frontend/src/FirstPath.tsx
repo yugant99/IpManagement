@@ -235,8 +235,11 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
     setImportError(null);
     try {
       if (file.size > 10 * 1024 * 1024) throw new ApiError("Choose a JSON file no larger than 10 MiB.", "FILE_TOO_LARGE");
-      const body = await file.text();
+      const bytes = await file.arrayBuffer();
       if (controller.signal.aborted) return;
+      let body: string;
+      try { body = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes); }
+      catch { throw new ApiError("The selected file is not valid UTF-8. No upload was sent; save the source as UTF-8 JSON and try again.", "INVALID_ENCODING"); }
       try { JSON.parse(body); } catch { throw new ApiError("The selected file is not valid JSON. No upload was sent.", "INVALID_JSON"); }
       const result = await uploadSource(body, controller.signal);
       if (controller.signal.aborted) return;
