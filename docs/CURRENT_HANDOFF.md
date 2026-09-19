@@ -2,7 +2,7 @@
 
 **The bounded Stage 5 local test run is complete and accepted: 14 observed passes, two partial scenarios, no observed application defect.** All acceptance-owned services are stopped. This is scoped local runtime acceptance, not final portable release acceptance.
 
-Persistent lead remains **`01a0b845-6c8d-7021-a5c9-15e673db07c9`**. Read [Stage 5 lead review](handoffs/stage-05-lead-review.md) for the exact evidence and limits.
+**Next task: Main Lead 2.0**, explicitly authorized by the user as replacement lead. Read [the complete transfer record](handoffs/main-lead-2.0.md); receiver task ID is pending registration. Outgoing `01a0b845-6c8d-7021-a5c9-15e673db07c9` becomes reference-only after publication, and its monitor is paused pending reattachment. Read [Stage 5 lead review](handoffs/stage-05-lead-review.md) for unchanged evidence and limits.
 
 ## Exact checkpoint
 
@@ -24,4 +24,4 @@ Next owner actions: lead coordinates application integration and adjudicates the
 
 Final acceptance must also retain [the DOCX phase-section evidence and gaps](PHASE_COVERAGE.md). Selected synthetic mechanisms support parts of both phases; neither the validated customer Phase 1 assessment nor the full Phase 2 transformation is complete. This is a separate scope view, not extra questionnaire credit or a new feature assignment.
 
-Keep the existing Stage 5 task for concrete evidence follow-ups and existing Stage 3/Stage 4/core/data tasks for their owned defects. No defect was found to route from this run. Do not create another acceptance task, restart planning, or rotate project lead. The temporary heartbeat remains read-only and reports only meaningful new progress.
+Keep the existing Stage 5 task for concrete evidence follow-ups and existing Stage 3/Stage 4/core/data tasks for their owned defects. No defect was found to route from this run. Do not create another acceptance task or restart planning. Lead replacement is limited to the explicitly authorized Main Lead 2.0 transfer; the temporary heartbeat is paused until correctly reattached and retains its read-only limits.
