@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from importlib.resources import files
 from ipaddress import ip_address, ip_network
 import json
+from pathlib import Path
 from uuid import UUID
 
 from .errors import AppError
@@ -115,6 +116,43 @@ def seed_baseline(directory) -> dict:
     except (ValueError, KeyError, TypeError, OSError) as exc:
         raise AppError("INVALID_BASELINE", "Packaged baseline could not be loaded or validated.", status=500,
                        details={"reason": str(exc)}) from exc
+    return _install_seed(directory, envelope)
+
+
+def seed_rich(directory, inventory_path) -> dict:
+    """Explicit fresh-store setup from the separately owned rich fixture file.
+
+    The CLI owner wires this helper; normal startup and baseline seeding never
+    select a richer inventory implicitly. Source files are never modified.
+    """
+    try:
+        path = Path(inventory_path).expanduser().resolve()
+        with path.open("rb") as source:
+            body = source.read(10 * 1024 * 1024 + 1)
+        if len(body) > 10 * 1024 * 1024:
+            raise ValueError("Rich inventory exceeds the 10 MiB limit")
+        envelope = json.loads(body)
+        if (envelope.get("source_id"), envelope.get("source_run_id")) != ("synthetic-inventory-rich", "rich-v1-inventory"):
+            raise ValueError("Select the explicit synthetic-inventory-rich / rich-v1-inventory fixture")
+        if sum(len(envelope[group]) for group in ("scopes", "prefixes", "pools", "allocations")) > 10000:
+            raise ValueError("Rich inventory exceeds 10,000 records")
+        baseline = json.loads(files("ipam_demo").joinpath("data/baseline.json").read_text(encoding="utf-8"))
+        if envelope["demo_clock_at"] != baseline["demo_clock_at"]:
+            raise ValueError("Rich inventory must preserve the original demo clock")
+        for group in ("scopes", "prefixes", "pools", "allocations"):
+            records = {record["id"]: record for record in envelope[group]}
+            if any(records.get(record["id"]) != record for record in baseline[group]):
+                raise ValueError(f"Rich inventory must preserve every original {group} record and ID")
+        _validate(envelope)
+    except (ValueError, KeyError, TypeError, AttributeError, OSError) as exc:
+        raise AppError("INVALID_RICH_INVENTORY", "Rich inventory could not be loaded or validated.", 422,
+                       {"reason": str(exc)}) from exc
+    result = _install_seed(directory, envelope)
+    result["setup_mode"] = "rich"
+    return result
+
+
+def _install_seed(directory, envelope) -> dict:
     ingested_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     def origin(record):
         return json.dumps({"source_id": envelope["source_id"], "source_run_id": envelope["source_run_id"],
@@ -152,7 +190,8 @@ def seed_baseline(directory) -> dict:
                 "UPDATE app_meta SET initialized=1, baseline_version=1, scenario=?, demo_clock_at=?, seeded_at=?, seed_envelope=? WHERE singleton=1",
                 (envelope["scenario"], envelope["demo_clock_at"], ingested_at, json.dumps(envelope, sort_keys=True)),
             )
-    return {"status": "seeded", "scenario": "baseline", "synthetic": True, "database": str(path),
+    return {"status": "seeded", "scenario": envelope["scenario"], "synthetic": True, "database": str(path),
+            "source_id": envelope["source_id"], "source_run_id": envelope["source_run_id"],
             "demo_clock_at": envelope["demo_clock_at"], "ingested_at": ingested_at,
             "counts": {group: len(envelope[group]) for group in ("scopes", "prefixes", "pools", "allocations")}}
 
