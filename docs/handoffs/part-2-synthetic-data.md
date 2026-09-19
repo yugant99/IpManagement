@@ -2,6 +2,66 @@
 
 **READY FOR PROJECT-LEAD REVIEW — Synthetic data**
 
+## Current addition: evolving feed for scheduled ingestion
+
+The user's later instruction requires an evolving synthetic feed fetched every
+six hours (configurable), plus **Run now**. This supersedes scheduling deferral;
+it does not authorize application execution or change the original data ownership
+boundary. The lead finalized the provider/scheduler contract directly with the
+data and application owners.
+
+- Existing worktree: `/Users/yuganthareshsoni/Downloads/Ip_inventory-synthetic-data`.
+  New feature branch: `codex/part-2-evolving-feed`, starting at exact Stage 3
+  `c2629fbf6516a744e65c52a424700563c0f4a0a2` (PR #18). The previous data branch
+  and checkpoint remain preserved; no worktree was recreated.
+- Owned code: `fixtures/evolving/ipam_synthetic_feed/__init__.py`. The fixture-local
+  README and independent expected manifest accompany the source; only these
+  fixture paths and the two existing data documents change.
+- Interface: `build_cycle(index: int, baseline_envelopes: list[dict]) -> dict`,
+  returning `feed_version`, `cycle_id`, `cycle_index`, `demo_clock_at`, `envelopes`.
+  Nine source envelopes per cycle: one policy, four DHCP, four routing. Same
+  immutable inputs/index yield the same content; no file/DB/network/wall-clock
+  access, writes or expected-manifest dependency. This is implementation intent
+  from source inspection, not executed determinism evidence.
+- Dependencies: immutable rich v1 policy and eight observation inputs; existing
+  `ipam-synthetic-v1` envelope shape and rich logical source IDs; explicit seed
+  UUIDs/clock preserved. Wrapper metadata stays outside importer envelopes.
+  Index zero is a reference; scheduled/manual advancement starts at one. The
+  two-day event pattern repeats without rewinding time through index 1460, then
+  raises a visible scenario-exhaustion error.
+- Source scenarios: Coastal arrivals/renewals/expiry and full current pool;
+  North route withdrawal at its original declared expiry, partial empty export
+  and complete recovery; Lab route recovery and new conflicting principals;
+  Central additional ghost/unregistered observations and stale/fresh sources.
+  Preserve complete rolling interval history, missing evidence and slow-moving
+  historical metrics. See the [timeline](../../fixtures/evolving/README.md).
+- Scheduler/application owner must include the fixture package in the existing
+  wheel normally, read pinned v1 assets through `IPAM_SYNTHETIC_FEED_DIR`, and
+  own all shared app/schema/UI/startup changes. Spencer owns packaging the assets.
+  No dynamic execution, runtime path injection, second recipe or copied baseline
+  is needed. Existing static imports retain their behavior.
+- Required orchestration: reject incompatible inventory/mixed source authority;
+  one existing shared run lock and immediate transaction for clock, all nine
+  imports, calculation, exceptions and committed cursor. A failure rolls back
+  the cycle; record that failure separately and retry the same index. Intentional
+  incomplete North coverage remains accepted unknown evidence; unexpected row
+  rejects must fail the cycle. Default wall interval is six hours; after downtime
+  make one due attempt without backlog catch-up. Feed generation itself has no
+  scheduling or cursor side effects.
+- Checks/evidence: source/document/Git review only. **No provider execution,
+  generator runs, tests, smoke/type/compile checks, builds, imports, scheduler,
+  application or infrastructure execution.** No generated evolving counts,
+  live fetches, receipts, saved calculations or questionnaire credit are claimed.
+- Published source SHA/PR are recorded in the worker's final handoff after the
+  coherent source/doc commits. This PR targets the Stage 3 branch and remains
+  unmerged; the lead pins its reviewed SHA for the separate scheduler lane.
+
+Next integration step: lead review of this exact provider checkpoint, then the
+assigned scheduler agent's adapter/package/atomic orchestration/UI implementation.
+No backend/frontend, dependency/lock, shared schema, packaging or global status
+files were edited by this data worker. The original completed pack is recorded
+below as historical context; its Stage 1/2 limitations do not redefine Stage 3.
+
 ## Owner, checkout and published checkpoint
 
 - Lane owner: data task `01a0b8b9-82fb-7a11-bc50-ec3a5b234729`, originally **Build IPAM synthetic data pack**. Sidebar titles changed during coordination; use this ID and branch to identify the owner.

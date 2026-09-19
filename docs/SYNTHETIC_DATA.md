@@ -1,5 +1,46 @@
 # Synthetic data pack v1
 
+## Evolving feed addition (source only)
+
+The later scheduled-fetch requirement adds the pure Python package
+[`ipam_synthetic_feed`](../fixtures/evolving/ipam_synthetic_feed/__init__.py), with
+its [interface and timeline](../fixtures/evolving/README.md) and a separate
+[authored comparison manifest](../fixtures/evolving/expected-outcomes.json).
+The original generator and every `fixtures/v1/` artifact remain unchanged.
+
+`build_cycle(index, baseline_envelopes)` accepts the original policy plus eight
+rich observation envelopes, without reading files or application state. It returns
+nine importer-shaped envelopes and explicit cycle/time metadata. Index zero is a
+reference; the scheduler starts with index one at `2026-09-01T06:00:00.000Z`.
+Each successful cycle advances six **simulated** hours, independently of the
+configurable real fetch interval (default six hours). Manual **Run now** consumes
+the next cycle. The provider does not schedule anything itself.
+
+The recipe adds real changes to fictional observations: sequential renewals,
+arrivals and expiry, North route withdrawal/partial export/recovery, Lab route
+recovery, additional Central unregistered observations, stale-source recovery and
+new overlapping Lab claims. Existing rich logical source IDs continue with new
+`evolving-v1-NNNNNN` run identities. UUIDs for new intervals derive from stable
+event identities. Original intervals are retained unchanged until they leave the
+rolling 30-day window; timestamps are never shifted to manufacture fresh history.
+The eight-step story repeats on increasing time, with a visible upper bound of
+365 simulated days rather than a silent cursor rewind. Thirty-day p95 and historical
+conflict findings need not disappear when current occupancy changes.
+
+The application lane owns normal package inclusion, the baseline-file adapter
+using `IPAM_SYNTHETIC_FEED_DIR`, schedule storage/UI and one atomic
+clock/import/calculation/exception/cursor transaction. It must validate the pinned
+original assets and the rich inventory, refuse mixed first-path/foreign authority,
+use the existing shared run lock, and retry a failed cycle at the same index.
+Expected outcome labels must never enter the provider or that transaction.
+The complete integration contract is in the fixture-local README; this source
+does not change backend schemas, startup, the import API or intended allocations.
+
+**Evidence boundary:** this addition was authored and source-reviewed only.
+No evolving batches have been generated or imported; no recipe, tests, builds,
+scheduler or application runtime has been executed. The existing generated counts
+below describe the frozen v1 pack, not executed evolving-feed outputs.
+
 Actual generated inputs are in [`fixtures/v1/`](../fixtures/v1/), with the [standard-library generator](../fixtures/generate.py), [field contract](../fixtures/SCHEMA.md), [file/count/hash index](../fixtures/v1/pack.json) and independent [expected outcomes](../fixtures/v1/expected-outcomes.json). These artifacts are implemented; app import, calculations and rule execution have **not** been demonstrated.
 
 The fixed clock is **2026-09-01T00:00:00.000Z**. History spans `[2026-08-02T00:00:00.000Z, 2026-09-01T00:00:00.000Z)`, exactly 30 days. Final validity intervals extend past the clock to support current presence. Ingestion timestamps belong to the eventual application, not the fixture generator.
