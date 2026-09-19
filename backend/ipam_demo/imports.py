@@ -257,11 +257,73 @@ def _stage_inventory(connection, envelope, raw_envelope):
     if clock != _timestamp(meta["demo_clock_at"], "seeded demo_clock_at"):
         raise ValueError("demo_clock_at must equal the seeded inventory clock")
     try:
+        row_fields = {
+            "scopes": {"id", "name", "namespace", "domain", "region", "managed_cidrs", "source_record_id"},
+            "prefixes": {"id", "scope_id", "family", "cidr", "parent_id", "owner", "purpose", "tags", "custom_fields", "version", "source_record_id"},
+            "pools": {"id", "scope_id", "prefix_id", "name", "management_mode", "allocation_authority", "ranges", "exclusions", "pool_version", "source_record_id"},
+            "allocations": {"id", "scope_id", "prefix_id", "pool_id", "family", "address", "owner", "purpose", "source_record_id"},
+        }
         for group in groups:
+            identifiers, references = set(), set()
             for record in envelope[group]:
-                if not isinstance(record, dict):
-                    raise ValueError("Each intended inventory row must be an object")
-                _text(record["source_record_id"], "source_record_id")
+                _fields(record, row_fields[group], group + " row")
+                identifier = _uuid(record["id"], "id")
+                source_reference = _text(record["source_record_id"], "source_record_id")
+                if identifier in identifiers or source_reference in references:
+                    raise ValueError(f"{group} contains duplicate row IDs or source record identities")
+                identifiers.add(identifier)
+                references.add(source_reference)
+                for field in ("scope_id", "prefix_id", "parent_id", "pool_id"):
+                    if field in record and record[field] is not None:
+                        _uuid(record[field], field)
+                for field in ("owner", "purpose"):
+                    if field in record and (not isinstance(record[field], str) or len(record[field]) > 512):
+                        raise ValueError(f"{field} must be a string of at most 512 characters; blank metadata is retained")
+                if "family" in record and (type(record["family"]) is not int or record["family"] not in (4, 6)):
+                    raise ValueError("family must be integer 4 or 6")
+        namespaces = set()
+        for record in envelope["scopes"]:
+            for field in ("name", "namespace", "domain", "region"):
+                _text(record[field], field, 200)
+            if record["namespace"] in namespaces:
+                raise ValueError("Scope namespaces must be unique")
+            namespaces.add(record["namespace"])
+            if not isinstance(record["managed_cidrs"], list) or not record["managed_cidrs"]:
+                raise ValueError("managed_cidrs must explicitly declare at least one network")
+            for cidr in record["managed_cidrs"]:
+                if not isinstance(cidr, str) or "/" not in cidr or "%" in cidr:
+                    raise ValueError("managed_cidrs must contain explicit network CIDRs without zone identifiers")
+                ip_network(cidr, strict=True)
+        for record in envelope["prefixes"]:
+            if type(record["version"]) is not int or record["version"] < 1:
+                raise ValueError("Prefix version must be a positive integer")
+            if not isinstance(record["tags"], list):
+                raise ValueError("Prefix tags must be an array")
+            if not isinstance(record["cidr"], str) or "/" not in record["cidr"] or "%" in record["cidr"]:
+                raise ValueError("Prefix cidr must be an explicit network without a zone identifier")
+        for record in envelope["pools"]:
+            _text(record["name"], "name", 200)
+            if record["management_mode"] not in ("dhcp", "static"):
+                raise ValueError("management_mode must be dhcp or static")
+            if record["allocation_authority"] not in ("local", "external"):
+                raise ValueError("allocation_authority must be local or external")
+            if type(record["pool_version"]) is not int or record["pool_version"] < 1:
+                raise ValueError("Pool version must be a positive integer")
+            for field in ("ranges", "exclusions"):
+                if not isinstance(record[field], list):
+                    raise ValueError(f"{field} must be an array")
+                for value in record[field]:
+                    _fields(value, {"start", "end"}, field)
+                    if any(not isinstance(value[bound], str) or "%" in value[bound] for bound in ("start", "end")):
+                        raise ValueError("Range bounds must be IP strings without zone identifiers")
+        allocation_keys = set()
+        for record in envelope["allocations"]:
+            if not isinstance(record["address"], str) or "%" in record["address"]:
+                raise ValueError("Allocation address must be an IP string without a zone identifier")
+            key = (_uuid(record["scope_id"], "scope_id"), record["family"], str(ip_address(record["address"])))
+            if key in allocation_keys:
+                raise ValueError("Intended allocations must be unique by scope, family and address")
+            allocation_keys.add(key)
         _validate(envelope)
     except (KeyError, TypeError, AttributeError, RecursionError) as exc:
         raise ValueError("Intended inventory is missing required fields or contains invalid field types") from exc
