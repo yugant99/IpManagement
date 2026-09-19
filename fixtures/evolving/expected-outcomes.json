@@ -1,0 +1,128 @@
+{
+  "feed_version": "ipam-evolving-v1",
+  "evidence_status": "Independently authored source-only expectations; no evolving outputs generated and no imports, calculations, tests, builds or runtime checks executed.",
+  "use": "Comparison only after the application independently produces results. Never a generator, importer, calculator, detector, scheduler or UI input.",
+  "reference_clock_at": "2026-09-01T00:00:00.000Z",
+  "cycle_contract": {
+    "step_hours": 6,
+    "reference_index": 0,
+    "first_advance_index": 1,
+    "last_supported_index": 1460,
+    "last_supported_clock_at": "2027-09-01T00:00:00.000Z",
+    "exhaustion": "Index 1461 and higher raises ValueError; do not rewind or silently reuse an earlier cycle.",
+    "cycle_id_template": "evolving-v1-{index:06d}",
+    "event_period_hours": 48,
+    "history_days": 30,
+    "interval_bounds": "Half-open: start <= clock < end.",
+    "source_selection": "The new accepted run for each stable source replaces its previous selected batch; never union old selected batches or fall back to complete predecessors.",
+    "identities": "Every cycle has new source_run_id values for all nine envelopes; repeated calls with the same index and baseline inputs are deterministic. Later event episodes use later timestamps and distinct interval identities.",
+    "input_roles": "Exact rich-v1 policy plus eight default DHCP/routing observation envelopes only. No inventory, pack index, first-path, opt-in or expected-answer inputs.",
+    "output_order": [
+      "synthetic-inventory-policy",
+      "synthetic-dhcp-north",
+      "synthetic-dhcp-coastal",
+      "synthetic-dhcp-central",
+      "synthetic-dhcp-lab",
+      "synthetic-routing-north",
+      "synthetic-routing-coastal",
+      "synthetic-routing-central",
+      "synthetic-routing-lab"
+    ]
+  },
+  "current_occupancy": {
+    "scope": "Coastal",
+    "pool_source_record_id": "pool-coastal-access-1",
+    "prefix": "10.60.1.0/24",
+    "capacity": "100",
+    "basis": "Distinct active addresses at the selected demo clock, not interval count or monthly p95.",
+    "first_cycles": [
+      {"cycle_index": 0, "elapsed_hours": 0, "occupied": "90"},
+      {"cycle_index": 1, "elapsed_hours": 6, "occupied": "96"},
+      {"cycle_index": 2, "elapsed_hours": 12, "occupied": "96"},
+      {"cycle_index": 3, "elapsed_hours": 18, "occupied": "90"},
+      {"cycle_index": 4, "elapsed_hours": 24, "occupied": "90"},
+      {"cycle_index": 5, "elapsed_hours": 30, "occupied": "100"},
+      {"cycle_index": 6, "elapsed_hours": 36, "occupied": "100"},
+      {"cycle_index": 7, "elapsed_hours": 42, "occupied": "90"},
+      {"cycle_index": 8, "elapsed_hours": 48, "occupied": "90"}
+    ],
+    "repeat": "After the reference, the same current-count phases recur every eight cycles with later event identities.",
+    "renewal_control": "The six-client cohort renews exactly at hour 12+48k without overlap or double-counting, then expires at hour 18+48k.",
+    "history_limit": "Do not copy current occupancy into p95 or forecast. These values must be calculated from the complete rolling history; historical pressure does not instantly clear on departure."
+  },
+  "scenarios": [
+    {
+      "id": "north-route-withdrawal-unknown-recovery",
+      "scope": "North",
+      "subject": "10.40.1.0/24",
+      "source_id": "synthetic-routing-north",
+      "first_cycles": [
+        {"cycle_index": 0, "expect": "Fresh complete evidence contains the current expected exact route."},
+        {"cycle_index": 4, "expect": "Fresh complete evidence lacks the expected exact route after expiry at hour 24; missing_expected_route is supported."},
+        {"cycle_index": 5, "expect": "The new selected batch is empty and declared incomplete. Route absence is unknown; do not resolve the earlier finding or use its complete predecessor."},
+        {"cycle_index": 6, "expect": "Fresh complete evidence contains the exact route starting at hour 36; eligible recovery can resolve the missing-route finding."}
+      ],
+      "repeat": "Route episodes are [36+48k,72+48k); subsequent gaps are [72+48k,84+48k). The North routing batch is incomplete at hour 30+48k, for k >= 0."
+    },
+    {
+      "id": "lab-route-recovery",
+      "scope": "Lab",
+      "subject": "10.40.2.0/24",
+      "source_id": "synthetic-routing-lab",
+      "first_cycles": [
+        {"cycle_index": 0, "expect": "Fresh complete evidence lacks the expected exact route; missing_expected_route is supported."},
+        {"cycle_index": 6, "expect": "The exact route starts at hour 36 under fresh complete evidence; eligible recovery can resolve its missing-route finding."}
+      ],
+      "repeat": "Contiguous intervals [36+48k,84+48k) preserve current presence from hour 36 onward; meeting boundaries are not withdrawals."
+    },
+    {
+      "id": "central-new-discrepancy-stale-recovery",
+      "scope": "Central",
+      "address": "10.80.243.10",
+      "route": "10.80.243.0/24",
+      "source_ids": ["synthetic-dhcp-central", "synthetic-routing-central"],
+      "first_cycles": [
+        {"cycle_index": 5, "expect": "The new address and route are not yet current."},
+        {"cycle_index": 6, "expect": "Current address and route are inside managed space but outside intended inventory; eligible positive evidence adds observations to ghost_scope and unregistered_managed_route. Original Central anomalies already exist."},
+        {"cycle_index": 7, "expect": "DHCP coverage age is 60 minutes and routing coverage age is 10 minutes. The selected views are stale; raw retained rows do not establish fresh current conclusions, and unknown cannot resolve prior findings."},
+        {"cycle_index": 8, "expect": "Both sources are fresh again. The episode has ended at hour 48, so these new current observations disappear. The managed-perimeter findings remain anomalous because the original Central discrepancies still exist. Historical rows remain while they overlap the window."}
+      ],
+      "repeat": "New discrepancy episodes are [36+48k,48+48k); stale views occur at hour 42+48k and contain only evidence available by their respective coverage cutoffs."
+    },
+    {
+      "id": "lab-current-versus-historical-conflicts",
+      "scope": "Lab",
+      "original_address": "10.40.1.100",
+      "original_source_record_ids": ["lease-lab-conflict-alpha", "lease-lab-conflict-beta"],
+      "original_interval": "[2026-08-31T22:00:00.000Z,2026-09-01T02:00:00.000Z)",
+      "new_address": "10.40.1.101",
+      "new_principals": ["lab-gamma", "lab-delta"],
+      "first_cycles": [
+        {"cycle_index": 0, "expect": "The original concurrent claims are current and contribute one occupied address."},
+        {"cycle_index": 1, "expect": "The original claims are no longer current and are never renewed, but their historical overlap remains eligible conflict evidence in the rolling window."},
+        {"cycle_index": 8, "expect": "Two new incompatible principals simultaneously claim the new scoped address; the new conflict contributes one occupied address. Original historical conflict evidence remains."},
+        {"cycle_index": 9, "expect": "The new claims expire at hour 54; historical conflict evidence is not instantly cleared by current expiry."}
+      ],
+      "repeat": "New gamma/delta intervals are [48+48k,54+48k), for k >= 0. Historical evidence ages out only when it no longer overlaps the rolling 30-day window."
+    }
+  ],
+  "controls": [
+    "Preserve scoped identity: matching North and Lab private addresses are legitimate isolated reuse.",
+    "Persistent baseline claims renew daily from their actual final expiry at hour 24; sequential renewals must not create occupancy spikes or incompatible-principal conflicts.",
+    "Complete source batches retain a full rolling 30-day history. Retain permitted future expiry times; do not emit future-start or future-observation rows beyond a view's cutoff.",
+    "Keep intended route policy separate from route observations. An explicit expected route needs an eligible complete view to support absence.",
+    "Keep the original rich-v1 inventory, source IDs and committed files unchanged; all changed envelope payloads receive new run identities.",
+    "Current lease expiry does not establish safe reclamation, and no synthetic scene represents live network discovery or external provisioning."
+  ],
+  "runtime_integration_requirements": {
+    "ownership": "Separate lead-assigned runtime adapter and scheduler; these are required integration behavior, not execution evidence from the pure recipe.",
+    "baseline_directory_setting": "IPAM_SYNTHETIC_FEED_DIR",
+    "default_wall_interval_hours": 6,
+    "advance": "Manual next and configurable scheduling advance one index by six simulated hours; wall time does not replace the explicit demo clock.",
+    "atomic_success": "Commit all nine imports, the new demo clock, the saved calculation run and the persisted cursor together.",
+    "failure": "Roll back partial cycle effects visibly; retry the same index and payload identities without consuming the failed cycle.",
+    "catch_up": "At most one bounded catch-up cycle; no burst replay or clock rewind.",
+    "packaging": "Include ipam_synthetic_feed in the normal application wheel; the pure function performs no IO or application mutation."
+  },
+  "verification_limits": "All numeric values and transitions above are authored expectations. No executed record totals, generated byte hashes, receipts, findings or demonstrated questionnaire credit are supplied."
+}
