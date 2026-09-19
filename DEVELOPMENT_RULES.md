@@ -10,7 +10,7 @@ These rules apply to every human and agent working on this repository. The goal 
 - Escalate only a genuine blocker that agents cannot resolve within the user's constraints, or an action outside existing authorization such as new infrastructure spending. Do not send routine tradeoffs back to the user.
 - If a genuine blocker requires user input, batch at most three material questions. Do not re-ask answered questions or request facts available in the repository. This is not a limit on the explicitly delegated agent-to-agent review.
 - Implement only authorized work. No cloud rental, public exposure, external writes or new ongoing cost follows automatically from a feature request.
-- Keep the 111-row external requirement view separate from the smaller demo-goal scorecard. Do not relabel partial or simulated behavior as full requirement satisfaction.
+- Use the 111-row questionnaire as the primary coverage denominator. Read `docs/QUESTIONNAIRE_PRIORITIES.md` and the row map before selecting work. The older 30-goal manifest is an implementation reference, not the success headline. Report functional, deployment, design/documentary, partial and missing evidence separately; never count a roadmap promise as implemented capability.
 
 ## 2. Three changes, then push
 

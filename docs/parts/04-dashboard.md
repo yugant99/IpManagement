@@ -1,6 +1,6 @@
 # Part 4: dashboard and capacity
 
-Owner: UI/calculation agent. Core goals: G17–G18, with Part 1 for G02. Stretch: G19–G20. Branch: `codex/part-4-dashboard`.
+Owner: UI/calculation agent. Original core: G17–G18, with Part 1 for G02. Current questionnaire priority includes bounded G19 IPv6 prefix planning and a minimal G20 report preset/export, alongside G16 history display. Branch: `codex/part-4-dashboard`, with separate branches per feature.
 
 ## Win
 
@@ -23,5 +23,7 @@ Pin overview, details and exports to one `run_id`. Label the 720 hourly samples 
 ## Acceptance and limits
 
 Detail and overview agree for the same saved run. Every action uses the real local API. Synthetic/unknown/simulated states remain visible. No disconnected mock charts, traffic utilization claim, advanced model, separate metrics generator or IPv6 host-density arithmetic.
+
+Prioritize one existing inventory form for custom metadata and a child-prefix planning panel over separate polished layouts. Show IPv6 prefix capacity without host enumeration; persist a selected child through Part 1's validated API under a region parent. Expose two-run comparison and one saved report preset using current filters. See the scope delta for exact bounds; these strengthen the actual questionnaire, not an internal widget count.
 
 Handoff: routes, reusable components, API dependencies, built asset location and implemented-versus-placeholder list. Part 6 receives a real build path, not only a development server command.

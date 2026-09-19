@@ -1,6 +1,6 @@
 # Part 5: allocation, review and audit
 
-Owner: core workflow agent, **not Spencer**. Core goals: G21–G22. Stretch: G23–G25. Branch: `codex/part-5-workflow`.
+Owner: core workflow agent, **not Spencer**. Original core: G21–G22. Current questionnaire priority includes the bounded G25 exception/notification/escalation queue (072/082), with actual cross-team handoff (081) conditional. G23 reclaim/remediation and G24 configurable lifecycle remain deferred. Branch: `codex/part-5-workflow`, with separate branches per feature.
 
 ## Win
 
@@ -21,5 +21,7 @@ Show downstream provisioning as simulated and distinct from the actual local all
 ## Acceptance and limits
 
 Persisted decisions survive restart; unauthorized/self approval fails; rejection and conflict do not leave partial allocations. A fixed state machine is sufficient. No live provisioning, SSO, configurable workflow designer, broad reclamation engine or customer process claim.
+
+The additional queue stores finding reference, owner, acknowledgement/escalation and reason/history. These operational states never overwrite the rule's evidence state. Conditional 081 requires an actual recipient handoff and acknowledgement between named fictional teams; a team label is insufficient. Reuse the existing audit path. See `docs/QUESTIONNAIRE_SCOPE_DELTA.md`.
 
 Handoff: transaction boundaries, role/actor contract, API examples, audit storage and unverified limits. Part 6 must preserve these records across startup/restart/backup; it must not know business logic to do so.

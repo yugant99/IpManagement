@@ -2,6 +2,8 @@
 
 Owner: data agent. Core goals: G05–G08. Branch: `codex/part-2-sources`.
 
+Current questionnaire priority: maintain this source/evidence core; support the lead's small delivery-method pack using existing assessment facts. RFP-043's actual post-import rerun is a conditional addition after imports/reconciliation work, as specified in `docs/QUESTIONNAIRE_SCOPE_DELTA.md`. No new connector framework or automatic baseline promotion.
+
 ## Win
 
 Load reproducible synthetic records and show where they came from, what was rejected and whether there is sufficient evidence to calculate a finding.

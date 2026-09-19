@@ -1,5 +1,7 @@
 # Bounded implementation decisions
 
+Revision note: `QUESTIONNAIRE_SCOPE_DELTA.md` now overrides earlier stretch/exclusion statements for the selected inventory/history/exception changes and conditional triggers. The original source and calculation definitions below remain in force. Questionnaire rows are the primary scorecard; the older 30-goal checklist is retained as a work reference.
+
 Status: agent-decided design, **not implemented or runtime-verified**. This is the detailed companion to [CONTRACTS.md](CONTRACTS.md), integrated after the [75-question exchange](GRILL_75.md). Read only sections relevant to your lane. The lead resolves any contract/code mismatch before another lane depends on it.
 
 These choices bound the weekend demo; they are not customer scale, operational freshness or production guarantees. Retain one app, one SQLite database and direct functions. Do not translate every concept below into a new table, service or abstraction.
@@ -26,7 +28,7 @@ These choices bound the weekend demo; they are not customer scale, operational f
 
 Part 4's calculation owner first supplies one backend occupancy/forecast function using G01/G05/G06 inputs. Part 3 invokes eligibility, occupancy/forecast and rules, then persists their output together. G09 consumes the calculation portion of G17, not its UI. The G17 chart consumes the saved result. No dependency cycle, second algorithm or additional goal is needed.
 
-The immutable saved result includes `run_id`, demo clock, ledger revision, selected source-run IDs, rule version, pool capacity, occupancy, p95 value/status/window/sample counts, forecast value/status/basis and findings with evidence references. Retain old runs and their inputs for pinned reads; G16's historical comparison UI is still stretch.
+The immutable saved result includes `run_id`, demo clock, ledger revision, selected source-run IDs, rule version, pool capacity, occupancy, p95 value/status/window/sample counts, forecast value/status/basis and findings with evidence references. Retain old runs and their inputs for pinned reads; the questionnaire revision prioritizes G16's bounded comparison UI.
 
 | Calculation | Decision |
 |---|---|
@@ -79,4 +81,4 @@ Core implements these behaviors; Spencer packages and documents them. Planned CL
 
 ## Completion discipline
 
-Freeze new features at lead hour 14. Keep the 30-goal denominator and binary evidence-backed completion; broken provenance, calculation consistency, allocation controls or recipient startup/persistence block release regardless of the score. Tie evidence to commit, fixture/scenario and run/clock. A later edit reopens affected goals and direct dependencies, not every unrelated passing behavior. No runtime checks have been performed during this planning work.
+Freeze new features at lead hour 14. Use the 111-row questionnaire ledger and distinguish complete, partial, design/documentary and absent evidence; the old 30 goals remain work references. Broken provenance, calculation consistency, allocation controls or recipient startup/persistence block release regardless of the score. Tie evidence to commit, fixture/scenario and run/clock. A later edit reopens affected requirements and direct dependencies, not every unrelated passing behavior. No runtime checks have been performed during this planning work.

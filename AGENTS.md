@@ -5,8 +5,8 @@ Read [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) before changing this repositor
 Then read, in order:
 
 1. [Current status](docs/STATUS.md): authorization, active decisions, owners and next step.
-2. [Architecture](docs/ARCHITECTURE.md): accepted versus proposed choices.
-3. [Delivery plan](docs/PLAN.md) and [goal scorecard](docs/GOALS.csv).
+2. [Questionnaire priorities](docs/QUESTIONNAIRE_PRIORITIES.md) and your IDs in [the 111-row map](docs/QUESTIONNAIRE_ROW_MAP.md): current scope and remaining gaps.
+3. [Architecture](docs/ARCHITECTURE.md) and [delivery plan](docs/PLAN.md). The older [goal manifest](docs/GOALS.csv) is a work reference, not the primary coverage denominator.
 4. Your assigned file under [docs/parts](docs/parts/).
 5. [Shared contracts](docs/CONTRACTS.md) when your work crosses a boundary.
 

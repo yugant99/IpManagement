@@ -1,5 +1,7 @@
 # IPAM demo architecture decisions
 
+Current scope revision: `demo-v2-questionnaire`. [Questionnaire priorities](QUESTIONNAIRE_PRIORITIES.md) defines the primary target; [scope delta](QUESTIONNAIRE_SCOPE_DELTA.md) prioritizes bounded inventory editing, IPv6/domain planning, history, exceptions and delivery artifacts. The one-app/one-database architecture and evidence rules remain.
+
 Status: **agent-decided under the user's explicit delegation**, 2026-09-19. The architecture interviewer `/root/grill_architecture` and proposer `/root/coverage_20h` completed an initial two-round discussion followed by 75 individual questions and answers in three dependent batches of 25. The lead supplied the runtime contract and reconciled the decisions. These are decisions for implementation, not claims of working software or user answers to an interview. No application, container, VM, dependency installation, or application verification was performed.
 
 The user explicitly directed agents to grill each other instead of asking them questions. That overrides the grilling skill's usual user-interview and confirmation steps. The earlier interview draft is superseded. The initial exchange is historical in `AGENT_GRILL_TRANSCRIPT.md`; the deeper exchange and correction trail are in [GRILL_75.md](GRILL_75.md). Use [shared contracts](CONTRACTS.md) and its linked [implementation decisions](IMPLEMENTATION_DECISIONS.md) for current engineering instructions; the transcript is evidence, not a required reread on every feature.
@@ -8,8 +10,8 @@ The user explicitly directed agents to grill each other instead of asking them q
 
 Build one portable synthetic IPAM assessment and Pool Watch dashboard. It compares intended inventory, DHCP assignments, and routing observations, explains findings, shows capacity, and executes one local allocation workflow. Synthetic input does not mean hardcoded outcomes: calculations and persisted state drive the UI.
 
-- Fixed delivery checklist: **30 named demo goals; 22 core goals targeted = 73.3%**. The lead's goal manifest is canonical; freezing the denominator prevents shrinking it later to manufacture success.
-- Separate requirement ledger: **111 technical RFP rows**, with working, partial, simulated, documented, and absent evidence kept distinct. Strictly exceeding 60% would require 67 fully evidenced rows; that is not promised.
+- Primary delivery ledger: **111 technical RFP rows**, with functional, deployment, partial, simulated, design/documentary and absent evidence kept distinct. The current plan addresses 65 rows, with two conditional additions to 67 and optional scheduling to 68. These mixed-evidence counts do not promise 67 fully satisfied whole requirements.
+- The original 30-goal manifest and its 22-core selection remain historical work references. Its 73.3% is not the project's coverage headline. Do not shrink the questionnaire denominator or count the same row twice because several features contribute.
 - These targets are estimates. Twenty lead development hours with overlapping agent/Spencer work is not twenty hours multiplied by agent count.
 - Production scale, live-network integration, actual customer assessment, enterprise identity, HA, and contractual compliance remain unproved.
 

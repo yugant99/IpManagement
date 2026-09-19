@@ -1,6 +1,6 @@
 # Six parts, one integrated application
 
-Planning budget: approximately 20 lead working hours, with Spencer's 6–8 hours overlapping. These are estimates, not 20 hours per agent. The scorecard and limits live in `COVERAGE.md` and `GOALS.csv`.
+Planning budget: approximately 20 lead working hours, with Spencer's 6–8 hours overlapping. These are estimates, not 20 hours per agent. **Current priority and coverage live in `QUESTIONNAIRE_PRIORITIES.md` and the 111-row map.** `COVERAGE.md` and `GOALS.csv` preserve the earlier baseline; their 22/30 percentage is no longer the success headline.
 
 ## Ownership
 
@@ -15,12 +15,14 @@ Planning budget: approximately 20 lead working hours, with Spencer's 6–8 hours
 
 These are work packages. Run only as many simultaneous lanes as available tools/contributors support. The lead integrates and can combine small lanes; do not spawn agents just to fill a diagram.
 
+Current fold-ins: Parts 1/4 prioritize bounded subnet editing, custom fields and domain/IPv6 prefix planning; Parts 3/4 expose existing run history and one report preset; Part 5 adds the small exception queue. Lead owns the delivery method/roadmap draft. These target 12 new rows beyond the original 53. Actual import-triggered rerun and team handoff are the two conditional additions toward 67; scheduling follows only if time remains. Refer to the scope delta for exact acceptance and limitations. They do not change Spencer's runtime ownership.
+
 ## Sequence
 
 1. **Hours 0–1.5:** freeze contracts, a small fixture and file ownership; establish backend/frontend entrypoints and dependency locks. Spencer can prepare Part 6 against the documented contract.
 2. **Hours 1.5–6:** deliver source import → saved inventory/observations → one computed finding → browser evidence detail. UI and rules use the same fixture IDs and response shape.
 3. **Hours 6–11:** complete rule conditions and controls, capacity view and fixed allocation flow. Publish `PART6_READY` only when actual runtime dependencies exist.
-4. **Hours 11–14:** integrate core paths and packaging. Repair interface failures before adding stretch work.
+4. **Hours 11–14:** integrate core paths and packaging; choose remaining questionnaire additions only where their dependencies work. Repair interface failures before the conditional import/team additions. Defer scheduling first if time is tight.
 5. **At hour 14, freeze new features. Hours 14–17:** integration repairs, portable startup and focused acceptance evidence when authorized; update goal status honestly.
 6. **Hours 17–20:** recovery buffer, handoff and user rehearsal. Repair broken core paths; no architecture swap or new platform dependency.
 

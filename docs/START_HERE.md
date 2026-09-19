@@ -6,8 +6,8 @@ Canonical repository: https://github.com/yugant99/IpManagement
 
 1. `AGENTS.md` and `DEVELOPMENT_RULES.md`.
 2. `docs/STATUS.md`: current authorization, integration baseline and readiness.
-3. `docs/ARCHITECTURE.md`, then the relevant portion of `docs/CONTRACTS.md`.
-4. Your `docs/parts/NN-*.md` and linked goal IDs in `docs/GOALS.csv`.
+3. `docs/QUESTIONNAIRE_PRIORITIES.md` and your IDs in `docs/QUESTIONNAIRE_ROW_MAP.md`, then `docs/ARCHITECTURE.md` and the relevant portion of `docs/CONTRACTS.md`.
+4. Your `docs/parts/NN-*.md`, the relevant `docs/QUESTIONNAIRE_SCOPE_DELTA.md` section, and linked work IDs in the original `docs/GOALS.csv` manifest. Its old Core/Stretch labels are superseded where the current questionnaire priority explicitly differs.
 5. Your handoff, if present. Spencer uses `docs/handoffs/part-6.md`.
 
 Do not reread the entire local assessment or invoke a planning pipeline on every turn. Ask the lead for a missing contract; do not require the user to reconstruct the conversation.

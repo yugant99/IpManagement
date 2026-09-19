@@ -4,6 +4,8 @@ Owner: Spencer and his agent. Budget: approximately 6–8 hours. Core goals: G26
 
 Start at [the pickup handoff](../handoffs/part-6.md). No presentation work is assigned. Parts 1–5 belong to the core team.
 
+Questionnaire revision keeps this lane's 6–8-hour scope unchanged. Packaging, state operations and diagnostics supply concrete deployment evidence; they do not automatically supply HA, hybrid networking, tenant isolation or scale evidence. The lead owns the added delivery-method/roadmap pack; Spencer supplies accurate operator and dependency facts from the actual package.
+
 ## Win
 
 Another person can start the same application, preserve its data, reset the synthetic scenario deliberately, and resume development without the original chat or a permanently rented host.

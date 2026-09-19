@@ -14,6 +14,7 @@ During the present planning stage, this document is a handoff specification, not
 
 1. `AGENTS.md` and `DEVELOPMENT_RULES.md`.
 2. `docs/STATUS.md` and `docs/ARCHITECTURE.md`.
+   The architecture/deployment section of `docs/QUESTIONNAIRE_PRIORITIES.md` identifies what packaging can substantiate and what remains a production gap. No need to read every application row.
 3. `docs/CONTRACTS.md`, especially runtime, file ownership and readiness.
    Its companion `docs/IMPLEMENTATION_DECISIONS.md` has a short **Core and Part 6** section; no need to reread the full grill transcript.
 4. `docs/parts/06-portability.md` and goals G26–G28/G30 in `docs/GOALS.csv`.
@@ -75,4 +76,4 @@ Second CPU architecture, second host or Sunday VM are stretch. No cloud resource
 
 ## Current lane handoff
 
-Owner: Spencer / Part 6. Branch/commit: not started; choose current `origin/main` at pickup. Contract revision: `demo-v1-planning-75q`. Pushed implementation: none. Working application: none yet. Next action: read status and contracts, then take the first authorized packaging feature once assigned. Replace this line with exact pushed SHA, integration base SHA, contract revision, dependencies and results when work starts.
+Owner: Spencer / Part 6. Branch/commit: not started; choose current `origin/main` at pickup. Contract revision: `demo-v2-questionnaire`; runtime CLI/data ownership is unchanged. Pushed implementation: none. Working application: none yet. The lead owns added delivery-method/roadmap documents; no HA, carrier-scale or enterprise identity work is assigned to this lane. Next action: read status and contracts, then take the first authorized packaging feature once assigned. Replace this line with exact pushed SHA, integration base SHA, contract revision, dependencies and results when work starts.
