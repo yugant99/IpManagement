@@ -60,7 +60,7 @@ These rules apply to every human and agent working on this repository. The goal 
 - Use the useful artifact: a small decision tree, UI review findings, root-cause explanation or targeted review. Stop when that artifact is complete.
 - Ask security questions only for concrete scope: public deployment, permissions, secrets, or a real state-changing action. Do not design enterprise SSO, HA, compliance or threat programs for this local synthetic demonstration.
 - Do not remove essential correctness controls in the name of speed. Unknown evidence stays unknown; the API enforces claimed permissions; allocations cannot silently collide.
-- The user explicitly overrides the grilling skill's user-interview and user-confirmation defaults for this project. Run agent-to-agent rounds, at most two rounds/ten minutes unless a concrete unresolved contradiction warrants more. Record the actual exchange and resulting decisions; do not fabricate a debate.
+- The user explicitly overrides the grilling skill's user-interview and user-confirmation defaults for this project. Run short agent-to-agent frontier rounds; record the actual exchange and resulting decisions, never a fabricated debate. The current deeper 75-question architecture pass is a one-time planning exercise responding to the requested depth, not a mandatory feature ritual. Later rounds reopen only material unresolved choices.
 - Other skill confirmation requirements must be checked against existing user authorization. Do not create additional approval gates by interpretation.
 
 ## 6. Evidence and synthetic data
