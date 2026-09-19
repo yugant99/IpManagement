@@ -2,11 +2,11 @@
 
 A planned portable IP address inventory and reconciliation demonstration using synthetic data.
 
-**Current state:** documentation and agent coordination only. The application, container and runtime commands are not implemented yet. Start with [current status](docs/STATUS.md).
+**Current state:** planning is complete; Stage 1 foundation is in progress and a separate synthetic-data lane is prepared for parallel pickup. No application runtime or portable release is accepted yet. Start with [current status](docs/STATUS.md).
 
 ## Agent pickup
 
-**Next: [current stage and generated pickup prompt](docs/CURRENT_HANDOFF.md).** The [chat-stage guide](docs/CHAT_STAGES.md) makes each lead generate a fresh-chat prompt at the next milestone and keeps prior chats available for branch follow-ups.
+**Current work: [stage and generated pickup prompt](docs/CURRENT_HANDOFF.md).** The original chat stays [persistent project lead](docs/PROJECT_OVERSIGHT.md). The [chat-stage guide](docs/CHAT_STAGES.md) has workers report checkpoints and the lead publish each next-stage prompt; prior worker chats remain available for branch follow-ups.
 
 Read [AGENTS.md](AGENTS.md), [development rules](DEVELOPMENT_RULES.md), and [the pickup guide](docs/START_HERE.md). The lead owns integration; contributors own bounded parts on separate branches.
 

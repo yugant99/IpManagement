@@ -22,6 +22,8 @@ During the present planning stage, this document is a handoff specification, not
 
 Do not require the previous chat, source customer files or a separate planning interview. Facts come from the repo; missing core interfaces go to the lead.
 
+The original **Build synthetic inventory demo** chat remains persistent project lead. Report pushed branch/SHA/PR, implemented versus observed behavior, gaps and blockers through the repository handoff. The lead reviews acceptance, global status and main integration; Spencer's agent does not replace this ownership. External agent conversations need not be accessible. See `docs/PROJECT_OVERSIGHT.md`.
+
 ## Branch and ownership
 
 Start each distinct feature from current `main` on a separate branch. First feature: `codex/part-6-container-startup`. Later backup/operator improvements can use a separate `codex/part-6-...` branch after their prerequisite is merged. Use an isolated worktree if another agent shares the checkout.
