@@ -1,5 +1,7 @@
 # Current project status
 
+**Active follow-up:** the user authorized the substantive [F1–F7 audit response](handoffs/audit-response-authorization.md), including local inventory-correction approval, metadata findings/history preservation, exception lifecycle, focused local tests and final native rehearsal. Existing owners continue; Stage 4 is the sole new schema/migration owner. New behavior and acceptance are in progress. Historical checkpoints below stay unchanged; infrastructure and portable runtime execution remain outside the grant.
+
 ## Authorization and evidence
 
 - **User-authorized lead replacement:** Main Lead 2.0 takes over via [the transfer record](handoffs/main-lead-2.0.md); **registered receiver `01a0bb80-cf0d-7f60-8e46-1e825f42d276`**, host `local`. Outgoing `01a0b845-6c8d-7021-a5c9-15e673db07c9` becomes reference-only after publication. The existing `ipam-project-oversight` monitor is reattached to this receiver and ACTIVE; saved target/status were verified. All existing worker ownership and acceptance limits remain unchanged.

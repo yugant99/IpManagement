@@ -1,5 +1,7 @@
 # Current project handoff
 
+**Current work: implement and accept the bounded [F1–F7 audit response](handoffs/audit-response-authorization.md).** The user authorized the local correction scope, focused local checks and one final rehearsal. Continue with existing workers and serialized schema ownership; do not create Stage 6. The previous application/accounting checkpoint below is the preserved baseline, not acceptance of these new changes.
+
 **The bounded Stage 5 local test run is complete and accepted: 14 observed passes, two partial scenarios, no observed application defect.** All acceptance-owned services are stopped. This is scoped local runtime acceptance, not final portable release acceptance.
 
 **Current lead: Main Lead 2.0**, explicitly authorized by the user as replacement lead. Read [the complete transfer record](handoffs/main-lead-2.0.md); receiver task **`01a0bb80-cf0d-7f60-8e46-1e825f42d276`**, host `local`, registered 2026-09-19. Outgoing `01a0b845-6c8d-7021-a5c9-15e673db07c9` becomes reference-only after publication, and the existing `ipam-project-oversight` monitor is ACTIVE on the receiver, with unchanged 30-minute cadence and September 21, 2026, 17:00 UTC expiry. Read [Stage 5 lead review](handoffs/stage-05-lead-review.md) for unchanged evidence and limits.
