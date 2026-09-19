@@ -1,6 +1,6 @@
 # Shared engineering contracts
 
-Status: agent-decided design contract, with a **Stage 1 implementation checkpoint pending review and runtime evidence**. See [the concrete foundation API](FOUNDATION_API.md) and [native setup/status](FOUNDATION.md). Only inventory, explicit seed, serve/readiness and UI source are implemented at this checkpoint. Imports, calculations, writes/workflow and reset/backup/restore remain planned. The lead records any change here before another lane depends on it. These interfaces do not require generic adapter or workflow frameworks.
+Status: implemented in the accepted application pickup `117d05295473cf25d362adb320e6fef26ecdd74c`, with bounded local evidence at `fe50cd6828016a25fee9086f499e2e865b4a16e4`. [Current integration and readiness](handoffs/accepted-candidate-integration.md) and [Stage 5 limits](handoffs/stage-05-lead-review.md) govern claims. Imports, calculations, inventory editing, workflow, scheduling and core state commands are supplied; not every command/failure branch has runtime proof. The lead records contract changes before another lane depends on them.
 
 Contract revision: `demo-v2-questionnaire`. [Implementation decisions](IMPLEMENTATION_DECISIONS.md) supplies identity, import, calculation, API, workflow and state-operation details, with explicit scope changes in [QUESTIONNAIRE_SCOPE_DELTA.md](QUESTIONNAIRE_SCOPE_DELTA.md). The scope delta takes precedence only where it changes earlier exclusions, such as bounded inventory editing, history and the exception queue. The [75-question record](GRILL_75.md) preserves historical rationale; superseded answers never override current contracts.
 
@@ -17,7 +17,7 @@ Later required addition: [evolving feed and scheduling](SCHEDULING_CONTRACT.md) 
 | `docs/parts/06-portability.md`, `docs/handoffs/part-6.md`, `docs/RUNNING.md` | Spencer, Part 6 |
 | `AGENTS.md`, development rules, status, shared contracts | Lead/integration |
 
-Paths are ownership boundaries. Stage 1 supplies application files and locks; contributors must inspect current files before editing. The separate data lane owns `fixtures/`, while core owns its small packaged seed at `backend/ipam_demo/data/baseline.json`.
+Paths are ownership boundaries. The accepted candidate supplies application files and locks; contributors must inspect current files before editing. The separate data lane owns `fixtures/`, while core owns its small packaged seed at `backend/ipam_demo/data/baseline.json`.
 
 ## Runtime supplied by the core team
 
@@ -35,7 +35,9 @@ Paths are ownership boundaries. Stage 1 supplies application files and locks; co
 - Data resides on supported local filesystems/local Docker volumes, not network mounts. Missing/unwritable paths fail visibly without an ephemeral fallback. Unsupported schema preserves data and fails with a clear reason.
 - Core chooses and pins actual runtime/dependency versions at implementation start. Part 6 consumes the committed locks rather than selecting a second set.
 
-`serve` and `seed` are implemented in Stage 1 source. They have not been executed; no command above is an instruction to run checks now. `reset`, `backup` and `restore` remain required future entrypoints and are explicitly absent from CLI parsing. Stage 1 uses exclusive local app-data locking; stop the service before seeding. `PART6_READY` remains false until the missing state commands and actual build/readiness prerequisites exist.
+The actual CLI supplies `serve`, `seed`, `migrate`, `backup`, `restore` and `reset`; see [state-operation semantics and supported schemas](STATE_OPERATIONS.md). Stage 5 observed rich setup, serve/readiness, populated disabled backup/restore/restart and representative v3-to-v4 migration. Reset, v1/v2 and enabled-snapshot restore remain unrun. All state-mutating commands require the documented stopped-service/exclusive-data rules. These interfaces are not instructions to execute new checks.
+
+Scheduling additionally needs the packaged `ipam_synthetic_feed` module and immutable `IPAM_SYNTHETIC_FEED_DIR` assets under the [schedule contract](SCHEDULING_CONTRACT.md). Core prerequisites are available at the pinned candidate. `PART6_READY=no` remains the controlling transferred gate because package and recipient evidence are absent; do not infer portable acceptance from native local success.
 
 ## Data and calculation boundary
 
@@ -65,4 +67,4 @@ Downstream provisioning is explicitly simulated. Demo identity is not enterprise
 
 Primary packaged target: ordinary Linux `amd64`. Local development machine observed as `arm64`; native development support does not prove an ARM container works. A second architecture/host is stretch unless it becomes a specified recipient requirement. Record exactly what was exercised.
 
-Lead sets `PART6_READY=yes` only after the real runtime module, locks, UI build path, data-path behavior, health and state-management commands are present. Spencer may prepare documentation/package files beforehand, but cannot claim a runnable handoff from placeholders.
+Readiness terminology correction: earlier versions used `PART6_READY` for core prerequisites alone; the latest transfer/status retains `PART6_READY=no` while package/recipient acceptance is pending. Core prerequisites are available separately at the pinned candidate. Only the lead may change the controlling gate after reviewing the published package and authorized target-host/recipient evidence. Spencer retains packaging and operator ownership.

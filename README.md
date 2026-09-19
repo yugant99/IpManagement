@@ -1,12 +1,12 @@
 # IpManagement
 
-A planned portable IP address inventory and reconciliation demonstration using synthetic data.
+An IP address inventory and reconciliation demonstration using synthetic data, with real local calculations and persistence.
 
-**Current state:** Foundation [PR #5](https://github.com/yugant99/IpManagement/pull/5), synthetic-data [PR #7](https://github.com/yugant99/IpManagement/pull/7), first-path [PR #8](https://github.com/yugant99/IpManagement/pull/8) and rich-seed CLI [PR #12](https://github.com/yugant99/IpManagement/pull/12) have accepted source checkpoints, all unmerged. Stage 3 is active; core state compatibility and packaging remain separate lanes. Main contains documentation only. Runtime and portable-release evidence remain pending. Start with [current status](docs/STATUS.md).
+**Current state:** Stage 5 bounded local acceptance is complete: **14 observed passes, two partial scenarios, no observed application defects**. [Application integration PR #34](https://github.com/yugant99/IpManagement/pull/34) carries the exact tested lineage into the current lead documentation. Portable packaging and recipient proof remain pending with Spencer. Read [current status](docs/STATUS.md), [readiness and integration](docs/handoffs/accepted-candidate-integration.md), and [accepted evidence limits](docs/handoffs/stage-05-lead-review.md).
 
 ## Agent pickup
 
-**Current work: [stage and generated pickup prompt](docs/CURRENT_HANDOFF.md).** The original chat stays [persistent project lead](docs/PROJECT_OVERSIGHT.md). The [chat-stage guide](docs/CHAT_STAGES.md) has workers report checkpoints and the lead publish each next-stage prompt; prior worker chats remain available for branch follow-ups.
+**Current work: [stage and generated pickup prompt](docs/CURRENT_HANDOFF.md).** Main Lead 2.0 is the registered [persistent project lead](docs/PROJECT_OVERSIGHT.md). The [chat-stage guide](docs/CHAT_STAGES.md) has workers report checkpoints and the lead publish each next-stage prompt; prior worker chats remain available for branch follow-ups.
 
 Read [AGENTS.md](AGENTS.md), [development rules](DEVELOPMENT_RULES.md), and [the pickup guide](docs/START_HERE.md). The lead owns integration; contributors own bounded parts on separate branches.
 
@@ -19,11 +19,11 @@ Read [AGENTS.md](AGENTS.md), [development rules](DEVELOPMENT_RULES.md), and [the
 | 5 | Approval and local allocation | [Workflow](docs/parts/05-workflow.md) |
 | 6 | Runnable portable handoff | [Spencer's part](docs/parts/06-portability.md) |
 
-Spencer's agent starts at [the Part 6 handoff](docs/handoffs/part-6.md). No prior chat or private customer attachment is required to understand that engineering package.
+Spencer's agent first reads the [current candidate addendum](docs/handoffs/accepted-candidate-integration.md#spencers-current-candidate-and-remaining-evidence), then [the Part 6 handoff](docs/handoffs/part-6.md). No prior chat or private customer attachment is required to understand that engineering package.
 
 ## Planning references
 
-- **Current scope:** [questionnaire priorities](docs/QUESTIONNAIRE_PRIORITIES.md), [all 111 rows and gaps](docs/QUESTIONNAIRE_ROW_MAP.md), and [scope changes](docs/QUESTIONNAIRE_SCOPE_DELTA.md). Target 65 addressed rows, two conditional additions to reach 67; these totals include partial and document evidence.
+- **Current scope:** [questionnaire priorities](docs/QUESTIONNAIRE_PRIORITIES.md), [all 111 rows and gaps](docs/QUESTIONNAIRE_ROW_MAP.md), and [scope changes](docs/QUESTIONNAIRE_SCOPE_DELTA.md). The denominator is 111; historical 65/67/68 planning bundles and the 51 candidate evidence IDs are not fully satisfied-row counts. Retain the separate [customer phase gaps](docs/PHASE_COVERAGE.md).
 - [Architecture decisions](docs/ARCHITECTURE.md) and [shared contracts](docs/CONTRACTS.md).
 - [75-question agent review](docs/GRILL_75.md) and [adopted implementation details](docs/IMPLEMENTATION_DECISIONS.md).
 - [Original twenty-hour coverage baseline](docs/COVERAGE.md), [original goal manifest](docs/GOALS.csv), and [original requirement links](docs/REQUIREMENT_COVERAGE.csv). These preserve the 53-row baseline; the current row map takes precedence for priority.
@@ -33,6 +33,6 @@ The demo scorecard and full external questionnaire have different denominators. 
 
 ## Runtime
 
-Application entrypoint/seed/health/migration source exists on the unmerged branches; it has no accepted runtime evidence. The intended delivery is a Python API serving a compiled React UI, SQLite stored outside the image, deterministic synthetic inputs and explicit reset/backup/restore. Core state commands are a separate active source lane. Read checkpoint reports before treating a planned command as implemented or exercised.
+The accepted candidate supplies one Python API serving a compiled React UI, local SQLite state, deterministic synthetic acquisition, calculations, allocation/audit and scheduling. See [runtime contracts](docs/CONTRACTS.md), [schedule API](docs/STAGE4_API.md) and [state operations](docs/STATE_OPERATIONS.md). The [Stage 5 report](docs/handoffs/stage-05-report.md) records macOS arm64 observations; it does not establish Docker/Compose/Linux or recipient operation. External provisioning is simulated. Reset, enabled-snapshot restore, v1/v2 migration and other listed failure cases remain unrun. `PART6_READY=no`; no package checkpoint or recipient-host evidence is registered.
 
 Private source documents, detailed assessment extracts, credentials and runtime data stay outside Git. Public documentation contains generic engineering scope and synthetic examples.

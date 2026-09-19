@@ -4,6 +4,8 @@
 
 **Current lead: Main Lead 2.0**, explicitly authorized by the user as replacement lead. Read [the complete transfer record](handoffs/main-lead-2.0.md); receiver task **`01a0bb80-cf0d-7f60-8e46-1e825f42d276`**, host `local`, registered 2026-09-19. Outgoing `01a0b845-6c8d-7021-a5c9-15e673db07c9` becomes reference-only after publication, and the existing `ipam-project-oversight` monitor is ACTIVE on the receiver, with unchanged 30-minute cadence and September 21, 2026, 17:00 UTC expiry. Read [Stage 5 lead review](handoffs/stage-05-lead-review.md) for unchanged evidence and limits.
 
+**Integration in progress:** [PR #34](https://github.com/yugant99/IpManagement/pull/34) carries the exact tested lineage onto registered-lead main without application, fixture or lock changes. Read the [readiness map and controlling Part 6 candidate addendum](handoffs/accepted-candidate-integration.md) before using the older package pickup. Final row adjudication follows separately.
+
 ## Exact checkpoint
 
 - Existing worker: **Execute Stage 5 acceptance handoff**, `01a0baff-2143-7073-ad3d-4963a9cc0ca5`; `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5`, `codex/stage-5-local-acceptance`.
