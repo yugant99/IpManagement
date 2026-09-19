@@ -22,6 +22,8 @@ Do not modify schema, business rules, app module names, dependency versions/lock
 
 On the declared target, documented startup serves UI and API. Restart preserves allocations/audit. Reset is explicit; backup/restore is consistent. Missing or unwritable data produces an actionable error. Record actual evidence and any unverified platform claims.
 
+G27 persistence acceptance needs actual G21/G22 workflow records; seed-only restart is insufficient. Core owns readiness/setup behavior, SQLite backup and stopped-service reset/restore correctness. Part 6 wraps these interfaces and uses local filesystem mounts, with no silent ephemeral fallback. See the Core and Part 6 section of `docs/IMPLEMENTATION_DECISIONS.md`.
+
 Primary packaged target is Linux amd64. The development Mac is arm64; cross-architecture support and a second host are stretch until exercised. No paid cloud dependency, VM rental, public URL, GPU, HA/DR promise or presentation responsibility.
 
 ## Timebox

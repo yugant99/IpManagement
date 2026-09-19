@@ -21,14 +21,15 @@ These are work packages. Run only as many simultaneous lanes as available tools/
 2. **Hours 1.5–6:** deliver source import → saved inventory/observations → one computed finding → browser evidence detail. UI and rules use the same fixture IDs and response shape.
 3. **Hours 6–11:** complete rule conditions and controls, capacity view and fixed allocation flow. Publish `PART6_READY` only when actual runtime dependencies exist.
 4. **Hours 11–14:** integrate core paths and packaging. Repair interface failures before adding stretch work.
-5. **Hours 14–17:** portable startup and focused acceptance evidence when authorized; update goal status honestly.
-6. **Hours 17–20:** feature freeze, recovery buffer, handoff and user rehearsal. No architecture swap or new platform dependency.
+5. **At hour 14, freeze new features. Hours 14–17:** integration repairs, portable startup and focused acceptance evidence when authorized; update goal status honestly.
+6. **Hours 17–20:** recovery buffer, handoff and user rehearsal. Repair broken core paths; no architecture swap or new platform dependency.
 
 If the first complete path is not integrated around hour 6, cut stretch work immediately. Preserve evidence correctness, actual calculations, persisted decisions and portability. A numerical completion percentage never excuses a broken essential path.
 
 ## Handoffs and integration
 
 - Root publishes shared contracts before lanes diverge. Root alone coordinates shared schema/lockfile/app-shell changes.
+- The shared backend occupancy/forecast calculation is the first G17 deliverable, consumed by G09 pressure and later by the G17 chart. Implement it before completing pressure; do not wait for the dashboard or duplicate the formula in a rule.
 - Each lane provides a small commit set and a handoff with exact branch/commit, changed interfaces, working behavior and unverified limits.
 - Keep approved fixes on the lane's branch; the lead integrates coherent commits rather than making parallel edits to the same files.
 - Spencer's next action and readiness are defined in `handoffs/part-6.md`. He does not need to read private assessments or prepare a presentation.

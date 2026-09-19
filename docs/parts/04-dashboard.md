@@ -10,11 +10,15 @@ Understand inventory discrepancies and pool capacity from a readable browser das
 
 Use the common API and saved calculations. Own assigned React views/components and the bounded forecast module by agreement with the lead. Coordinate shared navigation/build configuration once; do not fork the app shell.
 
+Deliver the G17 backend occupancy/forecast module first so Part 3 can consume it for G09 pressure. Its inputs are Parts 1–2 data and coverage, not a pressure finding. The G17 chart then displays the same saved result. This is one calculation within the existing goal, not a new service or goal.
+
 Inventory, source status, findings/detail, capacity and workflow should share layout/type/color/state conventions. Use restrained motion and reusable empty/loading/error/unknown states. Do not add a visual library because a generic skill demands it.
 
 ## Output
 
 Computed overview totals, working filters/drilldown, lease-occupancy history and an explained simple positive-growth exhaustion estimate. Handle no-growth, already-exhausted and insufficient-history cases. Show capacity denominator and observation window. Distinguish candidate space from released space.
+
+Pin overview, details and exports to one `run_id`. Label the 720 hourly samples as the bounded demo approximation. The backend fits daily p95 occupied-address counts over 14–30 complete consecutive days; the UI never recomputes the forecast or substitutes zero for unavailable values. See `docs/IMPLEMENTATION_DECISIONS.md` for states and limits.
 
 ## Acceptance and limits
 

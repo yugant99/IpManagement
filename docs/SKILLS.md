@@ -20,7 +20,7 @@ Use a skill to produce a concrete useful artifact within the feature budget. Thi
 
 | Skill | Normal budget | Stop condition |
 |---|---|---|
-| `grilling` | Short agent-to-agent frontier rounds, normally 10–15 minutes | Material decisions are explicit; a current one-time deeper 75-question pass is recorded separately. Do not impose 75 questions on every feature |
+| `grilling` | Short agent-to-agent frontier rounds, normally 10–15 minutes | Material decisions are explicit; the completed one-time [75-question pass](GRILL_75.md) is recorded separately. Do not impose 75 questions on every feature |
 | `design-taste-frontend` | One 30-minute shared design pass | Reusable layout and states are clear; implement within the feature budget |
 | `review` | 15–20 minutes per coherent integration | Actionable findings or explicit limits recorded; no repeated unchanged diff reviews |
 | `investigate` | 20–30 minutes | Root cause/narrow fix or evidence-backed blocker; after three failed hypotheses, escalate to the lead |

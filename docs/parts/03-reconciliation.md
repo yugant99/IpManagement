@@ -16,8 +16,10 @@ Implement pool pressure, oversized pool, zombie candidate, ghost scope, unregist
 
 Inactivity over a complete applicable 30-day DHCP window creates a candidate only. Missing/stale/failed evidence produces unknown and suppresses unsupported absence conclusions. Route matching follows the recorded scope/announcement policy, not arbitrary exact-string joins. Count distinct active allocations at a time, not DHCP event volume.
 
+Pressure is p95 occupancy >=80% OR a valid forecast <60 days to full; oversized is 30-day p95 <50%. Consume the shared backend calculation delivered first within G17; do not depend on the G17 UI or build another forecast. Known true makes the pressure OR true; both known false make it false; otherwise it is unknown. Read the calculation and eligibility details in `docs/IMPLEMENTATION_DECISIONS.md`.
+
 ## Acceptance and limits
 
 All conditions have evidence, healthy controls and insufficient-evidence controls. Changing eligible inputs changes actual rule outputs. No reclaim/withdraw execution, traffic inference from leases, event bus, collector fleet or broad policy engine.
 
-Handoff: rule definitions/version, run/finding examples, coverage assumptions, calculated sample outputs and actual verification status. Historical comparison remains stretch; retaining the source references for the current saved run is core.
+Handoff: rule definitions/version, run/finding examples, coverage assumptions, calculated sample outputs and actual verification status. Historical comparison UI remains stretch; retaining immutable saved runs and their source references for pinned reads is core.

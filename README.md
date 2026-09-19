@@ -22,6 +22,7 @@ Spencer's agent starts at [the Part 6 handoff](docs/handoffs/part-6.md). No prio
 ## Planning references
 
 - [Architecture decisions](docs/ARCHITECTURE.md) and [shared contracts](docs/CONTRACTS.md).
+- [75-question agent review](docs/GRILL_75.md) and [adopted implementation details](docs/IMPLEMENTATION_DECISIONS.md).
 - [Twenty-hour plan and coverage](docs/COVERAGE.md), [demo goals](docs/GOALS.csv), and [full requirement tracking](docs/REQUIREMENT_COVERAGE.csv).
 - [Work sequence](docs/PLAN.md) and [bounded skill playbook](docs/SKILLS.md).
 

@@ -1,8 +1,8 @@
 # IPAM demo architecture decisions
 
-Status: **agent-decided under the user's explicit delegation**, 2026-09-19. The architecture interviewer `/root/grill_architecture` and proposer `/root/coverage_20h` completed two actual discussion rounds. The lead supplied the runtime contract. These are decisions for implementation, not claims of working software or user answers to an interview. No application, container, VM, dependency installation, or verification was performed by this subtask.
+Status: **agent-decided under the user's explicit delegation**, 2026-09-19. The architecture interviewer `/root/grill_architecture` and proposer `/root/coverage_20h` completed an initial two-round discussion followed by 75 individual questions and answers in three dependent batches of 25. The lead supplied the runtime contract and reconciled the decisions. These are decisions for implementation, not claims of working software or user answers to an interview. No application, container, VM, dependency installation, or application verification was performed.
 
-The user explicitly directed agents to grill each other instead of asking them questions. That overrides the grilling skill's usual user-interview and confirmation steps. The earlier `ARCHITECTURE_GRILL_DRAFT.md` is superseded. Discussion evidence is in `AGENT_GRILL_TRANSCRIPT.md`.
+The user explicitly directed agents to grill each other instead of asking them questions. That overrides the grilling skill's usual user-interview and confirmation steps. The earlier interview draft is superseded. The initial exchange is historical in `AGENT_GRILL_TRANSCRIPT.md`; the deeper exchange and correction trail are in [GRILL_75.md](GRILL_75.md). Use [shared contracts](CONTRACTS.md) and its linked [implementation decisions](IMPLEMENTATION_DECISIONS.md) for current engineering instructions; the transcript is evidence, not a required reread on every feature.
 
 ## 1. Product and counting boundary
 
@@ -51,10 +51,12 @@ Seeding/resetting never happens implicitly at normal startup. Seed generation us
 - Join only with declared namespace/VRF, address family, object and relevant time. Missing scope is unresolved; separate isolated private networks may reuse the same address.
 - Parent/child containment is not automatically a conflict. Contradictory simultaneous assignments remain available as evidence rather than being silently deduplicated.
 - Occupancy counts distinct active addresses from valid lease intervals at documented sample times. Renewals must not inflate usage. Capacity is the configured assignable range minus exclusions, not blindly the CIDR size.
+- Pressure uses p95 occupancy **at least 80% OR a valid forecast below 60 days to full**. Oversized means 30-day p95 occupancy **below 50%**. An unsupported 90%/10% proposal was rejected during the deeper review. Hourly sampling is an explicit demo approximation to the source's minute sampling, not full production fidelity.
 - Apply DHCP rules only to DHCP-managed pools. A complete eligible 30-day zero-lease window produces an **investigation candidate**. It does not prove safe reclamation. The deck's 90-day-plus-probing rule is not represented as implemented.
 - An absent route requires a complete eligible routing view and explicit expected-announcement policy. A failed/stale source yields **unknown**, not unused or stranded.
 - Allocated, leased, routed, and carrying traffic are different facts. The proposed three-source demo does not measure traffic.
 - Use an explained simple positive-growth capacity estimate. Show insufficient-data, no-growth, scope-changed, and already-exhausted states; do not invent an exhaustion date.
+- Compute capacity history/forecast once in the backend before evaluating pressure. Part 3 consumes that result and Part 4 displays it; neither the rule nor its backend calculation depends on the UI being built.
 - Candidate reclaimable space is separate from released space. All external DNS/DHCP/router effects remain visibly simulated and approval-gated.
 
 ## 6. One fixed allocation workflow
@@ -98,7 +100,7 @@ The module lives under `backend/ipam_demo`; core supplies the installation/worki
 
 Develop locally. No VM is required. A Sunday CPU host is a later isolated deployment decision with explicit provider, cost, lifetime, disks, ports, backup destination, and cleanup owner. Do not rent/build/run infrastructure during this planning task.
 
-No tests or verification were run by this subtask. Implementation follows the governing repository/session verification instructions. When checks are authorized/required, select them by changed behavior and actual risk: affected scenario calculations, allocation transaction/role behavior, or recipient startup/persistence. Reuse valid results until a relevant change or failure invalidates them. Do not run an expanding full suite after every feature or write tests that mirror implementation details.
+No application tests or runtime verification were run. The documents received agent review and source cross-checking. Implementation follows the governing repository/session verification instructions. When checks are authorized/required, select them by changed behavior and actual risk: affected scenario calculations, allocation transaction/role behavior, or recipient startup/persistence. Reuse valid results until a relevant change or failure invalidates them. Do not run an expanding full suite after every feature or write tests that mirror implementation details.
 
 Keep authored acceptance criteria, code inspection, runtime evidence, and observed recipient portability distinct. Record what remains unverified. A failed check or timebox requires narrowing/disclosing scope, never a hardcoded successful result.
 

@@ -8,7 +8,7 @@ These rules apply to every human and agent working on this repository. The goal 
 - Distinguish accepted decisions, proposals, implementation and demonstrated results. Never treat a written plan or a green-looking screen as completed behavior.
 - Resolve routine coding details using existing conventions. The user has delegated architecture grilling to agents: interviewer and proposer must challenge each other directly, settle bounded choices, and record assumptions. Do not interview the user by default.
 - Escalate only a genuine blocker that agents cannot resolve within the user's constraints, or an action outside existing authorization such as new infrastructure spending. Do not send routine tradeoffs back to the user.
-- Batch material questions, at most three per round. Do not re-ask answered questions or request facts available in the repository.
+- If a genuine blocker requires user input, batch at most three material questions. Do not re-ask answered questions or request facts available in the repository. This is not a limit on the explicitly delegated agent-to-agent review.
 - Implement only authorized work. No cloud rental, public exposure, external writes or new ongoing cost follows automatically from a feature request.
 - Keep the 111-row external requirement view separate from the smaller demo-goal scorecard. Do not relabel partial or simulated behavior as full requirement satisfaction.
 
@@ -60,7 +60,7 @@ These rules apply to every human and agent working on this repository. The goal 
 - Use the useful artifact: a small decision tree, UI review findings, root-cause explanation or targeted review. Stop when that artifact is complete.
 - Ask security questions only for concrete scope: public deployment, permissions, secrets, or a real state-changing action. Do not design enterprise SSO, HA, compliance or threat programs for this local synthetic demonstration.
 - Do not remove essential correctness controls in the name of speed. Unknown evidence stays unknown; the API enforces claimed permissions; allocations cannot silently collide.
-- The user explicitly overrides the grilling skill's user-interview and user-confirmation defaults for this project. Run short agent-to-agent frontier rounds; record the actual exchange and resulting decisions, never a fabricated debate. The current deeper 75-question architecture pass is a one-time planning exercise responding to the requested depth, not a mandatory feature ritual. Later rounds reopen only material unresolved choices.
+- The user explicitly overrides the grilling skill's user-interview and user-confirmation defaults for this project. Run short agent-to-agent frontier rounds; record the actual exchange and resulting decisions, never a fabricated debate. The completed deeper 75-question architecture pass is a one-time planning exercise responding to the requested depth, not a mandatory feature ritual. Later rounds reopen only material unresolved choices.
 - Other skill confirmation requirements must be checked against existing user authorization. Do not create additional approval gates by interpretation.
 
 ## 6. Evidence and synthetic data

@@ -18,6 +18,8 @@ Visible import counts/reasons, immutable raw record references, source ownership
 
 ## Acceptance and limits
 
-Accepted plus rejected records accounts for every input. Missing source data remains unknown. Assessment workflow/maturity sections use fictional examples or "not assessed"; they cannot claim real organizational discovery. No live connectors, subscriber identity or arbitrary file-format platform.
+Accepted plus rejected plus duplicate records account for every input, with exclusive statuses. Identical whole-batch replay returns its original receipt with no new effects. Required rejected observations make effective completeness false. Publish the selected observation batch and effective coverage for Part 3; never silently fall back to an older complete batch. Core input is versioned JSON, not arbitrary format support. Read the identity/import sections in `docs/IMPLEMENTATION_DECISIONS.md`.
+
+Missing source data remains unknown. Assessment workflow/maturity sections use fictional examples or "not assessed"; they cannot claim real organizational discovery. No live connectors, subscriber identity or arbitrary file-format platform.
 
 Handoff: fixtures/schema, source-run IDs, fixed clock, expected outcomes for independent comparison, import errors and limits. Part 3 must not have to reverse-engineer the source format.
