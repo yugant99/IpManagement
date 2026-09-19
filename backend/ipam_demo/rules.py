@@ -91,7 +91,7 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
             oversized["explanation"] = "All 720 eligible hourly samples are required; missing samples are never filled with zero."
         overlap = metric["lease_overlap_30d"]
         if overlap is True:
-            _state(zombie, "healthy", "An assignable lease overlaps the 30-day window; this is not a zero-lease candidate.")
+            _state(zombie, "healthy", "A DHCP lease within the intended pool prefix overlaps the 30-day window, including any excluded or out-of-range claim; this is not a zero-lease candidate.")
         elif overlap is None:
             zombie["explanation"] = "A complete, consistent 30-day DHCP interval is required to establish zero lease overlap."
         else:

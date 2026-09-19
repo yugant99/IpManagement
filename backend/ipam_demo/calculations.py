@@ -91,22 +91,25 @@ def calculate_pools(connection, views, clock_text):
             continue
         coverage = view["coverage"]
         start, end = instant(coverage["window_start_at"]), instant(coverage["window_end_at"])
-        leases = []
+        leases, prefix_leases = [], []
+        network = ip_network(prefix["cidr"])
         for record, typed in typed_records(view):
             if typed["family"] != pool["family"]:
                 continue
             address = int(ip_address(typed["address"]))
+            inside_prefix = ip_address(typed["address"]) in network
+            if inside_prefix and instant(typed["observed_at"]) <= clock:
+                prefix_leases.append((instant(typed["lease_start_at"]), instant(typed["lease_end_at"])))
+                metric["input_references"].append(reference(view, record))
             if not any(left <= address <= right for left, right in intervals):
-                if (ip_address(typed["address"]) in ip_network(prefix["cidr"])
+                if (inside_prefix
                         and instant(typed["observed_at"]) <= clock
                         and instant(typed["lease_start_at"]) <= clock < instant(typed["lease_end_at"])):
                     metric["out_of_range_observations"].append({"address": typed["address"],
                         "client_id": typed["client_id"], "input_reference": reference(view, record)})
-                    metric["input_references"].append(reference(view, record))
                 continue
             if instant(typed["observed_at"]) <= clock:
                 leases.append((address, instant(typed["lease_start_at"]), instant(typed["lease_end_at"])))
-                metric["input_references"].append(reference(view, record))
 
         def occupancy(sample):
             return len({address for address, left, right in leases if left <= sample < right})
@@ -135,7 +138,7 @@ def calculate_pools(connection, views, clock_text):
             metric["p95"].update(status="available", occupied_addresses=str(value), utilization_pct=100 * value / capacity)
         else:
             metric["p95"]["reason"] = "scope_or_capacity_changed" if not consistent else "incomplete_30_day_sample_coverage"
-        positive_overlap = any(left < min(clock, end) and right > max(window_start, start) for _, left, right in leases)
+        positive_overlap = any(left < min(clock, end) and right > max(window_start, start) for left, right in prefix_leases)
         if positive_overlap:
             metric["lease_overlap_30d"] = True
         elif consistent and coverage["effective_complete"] and start <= window_start and end >= clock:
