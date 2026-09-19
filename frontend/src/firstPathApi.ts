@@ -20,10 +20,10 @@ export interface Receipt {
   sequence: number;
   source_id: string;
   source_run_id: string;
-  source_kind: "routing" | "route_policy";
+  source_kind: "routing" | "route_policy" | "dhcp" | "inventory_staged";
   ingested_at: string;
   demo_clock_at: string;
-  application_status: "complete" | "partial";
+  application_status: "complete" | "partial" | "staged";
   input_rows: number;
   accepted_rows: number;
   rejected_rows: number;
@@ -56,7 +56,7 @@ export interface InputReference {
 export interface Finding {
   id: string;
   run_id: string;
-  rule_id: "missing_expected_route";
+  rule_id: string;
   rule_version: number;
   subject: {
     id: string;
@@ -67,21 +67,15 @@ export interface Finding {
     version: number;
     origin: Origin;
   };
-  severity: "high";
+  severity: "critical" | "high" | "warning";
   evidence_state: EvidenceState;
   explanation: string;
   input_references: InputReference[];
-  evaluated_window: { kind: "instant"; start_at: string; end_at: string; interval_convention: string };
+  evaluated_window: { kind: string; start_at: string; end_at: string; interval_convention: string };
   limitations: string[];
   proposed_action: string;
-  policy: {
-    source_record_id: string;
-    scope_id: string;
-    prefix_id: string;
-    expects_announcement: boolean;
-    route_match_policy: "exact" | "covering";
-    effective_from_at: string;
-  } | null;
+  policy: Record<string, unknown> | null;
+  observations?: unknown[];
   coverage: Coverage[];
 }
 
@@ -90,7 +84,7 @@ export interface RunSummary {
   created_at: string;
   demo_clock_at: string;
   ledger_version: number;
-  rule_id: "missing_expected_route";
+  rule_id: string;
   rule_version: number;
   synthetic: true;
   selected_batches: Receipt[];

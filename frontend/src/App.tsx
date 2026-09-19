@@ -3,6 +3,9 @@ import type { FormEvent, ReactNode } from "react";
 import { ApiError, loadScopes, request } from "./api";
 import type { Health, Origin, Page, Prefix, PrefixDetail, Scope } from "./api";
 import FirstPath from "./FirstPath";
+import CapacityReports from "./CapacityReports";
+import InventoryEditor from "./InventoryEditor";
+import Workflow from "./Workflow";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 type Bootstrap =
@@ -158,7 +161,7 @@ function PrefixContents({ prefix, onSelect }: { prefix: PrefixDetail; onSelect: 
 }
 
 export default function App() {
-  const [view, setView] = useState<"inventory" | "first-path">("inventory");
+  const [view, setView] = useState<"inventory" | "first-path" | "planning" | "capacity" | "workflow">("inventory");
   const [bootstrap, setBootstrap] = useState<Bootstrap>({ status: "loading" });
   const [evidenceScopes, setEvidenceScopes] = useState<Scope[] | null>(null);
   const [revision, setRevision] = useState(0);
@@ -248,12 +251,15 @@ export default function App() {
       <a className="skip-link" href="#inventory-main">Skip to main content</a>
       <header className="app-header">
         <div className="brand"><span className="brand-mark" aria-hidden="true">IP</span><span>IP inventory</span><span className="demo-label">Synthetic demo</span></div>
-        <span className="header-context">Stage 2 · First complete path</span>
+        <span className="header-context">Scoped inventory · Evidence · Decisions</span>
       </header>
       <main id="inventory-main">
         <nav className="view-navigation" aria-label="Inventory views">
           <button className="secondary" aria-current={view === "inventory" ? "page" : undefined} onClick={() => setView("inventory")}>Intended inventory</button>
           <button className="secondary" aria-current={view === "first-path" ? "page" : undefined} onClick={() => setView("first-path")}>Source evidence</button>
+          <button className="secondary" aria-current={view === "planning" ? "page" : undefined} onClick={() => setView("planning")}>Prefix planning</button>
+          <button className="secondary" aria-current={view === "capacity" ? "page" : undefined} onClick={() => setView("capacity")}>Capacity and reports</button>
+          <button className="secondary" aria-current={view === "workflow" ? "page" : undefined} onClick={() => setView("workflow")}>Requests and exceptions</button>
         </nav>
         <div hidden={view !== "inventory"}>
         <div className="page-heading">
@@ -308,6 +314,11 @@ export default function App() {
           </div>
         )}
         {evidenceScopes && <div hidden={view !== "first-path"}><FirstPath scopes={evidenceScopes} /></div>}
+        {bootstrap.status === "ready" && <>
+          <div hidden={view !== "planning"}><InventoryEditor scopes={bootstrap.scopes} onChanged={() => { setListRevision((value) => value + 1); setSelectedId(null); }} /></div>
+          <div hidden={view !== "capacity"}><CapacityReports scopes={bootstrap.scopes} /></div>
+          <div hidden={view !== "workflow"}><Workflow /></div>
+        </>}
         {health && <Readiness health={health} />}
         <footer className="page-footer">Synthetic inventory and evidence · Saved calculations are pinned to their run · Data and readiness are reported by the API</footer>
       </main>

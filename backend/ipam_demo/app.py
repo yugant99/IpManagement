@@ -171,7 +171,8 @@ def create_app() -> FastAPI:
             error.details = {**error.details, "audit_recorded": False}
             try:
                 actor_id = payload.get("actor_id") if isinstance(payload, dict) else None
-                workflow.require_actor(actor_id)
+                if actor_id == "system":
+                    actor_id = "unknown"
                 write_operation(request, lambda connection: workflow.audit_event(
                     connection, actor_id=actor_id, action=action, outcome="failed",
                     reason=f"{error.code}: {error.message}", subject_id=subject_id,
@@ -181,7 +182,7 @@ def create_app() -> FastAPI:
             except Exception:
                 logger.exception("Failure audit could not be stored; request_id=%s", request.state.request_id)
                 error.message += " Failure audit was not recorded; see the server log with the request ID."
-            raise error from exc
+            raise error
 
     @app.get("/api/actors")
     def actors(connection=Depends(database)):
@@ -192,7 +193,7 @@ def create_app() -> FastAPI:
         return inventory_commands.edit_context(connection, str(object_id))
 
     @app.get("/api/prefixes/{object_id}/child-preview")
-    def child_preview(object_id: UUID, prefix_length: int, limit: Annotated[int, Query(ge=1, le=50)] = 10,
+    def child_preview(object_id: UUID, prefix_length: int, limit: Annotated[int, Query(ge=1, le=20)] = 10,
                       connection=Depends(database)):
         return inventory_commands.preview_children(connection, str(object_id), prefix_length, limit)
 
