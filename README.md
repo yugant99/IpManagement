@@ -2,7 +2,7 @@
 
 A planned portable IP address inventory and reconciliation demonstration using synthetic data.
 
-**Current state:** Foundation [PR #5](https://github.com/yugant99/IpManagement/pull/5), synthetic-data [PR #7](https://github.com/yugant99/IpManagement/pull/7) and first-path [PR #8](https://github.com/yugant99/IpManagement/pull/8) are accepted source dependencies, all unmerged. The [Stage 3 kickoff](docs/handoffs/stage-03-kickoff.md) is approved; core state commands and packaging remain separate lanes. Main contains documentation only. Runtime and portable-release evidence remain pending. Start with [current status](docs/STATUS.md).
+**Current state:** Foundation [PR #5](https://github.com/yugant99/IpManagement/pull/5), synthetic-data [PR #7](https://github.com/yugant99/IpManagement/pull/7), first-path [PR #8](https://github.com/yugant99/IpManagement/pull/8) and rich-seed CLI [PR #12](https://github.com/yugant99/IpManagement/pull/12) have accepted source checkpoints, all unmerged. Stage 3 is active; core state compatibility and packaging remain separate lanes. Main contains documentation only. Runtime and portable-release evidence remain pending. Start with [current status](docs/STATUS.md).
 
 ## Agent pickup
 
