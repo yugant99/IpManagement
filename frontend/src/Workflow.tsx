@@ -62,8 +62,8 @@ export default function Workflow() {
     ]).then(([current, items, queue]) => {
       if (controller.signal.aborted) return;
       setStatus(current); setRequests(items); setExceptions(queue);
-      setSelectedRequest(previous => previous ? items.items.find(item => item.id === previous.id) ?? previous : null);
-      setSelectedException(previous => previous ? queue.items.find(item => item.id === previous.id) ?? previous : null);
+      setSelectedRequest(previous => previous ? items.items.find(item => item.id === previous.id) ?? null : null);
+      setSelectedException(previous => previous ? queue.items.find(item => item.id === previous.id) ?? null : null);
     }).catch((failure: unknown) => {
       if (!controller.signal.aborted) setError(`Refresh failed; previously shown data retains its earlier state. ${readableError(failure)}`);
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
@@ -105,8 +105,8 @@ export default function Workflow() {
   }
 
   async function decide(action: "approve" | "reject") {
-    if (!selectedRequest) return;
-    const attempt = decisionAttempt ?? { id: selectedRequest.id,
+    if (!selectedRequest && !decisionAttempt) return;
+    const attempt = decisionAttempt ?? { id: selectedRequest!.id,
       payload: { actor_id: actorId, action, reason: decisionReason, simulate_failure: action === "approve" && simulateFailure } };
     setDecisionAttempt(attempt); setBusy(true); setError(""); setMessage("");
     try {
@@ -146,6 +146,8 @@ export default function Workflow() {
     <div className="evidence-banner"><strong>Synthetic workflow</strong><span>Local allocations are real database changes. External provisioning is simulated. Queue actions leave calculated findings unchanged.</span></div>
     {error && <div className="notice" role="alert"><strong>Action or refresh failed</strong><p>{error}</p></div>}
     {message && <div className="notice" role="status">{message}</div>}
+    {decisionAttempt && !selectedRequest && <div className="notice" role="status"><p>The decision response for request <code>{decisionAttempt.id}</code> is uncertain. Its row is outside the current page; the exact decision remains available for a safe retry.</p>
+      <button disabled={busy} onClick={() => void decide(decisionAttempt.payload.action)}>Retry exact decision</button></div>}
     {loading && <p role="status">Loading saved workflow records…</p>}
     {status && <>
       <div className="filters"><label>Named demo actor<select value={actorId} disabled={busy || !!createAttempt || !!decisionAttempt} onChange={event => setActorId(event.target.value)}>
