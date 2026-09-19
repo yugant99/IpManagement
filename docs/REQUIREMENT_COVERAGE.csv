@@ -1,0 +1,112 @@
+requirement_id,prior_feasibility_class,primary_work_part,linked_demo_goals,evidence_status,accounting_rule
+RFP-001,working_demo_candidate,5,G21 G24,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-002,working_demo_candidate,1,G01,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-003,working_demo_candidate,1,G04,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-004,working_demo_candidate,5,G22,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-005,working_demo_candidate,5,G22,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-006,working_demo_candidate,"1,4",G02 G20,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-007,working_demo_candidate,"1,4",G02 G18,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-008,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-009,working_demo_candidate,5,G21,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-010,working_demo_candidate,1,G03,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-011,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-012,working_demo_candidate,1,G03,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-013,working_demo_candidate,1,G03,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-014,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-015,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-016,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-017,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-018,working_demo_candidate,6,G27,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-019,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-020,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-021,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-022,working_demo_candidate,6,G28,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-023,enterprise_deferred,6,G29,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-024,enterprise_deferred,6,G29,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-025,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-026,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-027,working_demo_candidate,1,G04,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-028,working_demo_candidate,1,G02,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-029,working_demo_candidate,"1,3",G01 G14,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-030,working_demo_candidate,1,G01,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-031,working_demo_candidate,1,G01,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-032,business_evidence_or_process,2,G08,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-033,working_demo_candidate,2,G05 G07,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-034,working_demo_candidate,"2,3",G07 G14,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-035,working_demo_candidate,"1,4",G04 G19,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-036,simulated_integration_or_partial,2,G06,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-037,working_demo_candidate,2,G07 G08,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-038,business_evidence_or_process,2,G08,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-039,business_evidence_or_process,2,G08,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-040,business_evidence_or_process,2,G08,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-041,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-042,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-043,simulated_integration_or_partial,5,G23,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-044,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-045,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-046,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-047,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-048,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-049,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-050,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-051,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-052,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-053,working_demo_candidate,5,G21,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-054,working_demo_candidate,5,G21,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-055,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-056,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-057,working_demo_candidate,5,G23,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-058,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-059,working_demo_candidate,5,G21 G24,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-060,working_demo_candidate,5,G21 G22,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-061,simulated_integration_or_partial,"2,3",G06 G15,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-062,working_demo_candidate,"2,3",G07 G14 G15,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-063,working_demo_candidate,"2,3",G05 G06 G11 G12 G13 G15,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-064,working_demo_candidate,3,G14,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-065,working_demo_candidate,3,G10 G15,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-066,working_demo_candidate,3,G11 G12,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-067,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-068,simulated_integration_or_partial,3,G16,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-069,working_demo_candidate,"3,4",G13 G16 G18 G20,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-070,simulated_integration_or_partial,5,G23,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-071,working_demo_candidate,3,G16,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-072,working_demo_candidate,5,G25,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-073,working_demo_candidate,"3,4",G09 G17 G18,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-074,simulated_integration_or_partial,"3,4",G09 G17,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-075,working_demo_candidate,"3,4",G10 G18,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-076,working_demo_candidate,"3,4",G09 G17 G18 G20,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-077,working_demo_candidate,4,G18 G20,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-078,working_demo_candidate,"4,5",G20 G22,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-079,business_evidence_or_process,2,G08,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-080,working_demo_candidate,5,G21 G24,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-081,simulated_integration_or_partial,5,G25,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-082,working_demo_candidate,5,G25,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-083,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-084,working_demo_candidate,5,G22 G23,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-085,working_demo_candidate,3,G14,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-086,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-087,working_demo_candidate,2,G07,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-088,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-089,working_demo_candidate,2,G07,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-090,simulated_integration_or_partial,6,G26 G29,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-091,simulated_integration_or_partial,6,G26,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-092,business_evidence_or_process,6,G30,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-093,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-094,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-095,simulated_integration_or_partial,4,G19,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-096,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-097,enterprise_deferred,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-098,simulated_integration_or_partial,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-099,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-100,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-101,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-102,business_evidence_or_process,6,G30,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-103,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-104,business_evidence_or_process,6,G30,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-105,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-106,business_evidence_or_process,6,G30,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-107,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-108,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-109,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-110,business_evidence_or_process,,,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
+RFP-111,working_demo_candidate,5,G24,Not built or verified,Linked goals demonstrate bounded behavior only; no whole-row compliance credit without complete evidence
