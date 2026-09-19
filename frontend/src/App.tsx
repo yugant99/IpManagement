@@ -314,10 +314,11 @@ export default function App() {
           </div>
         )}
         {evidenceScopes && <div hidden={view !== "first-path"}><FirstPath scopes={evidenceScopes} /></div>}
+        {/* Preserve unresolved workflow retries after initial readiness, including refresh failures. */}
+        {evidenceScopes && <div hidden={view !== "workflow" || bootstrap.status !== "ready"}><Workflow /></div>}
         {bootstrap.status === "ready" && <>
           <div hidden={view !== "planning"}><InventoryEditor scopes={bootstrap.scopes} onChanged={() => { setListRevision((value) => value + 1); setSelectedId(null); }} /></div>
           <div hidden={view !== "capacity"}><CapacityReports scopes={bootstrap.scopes} /></div>
-          <div hidden={view !== "workflow"}><Workflow /></div>
         </>}
         {health && <Readiness health={health} />}
         <footer className="page-footer">Synthetic inventory and evidence · Saved calculations are pinned to their run · Data and readiness are reported by the API</footer>
