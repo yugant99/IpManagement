@@ -1,6 +1,8 @@
 # Stage 5: local acceptance and delivery handoff
 
-**Approved Stage 5 handoff for source/evidence preparation; local execution authorization is pending.** Stage 4 source is accepted at **`54f8f8168108733d40d842263218f16b33df5868`**, [PR #25](https://github.com/yugant99/IpManagement/pull/25), after both owner corrections and independent delta closeout. No new acceptance task has been created. The user has been asked about bounded local E2E in the data-owner task; do not repeat that question or treat elapsed time as approval.
+**Stage 5 is assigned to existing task `01a0baff-2143-7073-ad3d-4963a9cc0ca5` (Execute Stage 5 acceptance handoff).** Its worktree is `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5`, branch `codex/stage-5-local-acceptance`; accepted corrected preparation is `7e37dde6ba18a08717b0ce56c4438522fc5f7008`, [PR #27](https://github.com/yugant99/IpManagement/pull/27). Continue there; do not repeat setup or create a duplicate. The complete prompt below is retained as its original approved assignment, with current STATUS/CURRENT_HANDOFF governing subsequent checkpoints. Preparation acceptance adds no runtime evidence.
+
+**Local execution authorization is pending.** Stage 4 source is accepted at **`54f8f8168108733d40d842263218f16b33df5868`**, [PR #25](https://github.com/yugant99/IpManagement/pull/25), after both owner corrections and independent delta closeout. The user has been asked about bounded local E2E in the data-owner task; do not repeat that question or treat elapsed time as approval.
 
 Exact pickup publication: **`117d05295473cf25d362adb320e6fef26ecdd74c`**. The lead separately read its API/report-only delta over accepted code. Application code remains outside main and PR #25 remains open/draft against Stage 3.
 
