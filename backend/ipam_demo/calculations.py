@@ -155,12 +155,12 @@ def calculate_pools(connection, views, clock_text):
         forecast.update(complete_days=len(daily), daily_p95=daily,
                         window_start_at=daily[0]["day_start_at"] if daily else None,
                         window_end_at=stamp(last_day_end))
-        if not consistent:
-            forecast["reason"] = "scope_or_capacity_changed"
-        elif metric["current"]["status"] != "available":
+        if metric["current"]["status"] != "available":
             forecast["reason"] = "missing_complete_current_evidence"
         elif current >= capacity:
             forecast.update(status="exhausted", days_to_full=0, baseline_addresses=str(current))
+        elif not consistent:
+            forecast["reason"] = "scope_or_capacity_changed"
         elif daily and int(daily[-1]["occupied_addresses"]) >= capacity:
             forecast.update(status="exhausted", days_to_full=0, baseline_addresses=daily[-1]["occupied_addresses"])
         elif len(daily) < 14:
