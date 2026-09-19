@@ -66,9 +66,15 @@ def calculate_pools(connection, views, clock_text):
                                "slope_addresses_per_day": None, "baseline_addresses": None,
                                "complete_days": 0, "daily_p95": [], "method": "ordinary_least_squares"},
                   "history": [], "lease_overlap_30d": None, "out_of_range_observations": [],
+                  "static_dhcp_observations": [], "assignment_evidence": {"status": "unavailable"},
                   "limitations": ["Synthetic lease occupancy is not traffic; hourly samples are an illustrative approximation.",
                                   "Counts use distinct assignable addresses; renewals and conflicting clients do not inflate occupancy."]}
         results.append(metric)
+        occupancy_applicable = pool["family"] == 4 and pool["management_mode"] == "dhcp"
+        if not occupancy_applicable:
+            for field in ("current", "p95", "forecast"):
+                metric[field].update(status="not_applicable",
+                                     reason="Occupancy and forecasting apply to DHCP-managed IPv4 pools.")
         reason = None
         try:
             intervals = assignable_intervals(pool, prefix["cidr"])
@@ -76,20 +82,19 @@ def calculate_pools(connection, views, clock_text):
             metric["capacity"] = str(capacity)
         except (ValueError, KeyError, TypeError) as exc:
             reason = "invalid_capacity: " + str(exc)
-        if reason is None and (pool["family"] != 4 or pool["management_mode"] != "dhcp"):
-            reason = "not_applicable: occupancy and forecasting apply to DHCP-managed IPv4 pools"
         if reason is None and len(candidates) != 1:
             reason = "missing_source" if not candidates else "ambiguous_source_authority"
         view = candidates[0] if len(candidates) == 1 else None
         if reason is None and not eligible_current_view(view, clock, "dhcp"):
             reason = "stale_or_inapplicable_source"
         if reason:
-            for field in ("current", "p95", "forecast"):
-                metric[field]["reason"] = reason
-                if reason.startswith("not_applicable"):
-                    metric[field]["status"] = "not_applicable"
+            metric["assignment_evidence"]["reason"] = reason
+            if occupancy_applicable:
+                for field in ("current", "p95", "forecast"):
+                    metric[field]["reason"] = reason
             continue
         coverage = view["coverage"]
+        metric["assignment_evidence"]["status"] = "complete" if coverage["effective_complete"] else "partial"
         start, end = instant(coverage["window_start_at"]), instant(coverage["window_end_at"])
         leases, prefix_leases = [], []
         network = ip_network(prefix["cidr"])
@@ -101,6 +106,10 @@ def calculate_pools(connection, views, clock_text):
             if inside_prefix and instant(typed["observed_at"]) <= clock:
                 prefix_leases.append((instant(typed["lease_start_at"]), instant(typed["lease_end_at"])))
                 metric["input_references"].append(reference(view, record))
+                if (pool["management_mode"] == "static"
+                        and instant(typed["lease_start_at"]) <= clock < instant(typed["lease_end_at"])):
+                    metric["static_dhcp_observations"].append({"address": typed["address"],
+                        "client_id": typed["client_id"], "input_reference": reference(view, record)})
             if not any(left <= address <= right for left, right in intervals):
                 if (inside_prefix
                         and instant(typed["observed_at"]) <= clock
@@ -110,6 +119,9 @@ def calculate_pools(connection, views, clock_text):
                 continue
             if instant(typed["observed_at"]) <= clock:
                 leases.append((address, instant(typed["lease_start_at"]), instant(typed["lease_end_at"])))
+
+        if not occupancy_applicable:
+            continue
 
         def occupancy(sample):
             return len({address for address, left, right in leases if left <= sample < right})
