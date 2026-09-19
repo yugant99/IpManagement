@@ -22,4 +22,6 @@ Application code is still outside main. PRs #5/#7/#8/#10/#18/#19/#25/#27 remain 
 
 Next owner actions: lead coordinates application integration and adjudicates the **111** questionnaire rows using the actual evidence; Spencer publishes package/ops/recipient artifacts for separate review. The current runtime ledger links 51 unique candidate rows with partial clauses, not 51 fully satisfied requirements or a 60% completion claim. RFP-043 stays deferred.
 
+Final acceptance must also retain [the DOCX phase-section evidence and gaps](PHASE_COVERAGE.md). Selected synthetic mechanisms support parts of both phases; neither the validated customer Phase 1 assessment nor the full Phase 2 transformation is complete. This is a separate scope view, not extra questionnaire credit or a new feature assignment.
+
 Keep the existing Stage 5 task for concrete evidence follow-ups and existing Stage 3/Stage 4/core/data tasks for their owned defects. No defect was found to route from this run. Do not create another acceptance task, restart planning, or rotate project lead. The temporary heartbeat remains read-only and reports only meaningful new progress.
