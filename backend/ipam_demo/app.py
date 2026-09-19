@@ -280,10 +280,11 @@ def create_app() -> FastAPI:
         return audited_write(request, payload, "report_preset_save", lambda connection: reports.save_preset(connection, payload))
 
     @app.get("/api/report-preset/export")
-    def export_preset(connection=Depends(database)):
-        preset, body = reports.preset_csv(connection)
+    def export_preset(revision: Annotated[str, Query(pattern="^[0-9a-f]{64}$")], connection=Depends(database)):
+        preset, body = reports.preset_csv(connection, revision)
         return Response(body, media_type="text/csv", headers={"Content-Disposition": 'attachment; filename="ipam-findings.csv"',
-                        "X-Run-ID": preset["run_id"], "X-Report-Filters": json.dumps(preset["filters"], ensure_ascii=True)})
+                        "X-Run-ID": preset["run_id"], "X-Preset-Revision": preset["revision"],
+                        "X-Report-Filters": json.dumps(preset["filters"], ensure_ascii=True)})
 
     def import_receipt(connection, batch_id):
         row = connection.execute("SELECT receipt_json FROM source_batches WHERE id=?", (batch_id,)).fetchone()

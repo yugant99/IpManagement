@@ -14,7 +14,7 @@ interface Metric {
 }
 interface CapacityRun extends SavedRun { calculations?: Metric[]; candidate_space?: unknown }
 interface Actor { id: string; name?: string; role: string; team: string }
-interface Preset { name: string; run_id: string; filters: Record<string, string>; columns: string[] }
+interface Preset { name: string; run_id: string; filters: Record<string, string>; columns: string[]; revision: string }
 interface Comparison { before_run_id: string; after_run_id: string; limitations: string[]; items: { subject: Finding["subject"]; rule_id: string; transition: string; before: Finding | null; after: Finding | null }[] }
 const columns = ["run_id", "rule_id", "scope_id", "subject", "severity", "evidence_state", "explanation", "proposed_action"];
 
@@ -93,6 +93,40 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
     } catch (error) { setError(error instanceof Error ? error.message : "Preset save failed."); }
     finally { setBusy(false); }
   }
+  async function reloadPreset() {
+    setBusy(true); setError(""); setNotice("");
+    try {
+      setPreset(await request<Preset | null>("/api/report-preset", new AbortController().signal));
+      setNotice("Saved preset reloaded. Review its run, filters and columns before exporting.");
+    } catch (error) { setError(error instanceof Error ? error.message : "Could not reload the saved preset."); }
+    finally { setBusy(false); }
+  }
+  async function downloadPreset() {
+    if (!preset) return;
+    setBusy(true); setError(""); setNotice("");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12000);
+    try {
+      const response = await fetch(`/api/report-preset/export?revision=${preset.revision}`, {
+        signal: controller.signal, headers: { Accept: "text/csv" },
+      });
+      if (!response.ok) {
+        const body = response.headers.get("content-type")?.includes("application/json") ? await response.json() : null;
+        throw new Error(body?.error?.message ?? `Export failed (HTTP ${response.status}).`);
+      }
+      if (!response.headers.get("content-type")?.includes("text/csv") || response.headers.get("X-Preset-Revision") !== preset.revision) {
+        throw new Error("The export did not match the displayed preset. Reload the saved preset and retry.");
+      }
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a");
+      link.href = url; link.download = "ipam-findings.csv";
+      document.body.appendChild(link); link.click(); link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNotice("CSV download requested for the displayed preset.");
+    } catch (error) {
+      setError(controller.signal.aborted ? "Export timed out after 12 seconds. Retry the displayed preset." : error instanceof Error ? error.message : "Could not download the saved preset.");
+    } finally { window.clearTimeout(timeout); setBusy(false); }
+  }
   const visibleMetrics = (run?.calculations ?? []).filter((metric) => !filters.scope_id || metric.scope_id === filters.scope_id);
   const exportParams = new URLSearchParams(Object.entries(filters).filter(([, value]) => value));
   return <section aria-labelledby="capacity-heading">
@@ -124,7 +158,7 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
       <p><a href={`/api/runs/${run.id}/export?${exportParams}`}>Export pinned findings and calculations (JSON)</a></p>
       <form className="inventory-panel report-preset" onSubmit={(event) => { void savePreset(event); }}><h2>One report preset</h2><div className="filters"><label>Demo actor<select value={actor} onChange={(event) => setActor(event.target.value)}>{actors.map((item) => <option key={item.id} value={item.id}>{item.id} · {item.team}</option>)}</select></label><label>Name<input maxLength={200} required value={name} onChange={(event) => setName(event.target.value)} /></label><label>Reason<input maxLength={200} required value={reason} onChange={(event) => setReason(event.target.value)} /></label></div><fieldset><legend>CSV columns</legend><div className="column-options">{columns.map((column) => <label key={column}><input type="checkbox" checked={selectedColumns.includes(column)} onChange={(event) => setSelectedColumns(event.target.checked ? [...selectedColumns, column] : selectedColumns.filter((value) => value !== column))} />{column}</label>)}</div></fieldset><button disabled={busy || !selectedColumns.length}>Save current run and filters</button></form>
     </>}
-    {preset && <div className="notice"><strong>Saved preset: {preset.name}</strong><p>Pinned run <code>{preset.run_id}</code>; filters <code>{JSON.stringify(preset.filters)}</code></p><a href="/api/report-preset/export">Export saved preset (CSV)</a></div>}
+    {preset && <div className="notice"><strong>Saved preset: {preset.name}</strong><p>Pinned run <code>{preset.run_id}</code>; filters <code>{JSON.stringify(preset.filters)}</code></p><p>Columns: {preset.columns.join(", ")}</p><button disabled={busy} onClick={() => { void downloadPreset(); }}>Export displayed preset (CSV)</button> <button className="secondary" disabled={busy} onClick={() => { void reloadPreset(); }}>Reload saved preset</button></div>}
     <section className="path-step"><h2>Compare two runs</h2><div className="filters"><label>Earlier run<select value={before} onChange={(event) => setBefore(event.target.value)}><option value="">Select earlier run</option>{runs.map((item) => <option key={item.id} value={item.id}>{item.created_at} · {item.id}</option>)}</select></label><label>Later run<select value={after} onChange={(event) => setAfter(event.target.value)}><option value="">Select later run</option>{runs.map((item) => <option key={item.id} value={item.id}>{item.created_at} · {item.id}</option>)}</select></label><button disabled={busy || !before || !after || before === after} onClick={() => { void compare(); }}>Compare saved evidence</button></div>
       {comparison && <><p>Compared <code>{comparison.before_run_id}</code> → <code>{comparison.after_run_id}</code></p><ul>{comparison.limitations.map((text) => <li key={text}>{text}</li>)}</ul><div className="table-scroll"><table><thead><tr><th>Subject / rule</th><th>Earlier</th><th>Later</th><th>Transition</th></tr></thead><tbody>{comparison.items.map((item) => <tr key={`${item.rule_id}-${item.subject.scope_id}-${item.subject.id}`}><td>{item.subject.scope_name} · {item.subject.cidr}<div className="quiet">{item.rule_id}</div></td><td>{item.before?.evidence_state ?? "Not evaluated"}</td><td>{item.after?.evidence_state ?? "Not evaluated"}</td><td>{item.transition.replaceAll("_", " ")}</td></tr>)}</tbody></table></div></>}
     </section>

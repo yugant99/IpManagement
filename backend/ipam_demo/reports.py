@@ -2,6 +2,7 @@
 
 import csv
 from datetime import datetime, timezone
+from hashlib import sha256
 from io import StringIO
 import json
 
@@ -54,8 +55,10 @@ def get_preset(connection):
     row = connection.execute("SELECT * FROM report_preset WHERE singleton=1").fetchone()
     if row is None:
         return None
-    return {"name": row["name"], "run_id": row["run_id"], "filters": json.loads(row["filters_json"]),
-            "columns": json.loads(row["columns_json"]), "updated_at": row["updated_at"], "actor_id": row["actor_id"]}
+    preset = {"name": row["name"], "run_id": row["run_id"], "filters": json.loads(row["filters_json"]),
+              "columns": json.loads(row["columns_json"]), "updated_at": row["updated_at"], "actor_id": row["actor_id"]}
+    preset["revision"] = sha256(json.dumps(preset, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    return preset
 
 
 def save_preset(connection, payload):
@@ -106,10 +109,12 @@ def csv_text(columns, rows):
     return output.getvalue()
 
 
-def preset_csv(connection):
+def preset_csv(connection, expected_revision):
     preset = get_preset(connection)
     if preset is None:
         raise AppError("NOT_FOUND", "Save the report preset before exporting it.", 404)
+    if preset["revision"] != expected_revision:
+        raise AppError("STALE_REPORT_PRESET", "The saved preset changed. Reload the saved preset, review its run, filters and columns, then export again.", 409)
     run = get_run(connection, preset["run_id"])
     rows = [{**finding, "scope_id": finding["subject"]["scope_id"], "subject": finding["subject"]["cidr"]}
             for finding in filtered_findings(run, preset["filters"])]
