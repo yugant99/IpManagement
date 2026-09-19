@@ -12,7 +12,7 @@ import time
 from uuid import uuid4
 
 from .errors import AppError, store_error
-from .store import SCHEMA_VERSION, connect, exclusive_data_access, require_schema
+from .store import MIGRATABLE_SCHEMA_VERSIONS, SCHEMA_VERSION, connect, exclusive_data_access, require_schema
 
 logger = logging.getLogger("ipam_demo")
 SIDECAR_SUFFIXES = ("-wal", "-shm", "-journal")
@@ -75,9 +75,9 @@ def _read_only(path: Path):
 
 def _validate(connection: sqlite3.Connection) -> dict:
     version = connection.execute("PRAGMA user_version").fetchone()[0]
-    # v1 remains an explicit legacy input supported by store.migrate_schema.
-    # All other versions go through the current shared schema policy.
-    require_schema(connection, version=1 if version == 1 else SCHEMA_VERSION)
+    # Share the migration owner's legacy policy; unknown versions still fail
+    # the current-version check. State operations never migrate implicitly.
+    require_schema(connection, version=version if version in MIGRATABLE_SCHEMA_VERSIONS else SCHEMA_VERSION)
     integrity = [row[0] for row in connection.execute("PRAGMA integrity_check")]
     if integrity != ["ok"]:
         raise AppError("DATABASE_INTEGRITY_FAILED", "SQLite integrity validation failed; state was not replaced.",

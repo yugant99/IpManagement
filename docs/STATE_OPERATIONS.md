@@ -1,6 +1,6 @@
 # Core SQLite state operations
 
-**Source implementation; runtime evidence pending.** These commands extend the Stage 2 schema-v2 foundation. They were authored and source-reviewed without running the application, state commands, tests or builds. This document supplies core behavior for Spencer's packaging/runbook; it does not change his owned files or declare `PART6_READY=yes`.
+**Source implementation; runtime evidence pending.** These commands extend the Stage 2 foundation and consume Stage 3's shared schema-v3/legacy-version contract. They were authored and source-reviewed without running the application, state commands, tests or builds. This document supplies core behavior for Spencer's packaging/runbook; it does not change his owned files or declare `PART6_READY=yes`. See the [schema compatibility handoff](handoffs/part-1-state-schema-compat.md) for exact combined dependencies and the narrow follow-up change.
 
 Contribution: G27 core state correctness / RFP-018. No measured recovery objective, disaster-recovery, cross-host or allocation/audit persistence evidence is claimed.
 
@@ -22,7 +22,7 @@ The main file is exactly `IPAM_DATA_DIR/ipam_demo.sqlite3`. Only its exact `-wal
 
 ## Backup
 
-`backup --output PATH` copies the **entire SQLite main database** using `sqlite3.Connection.backup`, not selected rows or a raw copy of an open database file. It therefore includes inventory, original seed metadata, all Stage 2 import envelopes/receipts/raw and typed records/coverage, saved calculation runs and the findings embedded in their JSON. Other tables in the same database are also copied; code/assets, files outside SQLite and attached external databases are outside the snapshot.
+`backup --output PATH` copies the **entire SQLite main database** using `sqlite3.Connection.backup`, not selected rows or a raw copy of an open database file. It therefore includes inventory, original seed metadata, all Stage 2 import envelopes/receipts/raw and typed records/coverage, saved calculation runs and the findings embedded in their JSON. Schema v3's allocation requests, audit events, exceptions and report preset are included when present. Other tables in the same database are also copied; code/assets, files outside SQLite and attached external databases are outside the snapshot. Actual round-trip preservation remains unverified.
 
 The destination parent must already exist. The destination must be new: existing files, directories, symlinks and raced-in names are refused. Naming the active DB, its sidecars or its lock as output is refused. The source is opened read-only; its identity, supported schema, SQLite integrity and foreign keys must validate.
 
@@ -55,7 +55,9 @@ Success JSON includes `status: reset`, `database`, `database_removed`, `removed_
 
 ## Schema and file safety
 
-Application identity and required tables come from shared `require_schema`. Known schema v1 is retained as a legacy snapshot format using that helper's explicit `version=1`; all other inputs must match shared `SCHEMA_VERSION` (currently 2). Unsupported versions are refused. A restored v1 database remains v1 and returns `migration_required: true`; stop the service and use the existing explicit `python -m ipam_demo migrate` before normal current-runtime use. An uninitialized but structurally valid database stays uninitialized after backup/restore.
+Application identity and required tables come from shared `require_schema`. State validation uses the store owner's `MIGRATABLE_SCHEMA_VERSIONS` (currently v1 and v2) and `SCHEMA_VERSION` (currently v3). A declared legacy version is checked with `require_schema(version=that_version)`; current and all other inputs go through the current-version check, so unknown versions are refused. There is no separate historical-version list or table policy in state operations.
+
+This applies to backup sources, restore inputs/candidates, existing databases preserved before restore, and reset targets. A restored v1/v2 database keeps its original version and returns `migration_required: true`; stop the service and use the existing explicit `python -m ipam_demo migrate` before normal current-runtime use. Current-v3 restore returns `migration_required: false`. State operations never advance a schema themselves, and normal startup remains restricted to the current schema. An uninitialized but structurally valid database stays uninitialized after backup/restore.
 
 Validation includes `PRAGMA integrity_check` and `PRAGMA foreign_key_check`, beyond identity/version checks. These establish SQLite structural consistency when actually executed; they do not recalculate saved findings or revalidate every domain-level JSON assertion. Future schemas must keep shared helpers authoritative and coordinate any concrete compatibility change with the state-command owner.
 
@@ -69,6 +71,6 @@ Typical refusal codes are `CONFIRMATION_REQUIRED`, `DATA_IN_USE`, `STATE_FILE_MI
 
 An interruption can leave an operation-owned temporary file or a completed preserved snapshot. No startup cleanup scans or deletes those artifacts. This is a one-process local state interface, not a crash/power-loss recovery framework; crash consistency, directory/file-sync behavior and platform portability are unverified.
 
-Pending evidence includes complete Stage 2 snapshot round-trip and saved-ID/content preservation; invalid/foreign/unsupported/corrupt input refusal; original preservation on copy/replace/permission failures; active-service refusal; WAL/rollback-journal behavior; reset scope; replay of backup/restore/reset failures; v1 restore then explicit migration; and untouched unrelated files. No tests were added, and no state command, application install, migration, build, smoke/browser check or infrastructure operation was executed here. Allocation/audit persistence still additionally needs the future Part 5 records.
+Pending evidence includes complete v2/v3 snapshot round-trip and saved-ID/content preservation (including populated v3 workflow/audit/exception/preset tables); invalid/foreign/unsupported/corrupt input refusal; original preservation on copy/replace/permission failures; active-service refusal; WAL/rollback-journal behavior; reset scope; replay of backup/restore/reset failures; v1/v2 restore then explicit migration; replacement of an existing v2 target with a v3 snapshot while retaining its original; and untouched unrelated files. No tests were added, and no state command, application install, migration, build, smoke/browser check or infrastructure operation was executed here. Schema table availability alone does not establish populated Part 5 allocation/audit persistence evidence.
 
 Implementation references: [Python's backup API](https://docs.python.org/3.12/library/sqlite3.html#sqlite3.Connection.backup), [SQLite backup design](https://www.sqlite.org/backup.html), [SQLite URI semantics](https://www.sqlite.org/uri.html), and [SQLite temporary/journal files](https://www.sqlite.org/tempfiles.html). These inform source design; they are not runtime evidence for this implementation.
