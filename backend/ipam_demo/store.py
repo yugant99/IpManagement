@@ -11,6 +11,7 @@ from .errors import AppError
 
 APPLICATION_ID = 0x4950414D
 SCHEMA_VERSION = 3
+MIGRATABLE_SCHEMA_VERSIONS = (1, 2)
 CONTRACT_REVISION = "demo-v2-questionnaire"
 DATABASE_NAME = "ipam_demo.sqlite3"
 
@@ -121,13 +122,13 @@ def migrate_schema(directory: Path) -> dict:
                 if found == SCHEMA_VERSION:
                     require_schema(connection)
                     return {"schema_version": SCHEMA_VERSION, "changed": False}
-                if found not in (1, 2):
+                if found not in MIGRATABLE_SCHEMA_VERSIONS:
                     require_schema(connection)
                 require_schema(connection, version=found)
                 migration = ""
                 for target in range(found + 1, SCHEMA_VERSION + 1):
                     migration += "\n" + files("ipam_demo").joinpath(f"schema_v{target}.sql").read_text(encoding="utf-8")
-                # This owned SQL contains plain CREATE statements, no triggers or
+                # This owned SQL contains plain DDL/DML statements, no triggers or
                 # semicolons in literals. execute keeps the enclosing transaction;
                 # executescript would commit it before running the migration.
                 for statement in migration.split(";"):
