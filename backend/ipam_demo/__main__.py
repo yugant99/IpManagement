@@ -8,7 +8,7 @@ import sys
 from uuid import uuid4
 
 from .errors import AppError, store_error
-from .seed import seed_baseline
+from .seed import seed_baseline, seed_rich
 from .state_ops import backup_database, reset_database, restore_database
 from .store import data_directory, migrate_schema
 
@@ -19,9 +19,10 @@ def main() -> int:
     serve = commands.add_parser("serve", help="Serve one local API/UI process; never seeds automatically")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
-    seed = commands.add_parser("seed", help="Initialize the packaged baseline; stop the service first")
-    seed.add_argument("--scenario", choices=["baseline"], required=True)
-    commands.add_parser("migrate", help="Explicitly migrate the recognized v1 store; stop the service first")
+    seed = commands.add_parser("seed", help="Initialize explicit synthetic inventory; stop the service first")
+    seed.add_argument("--scenario", choices=["baseline", "rich"], required=True)
+    seed.add_argument("--inventory", help="Rich inventory JSON path; required for rich, forbidden for baseline")
+    commands.add_parser("migrate", help="Explicitly migrate recognized v1/v2 stores; stop the service first")
     backup = commands.add_parser("backup", help="Snapshot the complete store to a new file; stop the service first")
     backup.add_argument("--output", required=True)
     restore = commands.add_parser("restore", help="Validate and restore a snapshot, preserving the old store; stop the service first")
@@ -33,7 +34,15 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO)
     try:
         if args.command == "seed":
-            print(json.dumps(seed_baseline(data_directory()), indent=2))
+            if args.scenario == "rich":
+                if not args.inventory:
+                    raise AppError("INVALID_SEED_OPTIONS", "Rich setup requires --inventory PATH.", 422)
+                result = seed_rich(data_directory(), args.inventory)
+            else:
+                if args.inventory is not None:
+                    raise AppError("INVALID_SEED_OPTIONS", "Baseline uses its packaged inventory; omit --inventory.", 422)
+                result = seed_baseline(data_directory())
+            print(json.dumps(result, indent=2))
         elif args.command == "migrate":
             print(json.dumps(migrate_schema(data_directory()), indent=2))
         elif args.command == "backup":
