@@ -4,6 +4,8 @@
 
 This explicit decision supersedes earlier statements that the original lead must remain. Existing ownership, accepted evidence and permissions carry forward. The transfer grants no additional runtime or infrastructure authority.
 
+**Receiver checkpoint:** registration merged through PR #33; unchanged accepted application/evidence integrated through PR #34 at `e0ba2d99440c84c90ebe449f7442e247e2828b3f`. [Current readiness](accepted-candidate-integration.md) and [final 111-row adjudication](../QUESTIONNAIRE_ROW_MAP.md) supersede transfer-time pending states below. PR #9 remains OPEN / NO MERGE; Spencer's package and recipient evidence remain absent. Historical transfer facts are retained for provenance.
+
 ## Pickup and read order
 
 - Repository: https://github.com/yugant99/IpManagement
