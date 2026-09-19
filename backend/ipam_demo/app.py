@@ -173,11 +173,30 @@ def create_app() -> FastAPI:
                 actor_id = payload.get("actor_id") if isinstance(payload, dict) else None
                 if actor_id == "system":
                     actor_id = "unknown"
-                write_operation(request, lambda connection: workflow.audit_event(
-                    connection, actor_id=actor_id, action=action, outcome="failed",
-                    reason=f"{error.code}: {error.message}", subject_id=subject_id,
-                    request_id=subject_id if action.startswith("allocation") else None,
-                    details={"error_code": error.code, "http_request_id": request.state.request_id}))
+                def record_failure(connection):
+                    fields = ("pool_id", "scope_id", "candidate", "pool_version", "baseline_version", "idempotency_key",
+                              "expected_baseline_version", "expected_version", "expected_parent_version", "parent_id", "cidr", "action")
+                    context = {key: value for key, value in payload.items() if key in fields and (
+                        type(value) in (int, bool) or isinstance(value, str) and len(value) <= 500)}
+                    if action == "allocation_decision" and subject_id:
+                        try:
+                            saved = workflow.get_request(connection, subject_id)
+                            context.update({key: saved[key] for key in fields if key in saved})
+                        except AppError as missing:
+                            if missing.code != "NOT_FOUND":
+                                raise
+                    if context.get("pool_id") and not context.get("scope_id"):
+                        pool = connection.execute("SELECT scope_id FROM pools WHERE id=?", (context["pool_id"],)).fetchone()
+                        if pool:
+                            context["scope_id"] = pool["scope_id"]
+                    return workflow.audit_event(
+                        connection, actor_id=actor_id, action=action, outcome="failed",
+                        reason=f"{error.code}: {error.message}", subject_id=subject_id,
+                        request_id=subject_id if action.startswith("allocation") else None,
+                        scope_id=context.get("scope_id"), pool_id=context.get("pool_id"), address=context.get("candidate"),
+                        details={"error_code": error.code, "error_details": {key: value for key, value in error.details.items() if key != "audit_recorded"},
+                                 "attempt": context, "http_request_id": request.state.request_id})
+                write_operation(request, record_failure)
                 error.details["audit_recorded"] = True
             except Exception:
                 logger.exception("Failure audit could not be stored; request_id=%s", request.state.request_id)
