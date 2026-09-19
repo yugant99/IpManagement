@@ -57,7 +57,7 @@ class SyntheticScheduler:
         self._acquiring = False
         self.timer_error = None
         # If SQLite cannot save failure/next-due, still prevent an in-memory retry loop.
-        self._retry_at = None
+        self._retry_guard = None
 
     def _assets(self):
         if self._baseline is None:
@@ -128,7 +128,7 @@ class SyntheticScheduler:
                              "after": {"enabled": enabled, "interval_hours": hours, "config_version": version + 1, "next_due_at": due}})
 
     def configuration_committed(self):
-        self._retry_at = None
+        self._retry_guard = None
         self.timer_error = None
         self._wake.set()
 
@@ -246,7 +246,7 @@ class SyntheticScheduler:
                                      "receipts": [{field: receipt[field] for field in ("id", "source_id", "source_run_id", "application_status",
                                                    "input_rows", "accepted_rows", "rejected_rows", "duplicate_rows", "coverage")} for receipt in receipts]})
             self.timer_error = None
-            self._retry_at = None
+            self._retry_guard = None
             self._wake.set()
             return {**result, "replay": False}
         except Exception as exc:
@@ -272,24 +272,30 @@ class SyntheticScheduler:
                     expected = _state(connection)
                 if expected["enabled"]:
                     due = _instant(expected["next_due_at"])
-                    if self._retry_at is not None:
-                        due = max(due, self._retry_at)
+                    retry = self._retry_guard
+                    if retry is not None and retry[:2] == (expected["config_version"], expected["next_due_at"]):
+                        due = max(due, retry[2])
                     delay = max(0.0, (due - _now()).total_seconds())
                     if delay == 0:
                         key = f"timer:{expected['config_version']}:{expected['next_due_at']}"
                         # Set a forward guard before attempting, including failure-record loss.
-                        self._retry_at = _now() + timedelta(hours=expected["interval_hours"])
+                        self._retry_guard = (expected["config_version"], expected["next_due_at"],
+                                             _now() + timedelta(hours=expected["interval_hours"]))
                         result = self._acquire("system", key, workflow._hash(key), "Configured synthetic acquisition timer.", timer_expected=expected)
                         if result is None:
-                            self._retry_at = None
+                            self._retry_guard = None
                         delay = 0.0  # Re-read the persisted forward deadline, never catch up.
             except Exception as exc:
                 error = exc if isinstance(exc, AppError) else store_error(exc) if isinstance(exc, sqlite3.Error) else AppError(
                     "SCHEDULE_TIMER_FAILED", "The schedule timer failed. See server logs.", 500)
                 self.timer_error = _error_payload(error)
                 logger.error("%s: %s", error.code, error.message, exc_info=not isinstance(exc, AppError))
-                hours = expected["interval_hours"] if expected is not None else 6
-                self._retry_at = _now() + timedelta(hours=hours)
+                # A concurrent configuration save may have committed while this
+                # attempt failed. Its old guard must never delay the new due time.
+                # Without a captured schedule, retain any existing scoped guard.
+                if expected is not None:
+                    self._retry_guard = (expected["config_version"], expected["next_due_at"],
+                                         _now() + timedelta(hours=expected["interval_hours"]))
                 delay = 60.0
             if not self._stopping:
                 self._wake.wait(timeout=min(delay, 60.0))
