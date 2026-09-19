@@ -13,7 +13,7 @@
 
 ## Integration and task registry
 
-Repository: `yugant99/IpManagement`. Main contains documentation only. All registered tasks use host `local`; titles do not reassign ownership.
+Repository: `yugant99/IpManagement`. Main at registration `b6616a72d72d2b55659da796944e0a6fda46db7f` contains documentation only. [Integration PR #34](https://github.com/yugant99/IpManagement/pull/34) now supplies the unchanged accepted application/evidence lineage; see [the current readiness map and source-identity review](handoffs/accepted-candidate-integration.md). The registry below retains pre-integration PR states until main merge is confirmed. All registered tasks use host `local`; titles do not reassign ownership.
 
 | Owner / task | Branch / checkpoint / PR | Actual state |
 |---|---|---|

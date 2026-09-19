@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "window_start_at": "2026-08-02T00:00:00.000Z",
+  "window_end_at": "2026-09-01T00:00:00.000Z",
+  "foundation": {
+    "commit": "ea51aa64b1780fa5c171e95ae59a619bf0109d52",
+    "path": "backend/ipam_demo/data/baseline.json",
+    "snapshot": "foundation-baseline.json",
+    "sha256": "1bee93561d0093add205654f026b6b31cbf8fae567482fff03f9ad7b3fc6ceb6"
+  },
+  "default_inputs": [
+    "inventory.json",
+    "inventory-policy.json",
+    "observations/dhcp-north.json",
+    "observations/dhcp-lab.json",
+    "observations/dhcp-coastal.json",
+    "observations/dhcp-central.json",
+    "observations/routing-north.json",
+    "observations/routing-lab.json",
+    "observations/routing-coastal.json",
+    "observations/routing-central.json"
+  ],
+  "opt_in_inputs": [
+    "opt-in/dhcp-coastal-partial.json",
+    "opt-in/dhcp-central-partial.json",
+    "opt-in/routing-coastal-partial.json",
+    "opt-in/routing-central-partial.json",
+    "opt-in/routing-lab-partial.json",
+    "opt-in/dhcp-central-stale.json",
+    "opt-in/routing-central-stale.json",
+    "opt-in/dhcp-central-invalid.json",
+    "opt-in/routing-central-invalid.json",
+    "opt-in/dhcp-north-changed-replay.json"
+  ],
+  "first_path": {
+    "inventory_dependency": "foundation-baseline.json",
+    "default_inputs": [
+      "first-path/inventory-policy.json",
+      "first-path/routing-north.json",
+      "first-path/routing-lab.json"
+    ],
+    "opt_in_inputs": [
+      "first-path/routing-lab-partial.json",
+      "first-path/routing-lab-stale.json",
+      "first-path/routing-lab-recovery.json",
+      "first-path/inventory-policy-lab-partial.json"
+    ]
+  },
+  "counts": {
+    "scopes": 4,
+    "prefixes": 60,
+    "pools": 8,
+    "allocations": 1,
+    "dhcp_lease_intervals": 2000,
+    "routing_observations": 200
+  },
+  "generated_files": {
+    "inventory.json": {
+      "bytes": 36211,
+      "sha256": "45340ce2689ece6eddd3e2f121c7ed71e0465f6c88d8ec909d78429ba6e19426"
+    },
+    "inventory-policy.json": {
+      "bytes": 17420,
+      "sha256": "e9ed225610214409a436b8985080d732985f0bc08624dc42bbb9789b0afcf8a4",
+      "records": 60
+    },
+    "observations/dhcp-north.json": {
+      "bytes": 468987,
+      "sha256": "f24f12d1bf6cd7c5461012255de58839222b1f7ad5687e0b0c98a93402945e59",
+      "records": 750
+    },
+    "observations/dhcp-lab.json": {
+      "bytes": 323069,
+      "sha256": "e5f3bf9cbb371bf07a92da48c49919106e3cc8511efbd4e69a104da24d17b018",
+      "records": 520
+    },
+    "observations/dhcp-coastal.json": {
+      "bytes": 426757,
+      "sha256": "3a67e9f16167fb83e669b8869d01422718b53a2241abdaad0f6491de84020007",
+      "records": 679
+    },
+    "observations/dhcp-central.json": {
+      "bytes": 32712,
+      "sha256": "43e1b8e0458180e165559766de2f75552003464d46590460643edca5db88f012",
+      "records": 51
+    },
+    "observations/routing-north.json": {
+      "bytes": 31566,
+      "sha256": "b7a4e3b9befcc8f90408c80b06118f957bdd95cf49af90ad17a086c7a17f7420",
+      "records": 50
+    },
+    "observations/routing-lab.json": {
+      "bytes": 19020,
+      "sha256": "ed6b7bdfb7dffc811c75871f431fad7a5439a399045efb2d1c142ab0c14cd050",
+      "records": 30
+    },
+    "observations/routing-coastal.json": {
+      "bytes": 31892,
+      "sha256": "24d0f252e4fde9fe8ca7089688d10c2d03a3f707e58e68de6954e51d934e1df2",
+      "records": 50
+    },
+    "observations/routing-central.json": {
+      "bytes": 44372,
+      "sha256": "c286fad37e99187cefe525e9bc65bf51bb317d895e91dcb289b7c09d9b2c242b",
+      "records": 70
+    },
+    "opt-in/dhcp-coastal-partial.json": {
+      "bytes": 691,
+      "sha256": "2f853f78c0f9994349705573c07fe129df20d8a07b54936775d3b715241e4ece",
+      "records": 0
+    },
+    "opt-in/dhcp-central-partial.json": {
+      "bytes": 691,
+      "sha256": "85bf747baeb9936e91d17da584969d735713d8ca20c3aa9df73b896357e2f7b8",
+      "records": 0
+    },
+    "opt-in/routing-coastal-partial.json": {
+      "bytes": 700,
+      "sha256": "c5049c5400a8232e52f472cf05a309a5b54c8516e5b35d2ce62f228243fd01cd",
+      "records": 0
+    },
+    "opt-in/routing-central-partial.json": {
+      "bytes": 700,
+      "sha256": "27ac2d4c91ba79beff2922a5bcb75f78c52e682aba81bd2b93ce50b889653615",
+      "records": 0
+    },
+    "opt-in/routing-lab-partial.json": {
+      "bytes": 688,
+      "sha256": "d9018c152b68618aa70695150344857a038b5629c780084cb3351af37801c854",
+      "records": 0
+    },
+    "opt-in/dhcp-central-stale.json": {
+      "bytes": 32709,
+      "sha256": "7eb094e6ba05167969d4278b69472b8620d9394a53b4dda482b9692bc313d241",
+      "records": 51
+    },
+    "opt-in/routing-central-stale.json": {
+      "bytes": 44369,
+      "sha256": "7c799df0837e69dd17f5f340d178f9783f50d01c57f0463e1279500e2aa9b7bf",
+      "records": 70
+    },
+    "opt-in/dhcp-central-invalid.json": {
+      "bytes": 6218,
+      "sha256": "c6337f7940c0c0544791ed40d24c0813706c2732dcc4dac0e30f3d8900d576e7",
+      "records": 9
+    },
+    "opt-in/routing-central-invalid.json": {
+      "bytes": 5022,
+      "sha256": "eaac44979aefc322547822a28971d98c3f63577dc1c708d44654313432728b8d",
+      "records": 7
+    },
+    "opt-in/dhcp-north-changed-replay.json": {
+      "bytes": 469004,
+      "sha256": "c1827814495dec2e40ece1750ad9e23b799755b8a1c99565b911d33392a92f70",
+      "records": 750
+    },
+    "first-path/inventory-policy.json": {
+      "bytes": 2573,
+      "sha256": "0b3edc3d1a479ba22906a78336b800be9be730dd0138aa82c8db3e573e956a99",
+      "records": 6
+    },
+    "first-path/routing-north.json": {
+      "bytes": 1331,
+      "sha256": "c3df18751803bf4ae42a67a0711cb8000b67dbf0eb4d01d118ae90c7a135f3c5",
+      "records": 1
+    },
+    "first-path/routing-lab.json": {
+      "bytes": 705,
+      "sha256": "dad26960c124c87f16ee0b1617f6be9b268c62ba03fd0b10c9efbc17af73b67d",
+      "records": 0
+    },
+    "first-path/routing-lab-partial.json": {
+      "bytes": 705,
+      "sha256": "a6d2164ef5a1c80d1807ea785027457a79bcfe2e3feeb2f50e8ac9249eda844a",
+      "records": 0
+    },
+    "first-path/routing-lab-stale.json": {
+      "bytes": 702,
+      "sha256": "1b3289f4134af6734b922423e2d57264e9a8b703beb08d406c175aafd5e532ff",
+      "records": 0
+    },
+    "first-path/routing-lab-recovery.json": {
+      "bytes": 1321,
+      "sha256": "594cf6cf271a9e3b292f53eb92ef59bb9d79201bad663f0e5a51e372934ca298",
+      "records": 1
+    },
+    "first-path/inventory-policy-lab-partial.json": {
+      "bytes": 791,
+      "sha256": "438de5a51995489b1ba074a601f23dc5e70b98ef942e5bf84ce3cafb537f8a59",
+      "records": 0
+    }
+  },
+  "provenance": "Entirely fictional. Baseline rows copied unchanged; added IDs use fixed UUIDv5 names. No network or customer input."
+}

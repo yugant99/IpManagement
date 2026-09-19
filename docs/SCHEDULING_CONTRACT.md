@@ -1,6 +1,6 @@
 # Evolving synthetic feed and scheduling
 
-Lead decision, 2026-09-19. **Required source work; not implemented or demonstrated at this checkpoint.** The user selected an evolving synthetic feed we control, every six hours configurable, with a manual **Run now** button. This supersedes RFP-068's earlier optional/deferred status. It does not authorize execution, infrastructure or a real network connector.
+Lead decision, 2026-09-19. **Implemented in the accepted candidate, with bounded local observations; portable evidence remains pending.** The user selected an evolving synthetic feed we control, every six hours configurable, with a manual **Run now** button. This supersedes RFP-068's earlier optional/deferred status. It does not authorize execution, infrastructure or a real network connector.
 
 ## Owners and delivery boundary
 
@@ -37,4 +37,4 @@ Persist/expose enabled state, interval, next wall due, last attempt, last succes
 
 ## Remaining evidence
 
-No producer, scheduler, migration, timer, restart, replay, browser or packaging behavior has been executed or accepted. Required later evidence is one advancing successful cycle, unchanged retry, deliberate partial/unknown step, failed-cycle rollback, overlapping manual/timer attempt, restart without catch-up burst, matching saved run/detail/export clocks, and portable fixture availability. Preserve denominator 111; scheduled synthetic acquisition does not establish live discovery or satisfy every clause of RFP-061/068/043.
+The [Stage 5 lead review](handoffs/stage-05-lead-review.md) accepts advancing cycles, exact retry and browser schedule recovery, deliberate partial/unknown states, one failed-cycle rollback, controlled timer/configuration/overdue restart, and pinned saved run/detail/export evidence. S5-09 remains partial: the timer encountered a harness-held ordinary-run guard, not active ordinary reconciliation, and stop used direct scheduler/lifespan calls, not an OS signal during acquisition. S5-15 remains partial: asset/authority refusal after prior success and first-path-specific refusal were not exercised. Controlled time is not elapsed-hour endurance; enabled-snapshot restore remains unrun. Spencer still supplies portable fixture availability and package/recipient evidence. Preserve denominator 111; scheduled synthetic acquisition does not establish live discovery or satisfy every clause of RFP-061/068/043.

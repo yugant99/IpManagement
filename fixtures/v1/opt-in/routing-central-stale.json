@@ -1,0 +1,1148 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-routing-central",
+  "source_run_id": "rich-v1-stale",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional Central ROUTING export",
+    "owner": "Central Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-08-31T23:50:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "id": "93522ac1-71df-5a55-b24b-26c343277ec5",
+      "source_record_id": "route-central-10.80.1.0/24-01",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "79c0fcd7-adc1-53f9-b26c-b4b8ce477209",
+      "source_record_id": "route-central-10.80.1.0/24-02",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4a551f56-3a6c-529c-a55e-5998d30fbb3c",
+      "source_record_id": "route-central-10.80.1.0/24-03",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ec010645-2e6b-52d1-8ff0-a3dde18cbb58",
+      "source_record_id": "route-central-10.80.1.0/24-04",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d5fcaaa9-13ba-5a7e-9159-be0a89e739eb",
+      "source_record_id": "route-central-10.80.1.0/24-05",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3b65657d-4983-5d72-bbc8-aa6f1179e3aa",
+      "source_record_id": "route-central-10.80.1.0/24-06",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "a3135c36-2ec7-579b-9678-5f01ed1453da",
+      "source_record_id": "route-central-10.80.1.0/24-07",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "a8c907f0-cbd7-56bd-ba57-0bc4c3893409",
+      "source_record_id": "route-central-10.80.1.0/24-08",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "7317b031-3fc2-50b8-97b7-feeeaa91fd9d",
+      "source_record_id": "route-central-10.80.1.0/24-09",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "19a0f188-4591-5712-9e78-12acad837b09",
+      "source_record_id": "route-central-10.80.1.0/24-10",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.1.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "a856b702-ee06-5f96-95ac-feeee2002822",
+      "source_record_id": "route-central-10.80.2.0/24-01",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3da24971-0df4-5b26-a9fa-6c371aeff956",
+      "source_record_id": "route-central-10.80.2.0/24-02",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b805d350-cbc6-51d4-bb7f-1022dcf8330c",
+      "source_record_id": "route-central-10.80.2.0/24-03",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "60922b42-2882-527a-b3fd-82ba5365b631",
+      "source_record_id": "route-central-10.80.2.0/24-04",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "31e6e7ad-b2d5-5fa9-8387-2dc29f1b90d3",
+      "source_record_id": "route-central-10.80.2.0/24-05",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e2fa8313-332d-5c75-b9b9-bd8b470fa5f5",
+      "source_record_id": "route-central-10.80.2.0/24-06",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "1cfe26d6-41c2-5215-aefd-a52684c690b3",
+      "source_record_id": "route-central-10.80.2.0/24-07",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "538a7ed2-7ac5-5456-ba44-67deda3f84b0",
+      "source_record_id": "route-central-10.80.2.0/24-08",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "da3ecc44-d15c-5ae4-b9e7-21ba8a8b4c61",
+      "source_record_id": "route-central-10.80.2.0/24-09",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "cac37111-9877-5757-b7b9-c50423438d6d",
+      "source_record_id": "route-central-10.80.2.0/24-10",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.2.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "fa8caed7-19f7-51ab-af60-a6ecddb3f360",
+      "source_record_id": "route-central-2001:db8:80:1::/64-01",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "80b27aef-0c86-5f75-ba94-3159fe5538b1",
+      "source_record_id": "route-central-2001:db8:80:1::/64-02",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "7e63569f-e9a9-52ef-bf83-3379e327a0a4",
+      "source_record_id": "route-central-2001:db8:80:1::/64-03",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "5888d33a-130c-5f73-bed5-a8239117e00b",
+      "source_record_id": "route-central-2001:db8:80:1::/64-04",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "064a949d-8140-5328-ae4e-0a2a757062a3",
+      "source_record_id": "route-central-2001:db8:80:1::/64-05",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4ec274ad-2b81-5fd8-83b2-fe976381ce1a",
+      "source_record_id": "route-central-2001:db8:80:1::/64-06",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "8db49209-ea0c-5703-bce5-2625bb19e87f",
+      "source_record_id": "route-central-2001:db8:80:1::/64-07",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "1a7f66d5-0ff9-5a17-8042-e8abb4b806f4",
+      "source_record_id": "route-central-2001:db8:80:1::/64-08",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b5beddde-a06c-5610-bac0-fd2a110a0aa5",
+      "source_record_id": "route-central-2001:db8:80:1::/64-09",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2e89c3ad-ab95-5067-9dcb-f4660b5d19d9",
+      "source_record_id": "route-central-2001:db8:80:1::/64-10",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:1::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3d6e636d-3f9f-5141-b2e0-decd77f5cf21",
+      "source_record_id": "route-central-2001:db8:80:2::/64-01",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "19e93128-074e-59f0-8d99-f39f3956ddfe",
+      "source_record_id": "route-central-2001:db8:80:2::/64-02",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "51ffb70c-fc4c-518a-b2ed-622a6dffec27",
+      "source_record_id": "route-central-2001:db8:80:2::/64-03",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c3d11b03-52b5-5407-bba5-46adfa11c7cc",
+      "source_record_id": "route-central-2001:db8:80:2::/64-04",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "07282758-71d6-5713-ba76-b01b55087fd5",
+      "source_record_id": "route-central-2001:db8:80:2::/64-05",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d34c2e6d-b9ab-501f-b4bb-84795cfdb05a",
+      "source_record_id": "route-central-2001:db8:80:2::/64-06",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "7e3e5e07-63d0-5adf-b741-99051adff179",
+      "source_record_id": "route-central-2001:db8:80:2::/64-07",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ec4b2935-5dff-5a57-a962-004abaac0ab3",
+      "source_record_id": "route-central-2001:db8:80:2::/64-08",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "7bf3af67-98f3-52cd-afe6-48e661bf3aa5",
+      "source_record_id": "route-central-2001:db8:80:2::/64-09",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "26db3198-f73f-5ad3-85ad-e367205e2edb",
+      "source_record_id": "route-central-2001:db8:80:2::/64-10",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 6,
+      "cidr": "2001:db8:80:2::/64",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "bfaaa8ee-eac1-56e1-ab0f-7f97c687da7f",
+      "source_record_id": "route-central-10.80.4.0/24-01",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c5a697ef-66de-5bcc-8735-75bf0c5eb97f",
+      "source_record_id": "route-central-10.80.4.0/24-02",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2c63e74d-7d34-5077-8a42-1615d9304584",
+      "source_record_id": "route-central-10.80.4.0/24-03",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "98d69cfa-88d3-570c-82b1-3598ff35df2b",
+      "source_record_id": "route-central-10.80.4.0/24-04",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "fecd902d-567e-5fad-9261-178113a47159",
+      "source_record_id": "route-central-10.80.4.0/24-05",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "64643f1b-8b26-518f-a6c8-d335bfb9126f",
+      "source_record_id": "route-central-10.80.4.0/24-06",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4e62a42c-eb25-5b64-8911-ae16ad89efea",
+      "source_record_id": "route-central-10.80.4.0/24-07",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "23453342-0a7e-585d-ae1e-ec7c725d7a8d",
+      "source_record_id": "route-central-10.80.4.0/24-08",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f1ddc692-8c0d-50c1-85d0-85dda9bdf1a4",
+      "source_record_id": "route-central-10.80.4.0/24-09",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4b930443-0295-585f-afac-95916fe9466e",
+      "source_record_id": "route-central-10.80.4.0/24-10",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.4.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "111306bd-9072-515a-b558-e38e1494f3d7",
+      "source_record_id": "route-central-10.80.241.0/24-01",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "185ccecf-c990-5725-bbda-7902cfa75c8e",
+      "source_record_id": "route-central-10.80.241.0/24-02",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f86bbbd0-ed0a-590f-a351-62cb26cd7239",
+      "source_record_id": "route-central-10.80.241.0/24-03",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "280d54e7-f1fb-56db-becd-7d9fbe6b108a",
+      "source_record_id": "route-central-10.80.241.0/24-04",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "6aafceb5-dd31-59e2-a20e-acfaaef809b8",
+      "source_record_id": "route-central-10.80.241.0/24-05",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "bdbfd9f2-ce98-5500-9f2e-7cc98964fc73",
+      "source_record_id": "route-central-10.80.241.0/24-06",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "07d67e9c-8d03-5371-8e96-d296007f4cca",
+      "source_record_id": "route-central-10.80.241.0/24-07",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4acb21d9-a8f1-5719-86eb-b30547162d18",
+      "source_record_id": "route-central-10.80.241.0/24-08",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "640baebc-98ee-5de0-9db9-49338d88ff2a",
+      "source_record_id": "route-central-10.80.241.0/24-09",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c34ad90e-22ce-50e0-bcf4-d744ae6583fb",
+      "source_record_id": "route-central-10.80.241.0/24-10",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "10.80.241.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "9c373ea7-cc32-576a-8c05-afb8be674e5a",
+      "source_record_id": "route-central-198.51.100.0/24-01",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e3d865f1-0723-572a-a37c-d010e40742d3",
+      "source_record_id": "route-central-198.51.100.0/24-02",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "da15a64c-5a22-5ff5-9ebb-4a43077c8310",
+      "source_record_id": "route-central-198.51.100.0/24-03",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f9a5bbff-ec4d-5bd9-a388-dc39602195cb",
+      "source_record_id": "route-central-198.51.100.0/24-04",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "49ec9571-70da-5132-89bf-f34cc7fff51e",
+      "source_record_id": "route-central-198.51.100.0/24-05",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f781c26c-b5f2-514b-80c2-919b129b2fe7",
+      "source_record_id": "route-central-198.51.100.0/24-06",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4d62ccec-221d-5e15-815d-2be6604c41c0",
+      "source_record_id": "route-central-198.51.100.0/24-07",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2ea09bef-1f46-5981-a79b-b15defa95d14",
+      "source_record_id": "route-central-198.51.100.0/24-08",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e70075d0-8758-5472-8478-a5b80277cc19",
+      "source_record_id": "route-central-198.51.100.0/24-09",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b2700af3-0682-53ff-a76c-190df6c0bb32",
+      "source_record_id": "route-central-198.51.100.0/24-10",
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "family": 4,
+      "cidr": "198.51.100.0/24",
+      "router_id": "central-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    }
+  ]
+}
