@@ -9,7 +9,7 @@ from uuid import uuid4
 
 from .errors import AppError, store_error
 from .seed import seed_baseline
-from .store import data_directory
+from .store import data_directory, migrate_schema
 
 
 def main() -> int:
@@ -20,11 +20,14 @@ def main() -> int:
     serve.add_argument("--port", type=int, default=8000)
     seed = commands.add_parser("seed", help="Initialize the packaged baseline; stop the service first")
     seed.add_argument("--scenario", choices=["baseline"], required=True)
+    commands.add_parser("migrate", help="Explicitly migrate the recognized v1 store; stop the service first")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
     try:
         if args.command == "seed":
             print(json.dumps(seed_baseline(data_directory()), indent=2))
+        elif args.command == "migrate":
+            print(json.dumps(migrate_schema(data_directory()), indent=2))
         else:
             if not 1 <= args.port <= 65535:
                 raise AppError("INVALID_PORT", "Port must be between 1 and 65535.", 422)

@@ -10,7 +10,7 @@ import sqlite3
 from .errors import AppError
 
 APPLICATION_ID = 0x4950414D
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 CONTRACT_REVISION = "demo-v2-questionnaire"
 DATABASE_NAME = "ipam_demo.sqlite3"
 
@@ -60,15 +60,17 @@ def connect(path: Path, *, create: bool = False):
         connection.close()
 
 
-def require_schema(connection: sqlite3.Connection) -> None:
+def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERSION) -> None:
     identity = connection.execute("PRAGMA application_id").fetchone()[0]
-    version = connection.execute("PRAGMA user_version").fetchone()[0]
+    found_version = connection.execute("PRAGMA user_version").fetchone()[0]
     if identity != APPLICATION_ID:
         raise AppError("UNRECOGNIZED_DATABASE", "Database identity is not IPAM demo. Existing data was preserved.")
-    if version != SCHEMA_VERSION:
-        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved.",
-                       details={"found": version, "supported": SCHEMA_VERSION})
+    if found_version != version:
+        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1, stop the service and run python -m ipam_demo migrate.",
+                       details={"found": found_version, "supported": version})
     expected = {"app_meta", "scopes", "prefixes", "pools", "allocations"}
+    if version == 2:
+        expected.update({"source_batches", "source_coverage", "source_records", "calculation_runs"})
     tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     if not expected.issubset(tables) or connection.execute("SELECT singleton FROM app_meta WHERE singleton=1").fetchone() is None:
         raise AppError("INVALID_SCHEMA", "Required inventory tables or metadata are missing. Existing data was preserved.")
@@ -83,6 +85,7 @@ def initialize_schema(path: Path) -> None:
             require_schema(connection)
             return
         schema = files("ipam_demo").joinpath("schema.sql").read_text(encoding="utf-8")
+        schema += "\n" + files("ipam_demo").joinpath("schema_v2.sql").read_text(encoding="utf-8")
         connection.executescript(
             f"BEGIN IMMEDIATE;\nPRAGMA application_id = {APPLICATION_ID};\n"
             f"PRAGMA user_version = {SCHEMA_VERSION};\n{schema}\nCOMMIT;"
@@ -94,3 +97,30 @@ def require_initialized(connection: sqlite3.Connection) -> None:
     row = connection.execute("SELECT initialized FROM app_meta WHERE singleton=1").fetchone()
     if not row["initialized"]:
         raise AppError("SETUP_NEEDED", "Stop the service, run python -m ipam_demo seed --scenario baseline, then restart.")
+
+
+def migrate_schema(directory: Path) -> dict:
+    """Explicit known-v1 migration, never an implicit startup side effect."""
+    with exclusive_data_access(directory) as path:
+        if path.is_symlink() or not path.is_file():
+            raise AppError("UNSAFE_DATABASE_PATH", "Migration needs an existing regular app database; nothing was changed.")
+        with connect(path) as connection:
+            # The process lock excludes serve/seed/state owners. BEGIN IMMEDIATE
+            # additionally reserves the SQLite writer before checking its identity.
+            with connection:
+                connection.execute("BEGIN IMMEDIATE")
+                found = connection.execute("PRAGMA user_version").fetchone()[0]
+                if found == SCHEMA_VERSION:
+                    require_schema(connection)
+                    return {"schema_version": SCHEMA_VERSION, "changed": False}
+                require_schema(connection, version=1)
+                migration = files("ipam_demo").joinpath("schema_v2.sql").read_text(encoding="utf-8")
+                # This owned SQL contains plain CREATE statements, no triggers or
+                # semicolons in literals. execute keeps the enclosing transaction;
+                # executescript would commit it before running the migration.
+                for statement in migration.split(";"):
+                    if statement.strip():
+                        connection.execute(statement)
+                connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+                require_schema(connection)
+            return {"schema_version": SCHEMA_VERSION, "previous_schema_version": 1, "changed": True}
