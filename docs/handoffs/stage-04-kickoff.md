@@ -1,6 +1,8 @@
 # Approved Stage 4 kickoff: scheduling, integration and freeze
 
-Stage 3 source is accepted at `009e80197ab610e5a365d1e3dd4462588754d646`, with runtime evidence pending. The user subsequently required evolving synthetic acquisition every six hours configurable, plus manual Run now. This is the bounded new feature for Stage 4; freeze unrelated expansion. No new Stage 4 task has been created by the lead. The original task remains persistent lead.
+**Stage 4 is now active in task `01a0bacd-a541-73e1-8a06-f674dd4a1bcd`; do not create a duplicate.** It uses `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-4`, branch `codex/stage-4-scheduler-integration`. The prompt below is retained as its approved assignment, not a request to repeat setup. See STATUS.md for subsequent checkpoints.
+
+Stage 3 source is accepted at `009e80197ab610e5a365d1e3dd4462588754d646`, with runtime evidence pending. The user subsequently required evolving synthetic acquisition every six hours configurable, plus manual Run now. This is the bounded new feature for Stage 4; freeze unrelated expansion. The original task remains persistent lead.
 
 ## Complete copyable prompt
 
