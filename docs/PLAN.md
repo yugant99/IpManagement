@@ -15,7 +15,7 @@ Planning budget: approximately 20 lead working hours, with Spencer's 6–8 hours
 
 These are work packages. Run only as many simultaneous lanes as available tools/contributors support. The lead integrates and can combine small lanes; do not spawn agents just to fill a diagram.
 
-The lead uses the five implementation chats in `CHAT_STAGES.md`: foundation, first complete path, main capabilities, integration/freeze, and acceptance/delivery. These are coordination stages, not a new ownership split. Start a fresh lead chat at each recorded checkpoint with an automatically generated handoff prompt. Spencer's preparation can start alongside Stage 1; runtime readiness remains event-driven.
+The persistent lead coordinates the five implementation stages in `CHAT_STAGES.md`: foundation, first complete path, main capabilities, integration/freeze, and acceptance/delivery. Fresh worker chats receive generated prompts at reviewed checkpoints; the original lead retains overall ownership throughout. Parts can overlap: richer synthetic data and Spencer's preparation can proceed alongside Stage 1. Runtime readiness remains event-driven. See `PROJECT_OVERSIGHT.md` for acceptance and reporting.
 
 Current fold-ins: Parts 1/4 prioritize bounded subnet editing, custom fields and domain/IPv6 prefix planning; Parts 3/4 expose existing run history and one report preset; Part 5 adds the small exception queue. Lead owns the delivery method/roadmap draft. These target 12 new rows beyond the original 53. Actual import-triggered rerun and team handoff are the two conditional additions toward 67; scheduling follows only if time remains. Refer to the scope delta for exact acceptance and limitations. They do not change Spencer's runtime ownership.
 

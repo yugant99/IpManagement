@@ -1,12 +1,12 @@
-# When to start a fresh chat
+# When to start a fresh implementation chat
 
-The user wants a fresh lead chat for each build stage and a generated handoff prompt at the boundary. Agents must surface the boundary themselves; do not wait for the user to notice a long conversation or ask for a summary. This is a repository workflow rule, not a background notification service or automatic task creator.
+The existing project-lead chat remains responsible for oversight across the whole build. The user wants fresh implementation chats for the stages, not a replacement lead each time. See [PROJECT_OVERSIGHT.md](PROJECT_OVERSIGHT.md). Agents must surface checkpoints themselves and generate handoff prompts; do not wait for the user to reconstruct context.
 
-**Find the active boundary and generated prompt in [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md).** The first boundary established by this guide is planning → Stage 1. Keep the planning chat for architecture and planning follow-ups; later agents update the current handoff as implementation progresses.
+**Find the active implementation boundary and generated prompt in [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md).** The first boundary is planning → Stage 1. Keep this original chat as persistent project lead; it reviews worker reports and updates global status/handoff pointers.
 
 ## Stage map
 
-Hours are approximate elapsed lead working hours from implementation start, not a new 20-hour allowance per chat. The stages describe lead coordination; the six numbered parts describe ownership and can run in parallel.
+Hours are approximate elapsed lead working hours from implementation start, not a new 20-hour allowance per chat. Stages describe implementation work supervised by the persistent lead; the six parts describe ownership and can run in parallel.
 
 | Stage / suggested chat title | Work | Checkpoint required before the next chat |
 |---|---|---|
@@ -26,21 +26,21 @@ Spencer starts Part 6 documentation/package preparation alongside Stage 1. `PART
 At the end of every implementation turn, compare actual progress with this stage map. When the checkpoint is reached, or context is repeatedly causing lost constraints and a safe checkpoint is available:
 
 1. Finish or explicitly checkpoint the owned slice. Preserve dirty work; record unfinished files. Commit coherent changes and push before handoff even if fewer than three commits. If push fails, show the blocker and local SHA; do not call the handoff portable.
-2. Read actual Git branch/HEAD/upstream status, integration base, worktree ownership and PR/dependency state. Update `docs/STATUS.md`, the stage handoff and `docs/CURRENT_HANDOFF.md`.
+2. Read actual Git branch/HEAD/upstream status, integration base, worktree ownership and PR/dependency state. The worker updates its stage/lane report on its own branch and submits proposed global changes. Only the persistent lead updates `docs/STATUS.md` and `docs/CURRENT_HANDOFF.md` after review.
 3. Generate the next prompt from those facts. Include the next stage's exact work and stopping point, not a generic "continue the project" instruction. Do not ask the user to write it.
 4. Publish the handoff. Capture the final pushed code checkpoint separately from any later documentation-only publishing commit; do not try to place a document's own unknown future commit hash inside itself.
-5. End with this visible callout and a complete copyable prompt:
+5. The worker ends with **READY FOR PROJECT-LEAD REVIEW — Stage N**, its SHA/PR and report, plus a draft next-stage prompt. The persistent lead reviews the claim and, when the next baseline is accepted, emits this callout and the final complete copyable prompt:
 
-> **START A NEW CHAT — Stage N: title**  
-> This chat has reached its stage checkpoint. Keep it for related branch fixes.  
+> **START A NEW IMPLEMENTATION CHAT — Stage N: title**  
+> The previous implementation stage has reached its reviewed checkpoint. Keep its chat for related fixes; this project-lead chat continues overseeing the build.  
 > State: implemented / demonstrated / unverified / blocked, as applicable.  
 > Next chat: paste the generated prompt below. Handoff: link. Pushed checkpoint: branch + SHA.
 
-Do not begin the next lead stage in the old chat after emitting the handoff, unless the user explicitly asks to continue here. Do not create, archive or rename chats automatically; this workflow generates a prompt and a visible response. If the user separately requests creation of the new chat, create it using that actual generated prompt. No background timer, scheduler or context-percentage monitor is needed or implied.
+Do not begin the next implementation stage in the old worker chat unless the user asks to continue there. The project-lead chat stays active as coordinator across boundaries. Do not create, archive or rename chats automatically; if the user separately requests a new chat, create it with the generated prompt. Periodic read-only oversight is a separately configured heartbeat, described in `PROJECT_OVERSIGHT.md`; stage switching itself creates no background process or token monitor.
 
 ## Required handoff facts
 
-Use a short file named `docs/handoffs/stage-NN-description.md` and a pointer/summary in `docs/CURRENT_HANDOFF.md`. The first real example is [Stage 1](handoffs/stage-01-foundation.md). Later files are generated at their checkpoints, not filled with invented future SHAs now.
+Use a short file named `docs/handoffs/stage-NN-description.md`; the lead publishes its accepted pointer/summary in `docs/CURRENT_HANDOFF.md`. The first real example is [Stage 1](handoffs/stage-01-foundation.md). Later files are generated at their checkpoints, not filled with invented future SHAs now.
 
 - Source stage/chat purpose and next stage; repository URL and actual checkout/worktree location in the user-facing prompt.
 - Exact code checkpoint branch/SHA, integration base SHA, contract revision, pushed status, PR/merge state, unmerged dependencies and dirty/untracked work that must be preserved.
@@ -57,6 +57,6 @@ The receiving agent reads applicable ancestor/root/nested `AGENTS.md` instructio
 
 Use separate feature branches and isolated worktrees for parallel contributors. A chat is not a Git branch: one stage may coordinate several feature branches, and a small fix can continue in the same chat. Do not open a new chat for every commit, push, error or pull request. If the next feature needs an unmerged prerequisite, name its exact branch/SHA and coordinate the dependency rather than silently starting from an empty `main`.
 
-The previous chat becomes available for explicitly assigned follow-ups. Before editing there, re-read current status/Git and check whether a new lead owns shared files. Fixes to an already merged feature use a new `codex/` fix branch from the current baseline; do not append work to a retired branch or force-push shared history. Send the new lead the fix SHA/PR and any affected contract/evidence changes.
+The previous worker chat becomes available for explicitly assigned follow-ups. Before editing there, re-read current status/Git and coordinate shared-file ownership with the persistent lead. Fixes to an already merged feature use a new `codex/` fix branch from the current baseline; do not append work to a retired branch or force-push shared history. Report the fix SHA/PR and affected contract/evidence changes to the same project lead.
 
 Keep the scope already agreed: synthetic data; one app/database; questionnaire-first accounting; three coherent changes per push; targeted skills; Spencer's Part 6 ownership; feature freeze at lead hour 14. The present user rule does not authorize adding/running application tests or smoke/verification commands unless explicitly requested. Cloud spending, container/VM operations and public deployment are not granted by a stage transition. Record pending gates without repeatedly asking the same permission question.

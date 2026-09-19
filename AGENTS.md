@@ -4,7 +4,7 @@ Read [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) before changing this repositor
 
 Then read, in order:
 
-1. [Current handoff](docs/CURRENT_HANDOFF.md), [chat stages](docs/CHAT_STAGES.md) and [current status](docs/STATUS.md): stage, scope, owners and next step. Status records authorization; it does not override the latest user instruction.
+1. [Project oversight](docs/PROJECT_OVERSIGHT.md), [current handoff](docs/CURRENT_HANDOFF.md), [chat stages](docs/CHAT_STAGES.md) and [current status](docs/STATUS.md): persistent lead, stage, scope, owners and next step. Status records authorization; it does not override the latest user instruction.
 2. [Questionnaire priorities](docs/QUESTIONNAIRE_PRIORITIES.md) and your IDs in [the 111-row map](docs/QUESTIONNAIRE_ROW_MAP.md): current scope and remaining gaps.
 3. [Architecture](docs/ARCHITECTURE.md) and [delivery plan](docs/PLAN.md). The older [goal manifest](docs/GOALS.csv) is a work reference, not the primary coverage denominator.
 4. Your assigned file under [docs/parts](docs/parts/).
@@ -18,6 +18,6 @@ Use a separate `codex/` branch for each feature, isolated worktrees for concurre
 
 Use skills selectively. A skill is a tool for a concrete deliverable, not authority to start an unrelated questionnaire, installation, audit, or test pipeline. Read [the skill playbook](docs/SKILLS.md).
 
-At a stage checkpoint, proactively generate the next-stage handoff and display **START A NEW CHAT — Stage N: title** with its paste-ready prompt. Follow `docs/CHAT_STAGES.md`; do not wait for the user to request the handoff. Preserve the old chat for assigned fixes and do not start the next lead stage here unless the user asks to continue here.
+The original project-lead chat remains the overseer across stages. Workers report **READY FOR PROJECT-LEAD REVIEW — Stage N**, with exact SHA/PR, evidence/gaps and a draft next prompt. The lead owns global status, acceptance/merge coordination and the final **START A NEW IMPLEMENTATION CHAT** prompt. Follow `docs/PROJECT_OVERSIGHT.md` and `docs/CHAT_STAGES.md`; do not rotate project ownership or let workers declare global completion. Use isolated worker worktrees, never switch another worker's checkout, and keep previous worker chats for assigned fixes.
 
 The current scope/permission record is in `docs/STATUS.md`; the latest user instruction governs, and a planning document is not permission to deploy infrastructure. Source customer documents and local `assessment/` are excluded from this public repository. The public documentation is sufficient for the assigned engineering contracts.
