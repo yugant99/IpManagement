@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-first-path-policy",
+  "source_run_id": "first-path-v1-policy",
+  "effective_from_at": "2026-08-02T00:00:00.000Z",
+  "source_kind": "inventory_policy",
+  "source": {
+    "name": "Fictional intended announcement policy",
+    "owner": "Demo Inventory Team",
+    "authority": "intended_policy",
+    "required_for": [
+      "route_policy"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "kind": "snapshot",
+      "window_start_at": "2026-09-01T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    },
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "kind": "snapshot",
+      "window_start_at": "2026-09-01T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "source_record_id": "policy-prefix-north-ipv4-parent",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b001",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "expects_announcement": false,
+      "route_match_policy": "exact"
+    },
+    {
+      "source_record_id": "policy-prefix-north-dhcp",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b002",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "expects_announcement": true,
+      "route_match_policy": "exact"
+    },
+    {
+      "source_record_id": "policy-prefix-north-static",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b003",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "expects_announcement": false,
+      "route_match_policy": "exact"
+    },
+    {
+      "source_record_id": "policy-prefix-north-ipv6-parent",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b004",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "expects_announcement": false,
+      "route_match_policy": "exact"
+    },
+    {
+      "source_record_id": "policy-prefix-north-ipv6-child",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b005",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "expects_announcement": false,
+      "route_match_policy": "exact"
+    },
+    {
+      "source_record_id": "policy-prefix-lab-ipv4",
+      "prefix_id": "41aca2b0-ec1d-4f64-8d21-c5af0ab0b006",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "expects_announcement": true,
+      "route_match_policy": "exact"
+    }
+  ]
+}

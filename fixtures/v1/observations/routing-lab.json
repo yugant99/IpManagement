@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-routing-lab",
+  "source_run_id": "rich-v1-complete",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional Lab ROUTING export",
+    "owner": "Lab Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "id": "306d2f1b-341d-5a03-9d07-b1d4a9341528",
+      "source_record_id": "route-lab-10.40.1.0/24-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "cf1c1466-a979-5686-b2a0-22a17778e772",
+      "source_record_id": "route-lab-10.40.1.0/24-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c88aa4b9-854c-549b-8be9-00d2a0bd1459",
+      "source_record_id": "route-lab-10.40.1.0/24-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "be10873a-d1e1-5762-9279-ea3c32d004d3",
+      "source_record_id": "route-lab-10.40.1.0/24-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "78ef69c8-91c5-50f3-826b-804e80dce641",
+      "source_record_id": "route-lab-10.40.1.0/24-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e5f953d7-c69e-5324-a4d7-a53528052cd1",
+      "source_record_id": "route-lab-10.40.1.0/24-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "290c65d5-8486-5b8c-9379-5c6b5c931555",
+      "source_record_id": "route-lab-10.40.1.0/24-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "86711867-1eb0-5676-a607-45424d33460e",
+      "source_record_id": "route-lab-10.40.1.0/24-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "5cdadf8f-62b5-5731-83ed-cfbe2bfa7828",
+      "source_record_id": "route-lab-10.40.1.0/24-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "cad1496d-874c-5483-a121-b914c2697eb2",
+      "source_record_id": "route-lab-10.40.1.0/24-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f4cb9e51-ae41-5cc6-999e-6d7e649b5530",
+      "source_record_id": "route-lab-10.40.3.0/24-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "6356edde-e300-51c7-8547-ef008935190d",
+      "source_record_id": "route-lab-10.40.3.0/24-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ead95748-66a7-5b2d-bdcf-ee25062f0db9",
+      "source_record_id": "route-lab-10.40.3.0/24-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "1c164839-f650-5af4-9fb9-b4dfb63c8812",
+      "source_record_id": "route-lab-10.40.3.0/24-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "1e9e25a4-166a-5176-9fde-f14573b61ccd",
+      "source_record_id": "route-lab-10.40.3.0/24-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2c510fa9-bae2-5eba-9030-a4a6418d7d51",
+      "source_record_id": "route-lab-10.40.3.0/24-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3f7989e0-96aa-598f-9e20-3b917f190799",
+      "source_record_id": "route-lab-10.40.3.0/24-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "50ff6d05-1e0a-5990-bc2a-8e6156dd574f",
+      "source_record_id": "route-lab-10.40.3.0/24-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "264a7714-59e2-5ac2-8331-91de3fcb4cae",
+      "source_record_id": "route-lab-10.40.3.0/24-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "382fcc62-f7c2-50df-8da2-d3deed72d1b1",
+      "source_record_id": "route-lab-10.40.3.0/24-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d7cc1b26-e024-55d3-82f4-b357aff0b274",
+      "source_record_id": "route-lab-10.40.4.0/24-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "89ce99bd-4a9b-5d0c-a5bf-1ff8d10430b2",
+      "source_record_id": "route-lab-10.40.4.0/24-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "843cdb72-c567-5c8a-a16f-8ba6cba502b9",
+      "source_record_id": "route-lab-10.40.4.0/24-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "9ba43637-c386-58b9-bae4-e3dd072efa93",
+      "source_record_id": "route-lab-10.40.4.0/24-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ac5a5054-0c77-53fa-8e56-c51de49aba2b",
+      "source_record_id": "route-lab-10.40.4.0/24-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "64373ad1-6b49-5557-940f-48792f7bfb6c",
+      "source_record_id": "route-lab-10.40.4.0/24-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2b728bf0-941f-5fab-a3df-c70e81a1c1aa",
+      "source_record_id": "route-lab-10.40.4.0/24-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "356bb98a-61e6-5931-aaa0-48537c500b3f",
+      "source_record_id": "route-lab-10.40.4.0/24-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "447a8863-f2f9-56b3-91a7-04edac02f9c1",
+      "source_record_id": "route-lab-10.40.4.0/24-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "43a08411-b357-5635-8423-bf4e34a7573e",
+      "source_record_id": "route-lab-10.40.4.0/24-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "lab-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    }
+  ]
+}

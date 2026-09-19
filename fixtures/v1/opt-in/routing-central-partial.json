@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-routing-central",
+  "source_run_id": "rich-v1-partial",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional Central ROUTING export",
+    "owner": "Central Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": false
+    }
+  ],
+  "records": []
+}
