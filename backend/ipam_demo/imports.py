@@ -3,7 +3,7 @@
 from collections import defaultdict
 from datetime import datetime, timezone
 from hashlib import sha256
-from ipaddress import ip_network
+from ipaddress import ip_address, ip_network
 import json
 import math
 import re
@@ -14,7 +14,7 @@ from .errors import AppError
 MAX_IMPORT_BYTES = 10 * 1024 * 1024
 MAX_IMPORT_ROWS = 10_000
 _TIMESTAMP_FIELDS = {"demo_clock_at", "effective_from_at", "window_start_at", "window_end_at",
-                     "observed_at", "valid_from_at", "valid_until_at"}
+                     "observed_at", "valid_from_at", "valid_until_at", "lease_start_at", "lease_end_at"}
 _TIMESTAMP_PATTERN = re.compile(
     r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)\Z"
 )
@@ -124,9 +124,9 @@ def _coverage(envelope, kind, scopes, clock) -> list[dict]:
         seen.add(scope_id)
         start = _timestamp(value["window_start_at"], "coverage.window_start_at")
         end = _timestamp(value["window_end_at"], "coverage.window_end_at")
-        if kind == "routing":
+        if kind in ("routing", "dhcp"):
             if value["kind"] != "interval" or start >= end:
-                raise ValueError("Routing coverage must be an interval with start before end")
+                raise ValueError("Observation coverage must be an interval with start before end")
         elif value["kind"] != "snapshot" or start != clock or end != clock:
             raise ValueError("Policy coverage must be a snapshot with both bounds at the demo clock")
         complete = _boolean(value["declared_complete"], "coverage.declared_complete")
@@ -139,6 +139,9 @@ def _typed_record(record, kind, declared_scopes, prefixes, clock, effective_from
     common = {"source_record_id", "scope_id"}
     if kind == "routing":
         expected = common | {"id", "family", "cidr", "router_id", "valid_from_at", "valid_until_at",
+                             "observed_at", "original_timestamps"}
+    elif kind == "dhcp":
+        expected = common | {"id", "family", "address", "client_id", "lease_start_at", "lease_end_at",
                              "observed_at", "original_timestamps"}
     else:
         expected = common | {"prefix_id", "expects_announcement", "route_match_policy"}
@@ -159,28 +162,42 @@ def _typed_record(record, kind, declared_scopes, prefixes, clock, effective_from
         result["effective_from_at"] = effective_from_at
         return result
     result["id"] = _uuid(record["id"], "id")
-    result["router_id"] = _text(record["router_id"], "router_id")
     if type(record["family"]) is not int or record["family"] not in (4, 6):
         raise ValueError("family must be integer 4 or 6")
-    if not isinstance(record["cidr"], str) or "/" not in record["cidr"]:
-        raise ValueError("cidr must explicitly include a prefix length")
-    try:
-        network = ip_network(record["cidr"], strict=True)
-    except ValueError as exc:
-        raise ValueError("cidr must be a strict network address with no host bits") from exc
-    if network.version != record["family"]:
-        raise ValueError("family differs from cidr")
-    result["cidr"] = str(network)
-    time_fields = {"valid_from_at", "valid_until_at", "observed_at"}
+    if kind == "dhcp":
+        result["client_id"] = _text(record["client_id"], "client_id")
+        if not isinstance(record["address"], str) or "%" in record["address"]:
+            raise ValueError("address must be an IP string without a zone identifier")
+        try:
+            address = ip_address(record["address"])
+        except ValueError as exc:
+            raise ValueError("address must be a valid IP address") from exc
+        if address.version != record["family"]:
+            raise ValueError("family differs from address")
+        result["address"] = str(address)
+        start_field, end_field = "lease_start_at", "lease_end_at"
+    else:
+        result["router_id"] = _text(record["router_id"], "router_id")
+        if not isinstance(record["cidr"], str) or "/" not in record["cidr"]:
+            raise ValueError("cidr must explicitly include a prefix length")
+        try:
+            network = ip_network(record["cidr"], strict=True)
+        except ValueError as exc:
+            raise ValueError("cidr must be a strict network address with no host bits") from exc
+        if network.version != record["family"]:
+            raise ValueError("family differs from cidr")
+        result["cidr"] = str(network)
+        start_field, end_field = "valid_from_at", "valid_until_at"
+    time_fields = {start_field, end_field, "observed_at"}
     _fields(record["original_timestamps"], time_fields, "original_timestamps")
     for field in time_fields:
         if record["original_timestamps"][field] != record[field]:
             raise ValueError(f"original_timestamps.{field} must retain the input value exactly")
         result[field] = _timestamp(record[field], field)
-    if result["valid_from_at"] >= result["valid_until_at"]:
-        raise ValueError("Route validity must have start before end")
-    if result["valid_from_at"] > clock or result["observed_at"] > clock:
-        raise ValueError("Route start and observed_at must not be after the demo clock")
+    if result[start_field] >= result[end_field]:
+        raise ValueError("Observation validity must have start before end")
+    if result[start_field] > clock or result["observed_at"] > clock:
+        raise ValueError("Observation start and observed_at must not be after the demo clock")
     return result
 
 
@@ -188,7 +205,7 @@ def _identities(record, kind):
     if not isinstance(record, dict):
         return []
     result = []
-    for field in ("source_record_id", "id") if kind == "routing" else ("source_record_id",):
+    for field in ("source_record_id", "id") if kind in ("routing", "dhcp") else ("source_record_id",):
         value = record.get(field)
         if isinstance(value, str) and value:
             if field == "id":
@@ -205,6 +222,138 @@ def _identities(record, kind):
     return result
 
 
+def _stage_inventory(connection, envelope, raw_envelope):
+    """Retain a validated candidate ledger without promoting any intended row."""
+    from .seed import _validate
+
+    groups = ("scopes", "prefixes", "pools", "allocations")
+    _fields(envelope, {"schema_version", "scenario", "demo_clock_at", "source_id", "source_run_id", *groups},
+            "intended inventory")
+    if type(envelope["schema_version"]) is not int:
+        raise ValueError("schema_version must be integer 1")
+    if any(not isinstance(envelope[group], list) for group in groups):
+        raise ValueError("Intended inventory collections must be arrays")
+    count = sum(len(envelope[group]) for group in groups)
+    if count > MAX_IMPORT_ROWS:
+        raise AppError("IMPORT_TOO_LARGE", "Import exceeds the 10,000 record limit.", 413)
+    source_id = _text(envelope["source_id"], "source_id", 200)
+    source_run_id = _text(envelope["source_run_id"], "source_run_id", 200)
+    clock = _timestamp(envelope["demo_clock_at"], "demo_clock_at")
+    fingerprint = sha256(_json(_normalized(envelope)).encode("utf-8")).hexdigest()
+    previous = connection.execute(
+        "SELECT envelope_hash, receipt_json FROM source_batches WHERE source_id=? AND source_run_id=?",
+        (source_id, source_run_id),
+    ).fetchone()
+    if previous is not None:
+        if previous["envelope_hash"] != fingerprint:
+            raise AppError("IMPORT_IDENTITY_CONFLICT", "This source/run identity already contains different content.", 409)
+        return json.loads(previous["receipt_json"]), True
+    previous_kind = connection.execute("SELECT source_kind FROM source_batches WHERE source_id=? LIMIT 1", (source_id,)).fetchone()
+    if previous_kind is not None and previous_kind["source_kind"] != "inventory_staged":
+        raise AppError("SOURCE_KIND_CONFLICT", "A source_id cannot change its source kind.", 409)
+    meta = connection.execute("SELECT initialized, demo_clock_at FROM app_meta WHERE singleton=1").fetchone()
+    if meta is None or not meta["initialized"]:
+        raise AppError("SETUP_NEEDED", "Initialize intended inventory before staging a candidate.", 503)
+    if clock != _timestamp(meta["demo_clock_at"], "seeded demo_clock_at"):
+        raise ValueError("demo_clock_at must equal the seeded inventory clock")
+    try:
+        row_fields = {
+            "scopes": {"id", "name", "namespace", "domain", "region", "managed_cidrs", "source_record_id"},
+            "prefixes": {"id", "scope_id", "family", "cidr", "parent_id", "owner", "purpose", "tags", "custom_fields", "version", "source_record_id"},
+            "pools": {"id", "scope_id", "prefix_id", "name", "management_mode", "allocation_authority", "ranges", "exclusions", "pool_version", "source_record_id"},
+            "allocations": {"id", "scope_id", "prefix_id", "pool_id", "family", "address", "owner", "purpose", "source_record_id"},
+        }
+        for group in groups:
+            identifiers, references = set(), set()
+            for record in envelope[group]:
+                _fields(record, row_fields[group], group + " row")
+                identifier = _uuid(record["id"], "id")
+                source_reference = _text(record["source_record_id"], "source_record_id")
+                if identifier in identifiers or source_reference in references:
+                    raise ValueError(f"{group} contains duplicate row IDs or source record identities")
+                identifiers.add(identifier)
+                references.add(source_reference)
+                for field in ("scope_id", "prefix_id", "parent_id", "pool_id"):
+                    if field in record and record[field] is not None:
+                        _uuid(record[field], field)
+                for field in ("owner", "purpose"):
+                    if field in record and (not isinstance(record[field], str) or len(record[field]) > 512):
+                        raise ValueError(f"{field} must be a string of at most 512 characters; blank metadata is retained")
+                if "family" in record and (type(record["family"]) is not int or record["family"] not in (4, 6)):
+                    raise ValueError("family must be integer 4 or 6")
+        namespaces = set()
+        for record in envelope["scopes"]:
+            for field in ("name", "namespace", "domain", "region"):
+                _text(record[field], field, 200)
+            if record["namespace"] in namespaces:
+                raise ValueError("Scope namespaces must be unique")
+            namespaces.add(record["namespace"])
+            if not isinstance(record["managed_cidrs"], list) or not record["managed_cidrs"]:
+                raise ValueError("managed_cidrs must explicitly declare at least one network")
+            for cidr in record["managed_cidrs"]:
+                if not isinstance(cidr, str) or "/" not in cidr or "%" in cidr:
+                    raise ValueError("managed_cidrs must contain explicit network CIDRs without zone identifiers")
+                ip_network(cidr, strict=True)
+        for record in envelope["prefixes"]:
+            if type(record["version"]) is not int or record["version"] < 1:
+                raise ValueError("Prefix version must be a positive integer")
+            if not isinstance(record["tags"], list):
+                raise ValueError("Prefix tags must be an array")
+            if not isinstance(record["cidr"], str) or "/" not in record["cidr"] or "%" in record["cidr"]:
+                raise ValueError("Prefix cidr must be an explicit network without a zone identifier")
+        for record in envelope["pools"]:
+            _text(record["name"], "name", 200)
+            if record["management_mode"] not in ("dhcp", "static"):
+                raise ValueError("management_mode must be dhcp or static")
+            if record["allocation_authority"] not in ("local", "external"):
+                raise ValueError("allocation_authority must be local or external")
+            if type(record["pool_version"]) is not int or record["pool_version"] < 1:
+                raise ValueError("Pool version must be a positive integer")
+            for field in ("ranges", "exclusions"):
+                if not isinstance(record[field], list):
+                    raise ValueError(f"{field} must be an array")
+                for value in record[field]:
+                    _fields(value, {"start", "end"}, field)
+                    if any(not isinstance(value[bound], str) or "%" in value[bound] for bound in ("start", "end")):
+                        raise ValueError("Range bounds must be IP strings without zone identifiers")
+        allocation_keys = set()
+        for record in envelope["allocations"]:
+            if not isinstance(record["address"], str) or "%" in record["address"]:
+                raise ValueError("Allocation address must be an IP string without a zone identifier")
+            key = (_uuid(record["scope_id"], "scope_id"), record["family"], str(ip_address(record["address"])))
+            if key in allocation_keys:
+                raise ValueError("Intended allocations must be unique by scope, family and address")
+            allocation_keys.add(key)
+        _validate(envelope)
+    except (KeyError, TypeError, AttributeError, RecursionError) as exc:
+        raise ValueError("Intended inventory is missing required fields or contains invalid field types") from exc
+    batch_id = str(uuid4())
+    ingested_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    cursor = connection.execute(
+        "INSERT INTO source_batches (id,source_id,source_run_id,source_kind,envelope_hash,envelope_json,receipt_json,ingested_at,demo_clock_at) "
+        "VALUES (?,?,?,'inventory_staged',?,?,?, ?,?)",
+        (batch_id, source_id, source_run_id, fingerprint, raw_envelope, "{}", ingested_at, clock),
+    )
+    receipt = {"id": batch_id, "sequence": cursor.lastrowid, "source_id": source_id, "source_run_id": source_run_id,
+               "source_kind": "inventory_staged", "ingested_at": ingested_at, "demo_clock_at": clock,
+               "application_status": "staged", "input_rows": count, "accepted_rows": count,
+               "rejected_rows": 0, "duplicate_rows": 0, "synthetic": True, "coverage": [],
+               "limitations": ["Validated synthetic intended inventory is staged only; no active inventory, allocation, version or calculation input changed.",
+                               "Baseline promotion is not implemented; candidate scopes do not declare active source coverage."]}
+    connection.execute("UPDATE source_batches SET receipt_json=? WHERE id=?", (_json(receipt), batch_id))
+    row_number = 0
+    for group in groups:
+        for record in envelope[group]:
+            row_number += 1
+            connection.execute(
+                "INSERT INTO source_records (id,batch_id,row_number,source_record_id,status,reason,raw_json,typed_json) "
+                "VALUES (?,?,?,?,'accepted',NULL,?,?)",
+                (str(uuid4()), batch_id, row_number, record["source_record_id"], _json(record),
+                 _json({"inventory_group": group, "record": _normalized(record), "application_status": "staged"})),
+            )
+    return receipt, False
+
+
 def import_envelope(connection, body: bytes) -> tuple[dict, bool]:
     """Caller owns BEGIN IMMEDIATE and commit/rollback; no partial commit occurs here."""
     if len(body) > MAX_IMPORT_BYTES:
@@ -215,10 +364,12 @@ def import_envelope(connection, body: bytes) -> tuple[dict, bool]:
                               parse_float=_finite_float, parse_constant=_reject_constant)
         if not isinstance(envelope, dict):
             raise ValueError("Import envelope must be an object")
+        if "scenario" in envelope:
+            return _stage_inventory(connection, envelope, raw_envelope)
         input_kind = envelope.get("source_kind")
-        if input_kind not in ("routing", "inventory_policy"):
-            raise ValueError("Only routing and inventory_policy envelopes are supported; inventory, DHCP and expected outcomes are not imported")
-        kind = "routing" if input_kind == "routing" else "route_policy"
+        if input_kind not in ("routing", "dhcp", "inventory_policy"):
+            raise ValueError("Only routing, dhcp, inventory_policy and staged intended inventory are supported")
+        kind = "route_policy" if input_kind == "inventory_policy" else input_kind
         expected = {"schema_version", "fixture_contract", "synthetic", "demo_clock_at", "source_id",
                     "source_run_id", "source_kind", "source", "coverage", "records"}
         if kind == "route_policy":
@@ -257,8 +408,9 @@ def import_envelope(connection, body: bytes) -> tuple[dict, bool]:
         _fields(source, {"name", "owner", "authority", "required_for"}, "source")
         _text(source["name"], "source.name", 200)
         _text(source["owner"], "source.owner", 200)
-        authority, requirement = (("observed", "routing_view") if kind == "routing" else
-                                  ("intended_policy", "route_policy"))
+        authority, requirement = {"routing": ("observed", "routing_view"),
+                                  "dhcp": ("observed", "dhcp_history"),
+                                  "route_policy": ("intended_policy", "route_policy")}[kind]
         if source["authority"] != authority or source["required_for"] != [requirement]:
             raise ValueError(f"source must declare authority {authority} and required_for [{requirement}]")
         scopes = {row["id"] for row in connection.execute("SELECT id FROM scopes")}
@@ -348,7 +500,7 @@ def import_envelope(connection, body: bytes) -> tuple[dict, bool]:
         (batch_id, source_id, source_run_id, kind, fingerprint, raw_envelope, "{}", ingested_at, clock),
     )
     receipt = {"id": batch_id, "sequence": cursor.lastrowid, "source_id": source_id, "source_run_id": source_run_id,
-               "source_kind": kind, "ingested_at": ingested_at, "demo_clock_at": clock,
+               "source_kind": kind, "source": source, "ingested_at": ingested_at, "demo_clock_at": clock,
                "application_status": "complete" if all(value["effective_complete"] for value in coverage) else "partial",
                "input_rows": len(records), "accepted_rows": counts["accepted"], "rejected_rows": counts["rejected"],
                "duplicate_rows": counts["duplicate"], "synthetic": True, "coverage": coverage, "limitations": limitations}
