@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-routing-coastal",
+  "source_run_id": "rich-v1-partial",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional Coastal ROUTING export",
+    "owner": "Coastal Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": false
+    }
+  ],
+  "records": []
+}

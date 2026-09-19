@@ -1,0 +1,828 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-routing-coastal",
+  "source_run_id": "rich-v1-complete",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional Coastal ROUTING export",
+    "owner": "Coastal Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "id": "acb7dfe6-f504-50d2-9c6c-27f923cee5a8",
+      "source_record_id": "route-coastal-10.60.1.0/24-01",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "721d7be8-1246-5cc8-8234-c0a9967b6343",
+      "source_record_id": "route-coastal-10.60.1.0/24-02",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "494c1ca7-e915-5657-890d-c6be47931362",
+      "source_record_id": "route-coastal-10.60.1.0/24-03",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ebd1c1c8-7549-5db5-8dc1-4cc69fe194d0",
+      "source_record_id": "route-coastal-10.60.1.0/24-04",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "968e2480-31f4-5d2d-a121-48811d6b06e3",
+      "source_record_id": "route-coastal-10.60.1.0/24-05",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "7c57adc1-369b-5fa7-b13d-ca098fb54b13",
+      "source_record_id": "route-coastal-10.60.1.0/24-06",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e41cbafb-0d1d-58c4-92c5-7ba67767c049",
+      "source_record_id": "route-coastal-10.60.1.0/24-07",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "0375dfa2-5462-52b3-94cb-c66992523b26",
+      "source_record_id": "route-coastal-10.60.1.0/24-08",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e6960cdf-4876-5dea-933e-313e6a750c7d",
+      "source_record_id": "route-coastal-10.60.1.0/24-09",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b63a0575-8e93-525b-b51d-8929b7ed76c3",
+      "source_record_id": "route-coastal-10.60.1.0/24-10",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.1.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f3c12397-5ba0-53e1-bcc7-fe03e44d5cd2",
+      "source_record_id": "route-coastal-10.60.2.0/24-01",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2fb4c166-5f66-5682-8667-7f78307464f6",
+      "source_record_id": "route-coastal-10.60.2.0/24-02",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b5451cd8-07f5-56dc-91a2-d2b3c227e98a",
+      "source_record_id": "route-coastal-10.60.2.0/24-03",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c8a557d5-b862-5d4b-a408-531b387d6a3e",
+      "source_record_id": "route-coastal-10.60.2.0/24-04",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3bc5bd18-688e-59cf-bec3-e15a59996466",
+      "source_record_id": "route-coastal-10.60.2.0/24-05",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "5f98fcd0-7441-51fd-8ca2-b96dea94ecef",
+      "source_record_id": "route-coastal-10.60.2.0/24-06",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "cfac9734-dd73-5c08-9cea-e729e86c8646",
+      "source_record_id": "route-coastal-10.60.2.0/24-07",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3af5b309-baca-5fd8-a041-829f0291e517",
+      "source_record_id": "route-coastal-10.60.2.0/24-08",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "13516d1e-2bbe-5e2d-b858-222675fedc79",
+      "source_record_id": "route-coastal-10.60.2.0/24-09",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ea793282-eab8-5f00-af04-e7a447133245",
+      "source_record_id": "route-coastal-10.60.2.0/24-10",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.2.0/24",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "6bfc5885-04df-5e4c-aa76-6279edad8eae",
+      "source_record_id": "route-coastal-10.60.0.0/20-01",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "00506835-ef43-551a-a8af-7a0eb8034247",
+      "source_record_id": "route-coastal-10.60.0.0/20-02",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "07bc5747-1caa-5f72-811f-8dec96c9ba41",
+      "source_record_id": "route-coastal-10.60.0.0/20-03",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4d3566d9-e45e-5ccf-b332-204294a56aae",
+      "source_record_id": "route-coastal-10.60.0.0/20-04",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b6da027a-40de-55b1-81f2-6b9c7b902637",
+      "source_record_id": "route-coastal-10.60.0.0/20-05",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "893923d6-1471-5b01-a8cb-85185c94ef98",
+      "source_record_id": "route-coastal-10.60.0.0/20-06",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "76c404a0-aa79-59c4-b051-b54cf555897c",
+      "source_record_id": "route-coastal-10.60.0.0/20-07",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "8238e4db-7946-51bd-b8f8-3b9d9d67100d",
+      "source_record_id": "route-coastal-10.60.0.0/20-08",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "91d1f9b1-8fea-5025-a7be-24734f956926",
+      "source_record_id": "route-coastal-10.60.0.0/20-09",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4bef27d2-349d-5bac-ae27-04d727e9ee71",
+      "source_record_id": "route-coastal-10.60.0.0/20-10",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 4,
+      "cidr": "10.60.0.0/20",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d6ef7ed3-53b0-50ad-b7c0-b2872d1d76f2",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-01",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f582e565-5241-5d2b-9266-0367b70516fa",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-02",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "53af176b-ac58-50bf-9954-85416a6d2c34",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-03",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b832469e-7c2a-59c4-91c0-cfd419891e55",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-04",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3d2511b6-749d-5e58-bd51-ad7e99548699",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-05",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "0e6be54a-d2d9-5ba3-a352-b86f6a51ccd1",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-06",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c2094ed2-ca53-5680-99dc-f18c9be1ee8a",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-07",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c6ac0f07-c919-51e7-a8b2-1b570a6eb16c",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-08",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c2e4ad3f-8bd4-5129-a507-4892ba341525",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-09",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "490f6f14-e9cd-55dd-a99a-f2a7e393325f",
+      "source_record_id": "route-coastal-2001:db8:60:1::/64-10",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:1::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "acb99af4-16a8-5251-9343-95cef51594d4",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-01",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "dec13be1-b66b-5630-b685-f73ff43f9153",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-02",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ed0bbb26-9398-5902-b08b-159600d9aca6",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-03",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "680f43db-58f5-5405-8805-41d72495f4a0",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-04",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "6669b9eb-3cff-50a2-8f16-d591f200aea9",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-05",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "78cae380-dfa8-5d67-9366-bf7dee1051d7",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-06",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "5f23cf5e-22bc-54a9-ab8f-f55f33c45513",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-07",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c30c7273-13aa-55a4-bf9f-c9b7fde80465",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-08",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ca8dbd1e-d414-5c29-936d-e43e417b594b",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-09",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b491e11a-0aa5-5ab5-8e01-8d07acdab6ad",
+      "source_record_id": "route-coastal-2001:db8:60:2::/64-10",
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "family": 6,
+      "cidr": "2001:db8:60:2::/64",
+      "router_id": "coastal-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    }
+  ]
+}

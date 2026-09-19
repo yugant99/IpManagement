@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-first-path-routing-north",
+  "source_run_id": "first-path-v1-complete",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional North ROUTING export",
+    "owner": "North Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "id": "37c9b781-2758-596c-ad5a-95f2d1836c24",
+      "source_record_id": "first-path-route-north",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-first-path-router",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    }
+  ]
+}

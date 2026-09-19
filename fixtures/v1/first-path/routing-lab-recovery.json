@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-first-path-routing-lab",
+  "source_run_id": "first-path-v1-recovery",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional Lab ROUTING export",
+    "owner": "Lab Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "id": "f07f0e05-bbce-56dd-9d67-38c9a78612d0",
+      "source_record_id": "first-path-route-lab",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "lab-first-path-router",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    }
+  ]
+}

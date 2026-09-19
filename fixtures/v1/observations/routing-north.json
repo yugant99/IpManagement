@@ -1,0 +1,828 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-routing-north",
+  "source_run_id": "rich-v1-complete",
+  "source_kind": "routing",
+  "source": {
+    "name": "Fictional North ROUTING export",
+    "owner": "North Network Team",
+    "authority": "observed",
+    "required_for": [
+      "routing_view"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "kind": "interval",
+      "window_start_at": "2026-08-02T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": true
+    }
+  ],
+  "records": [
+    {
+      "id": "89f75441-ea10-5fb6-9217-02f9b831e201",
+      "source_record_id": "route-north-10.40.1.0/24-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b41d786e-474e-5e03-9372-7b226ac1c92b",
+      "source_record_id": "route-north-10.40.1.0/24-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "bb0a999f-1f35-50f0-b017-f5b21bf38dcd",
+      "source_record_id": "route-north-10.40.1.0/24-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "7e94b8f2-bdf6-5536-a59f-c52f73aae93d",
+      "source_record_id": "route-north-10.40.1.0/24-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "8a0f8fdb-3c86-56c7-8d6e-a52c6f735942",
+      "source_record_id": "route-north-10.40.1.0/24-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c76b4a53-faf1-5383-a408-062d2314dfcf",
+      "source_record_id": "route-north-10.40.1.0/24-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "3ec5144f-d5ca-5f07-9023-b83e55dd65e1",
+      "source_record_id": "route-north-10.40.1.0/24-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "37e73cad-777f-5c26-8493-69e91cd61c8b",
+      "source_record_id": "route-north-10.40.1.0/24-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "a49d526b-b135-508b-ad0c-f55a8bf3dfb5",
+      "source_record_id": "route-north-10.40.1.0/24-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "bf956b6f-91ce-53da-8462-7f7d6803eaa6",
+      "source_record_id": "route-north-10.40.1.0/24-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.1.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "7c631988-6e51-590f-8d40-f652b242c120",
+      "source_record_id": "route-north-10.40.2.0/28-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f1fd870a-d0b0-5d89-b610-71d36bad61ee",
+      "source_record_id": "route-north-10.40.2.0/28-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "bb9c1c7f-ebcc-54e4-b05d-cdcbb7e6f961",
+      "source_record_id": "route-north-10.40.2.0/28-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "373b8cc3-983b-55da-8c4d-836ad53a28db",
+      "source_record_id": "route-north-10.40.2.0/28-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "05a37847-9156-5810-90c8-b19ff58aaa39",
+      "source_record_id": "route-north-10.40.2.0/28-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "209d3172-cf35-5977-bffa-7bc561d2b581",
+      "source_record_id": "route-north-10.40.2.0/28-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4cb91b5b-bfc3-5f60-8734-fd45adbe68d0",
+      "source_record_id": "route-north-10.40.2.0/28-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "a3f317a2-cccf-5aa7-8796-4ce7d8b93640",
+      "source_record_id": "route-north-10.40.2.0/28-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "6762a1fd-fc01-5c13-9adc-309377ac2bef",
+      "source_record_id": "route-north-10.40.2.0/28-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c1149dbf-d3bc-5fbc-a4d0-e8ea068165c8",
+      "source_record_id": "route-north-10.40.2.0/28-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.2.0/28",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "af40c3b3-1ad3-58e5-af22-975cba7230e2",
+      "source_record_id": "route-north-2001:db8:40:1::/64-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "fea05672-6494-51d2-91e5-6a7f47b8a2d0",
+      "source_record_id": "route-north-2001:db8:40:1::/64-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2b52d36a-4ba4-5442-9bba-bb9561b8a349",
+      "source_record_id": "route-north-2001:db8:40:1::/64-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "8f480482-3e48-5c98-a8c2-b79e4413dd12",
+      "source_record_id": "route-north-2001:db8:40:1::/64-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "b487a7a4-9299-5d7c-b692-e99414191acd",
+      "source_record_id": "route-north-2001:db8:40:1::/64-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ee9c4cf6-44ad-5479-9341-ddd7e995ca1e",
+      "source_record_id": "route-north-2001:db8:40:1::/64-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f3e2efe6-e37e-5421-aff1-d3b91e1b9afb",
+      "source_record_id": "route-north-2001:db8:40:1::/64-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "4c216ff6-eef0-5555-9cdc-7688ef453126",
+      "source_record_id": "route-north-2001:db8:40:1::/64-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "24520bac-1763-5c84-aaad-1250bcd49357",
+      "source_record_id": "route-north-2001:db8:40:1::/64-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d996da25-36c7-5b3b-999d-74c762da5a4a",
+      "source_record_id": "route-north-2001:db8:40:1::/64-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 6,
+      "cidr": "2001:db8:40:1::/64",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "1b232daf-7443-5bb2-b8c5-1d9d66186b1c",
+      "source_record_id": "route-north-10.40.3.0/24-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "c5c6b169-384d-511a-a3c9-e19da56fbb2b",
+      "source_record_id": "route-north-10.40.3.0/24-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "915b8b32-6353-5ed2-9593-faf139da6b9f",
+      "source_record_id": "route-north-10.40.3.0/24-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "0ddcea87-385e-5b0c-829e-95411bea424b",
+      "source_record_id": "route-north-10.40.3.0/24-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "6fa588bb-8edf-5869-a053-fcf4a1f49b3b",
+      "source_record_id": "route-north-10.40.3.0/24-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ad68c401-4ead-5629-83b2-cf0abc5faf1d",
+      "source_record_id": "route-north-10.40.3.0/24-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "2854de20-c806-563c-9ce1-355e3fd705a4",
+      "source_record_id": "route-north-10.40.3.0/24-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "94c08369-7bbe-533b-aec1-431af3f5125a",
+      "source_record_id": "route-north-10.40.3.0/24-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "258e35e1-ed99-5282-830b-c01b51c7f31d",
+      "source_record_id": "route-north-10.40.3.0/24-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "eaac438f-b47a-5a9f-942e-1bdbcbd8c2c1",
+      "source_record_id": "route-north-10.40.3.0/24-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.3.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "be83c20f-5b55-5528-a5ae-dfdcdee12eaf",
+      "source_record_id": "route-north-10.40.4.0/24-01",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-02T00:00:00.000Z",
+      "valid_until_at": "2026-08-05T00:00:00.000Z",
+      "observed_at": "2026-08-02T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-02T00:00:00.000Z",
+        "valid_until_at": "2026-08-05T00:00:00.000Z",
+        "observed_at": "2026-08-02T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "e1683025-b7f2-54de-9c4e-e3c8b4f920e3",
+      "source_record_id": "route-north-10.40.4.0/24-02",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-05T00:00:00.000Z",
+      "valid_until_at": "2026-08-08T00:00:00.000Z",
+      "observed_at": "2026-08-05T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-05T00:00:00.000Z",
+        "valid_until_at": "2026-08-08T00:00:00.000Z",
+        "observed_at": "2026-08-05T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "a124bdd9-160f-5177-bf82-9eb0bf90d7db",
+      "source_record_id": "route-north-10.40.4.0/24-03",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-08T00:00:00.000Z",
+      "valid_until_at": "2026-08-11T00:00:00.000Z",
+      "observed_at": "2026-08-08T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-08T00:00:00.000Z",
+        "valid_until_at": "2026-08-11T00:00:00.000Z",
+        "observed_at": "2026-08-08T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "1dbc36ea-bc78-5e41-b92a-ed4ad53ff16f",
+      "source_record_id": "route-north-10.40.4.0/24-04",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-11T00:00:00.000Z",
+      "valid_until_at": "2026-08-14T00:00:00.000Z",
+      "observed_at": "2026-08-11T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-11T00:00:00.000Z",
+        "valid_until_at": "2026-08-14T00:00:00.000Z",
+        "observed_at": "2026-08-11T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d648398b-4dda-51ac-9571-153a1ff0f076",
+      "source_record_id": "route-north-10.40.4.0/24-05",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-14T00:00:00.000Z",
+      "valid_until_at": "2026-08-17T00:00:00.000Z",
+      "observed_at": "2026-08-14T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-14T00:00:00.000Z",
+        "valid_until_at": "2026-08-17T00:00:00.000Z",
+        "observed_at": "2026-08-14T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ab5863b8-58bf-5a1b-9348-72f47cf24c05",
+      "source_record_id": "route-north-10.40.4.0/24-06",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-17T00:00:00.000Z",
+      "valid_until_at": "2026-08-20T00:00:00.000Z",
+      "observed_at": "2026-08-17T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-17T00:00:00.000Z",
+        "valid_until_at": "2026-08-20T00:00:00.000Z",
+        "observed_at": "2026-08-17T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "a6c1065f-9892-5b19-8d05-7e0e3f5868f2",
+      "source_record_id": "route-north-10.40.4.0/24-07",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-20T00:00:00.000Z",
+      "valid_until_at": "2026-08-23T00:00:00.000Z",
+      "observed_at": "2026-08-20T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-20T00:00:00.000Z",
+        "valid_until_at": "2026-08-23T00:00:00.000Z",
+        "observed_at": "2026-08-20T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "d1e54c3b-dd4a-5375-b348-2ea51ce9983f",
+      "source_record_id": "route-north-10.40.4.0/24-08",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-23T00:00:00.000Z",
+      "valid_until_at": "2026-08-26T00:00:00.000Z",
+      "observed_at": "2026-08-23T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-23T00:00:00.000Z",
+        "valid_until_at": "2026-08-26T00:00:00.000Z",
+        "observed_at": "2026-08-23T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "fb3a774e-95b5-56f8-b6c5-45973adcdf20",
+      "source_record_id": "route-north-10.40.4.0/24-09",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-26T00:00:00.000Z",
+      "valid_until_at": "2026-08-29T00:00:00.000Z",
+      "observed_at": "2026-08-26T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-26T00:00:00.000Z",
+        "valid_until_at": "2026-08-29T00:00:00.000Z",
+        "observed_at": "2026-08-26T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "f8237942-7f42-5ea0-97e1-7fdb02ec9a49",
+      "source_record_id": "route-north-10.40.4.0/24-10",
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001",
+      "family": 4,
+      "cidr": "10.40.4.0/24",
+      "router_id": "north-router-01",
+      "valid_from_at": "2026-08-29T00:00:00.000Z",
+      "valid_until_at": "2026-09-02T00:00:00.000Z",
+      "observed_at": "2026-08-29T00:00:00.000Z",
+      "original_timestamps": {
+        "valid_from_at": "2026-08-29T00:00:00.000Z",
+        "valid_until_at": "2026-09-02T00:00:00.000Z",
+        "observed_at": "2026-08-29T00:00:00.000Z"
+      }
+    }
+  ]
+}

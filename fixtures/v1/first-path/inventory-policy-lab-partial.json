@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "synthetic": true,
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "source_id": "synthetic-first-path-policy",
+  "source_run_id": "first-path-v1-policy-lab-partial",
+  "effective_from_at": "2026-08-02T00:00:00.000Z",
+  "source_kind": "inventory_policy",
+  "source": {
+    "name": "Fictional intended announcement policy",
+    "owner": "Demo Inventory Team",
+    "authority": "intended_policy",
+    "required_for": [
+      "route_policy"
+    ]
+  },
+  "coverage": [
+    {
+      "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002",
+      "kind": "snapshot",
+      "window_start_at": "2026-09-01T00:00:00.000Z",
+      "window_end_at": "2026-09-01T00:00:00.000Z",
+      "declared_complete": false
+    }
+  ],
+  "records": []
+}

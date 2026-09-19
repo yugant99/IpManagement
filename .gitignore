@@ -19,6 +19,8 @@ dist/
 /data/
 *.sqlite
 *.sqlite3
+*.sqlite3-*
+.ipam_demo.lock
 *.db
 *.db-wal
 *.db-shm

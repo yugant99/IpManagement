@@ -1,0 +1,371 @@
+"""Fixed synthetic actors, exact-candidate allocation and a separate exception queue.
+
+Mutations use the caller's BEGIN IMMEDIATE transaction. This module never commits;
+the API records failed attempts in a fresh transaction after rollback.
+"""
+
+from datetime import datetime, timezone
+from hashlib import sha256
+from ipaddress import ip_address, ip_network
+import json
+from uuid import UUID, uuid4
+
+from .errors import AppError
+from .evidence import active_dhcp_claims
+from .inventory import pool_payload
+from .seed import _ranges
+
+STATIC_POOL_ID = "8821c420-18ea-4caa-9d97-83a331c0c002"
+DEMO_ACTORS = {
+    "demo-requester": {"id": "demo-requester", "name": "Mira", "role": "requester",
+                       "team": "Access Planning", "permissions": ["request", "exception"]},
+    "demo-approver": {"id": "demo-approver", "name": "Rowan", "role": "approver",
+                      "team": "Network Operations",
+                      "permissions": ["request", "approve", "inventory_edit", "exception"]},
+}
+
+
+def _now():
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def _json(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def _hash(value):
+    return sha256(_json(value).encode("utf-8")).hexdigest()
+
+
+def actors():
+    return [dict(actor) for actor in DEMO_ACTORS.values()]
+
+
+def require_actor(actor_id, permission=None):
+    actor = DEMO_ACTORS.get(actor_id) if isinstance(actor_id, str) else None
+    if actor is None:
+        raise AppError("FORBIDDEN", "Select a recognized demo actor identity.", 403)
+    if permission and permission not in actor["permissions"]:
+        raise AppError("FORBIDDEN", "This demo actor is not permitted to perform that action.", 403,
+                       {"actor_id": actor_id, "permission": permission})
+    return dict(actor)
+
+
+def _text(value, field, maximum=500):
+    if not isinstance(value, str) or not value.strip() or len(value) > maximum:
+        raise AppError("INVALID_INPUT", f"{field} must be nonempty text, at most {maximum} characters.", 422,
+                       {"field": field})
+    return value.strip()
+
+
+def _version(value, field):
+    if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+        raise AppError("INVALID_INPUT", f"{field} must be a positive integer.", 422, {"field": field})
+    return value
+
+
+def _payload(payload, allowed):
+    if not isinstance(payload, dict) or set(payload) - set(allowed):
+        raise AppError("INVALID_INPUT", "Payload must be an object with only the documented fields.", 422)
+
+
+def audit_event(connection, *, actor_id, action, outcome, reason, request_id=None,
+                subject_id=None, scope_id=None, pool_id=None, address=None, details=None):
+    """Shared inventory/workflow audit, atomic with a successful local mutation."""
+    # Unknown supplied identities may be recorded for rejected attempts, never trusted.
+    actor = DEMO_ACTORS.get(actor_id) if isinstance(actor_id, str) else None
+    if actor_id == "system" and outcome != "failed":
+        actor = {"role": "system"}
+    if actor is None and outcome != "failed":
+        raise AppError("FORBIDDEN", "A successful mutation needs a recognized demo actor.", 403)
+    item = {"id": str(uuid4()), "created_at": _now(),
+            "actor_id": actor_id if isinstance(actor_id, str) else "unknown",
+            "actor_role": actor["role"] if actor else "unknown", "action": action,
+            "outcome": outcome, "reason": _text(reason, "reason", 2000), "request_id": request_id,
+            "subject_id": subject_id, "scope_id": scope_id, "pool_id": pool_id,
+            "address": address, "details": details or {}}
+    connection.execute(
+        "INSERT INTO audit_events(id,created_at,actor_id,actor_role,action,outcome,reason,request_id,"
+        "subject_id,scope_id,pool_id,address,details_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        (*[item[key] for key in ("id", "created_at", "actor_id", "actor_role", "action", "outcome", "reason",
+                                "request_id", "subject_id", "scope_id", "pool_id", "address")],
+         _json(item["details"])))
+    return item
+
+
+def list_audit(connection, request_id=None, subject_id=None):
+    items = []
+    for row in connection.execute("SELECT * FROM audit_events ORDER BY created_at DESC, id DESC"):
+        if request_id and row["request_id"] != request_id:
+            continue
+        if subject_id and row["subject_id"] != subject_id:
+            continue
+        item = dict(row)
+        item["details"] = json.loads(item.pop("details_json"))
+        items.append(item)
+    return items
+
+
+def _pool(connection, object_id=STATIC_POOL_ID):
+    if object_id != STATIC_POOL_ID:
+        raise AppError("POOL_NOT_AUTHORIZED", "Only the designated North static IPv4 pool supports this flow.", 422)
+    row = connection.execute(
+        "SELECT p.*, n.cidr FROM pools p JOIN prefixes n ON n.id=p.prefix_id WHERE p.id=?", (object_id,)
+    ).fetchone()
+    if row is None:
+        raise AppError("POOL_UNAVAILABLE", "The designated static pool is absent from the intended ledger.", 409)
+    pool = dict(row)
+    if pool["family"] != 4 or pool["management_mode"] != "static" or pool["allocation_authority"] != "local":
+        raise AppError("POOL_NOT_AUTHORIZED", "The designated pool must retain authoritative local static IPv4 policy.", 409)
+    try:
+        network = ip_network(pool["cidr"])
+        ranges = _ranges(json.loads(pool["ranges"]), network)
+        exclusions = _ranges(json.loads(pool["exclusions"]), network)
+        if not ranges or any(not any(a <= x <= y <= b for a, b in ranges) for x, y in exclusions):
+            raise ValueError("Exclusions must be inside the configured ranges")
+        if sum(b - a + 1 for a, b in ranges) <= sum(b - a + 1 for a, b in exclusions):
+            raise ValueError("Assignable capacity must be positive")
+    except (ValueError, KeyError, TypeError) as exc:
+        raise AppError("INVALID_CAPACITY", "The designated pool has invalid ranges or exclusions; allocation is blocked.",
+                       409, {"reason": str(exc)}) from exc
+    return pool, ranges, exclusions
+
+
+def _eligibility(connection, pool, ranges, exclusions, candidate, clock):
+    address = ip_address(candidate)
+    if address.version != 4 or not any(a <= int(address) <= b for a, b in ranges):
+        raise AppError("CANDIDATE_OUTSIDE_POOL", "The exact candidate is outside the pool's assignable ranges.", 409)
+    if any(a <= int(address) <= b for a, b in exclusions):
+        raise AppError("CANDIDATE_EXCLUDED", "The exact candidate is excluded by pool policy.", 409)
+    allocation = connection.execute(
+        "SELECT id FROM allocations WHERE scope_id=? AND family=4 AND address=?", (pool["scope_id"], candidate)
+    ).fetchone()
+    if allocation:
+        raise AppError("CANDIDATE_OCCUPIED", "The exact candidate already has an intended allocation in this scope.",
+                       409, {"allocation_id": allocation["id"]})
+    evidence = active_dhcp_claims(connection, pool["scope_id"], 4, candidate, clock)
+    if evidence["claims"]:
+        raise AppError("CANDIDATE_OBSERVED", "Current eligible DHCP evidence contradicts allocation of this candidate.",
+                       409, {"claims": evidence["claims"]})
+    return evidence.get("unknown_reasons", [])
+
+
+def workflow_status(connection):
+    pool, _, _ = _pool(connection)
+    meta = connection.execute("SELECT baseline_version,demo_clock_at FROM app_meta WHERE singleton=1").fetchone()
+    return {"actors": actors(), "pool": pool_payload(pool), "baseline_version": meta["baseline_version"],
+            "demo_clock_at": meta["demo_clock_at"], "synthetic": True,
+            "limitations": ["The local static ledger is authoritative only inside this demo.",
+                            "Pending requests do not reserve addresses. Approval rechecks the exact candidate and versions.",
+                            "Demo actor switching is not enterprise authentication. External provisioning is simulated."]}
+
+
+def _request_payload(row):
+    item = dict(row)
+    item["payload"] = json.loads(item.pop("payload_json"))
+    item.pop("payload_hash")
+    item.pop("decision_hash")
+    item["synthetic"] = True
+    item["local_outcome"] = "allocated" if item["state"] == "approved" else "unchanged"
+    return item
+
+
+def get_request(connection, object_id):
+    row = connection.execute("SELECT * FROM allocation_requests WHERE id=?", (object_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "No allocation request exists with that ID.", 404)
+    return _request_payload(row)
+
+
+def list_requests(connection):
+    return [_request_payload(row) for row in connection.execute(
+        "SELECT * FROM allocation_requests ORDER BY created_at DESC,id DESC")]
+
+
+def create_request(connection, payload):
+    _payload(payload, ("actor_id", "idempotency_key", "pool_id", "candidate", "pool_version", "baseline_version",
+                       "owner", "purpose", "reason", "supersedes_request_id"))
+    actor = require_actor(payload.get("actor_id"), "request")
+    normalized = {key: _text(payload.get(key), key, 200 if key != "reason" else 500)
+                  for key in ("idempotency_key", "pool_id", "candidate", "owner", "purpose", "reason")}
+    normalized["actor_id"] = actor["id"]
+    for key in ("pool_version", "baseline_version"):
+        normalized[key] = _version(payload.get(key), key)
+    try:
+        address = ip_address(normalized["candidate"])
+        if address.version != 4:
+            raise ValueError("IPv4 is required")
+        normalized["candidate"] = str(address)
+        previous = payload.get("supersedes_request_id")
+        normalized["supersedes_request_id"] = str(UUID(previous)) if previous is not None else None
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise AppError("INVALID_INPUT", "Candidate must be IPv4 and supersedes_request_id must be a UUID.", 422) from exc
+    digest = _hash(normalized)
+    old = connection.execute("SELECT * FROM allocation_requests WHERE actor_id=? AND idempotency_key=?",
+                             (actor["id"], normalized["idempotency_key"])).fetchone()
+    if old:
+        if old["payload_hash"] != digest:
+            raise AppError("IDEMPOTENCY_CONFLICT", "This creation key already identifies a different payload.", 409)
+        return _request_payload(old), True
+    if normalized["supersedes_request_id"]:
+        previous = get_request(connection, normalized["supersedes_request_id"])
+        if previous["actor_id"] != actor["id"]:
+            raise AppError("FORBIDDEN", "A renewed review may supersede only your own request.", 403)
+    pool, ranges, exclusions = _pool(connection, normalized["pool_id"])
+    meta = connection.execute("SELECT baseline_version,demo_clock_at FROM app_meta WHERE singleton=1").fetchone()
+    if (pool["pool_version"] != normalized["pool_version"]
+            or meta["baseline_version"] != normalized["baseline_version"]):
+        raise AppError("STALE_REVIEW", "Pool or intended-ledger version changed. Refresh and create a new review.", 409)
+    limitations = _eligibility(connection, pool, ranges, exclusions, normalized["candidate"], meta["demo_clock_at"])
+    object_id, created_at = str(uuid4()), _now()
+    connection.execute(
+        "INSERT INTO allocation_requests(id,actor_id,idempotency_key,payload_hash,payload_json,pool_id,scope_id,"
+        "candidate,pool_version,baseline_version,state,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        (object_id, actor["id"], normalized["idempotency_key"], digest, _json(normalized), pool["id"], pool["scope_id"],
+         normalized["candidate"], pool["pool_version"], meta["baseline_version"], "pending", created_at))
+    audit_event(connection, actor_id=actor["id"], action="allocation.request", outcome="succeeded",
+                reason=normalized["reason"], request_id=object_id, subject_id=object_id, scope_id=pool["scope_id"],
+                pool_id=pool["id"], address=normalized["candidate"],
+                details={"before": None, "after": {"state": "pending"}, "pool_version": pool["pool_version"],
+                         "baseline_version": meta["baseline_version"], "limitations": limitations,
+                         "authority": "local_static_ledger", "reserved": False})
+    return get_request(connection, object_id), False
+
+
+def decide_request(connection, object_id, payload):
+    _payload(payload, ("actor_id", "action", "reason", "simulate_failure"))
+    actor = require_actor(payload.get("actor_id"), "approve")
+    action = payload.get("action")
+    if action not in ("approve", "reject") or not isinstance(payload.get("simulate_failure", False), bool):
+        raise AppError("INVALID_INPUT", "Use approve or reject and a boolean simulate_failure flag.", 422)
+    reason = _text(payload.get("reason"), "reason")
+    simulation = payload.get("simulate_failure", False)
+    if action == "reject" and simulation:
+        raise AppError("INVALID_INPUT", "Provisioning simulation is available only for approval.", 422)
+    digest = _hash({"actor_id": actor["id"], "action": action, "reason": reason, "simulate_failure": simulation})
+    row = connection.execute("SELECT * FROM allocation_requests WHERE id=?", (object_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "No allocation request exists with that ID.", 404)
+    if row["actor_id"] == actor["id"]:
+        raise AppError("SELF_APPROVAL_FORBIDDEN", "A request needs a different permitted decision actor.", 403)
+    if row["state"] != "pending":
+        if row["decision_hash"] == digest:
+            return _request_payload(row), True
+        raise AppError("REQUEST_TERMINAL", "This request is immutable. Fetch its result or create a renewed review.", 409)
+    stored = _request_payload(row)
+    before = {"state": "pending", "pool_version": row["pool_version"], "baseline_version": row["baseline_version"]}
+    allocation_id, downstream, limitations = None, "not_requested", []
+    after = {"state": "rejected"}
+    if action == "approve":
+        pool, ranges, exclusions = _pool(connection, row["pool_id"])
+        meta = connection.execute("SELECT baseline_version,demo_clock_at FROM app_meta WHERE singleton=1").fetchone()
+        if pool["pool_version"] != row["pool_version"] or meta["baseline_version"] != row["baseline_version"]:
+            raise AppError("STALE_REVIEW", "Reviewed pool or intended-ledger version changed; no address was allocated.", 409,
+                           {"reviewed_pool_version": row["pool_version"], "current_pool_version": pool["pool_version"],
+                            "reviewed_baseline_version": row["baseline_version"], "current_baseline_version": meta["baseline_version"]})
+        limitations = _eligibility(connection, pool, ranges, exclusions, row["candidate"], meta["demo_clock_at"])
+        allocation_id = str(uuid4())
+        origin = {"source_id": "local-demo-workflow", "source_run_id": object_id, "source_record_id": allocation_id,
+                  "observed_at": meta["demo_clock_at"], "ingested_at": _now(), "synthetic": True}
+        connection.execute(
+            "INSERT INTO allocations(id,scope_id,prefix_id,pool_id,family,address,address_hex,owner,purpose,origin) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?)", (allocation_id, pool["scope_id"], pool["prefix_id"], pool["id"], 4,
+            row["candidate"], f"{int(ip_address(row['candidate'])):032x}", stored["payload"]["owner"],
+            stored["payload"]["purpose"], _json(origin)))
+        connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE id=?", (pool["id"],))
+        connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
+        downstream = "simulated_failure" if simulation else "simulated_success"
+        after = {"state": "approved", "allocation_id": allocation_id, "pool_version": pool["pool_version"] + 1,
+                 "baseline_version": meta["baseline_version"] + 1, "local_outcome": "allocated", "downstream_status": downstream}
+    connection.execute(
+        "UPDATE allocation_requests SET state=?,allocation_id=?,decided_at=?,decision_actor_id=?,decision_hash=?,"
+        "decision_reason=?,downstream_status=? WHERE id=?", (after["state"], allocation_id, _now(), actor["id"],
+        digest, reason, downstream, object_id))
+    audit_event(connection, actor_id=actor["id"], action=f"allocation.{action}", outcome="succeeded", reason=reason,
+                request_id=object_id, subject_id=object_id, scope_id=row["scope_id"], pool_id=row["pool_id"],
+                address=row["candidate"], details={"before": before, "after": after, "limitations": limitations})
+    return get_request(connection, object_id), False
+
+
+def sync_exceptions(connection, run):
+    """Notify once for each newly observed anomalous subject; never rewrite a run."""
+    created = 0
+    for finding in run["findings"]:
+        if finding["evidence_state"] != "anomalous":
+            continue
+        subject = finding["subject"]
+        key = _json([finding["rule_id"], subject["scope_id"], subject["family"], subject["id"]])
+        if connection.execute("SELECT id FROM exceptions WHERE subject_key=?", (key,)).fetchone():
+            continue
+        object_id, now = str(uuid4()), _now()
+        connection.execute(
+            "INSERT INTO exceptions(id,subject_key,run_id,finding_id,owner_actor_id,state,version,created_at,updated_at) "
+            "VALUES (?,?,?,?,?,'open',1,?,?)", (object_id, key, run["id"], finding["id"], "demo-requester", now, now))
+        audit_event(connection, actor_id="system", action="exception.detected", outcome="succeeded",
+                    reason="New calculated anomaly added to the in-app exception queue.", subject_id=object_id,
+                    scope_id=subject["scope_id"], details={"run_id": run["id"], "finding_id": finding["id"],
+                        "after": {"state": "open", "owner_actor_id": "demo-requester"}})
+        created += 1
+    return created
+
+
+def _exception_payload(connection, row):
+    item = dict(row)
+    saved = connection.execute("SELECT result_json FROM calculation_runs WHERE id=?", (item["run_id"],)).fetchone()
+    finding = next((value for value in json.loads(saved["result_json"])["findings"]
+                    if value["id"] == item["finding_id"]), None) if saved else None
+    if finding is None:
+        raise AppError("EXCEPTION_EVIDENCE_MISSING", "The saved finding referenced by this exception is unavailable.", 500)
+    item.pop("subject_key")
+    item["finding"] = finding
+    item["owner"] = require_actor(item["owner_actor_id"])
+    item["notification_pending"] = item["acknowledged_at"] is None
+    item["synthetic"] = True
+    return item
+
+
+def list_exceptions(connection):
+    return [_exception_payload(connection, row) for row in connection.execute(
+        "SELECT * FROM exceptions ORDER BY created_at DESC,id DESC")]
+
+
+def update_exception(connection, object_id, payload):
+    _payload(payload, ("actor_id", "version", "action", "reason", "recipient_actor_id"))
+    actor = require_actor(payload.get("actor_id"), "exception")
+    version, reason = _version(payload.get("version"), "version"), _text(payload.get("reason"), "reason")
+    action = payload.get("action")
+    if action not in ("acknowledge", "escalate", "handoff"):
+        raise AppError("INVALID_INPUT", "Use acknowledge, escalate or handoff for exception actions.", 422)
+    row = connection.execute("SELECT * FROM exceptions WHERE id=?", (object_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "No exception exists with that ID.", 404)
+    if row["version"] != version:
+        raise AppError("STALE_EXCEPTION", "Exception ownership or state changed. Refresh before deciding.", 409)
+    if row["owner_actor_id"] != actor["id"]:
+        raise AppError("FORBIDDEN", "Only the assigned exception owner can acknowledge, escalate or hand it off.", 403)
+    now = _now()
+    if action == "handoff":
+        recipient = require_actor(payload.get("recipient_actor_id"), "exception")
+        if recipient["team"] == actor["team"]:
+            raise AppError("INVALID_HANDOFF", "Choose the named recipient on the other fictional team.", 422)
+        connection.execute(
+            "UPDATE exceptions SET owner_actor_id=?,state='open',version=version+1,updated_at=?,"
+            "handoff_from_actor_id=?,handoff_at=?,acknowledged_at=NULL WHERE id=?",
+            (recipient["id"], now, actor["id"], now, object_id))
+    elif action == "acknowledge":
+        if row["acknowledged_at"] is not None:
+            raise AppError("EXCEPTION_ALREADY_ACKNOWLEDGED", "This owner has already acknowledged the exception.", 409)
+        # Acknowledging an escalated exception retains its escalation state.
+        state = "escalated" if row["state"] == "escalated" else "acknowledged"
+        connection.execute("UPDATE exceptions SET state=?,version=version+1,updated_at=?,acknowledged_at=? WHERE id=?",
+                           (state, now, now, object_id))
+    else:
+        if row["state"] == "escalated":
+            raise AppError("EXCEPTION_ALREADY_ESCALATED", "This exception is already escalated.", 409)
+        connection.execute("UPDATE exceptions SET state='escalated',version=version+1,updated_at=? WHERE id=?", (now, object_id))
+    updated = connection.execute("SELECT * FROM exceptions WHERE id=?", (object_id,)).fetchone()
+    result = _exception_payload(connection, updated)
+    audit_event(connection, actor_id=actor["id"], action=f"exception.{action}", outcome="succeeded", reason=reason,
+                subject_id=object_id, scope_id=result["finding"]["subject"]["scope_id"],
+                details={"before": dict(row), "after": dict(updated), "run_id": row["run_id"], "finding_id": row["finding_id"]})
+    return result
