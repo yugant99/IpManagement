@@ -1,6 +1,6 @@
 # Native local demo — completed rehearsal record
 
-**Focused agent procedural evidence completed on 2026-09-19/20.** F4 presentation readiness remains pending the separate-copy agent reproduction below. This runbook records the actual native candidate, paths, IDs and evidence. It is not human presenter acceptance or portable deployment acceptance.
+**Focused agent procedural evidence completed on 2026-09-19/20 and accepted within bounds.** F4 native presentation readiness includes the separate-copy agent reproduction below. This runbook records the actual native candidate, paths, IDs and evidence. It is not human presenter acceptance or portable deployment acceptance.
 
 Stage 5 owns this native demo procedure and focused evidence. Main Lead 2.0 accepts the candidate. Stage 4 owns shared schema/migration; Foundation owns state-command compatibility. Spencer retains packaging, `docs/RUNNING.md`, `scripts/ops/` and portable recipient delivery. An unregistered package checkpoint is a visibility gap, not proof that Spencer has done no work.
 
@@ -19,7 +19,7 @@ Stage 5 owns this native demo procedure and focused evidence. Main Lead 2.0 acce
 | Schema version / migration compatibility | Schema v5; restore reported `migration_required:false` |
 | Historical initial snapshot path and SHA256 | `final-rehearsal/snapshots/demo-initial-cycle1.sqlite3`; `8f652f649c36af0a0d515098e3c2c32fea1a8a437eec3e2599b6978fea5e0239`; preserved unchanged and has no preset |
 | Presenter-ready cycle-1 snapshot path and SHA256 | `ready-cycle1-with-preset-v2/snapshots/demo-ready-cycle1-with-preset.sqlite3`; `ee8134aa583dbf4711251f8bcd23e9bec6305ce77672e40e7cd3def91f655b37`; contains one cycle-1 run and one pinned preset |
-| Final evidence snapshot path and SHA256 | `snapshots/demo-final-evidence-cycle7.sqlite3`; `e5e50c01b4a7bc8a561b9ba4c2bcc96f317e165e3385b8e7ce39457148946a2d` |
+| Final evidence snapshot path and SHA256 | `final-rehearsal/snapshots/demo-final-evidence-cycle7.sqlite3`; `e5e50c01b4a7bc8a561b9ba4c2bcc96f317e165e3385b8e7ce39457148946a2d` |
 | Ready-state schedule | Observed disabled, config version 1, null due, no in-flight work, cycle 1 at `2026-09-01T06:00:00.000Z` |
 | Run IDs | Cycle 1 `004246ef`; cycle 2 `e25f6397`; cycle 3 `c8101c55`; cycle 4 `5b1e253c`; cycle 5 `efadc3fa`; cycle 6 `82e4a57f`; cycle 7 `ab3ae7bd`; full IDs in the evidence handoff |
 | Report preset | Presenter-ready cycle-1 revision `147f2054b8edf4f186bc3c8ac8b11d86bed4f08972f20e47da7cba763d6c71c6`; primary final revision `fffa8447...57831`; all eight supported columns and empty filters |
@@ -153,10 +153,22 @@ Record its SHA256, schema, command result and logical-state evidence separately.
 
 ## Stopped recovery
 
-Stop only the owned demo service, wait for exit and keep the terminal result. Stop other tools holding its database. A leftover `.ipam_demo.lock` file is normal; never remove it to bypass a live lock. After retaining final evidence, use the same absolute environment values and the recorded **initial cycle-1** snapshot:
+Stop only the owned demo service, wait for exit and keep the terminal result. Stop other tools holding its database. A leftover `.ipam_demo.lock` file is normal; never remove it to bypass a live lock. After retaining final evidence, use the same absolute environment values and the recorded **initial cycle-1** snapshot for final-rehearsal recovery:
 
 ```sh
 "$DEMO_PYTHON" -m ipam_demo restore --input "$DEMO_ROOT/snapshots/demo-initial-cycle1.sqlite3" --confirm
+```
+
+For the current presenter-ready copy, recover the prepared ready snapshot from its own root instead of the historical final-rehearsal initial snapshot:
+
+```sh
+export DEMO_PYTHON="/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-artifacts/run-20260919-zzeadfai/environment/bin/python"
+export DEMO_ROOT="/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-artifacts/run-20260919-zzeadfai/ready-cycle1-with-preset-v2"
+export DEMO_CHECKOUT="/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-acceptance"
+export IPAM_DATA_DIR="$DEMO_ROOT/data"
+export IPAM_STATIC_DIR="$DEMO_CHECKOUT/frontend/dist"
+export IPAM_SYNTHETIC_FEED_DIR="$DEMO_CHECKOUT/fixtures/v1"
+"$DEMO_PYTHON" -m ipam_demo restore --input "$DEMO_ROOT/snapshots/demo-ready-cycle1-with-preset.sqlite3" --confirm
 ```
 
 Require a successful restore result; retain `database_replaced`, schema, `migration_required` and the `preserved_database` path. If restoration reports a partial failure, inspect these fields rather than blindly retrying. The previous populated demo state is preserved by the command. Do not delete it or use reset as a shortcut.

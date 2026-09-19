@@ -1,6 +1,6 @@
 # Questionnaire-first delivery plan
 
-Status: **historical planning priorities, with final current-candidate accounting on 2026-09-19.** The controlling [111-row evidence table](QUESTIONNAIRE_ROW_MAP.md) records **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing** from the accepted local candidate. The unchanged application is integrated in main through PR #34. These classes are not a percentage of fully satisfied customer requirements. Use [status](STATUS.md) and the separate [DOCX phase gaps](PHASE_COVERAGE.md) for current acceptance. The original 30 goals and planning bundles below remain work references, not achievement totals.
+Status: **final bounded adjudication on 2026-09-20.** The controlling [111-row evidence table](QUESTIONNAIRE_ROW_MAP.md) records **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing**. This credits verified requester-subnet UI, bounded local correction/reconciliation, exercised escalation, and substantive user/operator guidance for RFP-092; RFP-104 remains Missing. PR #44 and the native procedural handoff are accepted within their documented limits. These classes are not a percentage of fully satisfied customer requirements. Use [status](STATUS.md) and the separate [DOCX phase gaps](PHASE_COVERAGE.md) for current acceptance. The original 30 goals and planning bundles below remain work references, not achievement totals.
 
 ## What the 111 rows require
 
@@ -46,7 +46,7 @@ The next two additions are the preferred route from 65 to 67, only after the und
 
 - Reuse the inventory form, one dashboard shell and saved-run data. Keep visual polish to readability; no bespoke executive layout, animation pass or separate reporting platform.
 - Keep assessment and delivery material as a small shared document pack with explicit fictional examples. Do not build a maturity-assessment wizard or duplicate every document as a UI screen.
-- Defer 057/070's local reclaim/remediation extension, 111's configurable workflow designer, live external connectors, tenant isolation, enterprise identity, HA and scale work. Do not trade allocation correctness or evidence provenance for these rows.
+- Reclamation (057), configurable workflow design (111), live external connectors, tenant isolation, enterprise identity, HA and scale remain deferred. The later user-authorized [F1 contract](AUDIT_RESPONSE_CONTRACT.md) adds bounded approved local missing-prefix registration relevant to 070; it supersedes the original blanket remediation deferral only for that slice. Do not trade allocation correctness or evidence provenance for these rows.
 - Keep saved reports to one filter/column preset and CSV export. Keep IPv6 to prefix arithmetic and bounded prefix assignment, with no host enumeration or IPv6 subscriber allocator.
 - At hour 6, require the original source-to-finding browser path. At hour 11, select remaining additions based on working prerequisites. Freeze new features at hour 14. Unfinished rows remain missing/partial; do not lower the denominator or fill a gap with a label.
 
