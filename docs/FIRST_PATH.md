@@ -4,7 +4,7 @@ This describes authored Stage 2 behavior and a source-reviewed fixture recipe. *
 
 ## Dependencies and boundaries
 
-Use the lead-approved foundation dependency from PR #5, then the Stage 2 branch/PR recorded in `handoffs/stage-02-report.md`. The separately owned fixture branch is `codex/part-2-synthetic-data`; the first-path inputs were published in commit `60df87025a9a76187638bcad1921981b851f6cbb`. Do not copy fixture generation into application code. The lead coordinates integration; this feature does not merge another owner's work or promote richer inventory.
+Use the lead-approved foundation dependency from PR #5, then the Stage 2 branch/PR recorded in `handoffs/stage-02-report.md`. The separately owned fixture branch is `codex/part-2-synthetic-data`; the first-path inputs were published in commit `60df87025a9a76187638bcad1921981b851f6cbb`, unchanged in the final data-lane checkpoint `907f6e7bf32f23f36d270da49c3177b015c8bfae` ([PR #7](https://github.com/yugant99/IpManagement/pull/7)). Do not copy fixture generation into application code. The lead coordinates integration; this feature does not merge another owner's work or promote richer inventory.
 
 The existing packaged seed has two scopes and six prefixes. The new first-path inputs refer to exactly those identities. Source imports do not insert, modify or delete intended inventory or allocations. Rich `inventory.json`, DHCP and expected-outcome files are outside the accepted Stage 2 format and return an explicit input error. One rule is implemented: G13 missing expected route, with G15 healthy/unknown controls. G05/G06/G07/G18 receive bounded contributions; their broader goals are not complete.
 
