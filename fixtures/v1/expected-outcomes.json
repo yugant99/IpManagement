@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "fixture_contract": "ipam-synthetic-v1",
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "evidence_status": "Independently authored expectations from the source recipe; no importer or detection execution demonstrated.",
+  "usage": "Comparison only after independent application output. Never import this file or use it in detection, calculations or UI answers.",
+  "default_recipe": "Use only pack.json default_inputs in a fresh intended inventory prepared by the future integration owner. All default observation batches declare complete coverage. All timestamps use half-open intervals.",
+  "metrics_basis": {
+    "window_start_at": "2026-08-02T00:00:00.000Z",
+    "window_end_at": "2026-09-01T00:00:00.000Z",
+    "hourly_samples": 720,
+    "nearest_rank_p95_one_based": 684,
+    "complete_days": 30,
+    "forecast": "OLS of daily p95 counts; latest completed-day p95 is the exhaustion baseline. These are expectations, not saved calculation outputs."
+  },
+  "pool_expectations": [
+    {"scope": "North", "source_record_id": "pool-north-dhcp", "capacity": "245", "current_occupied": "150", "p95_occupied": "150", "daily_p95": "150 on all 30 days", "forecast_state": "no_positive_growth", "pressure": false, "oversized": false, "zombie": false},
+    {"scope": "North", "source_record_id": "pool-north-static", "capacity": "13", "intended_allocations": "1", "dhcp_rules": "not_applicable", "reason": "Static local authority; no DHCP silence inference"},
+    {"scope": "Coastal", "source_record_id": "pool-coastal-access-1", "capacity": "100", "current_occupied": "90", "p95_occupied": "90", "daily_p95": "90 on all 30 days", "forecast_state": "no_positive_growth", "pressure": true, "oversized": false, "zombie": false},
+    {"scope": "Coastal", "source_record_id": "pool-coastal-access-2", "capacity": "100", "current_occupied": "69", "p95_occupied": "68", "daily_p95": "40,41,...,69", "ols_slope_addresses_per_day": "1", "forecast_days_to_full": "31", "pressure": true, "oversized": false, "zombie": false},
+    {"scope": "Central", "source_record_id": "pool-central-access-1", "capacity": "100", "current_occupied": "0", "p95_occupied": "0", "daily_p95": "0 on all 30 days", "forecast_state": "no_positive_growth", "pressure": false, "oversized": true, "zombie": true},
+    {"scope": "Central", "source_record_id": "pool-central-access-2", "capacity": "100", "current_occupied": "10", "p95_occupied": "10", "daily_p95": "10 on all 30 days", "forecast_state": "no_positive_growth", "pressure": false, "oversized": true, "zombie": false},
+    {"scope": "Lab", "source_record_id": "pool-lab-access-1", "capacity": "100", "current_occupied": "61", "p95_occupied": "60", "daily_p95": "60 for 29 days, then 61", "ols_slope_addresses_per_day": "1/155", "forecast_days_to_full": "6045", "forecast_state": "beyond_365_day_horizon", "pressure": false, "oversized": false, "zombie": false},
+    {"scope": "Lab", "source_record_id": "pool-lab-access-2", "capacity": "100", "current_occupied": "60", "p95_occupied": "60", "daily_p95": "60 on all 30 days", "forecast_state": "no_positive_growth", "pressure": false, "oversized": false, "zombie": false}
+  ],
+  "scenarios": [
+    {"id": "pressure-p95", "condition": "pool_pressure", "subject": "Coastal 10.60.1.0/24", "files": ["inventory.json", "observations/dhcp-coastal.json"], "expect": "finding: 90 percent p95 meets the 80 percent branch", "healthy_control": "North DHCP", "unknown_control": "opt-in/dhcp-coastal-partial.json"},
+    {"id": "pressure-forecast", "condition": "pool_pressure", "subject": "Coastal 10.60.2.0/24", "files": ["inventory.json", "observations/dhcp-coastal.json"], "expect": "finding from 31-day forecast despite p95 below 80 percent", "healthy_control": "Lab access 2", "unknown_control": "opt-in/dhcp-coastal-partial.json"},
+    {"id": "oversized", "condition": "oversized_pool", "subject": "Central 10.80.2.0/24", "files": ["inventory.json", "observations/dhcp-central.json"], "expect": "review candidate at 10 percent p95; no zombie because leases overlap the window", "healthy_control": "North DHCP", "unknown_control": "opt-in/dhcp-central-partial.json"},
+    {"id": "zombie", "condition": "zombie_candidate", "subject": "Central 10.80.1.0/24", "files": ["inventory.json", "observations/dhcp-central.json", "observations/routing-central.json"], "expect": "zombie and oversized review candidates: complete zero-lease window and current exact route", "healthy_control": "Central access 2 has leases; North static is not applicable", "unknown_control": "opt-in/dhcp-central-stale.json or opt-in/routing-central-stale.json", "limitation": "Never safe-to-reclaim or executed reclaim"},
+    {"id": "ghost", "condition": "ghost_dhcp_scope", "subject": "Central 10.80.240.10", "source_record_id": "lease-central-unlisted", "files": ["inventory.json", "observations/dhcp-central.json"], "expect": "managed-space observation with no containing intended prefix", "healthy_control": "Central 10.80.2.10 has intended inventory", "unknown_control": "opt-in/dhcp-central-partial.json", "limitation": "Unknown cannot resolve a prior ghost finding; no unauthorized-use verdict"},
+    {"id": "unregistered", "condition": "unregistered_managed_announcement", "subject": "Central 10.80.241.0/24", "source_record_id": "route-central-10.80.241.0/24-10", "files": ["inventory.json", "observations/routing-central.json"], "expect": "managed announcement without intended inventory", "healthy_control": "Central 10.80.2.0/24 is intended; 198.51.100.0/24 is outside managed space", "unknown_control": "opt-in/routing-central-stale.json"},
+    {"id": "missing-route", "condition": "missing_expected_route", "subjects": ["Lab 10.40.2.0/24", "Coastal 10.60.4.0/24"], "files": ["inventory.json", "inventory-policy.json", "observations/routing-lab.json", "observations/routing-coastal.json"], "expect": "two exact-policy absence findings with complete eligible views", "healthy_control": "North DHCP exact route and Coastal 10.60.3.0/24 covering policy", "unknown_control": "opt-in/routing-lab-partial.json or opt-in/routing-coastal-partial.json"},
+    {"id": "covering-policy", "condition": "route_policy_control", "subject": "Coastal 10.60.3.0/24", "files": ["inventory-policy.json", "observations/routing-coastal.json"], "expect": "10.60.0.0/20 satisfies covering policy; same aggregate does not satisfy exact policy on 10.60.4.0/24"},
+    {"id": "assignment-conflict", "condition": "concurrent_assignment_conflict", "subject": "Lab 10.40.1.100", "source_record_ids": ["lease-lab-conflict-alpha", "lease-lab-conflict-beta"], "files": ["observations/dhcp-lab.json"], "expect": "critical conflict for incompatible principals overlapping [2026-08-31T22:00:00.000Z,2026-09-01T02:00:00.000Z); occupies one address, not two"},
+    {"id": "cross-scope-reuse", "condition": "identity_control", "subject": "10.40.1.10 in North and Lab", "files": ["inventory.json", "observations/dhcp-north.json", "observations/dhcp-lab.json"], "expect": "legitimate isolated reuse, not a cross-scope assignment conflict"},
+    {"id": "sequential-renewal", "condition": "time_control", "source_record_ids": ["lease-north-1-client-001-renewal-1", "lease-north-1-client-001-renewal-2"], "files": ["observations/dhcp-north.json"], "expect": "touching at 2026-08-08T00:00:00.000Z is sequential, not concurrent; occupancy remains one"},
+    {"id": "hierarchy", "condition": "inventory_control", "subject": "North 10.40.0.0/16 and declared children", "files": ["inventory.json"], "expect": "declared same-scope parent/child containment is legitimate"},
+    {"id": "missing-metadata", "condition": "metadata_quality", "subject": "Lab 10.40.15.0/24", "files": ["inventory.json"], "expect": "retain blank owner/purpose and empty tags/custom fields; visibly report metadata gap without fabricating values"}
+  ],
+  "candidate_space": {"central_distinct_candidate_addresses": "200", "basis": "Union of Central access 1 and 2 assignable intervals; zombie and oversized on access 1 do not double-count", "label": "Addresses in candidate pools, not proven recoverable space"},
+  "opt_in": [
+    {"files": ["opt-in/dhcp-coastal-partial.json", "opt-in/dhcp-central-partial.json", "opt-in/routing-coastal-partial.json", "opt-in/routing-central-partial.json", "opt-in/routing-lab-partial.json"], "records_per_file": 0, "expect": "New selected batch has effective completeness false. Missing observations are unknown; never zero-fill, fall back, or resolve an old anomaly."},
+    {"file": "opt-in/dhcp-central-stale.json", "records": 51, "expect": "Coverage age 60 minutes exceeds 30-minute DHCP freshness. Affected current/history conclusions unavailable; no zombie or oversized certainty."},
+    {"file": "opt-in/routing-central-stale.json", "records": 70, "expect": "Coverage age 10 minutes exceeds 5-minute routing freshness. Route-dependent conclusions unknown despite present raw route rows."},
+    {"file": "opt-in/dhcp-central-invalid.json", "input_rows": 9, "accepted_rows": 1, "rejected_rows": 7, "duplicate_rows": 1, "expect": "Partial receipt; declared complete cannot survive required rejects; accepted positive evidence retained.", "reasons_by_source_record_id": {"dhcp-central-invalid-1": "missing expiry", "dhcp-central-invalid-2": "unmapped scope", "dhcp-central-invalid-3": "invalid IPv4 address", "dhcp-central-invalid-4": "timezone missing", "dhcp-central-invalid-5": "future start", "dhcp-central-invalid-6": "reversed interval", "dhcp-central-invalid-7": "family mismatch"}},
+    {"file": "opt-in/routing-central-invalid.json", "input_rows": 7, "accepted_rows": 1, "rejected_rows": 6, "duplicate_rows": 0, "expect": "Partial receipt; effective completeness false.", "reasons_by_source_record_id": {"routing-central-invalid-1": "missing validity end", "routing-central-invalid-2": "CIDR host bits set", "routing-central-invalid-3": "future observation", "routing-central-invalid-4": "family mismatch", "routing-central-invalid-5": "unmapped scope", "routing-central-invalid-6": "reversed interval"}},
+    {"file": "opt-in/dhcp-north-changed-replay.json", "input_rows": 750, "requires_prior": "observations/dhcp-north.json", "expect": "Whole-envelope 409 conflict; same source/run identity, changed payload, no mutation. Do not treat as 750 new accepted/rejected rows."},
+    {"file": "observations/dhcp-north.json", "action": "submit identical envelope twice", "expect": "Second call returns original receipt with no new ingestion sequence or rows/effects; not 750 new duplicate rows."},
+    {"action": "omit a required source in an isolated integration dataset", "expect": "Missing-source state is unknown, not complete zero use or healthy routing."}
+  ],
+  "first_path": {
+    "inventory": "Unchanged Stage 1 foundation ledger only: two scopes, six prefixes, two pools, one allocation",
+    "default_inputs": ["first-path/inventory-policy.json", "first-path/routing-north.json", "first-path/routing-lab.json"],
+    "default_expect": "North 10.40.1.0/24 healthy/present; Lab 10.40.1.0/24 missing_expected_route finding; four remaining explicit false-policy prefixes not applicable",
+    "controls": [
+      {"file": "first-path/routing-lab-partial.json", "expect": "New incomplete Lab view: unknown; old anomaly must not be resolved or hidden through complete-batch fallback"},
+      {"file": "first-path/routing-lab-stale.json", "expect": "New Lab view is 10 minutes old: unknown, not an absence finding"},
+      {"file": "first-path/routing-lab-recovery.json", "expect": "New complete fresh Lab view contains exact route: healthy/present; genuine eligible input change can resolve missing route"},
+      {"file": "first-path/inventory-policy-lab-partial.json", "expect": "Latest Lab policy snapshot is incomplete and omits prefix: policy unknown, not old-policy fallback or implicit expects_announcement false; North is unaffected"}
+    ],
+    "isolation": "Apply defaults then one control, or partial/stale then recovery to exercise latest selection. Policy-partial is a separate scenario; routing recovery cannot repair missing intended policy. Do not mix rich source feeds into this recipe."
+  },
+  "comparison_isolation": "Run each opt-in comparison in its own integration dataset. Replaying an old complete batch cannot restore latest selection after a newer partial batch. An explicit new complete run identity is needed to restore in-place. No reset/import command is supplied or authorized here."
+}
