@@ -129,8 +129,11 @@ def calculate_pools(connection, views, clock_text):
             metric["p95"].update(status="available", occupied_addresses=str(value), utilization_pct=100 * value / capacity)
         else:
             metric["p95"]["reason"] = "scope_or_capacity_changed" if not consistent else "incomplete_30_day_sample_coverage"
-        if consistent and coverage["effective_complete"] and start <= window_start and end >= clock:
-            metric["lease_overlap_30d"] = any(left < clock and right > window_start for _, left, right in leases)
+        positive_overlap = any(left < min(clock, end) and right > max(window_start, start) for _, left, right in leases)
+        if positive_overlap:
+            metric["lease_overlap_30d"] = True
+        elif consistent and coverage["effective_complete"] and start <= window_start and end >= clock:
+            metric["lease_overlap_30d"] = False
 
         daily = []
         # Consecutive full UTC days ending at the last completed demo day.
