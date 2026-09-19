@@ -22,7 +22,7 @@ def main() -> int:
     seed = commands.add_parser("seed", help="Initialize explicit synthetic inventory; stop the service first")
     seed.add_argument("--scenario", choices=["baseline", "rich"], required=True)
     seed.add_argument("--inventory", help="Rich inventory JSON path; required for rich, forbidden for baseline")
-    commands.add_parser("migrate", help="Explicitly migrate recognized v1/v2 stores; stop the service first")
+    commands.add_parser("migrate", help="Explicitly migrate recognized v1/v2/v3 stores; stop the service first")
     backup = commands.add_parser("backup", help="Snapshot the complete store to a new file; stop the service first")
     backup.add_argument("--output", required=True)
     restore = commands.add_parser("restore", help="Validate and restore a snapshot, preserving the old store; stop the service first")
