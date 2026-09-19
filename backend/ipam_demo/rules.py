@@ -104,13 +104,17 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
             else:
                 match_policy = "exact"
                 policies = views["route_policy"].get(metric["scope_id"], [])
+                policy_unresolved = len(policies) > 1
+                zombie["input_references"].extend(reference(view) for view in policies)
                 if len(policies) == 1:
                     policy_view = policies[0]
                     cov = policy_view["coverage"]
+                    policy_unresolved = True
                     if (cov["effective_complete"] and instant(cov["window_start_at"]) == clock
                             and instant(cov["window_end_at"]) == clock):
                         for record, policy in typed_records(policy_view):
                             if policy["prefix_id"] == prefix["id"] and instant(policy["effective_from_at"]) <= clock:
+                                policy_unresolved = False
                                 match_policy = policy["route_match_policy"]
                                 zombie["input_references"].append(reference(policy_view, record))
                 matches = []
@@ -125,6 +129,8 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
                 if matches:
                     zombie["input_references"].extend(reference(routes[0], record) for record in matches)
                     _state(zombie, "anomalous", "This intended DHCP pool is currently announced and has complete 30-day coverage without lease overlap; investigate only.")
+                elif policy_unresolved:
+                    zombie["explanation"] = "No exact positive route is accepted, and the selected intended matching policy is incomplete or ambiguous."
                 elif routes[0]["coverage"]["effective_complete"]:
                     _state(zombie, "healthy", "Complete fresh routing evidence has no applicable current announcement; the zombie conjunction is false.")
                 else:
@@ -176,7 +182,9 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
                                                             "input_reference": reference(view, record)})
                             finding["input_references"].append(reference(view, record))
                 if rule == "assignment_conflict":
-                    finding["evaluated_window"].update(kind="interval_and_current_snapshot", start_at=stamp(window_start))
+                    finding["evaluated_window"].update(kind="interval_and_current_snapshot",
+                        start_at=stamp(max(window_start, instant(view["coverage"]["window_start_at"]))),
+                        end_at=stamp(min(clock, instant(view["coverage"]["window_end_at"]))), snapshot_at=clock_text)
                     grouped = defaultdict(list)
                     for record, typed, left, right in evidence_rows:
                         grouped[typed["address"]].append((record, typed, left, right))
