@@ -1,6 +1,6 @@
 # Shared engineering contracts
 
-Status: agent-decided design contract. **Not implemented.** The lead records any change here before another lane depends on it. These interfaces remove guesswork; they do not require generic adapter or workflow frameworks.
+Status: agent-decided design contract, with a **Stage 1 implementation checkpoint pending review and runtime evidence**. See [the concrete foundation API](FOUNDATION_API.md) and [native setup/status](FOUNDATION.md). Only inventory, explicit seed, serve/readiness and UI source are implemented at this checkpoint. Imports, calculations, writes/workflow and reset/backup/restore remain planned. The lead records any change here before another lane depends on it. These interfaces do not require generic adapter or workflow frameworks.
 
 Contract revision: `demo-v2-questionnaire`. [Implementation decisions](IMPLEMENTATION_DECISIONS.md) supplies identity, import, calculation, API, workflow and state-operation details, with explicit scope changes in [QUESTIONNAIRE_SCOPE_DELTA.md](QUESTIONNAIRE_SCOPE_DELTA.md). The scope delta takes precedence only where it changes earlier exclusions, such as bounded inventory editing, history and the exception queue. The [75-question record](GRILL_75.md) preserves historical rationale; superseded answers never override current contracts.
 
@@ -15,7 +15,7 @@ Contract revision: `demo-v2-questionnaire`. [Implementation decisions](IMPLEMENT
 | `docs/parts/06-portability.md`, `docs/handoffs/part-6.md`, `docs/RUNNING.md` | Spencer, Part 6 |
 | `AGENTS.md`, development rules, status, shared contracts | Lead/integration |
 
-Paths are reserved ownership boundaries; application files do not exist yet. Contributors must inspect current files before editing.
+Paths are ownership boundaries. Stage 1 supplies application files and locks; contributors must inspect current files before editing. The separate data lane owns `fixtures/`, while core owns its small packaged seed at `backend/ipam_demo/data/baseline.json`.
 
 ## Runtime supplied by the core team
 
@@ -33,7 +33,7 @@ Paths are reserved ownership boundaries; application files do not exist yet. Con
 - Data resides on supported local filesystems/local Docker volumes, not network mounts. Missing/unwritable paths fail visibly without an ephemeral fallback. Unsupported schema preserves data and fails with a clear reason.
 - Core chooses and pins actual runtime/dependency versions at implementation start. Part 6 consumes the committed locks rather than selecting a second set.
 
-Every command above is a required future entrypoint, not an instruction to run it now. `PART6_READY` is false until they and their dependency/build artifacts actually exist.
+`serve` and `seed` are implemented in Stage 1 source. They have not been executed; no command above is an instruction to run checks now. `reset`, `backup` and `restore` remain required future entrypoints and are explicitly absent from CLI parsing. Stage 1 uses exclusive local app-data locking; stop the service before seeding. `PART6_READY` remains false until the missing state commands and actual build/readiness prerequisites exist.
 
 ## Data and calculation boundary
 

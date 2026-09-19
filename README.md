@@ -1,8 +1,8 @@
 # IpManagement
 
-A planned portable IP address inventory and reconciliation demonstration using synthetic data.
+A portable IP address inventory and reconciliation demonstration using synthetic data.
 
-**Current state:** planning is complete; Stage 1 foundation is in progress and a separate synthetic-data lane is prepared for parallel pickup. No application runtime or portable release is accepted yet. Start with [current status](docs/STATUS.md).
+**Current state:** Stage 1 foundation source is implemented: FastAPI/SQLite inventory, an explicit packaged seed, and a React/Vite API-backed view. Installation, builds and runtime behavior remain unverified. Imports, findings and workflow are later stages; packaging remains Spencer's Part 6. Start with [current status](docs/STATUS.md) and [foundation setup and limits](docs/FOUNDATION.md).
 
 ## Agent pickup
 
@@ -33,6 +33,6 @@ The demo scorecard and full external questionnaire have different denominators. 
 
 ## Runtime
 
-There is no working startup command yet. The intended delivery is a Python API serving a compiled React UI, SQLite stored outside the application image, deterministic synthetic inputs and documented reset/backup/restore. Do not treat planned commands in the contract as implemented software.
+The implemented CLI provides `python -m ipam_demo serve` and `python -m ipam_demo seed --scenario baseline`. Follow [native installation and startup](docs/FOUNDATION.md) for the pinned dependencies, explicit local data directory and frontend build path. These commands have not been executed as acceptance evidence. `reset`, `backup` and `restore` are still missing; `PART6_READY=no`.
 
 Private source documents, detailed assessment extracts, credentials and runtime data stay outside Git. Public documentation contains generic engineering scope and synthetic examples.
