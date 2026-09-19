@@ -4,6 +4,8 @@ Status: agent-decided design contract, with a **Stage 1 implementation checkpoin
 
 Contract revision: `demo-v2-questionnaire`. [Implementation decisions](IMPLEMENTATION_DECISIONS.md) supplies identity, import, calculation, API, workflow and state-operation details, with explicit scope changes in [QUESTIONNAIRE_SCOPE_DELTA.md](QUESTIONNAIRE_SCOPE_DELTA.md). The scope delta takes precedence only where it changes earlier exclusions, such as bounded inventory editing, history and the exception queue. The [75-question record](GRILL_75.md) preserves historical rationale; superseded answers never override current contracts.
 
+Later required addition: [evolving feed and scheduling](SCHEDULING_CONTRACT.md) defines the user-selected six-hour configurable timer, manual Run now, dual clocks and atomic synthetic acquisition. It supersedes the earlier optional scheduling decision. Source implementation/evidence state is in `STATUS.md`; the historical design status above is not a claim that current application branches are empty.
+
 ## Repository ownership
 
 | Surface | Owner |

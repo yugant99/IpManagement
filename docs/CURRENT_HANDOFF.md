@@ -1,37 +1,15 @@
-# Current implementation-chat handoff
+# Current implementation-task handoff
 
-**ACTIVE — Stage 3: main capabilities**
+**START A NEW IMPLEMENTATION CHAT — Stage 4: scheduled synthetic acquisition, integration and freeze.**
 
-PR #7 and Stage 2 PR #8 are accepted **unmerged source checkpoints** after three bounded independent reviews. No actionable defects were found in the reviewed surfaces. Runtime acceptance and questionnaire demonstration remain pending. See the [lead review](handoffs/stage-02-lead-review.md).
+The complete approved prompt is [stage-04-kickoff.md](handoffs/stage-04-kickoff.md). No Stage 4 task has been created automatically. First inspect the registry for a subsequently registered worker; do not duplicate it. The original persistent lead is still `01a0b845-6c8d-7021-a5c9-15e673db07c9`.
 
-Stage 3 has started in task `01a0b8f0-7036-74d1-81c1-e388d17b4cf4` under the [approved kickoff](handoffs/stage-03-kickoff.md). Do not create another Stage 3 worker. Its isolated worktree is `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-3`, branch `codex/stage-3-main-capabilities`. Pushed dependency integration `5578431c85ffa18071d6262d08a49a251b072afd` combines the approved inputs below and lead docs `1cde8dd7df0e3e0cf3a55b3d771843a1e4dd9a25`. Keep earlier workers for assigned fixes and this original task as persistent lead.
+Accepted application source: [PR #18](https://github.com/yugant99/IpManagement/pull/18), `codex/stage-3-main-capabilities`, **`009e80197ab610e5a365d1e3dd4462588754d646`**; final report-only pickup head **`63287e0ff281b678abbd8809ca9160739de8c537`**. Three independent reviews found three issues; the existing owner fixed all three and independent source closeout found no residual issue in those surfaces. Read [the lead review](handoffs/stage-03-lead-review.md). Runtime acceptance remains pending. Stage 3 task `01a0b8f0-7036-74d1-81c1-e388d17b4cf4` is retained for assigned fixes.
 
-Intermediate source `01550ab8b84936e289b4bbb74dfbfce9d6272940` publishes schema v3, the rich seed helper, API wiring/interface documentation and shared migratable-version policy. Dependent module integration remains pending; this is not an accepted Stage 3 or runnable candidate. Rich-seed CLI PR #12 at `d7b1fd580b88f875883dbde975c9504ead58a6a9` passed bounded independent source review and remains unmerged/runtime-unverified. See [review and exact state-compatibility pickup](handoffs/rich-seed-cli-lead-review.md).
+PR #18 includes foundation #5, Stage 2 #8, frozen fixtures #7, and component #12/#13/#14/#16/#17 source. GitHub marks those five component PRs merged into Stage 3; #5/#7/#8/#10/#18 remain open, and application code remains outside main. Main is documentation only. Core #16 contains corrected original #10; preserve combined CLI/state source and original history. See STATUS.md and the lead review for exact dependency SHAs. Later worker report-only commits may follow accepted code; inspect their diff, do not silently substitute new application changes.
 
-## Exact dependencies
+The user added required evolving synthetic acquisition every six hours configurable, with manual Run now. [SCHEDULING_CONTRACT.md](SCHEDULING_CONTRACT.md) supersedes the old optional RFP-068 plan. Data owner `01a0b8b9-82fb-7a11-bc50-ec3a5b234729` published the pure package on `codex/part-2-evolving-feed`, [PR #19](https://github.com/yugant99/IpManagement/pull/19), **`3218daade8de3fe61bd6df36da431411add4a3ad`**. [Source review](handoffs/evolving-feed-lead-review.md) found no actionable defect; the producer remains unexecuted and the PR unmerged. Lead approves combining this exact feed checkpoint, PR #18 publication and current lead documentation on Stage 4's isolated feature branch, preserving history. It does not authorize application PR/main merges or runtime execution.
 
-| Dependency | Pushed checkpoint | State |
-|---|---|---|
-| Foundation, PR #5 | `c6131c38a460c13c3a189ee64a530042b2a2bf0f` | Draft, unmerged; inherited by Stage 2 |
-| Stage 2, PR #8 | `8a1a122737618748c58c5a8fc31b58a3b5f6f37e` | Draft, unmerged; Stage 3 application base |
-| Fixtures, PR #7 | `907f6e7bf32f23f36d270da49c3177b015c8bfae` | Open, unmerged; separate data dependency |
+Stage 4 owns the new scheduler/application bridge and freeze report. Core retains `state_ops.py`, `__main__.py` and state docs; data retains fixtures/data docs; Spencer retains packaging/ops/operator docs; the delivery-method owner retains PR #9 docs and its no-merge restriction. One coordinator owns app/store/schema/common UI; route old feature defects to their owners and keep worktrees isolated.
 
-Main contains documentation only. Read current lead documents there before using an older application branch. The lead explicitly permits combining these exact dependencies and current lead documentation on the isolated Stage 3 feature integration branch, preserving commits. This does not authorize application PR merges into main or substituting later application commits.
-
-## Parallel owners
-
-All registered tasks use host `local`. Titles may change; task IDs identify owners.
-
-| Role | Task ID | Reserved scope |
-|---|---|---|
-| Persistent lead | `01a0b845-6c8d-7021-a5c9-15e673db07c9` | Global contracts/status, acceptance, main integration |
-| Stage 3 implementation | `01a0b8f0-7036-74d1-81c1-e388d17b4cf4` | Assigned application modules; coordinator owns store/schema/app/common UI |
-| Foundation 1 / core state commands | `01a0b8ae-bd65-7331-b548-da5dca1e0d5e` | `state_ops.py`, `__main__.py`, state-command docs; PR #10 awaiting lead review |
-| Implement Stage 2 first path | `01a0b8c2-f283-7cf1-9128-85e9164f5fe9` | Assigned Stage 2 fixes |
-| Overseer / synthetic data | `01a0b8b9-82fb-7a11-bc50-ec3a5b234729` | Fixtures and data docs |
-| Create delivery-method documentation | `01a0b8db-76df-7511-b024-9d3deb589074` | Delivery-method docs; PR #9 awaiting review, no merge |
-| Spencer / Part 6 | External worker not registered | Packaging, operator/Part 6 docs |
-
-Stage 3 owns assigned application/import/calculation/rule/inventory/workflow/UI work. One Stage 3 coordinator owns shared schema/store/API/UI integration. Full reserved paths and seed/CLI coordination are in the approved kickoff.
-
-No tests, builds, runtime, browser or infrastructure commands are authorized by this handoff. `PART6_READY=no`; no portable release is accepted. Preserve the 111-row denominator and partial/documentary limits. This lead owns acceptance and the eventual Stage 4 prompt.
+No tests, builds, generator/import/parser/smoke/type checks, runtime/browser/state/migration/container/VM or infrastructure commands are authorized. `PART6_READY=no`; no portable release is accepted. Keep 111 as denominator; source acceptance gives no demonstrated-row credit. The lead owns subsequent acceptance, main integration and the final Stage 5 prompt.

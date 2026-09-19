@@ -14,6 +14,7 @@ Use a skill to produce a concrete useful artifact within the feature budget. Thi
 | Part 5 workflow | `review` for the transaction and role boundaries | `investigate` for a broken transition | Confirm exact candidate/version handling, atomic allocation/audit and visible failure. No enterprise security program or generic workflow engine |
 | **Part 6 Spencer** | `review` as a bounded packaging/contract review; no special deploy skill is required | `browse` only for the packaged UI's authorized runtime evidence; `investigate` for a startup/persistence failure | Correct entrypoint, locks, volume, state commands and recipient instructions. No VM/deploy skill, source-rule rewrite or app-wide regression pipeline |
 | Independent integration reviewer | `review` | `browse` only when a claim needs visible evidence | A short list of actionable defects/limits, mapped to goals and files. Owning lane fixes; do not create competing edits |
+| Stage 4 scheduler / evolving-feed owners | `review` for clock, authority, atomic cycle and replay boundaries | `investigate` only for a concrete blocker; `browse` only after explicit authorization | Follow SCHEDULING_CONTRACT.md; source findings and pending evidence. No cron/deploy skill, setup ceremony or repeated architecture interview |
 | Source-document analyst, only if needed again | Presentation/document/spreadsheet skill matching the actual file type | None by default | Extract only missing facts with exact locators. Do not reopen the entire assessment during each feature |
 
 ## Timeboxes and invocation boundaries
