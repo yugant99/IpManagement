@@ -10,7 +10,7 @@ import sqlite3
 from .errors import AppError
 
 APPLICATION_ID = 0x4950414D
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 CONTRACT_REVISION = "demo-v2-questionnaire"
 DATABASE_NAME = "ipam_demo.sqlite3"
 
@@ -66,11 +66,13 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
     if identity != APPLICATION_ID:
         raise AppError("UNRECOGNIZED_DATABASE", "Database identity is not IPAM demo. Existing data was preserved.")
     if found_version != version:
-        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1, stop the service and run python -m ipam_demo migrate.",
+        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1 or 2, stop the service and run python -m ipam_demo migrate.",
                        details={"found": found_version, "supported": version})
     expected = {"app_meta", "scopes", "prefixes", "pools", "allocations"}
-    if version == 2:
+    if version >= 2:
         expected.update({"source_batches", "source_coverage", "source_records", "calculation_runs"})
+    if version >= 3:
+        expected.update({"allocation_requests", "audit_events", "exceptions", "report_preset"})
     tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     if not expected.issubset(tables) or connection.execute("SELECT singleton FROM app_meta WHERE singleton=1").fetchone() is None:
         raise AppError("INVALID_SCHEMA", "Required inventory tables or metadata are missing. Existing data was preserved.")
@@ -86,10 +88,13 @@ def initialize_schema(path: Path) -> None:
             return
         schema = files("ipam_demo").joinpath("schema.sql").read_text(encoding="utf-8")
         schema += "\n" + files("ipam_demo").joinpath("schema_v2.sql").read_text(encoding="utf-8")
+        schema += "\n" + files("ipam_demo").joinpath("schema_v3.sql").read_text(encoding="utf-8")
+        connection.execute("PRAGMA foreign_keys = OFF")
         connection.executescript(
             f"BEGIN IMMEDIATE;\nPRAGMA application_id = {APPLICATION_ID};\n"
             f"PRAGMA user_version = {SCHEMA_VERSION};\n{schema}\nCOMMIT;"
         )
+        connection.execute("PRAGMA foreign_keys = ON")
 
 
 def require_initialized(connection: sqlite3.Connection) -> None:
@@ -100,11 +105,14 @@ def require_initialized(connection: sqlite3.Connection) -> None:
 
 
 def migrate_schema(directory: Path) -> dict:
-    """Explicit known-v1 migration, never an implicit startup side effect."""
+    """Explicit known-v1/v2 migration, never an implicit startup side effect."""
     with exclusive_data_access(directory) as path:
         if path.is_symlink() or not path.is_file():
             raise AppError("UNSAFE_DATABASE_PATH", "Migration needs an existing regular app database; nothing was changed.")
         with connect(path) as connection:
+            # Rebuild source_batches without renaming its existing dependents.
+            # SQLite only permits changing FK enforcement outside a transaction.
+            connection.execute("PRAGMA foreign_keys = OFF")
             # The process lock excludes serve/seed/state owners. BEGIN IMMEDIATE
             # additionally reserves the SQLite writer before checking its identity.
             with connection:
@@ -113,8 +121,12 @@ def migrate_schema(directory: Path) -> dict:
                 if found == SCHEMA_VERSION:
                     require_schema(connection)
                     return {"schema_version": SCHEMA_VERSION, "changed": False}
-                require_schema(connection, version=1)
-                migration = files("ipam_demo").joinpath("schema_v2.sql").read_text(encoding="utf-8")
+                if found not in (1, 2):
+                    require_schema(connection)
+                require_schema(connection, version=found)
+                migration = ""
+                for target in range(found + 1, SCHEMA_VERSION + 1):
+                    migration += "\n" + files("ipam_demo").joinpath(f"schema_v{target}.sql").read_text(encoding="utf-8")
                 # This owned SQL contains plain CREATE statements, no triggers or
                 # semicolons in literals. execute keeps the enclosing transaction;
                 # executescript would commit it before running the migration.
@@ -123,4 +135,7 @@ def migrate_schema(directory: Path) -> dict:
                         connection.execute(statement)
                 connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
                 require_schema(connection)
-            return {"schema_version": SCHEMA_VERSION, "previous_schema_version": 1, "changed": True}
+                if connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
+                    raise AppError("INVALID_SCHEMA", "Migration found invalid references; all changes were rolled back.")
+            connection.execute("PRAGMA foreign_keys = ON")
+            return {"schema_version": SCHEMA_VERSION, "previous_schema_version": found, "changed": True}
