@@ -1,8 +1,8 @@
 # Current implementation-task handoff
 
-**START A NEW IMPLEMENTATION CHAT — Stage 4: scheduled synthetic acquisition, integration and freeze.**
+**ACTIVE — Stage 4: scheduled synthetic acquisition, integration and freeze.**
 
-The complete approved prompt is [stage-04-kickoff.md](handoffs/stage-04-kickoff.md). No Stage 4 task has been created automatically. First inspect the registry for a subsequently registered worker; do not duplicate it. The original persistent lead is still `01a0b845-6c8d-7021-a5c9-15e673db07c9`.
+Stage 4 is running in task **`01a0bacd-a541-73e1-8a06-f674dd4a1bcd`** under the [approved prompt](handoffs/stage-04-kickoff.md). Do not create another Stage 4 worker. Its isolated worktree is `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-4`, branch `codex/stage-4-scheduler-integration`. The lead inspected local dependency integration `ef4158536f437710677440eb973a5fe242be9962`, combining exact #18 publication, #19 feed and lead docs `d1551a0ac1c1bc5ef0c3125827be8d200ce59ab5`. No pushed Stage 4 checkpoint/PR was observed at registration. The original persistent lead remains `01a0b845-6c8d-7021-a5c9-15e673db07c9`; this is worker registration, not Stage 4 acceptance.
 
 Accepted application source: [PR #18](https://github.com/yugant99/IpManagement/pull/18), `codex/stage-3-main-capabilities`, **`009e80197ab610e5a365d1e3dd4462588754d646`**; final report-only pickup head **`63287e0ff281b678abbd8809ca9160739de8c537`**. Three independent reviews found three issues; the existing owner fixed all three and independent source closeout found no residual issue in those surfaces. Read [the lead review](handoffs/stage-03-lead-review.md). Runtime acceptance remains pending. Stage 3 task `01a0b8f0-7036-74d1-81c1-e388d17b4cf4` is retained for assigned fixes.
 
