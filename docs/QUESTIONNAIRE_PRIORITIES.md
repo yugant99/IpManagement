@@ -1,6 +1,6 @@
 # Questionnaire-first delivery plan
 
-Status: planning revision, 2026-09-19. Supersedes the 22-of-30 internal-goal percentage as the success headline. The original 30 goals remain useful work references; no application capability is implemented or demonstrated yet. This revision follows the user's request to maximize useful coverage of the actual 111 questionnaire rows, including architecture, deployment and delivery artifacts.
+Status: planning revision, 2026-09-19. Supersedes the 22-of-30 internal-goal percentage as the success headline. The original 30 goals remain useful work references. Application source now exists on feature branches; demonstrated evidence remains pending. Use STATUS.md for actual checkpoints. This revision follows the user's request to maximize useful coverage of the actual 111 questionnaire rows, including architecture, deployment and delivery artifacts.
 
 ## What the 111 rows require
 
@@ -17,7 +17,7 @@ Each row has exactly one primary delivery category below, even when several team
 
 The old 39/5/9 split was a feasibility split, not code/deployment/documentation ownership. In particular, the old 39 already included architecture, backup and health-related rows; adding deployment rows on top would double count them.
 
-**65/111 = 58.6%; 67/111 = 60.4%; optional scheduling reaches 68/111 = 61.3%.** These are unique rows with a planned concrete demonstration or supporting artifact, including explicitly partial evidence. They are not percentages of fully satisfied requirements. A roadmap sentence alone earns no implementation credit; documents count only where the row actually asks for a design, process, method or delivery artifact. RFP-105's proposed roadmap is a draft deliverable, not a vendor commitment.
+**Historical planning arithmetic: 65/111 = 58.6%; 67/111 = 60.4%; adding scheduling gave 68/111 = 61.3%.** Scheduling is now required, while the general import trigger is deferred; these old bundles are not current achievement counts. They described unique rows with planned demonstration or supporting artifacts, including partial evidence, not percentages of fully satisfied requirements. A roadmap sentence alone earns no implementation credit; documents count only where the row asks for design/process/method/delivery evidence. RFP-105's proposed roadmap remains a draft, not a vendor commitment.
 
 Report each row as demonstrated in the agreed synthetic scope, partially demonstrated, design/document supplied, or not demonstrated, with an evidence pointer and remaining gap. Synthetic inputs do not weaken a calculation that really works; a missing capability is still missing. The workbook's existing answers remain untouched.
 
@@ -40,7 +40,7 @@ The next two additions are the preferred route from 65 to 67, only after the und
 - **043, import-triggered reconciliation:** after an accepted evidence import commits, invoke the existing reconciler. Record which import triggered it and the result; show busy/failure separately from successful import. Fixed callback, no event bus. Estimated 0.25–0.75h.
 - **081, team handoff:** extend the actual exception queue with two fictional named teams, an assigned recipient, acknowledgement/escalation and audit. A team-name label alone does not qualify. Estimated 0.25–0.5h after the queue exists.
 
-**068, configurable local scheduling**, is a later option to reach 68: one-process timer using the existing run lock, saved interval/last/next status and visible busy/failure outcomes, approximately 0.75–1.25h. It is not required for the 67-row breadth target. It does not discover a real network.
+**068, configurable local scheduling**, was optional but is now required by the user's September 19 scope change: an evolving synthetic feed, every six hours configurable, plus manual Run now. Follow [the scheduling contract](SCHEDULING_CONTRACT.md): one process, shared run lock, durable cursor/status and atomic acquisition. The earlier timer-only estimate excludes evolving-feed/time integration and must not be presented as an unchanged delivery estimate. It does not discover a real network or earn demonstrated credit before evidence exists.
 
 ## What to simplify or defer
 
@@ -76,6 +76,6 @@ The future production design should be a short proposed path with workload assum
 
 Spencer keeps Part 6's application package, local persistence, state-command wrappers, health diagnostics and operator handoff. Do not assign him HA, SSO, scale demonstrations or presentation work. Core implements state correctness and new application behavior; the lead owns questionnaire evidence and the delivery method pack.
 
-At 67 addressed rows, **44 remain outside the selected evidence scope**: four application rows (043 is included, while 057/068/070/111 remain), ten architecture/deployment rows, seventeen integration/identity rows, five scale rows and eight business/provider-evidence rows. The row map names each. Within the addressed 67, partial clauses still remain and must be disclosed separately.
+The original 67-row target left **44 outside its selected evidence scope**, including optional 068. Required scheduling now adds 068 to planned scope, but 043 remains deferred and no numeric achievement increase follows automatically. Use actual per-row evidence; 111 remains the denominator. Partial clauses within addressed rows remain separately disclosed.
 
 The missing business/provider evidence includes references, a dedicated delivery-team commitment, local support, commercial licensing, SLAs and compliance evidence. Agents can prepare requested templates; they cannot invent these company facts. No commercial answer, customer reference or external commitment is authorized by this plan.
