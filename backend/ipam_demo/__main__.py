@@ -9,6 +9,7 @@ from uuid import uuid4
 
 from .errors import AppError, store_error
 from .seed import seed_baseline
+from .state_ops import backup_database, reset_database, restore_database
 from .store import data_directory, migrate_schema
 
 
@@ -21,6 +22,13 @@ def main() -> int:
     seed = commands.add_parser("seed", help="Initialize the packaged baseline; stop the service first")
     seed.add_argument("--scenario", choices=["baseline"], required=True)
     commands.add_parser("migrate", help="Explicitly migrate the recognized v1 store; stop the service first")
+    backup = commands.add_parser("backup", help="Snapshot the complete store to a new file; stop the service first")
+    backup.add_argument("--output", required=True)
+    restore = commands.add_parser("restore", help="Validate and restore a snapshot, preserving the old store; stop the service first")
+    restore.add_argument("--input", required=True)
+    restore.add_argument("--confirm", action="store_true")
+    reset = commands.add_parser("reset", help="Remove only the recognized application store; stop the service first")
+    reset.add_argument("--confirm", action="store_true")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
     try:
@@ -28,6 +36,12 @@ def main() -> int:
             print(json.dumps(seed_baseline(data_directory()), indent=2))
         elif args.command == "migrate":
             print(json.dumps(migrate_schema(data_directory()), indent=2))
+        elif args.command == "backup":
+            print(json.dumps(backup_database(data_directory(), args.output), indent=2))
+        elif args.command == "restore":
+            print(json.dumps(restore_database(data_directory(), args.input, confirm=args.confirm), indent=2))
+        elif args.command == "reset":
+            print(json.dumps(reset_database(data_directory(), confirm=args.confirm), indent=2))
         else:
             if not 1 <= args.port <= 65535:
                 raise AppError("INVALID_PORT", "Port must be between 1 and 65535.", 422)
