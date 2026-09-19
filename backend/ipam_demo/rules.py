@@ -54,22 +54,29 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
         zombie = _finding(run_id, clock_text, "zombie_candidate", subject, list(metric["input_references"]), metric["coverage"], "warning")
         out_of_range = _finding(run_id, clock_text, "pool_assignment_discrepancy", subject,
                                 list(metric["input_references"]), metric["coverage"])
-        out_of_range["observations"] = metric["out_of_range_observations"]
+        static = metric["management_mode"] == "static"
+        out_of_range["observations"] = metric["static_dhcp_observations"] if static else metric["out_of_range_observations"]
         for finding in (pressure, oversized, zombie, out_of_range):
             finding["calculation_pool_id"] = metric["pool_id"]
         for finding in (pressure, oversized, zombie):
             finding["evaluated_window"].update(kind="interval", start_at=stamp(window_start))
         findings.extend((pressure, oversized, zombie, out_of_range))
+        if out_of_range["observations"]:
+            _state(out_of_range, "anomalous",
+                   "Fresh current DHCP claims lie inside an intended static pool prefix. This is a management-policy/data discrepancy; DHCP capacity, inactivity and reclaim rules remain disabled." if static else
+                   "Fresh current DHCP claims lie inside this pool's intended prefix but outside its assignable ranges or within exclusions; they do not change the capacity denominator.")
+            if metric["assignment_evidence"]["status"] == "partial":
+                out_of_range["limitations"].append("Coverage is incomplete; accepted positive claims establish this discrepancy but cannot establish absence elsewhere.")
+        elif metric["assignment_evidence"]["status"] == "complete":
+            _state(out_of_range, "healthy",
+                   "The complete fresh scoped view contains no active DHCP claims inside this intended static pool prefix. This does not prove an address available." if static else
+                   "The complete fresh view has no current DHCP claims outside this pool's assignable ranges within its prefix.")
+        else:
+            out_of_range["explanation"] = "No positive assignment-policy discrepancy is accepted; complete fresh unambiguous evidence and valid pool geometry are required for a healthy control."
         if metric["management_mode"] != "dhcp" or metric["family"] != 4:
-            for finding in (pressure, oversized, zombie, out_of_range):
+            for finding in (pressure, oversized, zombie):
                 _state(finding, "not_applicable", "This rule is limited to DHCP-managed IPv4 pools.")
             continue
-        if out_of_range["observations"]:
-            _state(out_of_range, "anomalous", "Fresh current DHCP claims lie inside this pool's intended prefix but outside its assignable ranges or within exclusions; they do not change the capacity denominator.")
-        elif metric["current"]["status"] == "available":
-            _state(out_of_range, "healthy", "The complete fresh view has no current DHCP claims outside this pool's assignable ranges within its prefix.")
-        else:
-            out_of_range["explanation"] = "No positive out-of-range claim is accepted; complete fresh unambiguous evidence and valid capacity are required for a healthy control."
         p95_warning = p95["utilization_pct"] >= 80 if p95["status"] == "available" else None
         forecast_warning = (forecast["days_to_full"] < 60 if forecast["status"] in ("available", "beyond_horizon", "exhausted")
                             else False if forecast["status"] == "no_positive_growth" else None)
