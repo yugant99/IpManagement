@@ -2,7 +2,8 @@
 
 ## Authorization and evidence
 
-- Authorized current work: reprioritize all 111 questionnaire rows, distinguish code/architecture/deployment/integration/business work, and update planning/contracts/handoffs. Application implementation remains outside this planning turn.
+- Latest user direction: proceed toward implementation and establish stage-based fresh-chat handoffs with generated prompts. This conversation closes the planning stage; Stage 1 implementation is the next fresh-chat assignment in `CURRENT_HANDOFF.md`. Do not repeat planning or ask again whether to begin that assigned work.
+- Status is a record, not independent authority. Current user instructions govern. Application tests/smoke/verification commands have not been explicitly requested; existing test limits remain. No container/VM operation, cloud spending or public deployment is granted by the stage handoff.
 - Application implementation has not started. No runtime, application test, container build or deployment has been executed.
 - Do not interpret a goal, command or contract in these documents as an implemented capability.
 - Cloud rental/public deployment is outside the present work. Local source material remains outside the public repository.
@@ -10,6 +11,7 @@
 ## Integration
 
 - Repository: `yugant99/IpManagement`.
+- Lead stage: Stage 0 planning complete; Stage 1 foundation ready for a fresh chat. This planning chat remains available for related architecture/branch follow-ups.
 - Initial integration branch: `main`, documentation bootstrap only.
 - Feature branches: `codex/part-N-description`; Spencer's planned branch is `codex/part-6-portability`.
 - Obtain the current baseline with Git at pickup; do not assume a hash from a prior chat.
@@ -32,4 +34,4 @@
 | Portable release | Not built | Implemented application, packaging and recorded startup/persistence evidence |
 | Questionnaire evidence | 0 rows demonstrated/substantiated by this project | Deliver planned behavior/documents and retain remaining gaps per row |
 
-Next: the first authorized implementation turn establishes core entrypoints/locks, scoped data and one source-to-finding browser path. Use contract revision `demo-v2-questionnaire` and `QUESTIONNAIRE_PRIORITIES.md`; build its additions into the corresponding lanes without consuming the hour-14 feature freeze and integration reserve. Start G17's backend calculation before G09 pressure. Spencer can prepare packaging against the contract, but runtime acceptance waits for `PART6_READY` and relevant workflow records. Update this file when actual readiness changes.
+Next: use `CURRENT_HANDOFF.md` to start Stage 1 foundation in a fresh chat: core entrypoints/locks, scoped schema, minimal seed, inventory API/UI connection and explicit runtime contracts. Stage 2 completes the import-to-finding path. Use contract revision `demo-v2-questionnaire` and questionnaire priorities; preserve the hour-14 freeze and final integration reserve. Spencer can prepare packaging alongside Stage 1, but runtime acceptance waits for `PART6_READY` and relevant workflow records. At each boundary, update this status and generate the next prompt automatically under `CHAT_STAGES.md`.
