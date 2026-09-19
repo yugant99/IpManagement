@@ -1,6 +1,6 @@
-# Bounded local acceptance steps — not executed
+# Prepared bounded local acceptance steps
 
-Use only after the [ledger's execution gate](README.md) is satisfied for the particular operation. These are source-derived instructions, not a test suite, executable harness or runtime evidence. All expected results below are **unobserved**. Run each group once on the pinned candidate; after a concrete owner correction, rerun only affected behavior.
+This procedure was prepared before execution authorization. Its expectations remain source-derived, not observed results. The 2026-09-19 authorized run is recorded separately in the [ledger](README.md) and [observed results](observed-results.md), including partial/unrun branches and observer corrections. Preserve this preparation record; do not infer that every proposed subcase ran. Rerun only behavior affected by a concrete change, failure or unresolved concern.
 
 ## 1. Install, setup and readiness: S5-01/02
 

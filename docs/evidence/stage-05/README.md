@@ -1,118 +1,82 @@
 # Stage 5 local acceptance ledger
 
-**Preparation only — no application scenario has been executed.** Date: 2026-09-19. Owner: task `01a0baff-2143-7073-ad3d-4963a9cc0ca5`. This ledger records pending observations against a pinned candidate, not accepted questionnaire coverage.
+**Authorized local execution completed; scoped evidence awaits project-lead review.** Date: 2026-09-19. Worker task `01a0baff-2143-7073-ad3d-4963a9cc0ca5`; persistent lead `01a0b845-6c8d-7021-a5c9-15e673db07c9`. This is runtime evidence for a synthetic local candidate, not portable acceptance or questionnaire credit.
 
-## Candidate and authority
+Read [observed results](observed-results.md) for actual outcomes and limits, [run summary](run-summary.json) for compact identities/hashes, and [Stage 5 report](../../handoffs/stage-05-report.md) for the maintenance handoff. [Prepared steps](acceptance-steps.md) retain the original procedure; expected values there are not evidence.
 
-| Item | Recorded source/Git fact |
+## Candidate and execution authority
+
+| Item | Recorded fact |
 |---|---|
 | Accepted application code | `54f8f8168108733d40d842263218f16b33df5868` |
-| Exact pickup publication | `117d05295473cf25d362adb320e6fef26ecdd74c`; PR #25 OPEN/draft against Stage 3 when inspected |
-| Acceptance checkout | `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5` |
-| Acceptance branch | `codex/stage-5-local-acceptance`, created at the exact pickup |
-| Published lead documents | Main `07013a9f949863e2addae527901ed3f84c8e6000`, incorporated by merge `95f370713ecd2d983d76c15f9326cd9facac91b1` |
-| Application delta at preparation | None; inherited merge changes only STATUS, CURRENT_HANDOFF, Stage 4 lead review and Stage 5 kickoff |
-| Execution authorization | **Pending**, per lead `docs/STATUS.md` and `docs/handoffs/stage-05-kickoff.md` at main `07013a9` |
-| Runtime/platform/dependency versions | Not inspected by execution; installed availability remains unknown |
-| Service/port/database/run/operation IDs | None created by this task; no port bound |
+| Exact application pickup | `117d05295473cf25d362adb320e6fef26ecdd74c`; PR #25 against Stage 3 |
+| Acceptance checkout / branch | `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5`, `codex/stage-5-local-acceptance`, draft PR #27 |
+| Earlier preparation | `d7e062179aa75cc5cafd732746c120e9c44e0041`, report `46c225defea8c933363354fe2d5bb6492ee67073`, accepted disabled-snapshot correction `7e37dde6ba18a08717b0ce56c4438522fc5f7008` |
+| Authorization | User told lead **“lets go man tun the tests man”** on 2026-09-19; [published scope](../../handoffs/stage-05-execution-authorization.md) at `c4cccef8b2014c7bcb2740b9f26a683f3e9d26c6` |
+| Authorization incorporation | History-preserving documentation merge `e7a84f32ab2f409493a205a7f8357d39831f8245` |
+| Runtime | macOS 14.5/arm64, Python 3.12.10, uv 0.7.13, isolated Node 22.14.0, npm 10.9.2 |
+| Source changes | No application, fixture, dependency-lock or shared-contract changes; no accepted candidate substitution |
 
-The user supplied the approved preparation handoff. Its explicit gate is: “this handoff authorizes source/evidence preparation only until an explicit local execution decision is recorded.” The data-owner task already holds the pending question. Do not repeat it. No affirmative execution scope was present in the inspected lead permission record. Recent lead/data task reads returned empty turn items, so they did not establish any additional permission.
+The grant covers the 16 prepared scenarios, pinned installation/build, disposable localhost services/browser/API, derived synthetic controls, direct database comparisons, bounded controlled time/concurrency/fault/response loss, stopped backup/restore and representative recognized legacy migration. No renewed per-scenario permission was needed. Cloud/VM/Docker/deployment/spending/public exposure, existing user databases, unrelated processes, reset and exhaustive matrices remain excluded.
 
-Before execution, append the actual affirmative user wording, originating task/turn, publication of the lead permission record, date and precise allowed operations. Record exclusions separately. A completion message, task title, elapsed time or this checklist cannot supply permission.
+## Actual retained artifacts
 
-## Artifact separation
+Root: **`/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-artifacts/run-20260919-O8RVgx`**. Paths below are relative to it; data is disposable synthetic acceptance material and remains on disk.
 
-The following **proposed absolute paths have not been created**. At execution, create a fresh session directory without reusing an existing path and record its actual name. All children below are relative to proposed root `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-artifacts/acceptance-01`.
-
-| Child / path | Purpose and boundary |
+| Path | Purpose |
 |---|---|
-| `rich-scheduler/` | Primary rich store; only nine pinned source authorities; use manual acquisition to reach cycles 1–7 |
-| `source-control/` | Separate rich store for invalid/competing-source and workflow contradiction inputs; never copy its evidence into the scheduler store |
-| `state-operations/` | Store restored from a stopped, populated snapshot with scheduling confirmed disabled/null-due; explicit manual mutations and restore comparison happen here |
-| `setup-control/` | Disposable uninitialized store for setup/readiness refusal observations |
-| `harness/`, `legacy/` | Only create if the recorded scope separately covers controlled clock/fault work or legacy fixture creation/migration |
-| `snapshots/`, `logs/`, `browser/`, `requests/`, `observations/` | Whole-store snapshots, raw command/HTTP output, screenshots, exact retry payloads, and semantic before/after records; retained locally |
-| `environment/` | If approved/needed, isolated Python environment and dependency caches |
-| Candidate `frontend/node_modules/`, `frontend/dist/` | Ignored generated dependency/build output in this isolated checkout, outside tracked source |
-| `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5/frontend/dist` | Planned `IPAM_STATIC_DIR`, not built |
-| `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5/fixtures/v1` | Immutable `IPAM_SYNTHETIC_FEED_DIR`; rich seed is explicit `inventory.json` within it |
+| `rich-scheduler/` | Primary disabled, populated schema-v4 store at cycle 7; only nine pinned authorities |
+| `primary/` | Exact HTTP/proxy payloads, table snapshots, observer scripts, summaries and browser captures |
+| `source-control/` | Separate baseline arithmetic, derived invalid/static-DHCP inputs, negative workflow controls and stopped store |
+| `scheduler-harness/` | Isolated controlled clock/concurrency/rollback/asset copies; all threads stopped; `contention-stop` intentionally retains enabled config in its stopped store |
+| `setup-control/` | Empty-startup/repeated-seed control; service stopped |
+| `legacy/` | Historical v3 archive/provenance, populated v3 source/snapshot, restored migrated v4 and semantic comparisons |
+| `state-operations/`, `snapshots/`, `preservation/` | Primary populated snapshot, restored disposable copy, preserved newer state and S5-14 command/comparison records |
+| `environment/`, `uv-cache/`, `node-runtime/`, `npm-cache/` | Isolated pinned dependencies/tool/cache artifacts |
+| `logs/` | Install/build/primary CLI/proxy and observer outputs, including retained observer errors |
 
-No databases, environments, installed dependencies, compiled output, raw logs or screenshots currently exist as artifacts of this task. No acceptance-owned service needs stopping. Retain later artifacts and stop only the service/process this task starts; no broad cleanup or unrelated process inspection/termination.
-
-## Input identity
-
-These are **Git blob IDs read from `117d052`**, not newly measured filesystem SHA-256 values or runtime validation:
-
-| File | Git blob |
-|---|---|
-| `fixtures/v1/inventory.json` | `c8c8093177ebee70768274b80b55d988148f4f66` |
-| `backend/ipam_demo/feed_adapter.py` | `e7f137a4c0dd517f56f584acfc9fabefc5a09e8d` |
-| `uv.lock` | `56671dad30939e0e1df3fdf0e44105316f15a3d1` |
-| `frontend/package-lock.json` | `dbbecd811d7145e89f80aac002e17f870b5ecde6` |
-| `pyproject.toml` | `931397380ed4f4cfa46e1c7737b0bcb5706faad8` |
-| `frontend/package.json` | `f0c279228c2c07074ba37ce3d9a11a097f297cdc` |
-
-The exact nine source asset names and expected byte SHA-256 values are pinned in [`feed_adapter.py`](../../../backend/ipam_demo/feed_adapter.py), `_ASSETS`. At authorized execution, record measured input hashes with absolute paths and compare to those pins. Do not treat `pack.json` or expected-answer labels as runtime inputs; expected manifests are comparison-only. Source pins do not establish that installation packaged or loaded the assets.
+Compiled output is `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5/frontend/dist`; ignored dependencies live in that checkout's `frontend/node_modules`. Immutable source input is `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5/fixtures/v1`. Measured input hashes are in `primary/environment-inputs.json` and scheduler/source-control metadata. Nine feed hashes matched adapter pins. No expected-outcome manifest drove application detection or independent arithmetic. No raw database, environment, log or screenshot is committed.
 
 ## Scenario status
 
-Status vocabulary: `PENDING_PERMISSION`, `NOT_RUN`, `OBSERVED_PASS`, `OBSERVED_FAIL`, `PARTIAL`. No row below has observed output; all runtime ID/time/evidence fields are **not generated**. A group is not a pass until each claimed observation has its own evidence. Procedures are in [acceptance-steps.md](acceptance-steps.md).
+**14 OBSERVED_PASS, 2 PARTIAL, 0 OBSERVED_FAIL.** All 16 IDs were exercised. A pass is limited to the explicitly bounded observation; it is not exhaustive coverage. S5-09 and S5-15 retain material gaps from the prepared wording.
 
-| ID | Required observation | Store | Current status / additional gate | Defect owner |
+| ID | Actual observation / limit | Status | Artifact entry point | Defect owner |
 |---|---|---|---|---|
-| S5-01 | Locked install if needed; one frontend build; explicit rich setup; ready API and rendered compiled UI | setup-control, rich-scheduler | PENDING_PERMISSION | Foundation/core; build owner through lead |
-| S5-02 | Uninitialized setup state; repeated seed refusal; active-data-lock refusal | setup-control, rich-scheduler | PENDING_PERMISSION | Core |
-| S5-03 | First manual cycle: index 1, nine receipts, one run/operation, scenario `2026-09-01T06:00:00.000Z` | rich-scheduler | PENDING_PERMISSION | Stage 4 |
-| S5-04 | Exact retry has no new effects; changed payload conflicts; UI recovery retains exact key/payload through navigation/reload | rich-scheduler | PENDING_PERMISSION; response-loss manipulation only if covered | Stage 4 |
-| S5-05 | Representative healthy/anomaly/unknown; cross-scope reuse and static DHCP discrepancy | rich-scheduler, source-control | PENDING_PERMISSION | Stage 3/data |
-| S5-06 | Independent fixture arithmetic; saved run detail/export and older-run agreement; preset export | source-control baseline, rich-scheduler evolution | PENDING_PERMISSION | Stage 3/data |
-| S5-07 | Phase 5 incomplete North routing; phase 7 stale Central evidence; intermediate/restoration results retained | rich-scheduler | PENDING_PERMISSION | Stage 4, Stage 3/data |
-| S5-08 | Schedule save/disable/re-enable, interval and stale/actor controls | rich-scheduler | PENDING_PERMISSION | Stage 4 |
-| S5-09 | Timer/manual/ordinary-run contention; old six-hour failure versus new one-hour configuration; overdue restart once; clean stop | separate harness copy | PENDING_PERMISSION; controlled time/concurrency harness separately scoped | Stage 4 |
-| S5-10 | Controlled failed cycle rolls back clock/import/run/queue/cursor/replay; separate failure audit outcome | separate harness copy | PENDING_PERMISSION; fault injection separately scoped | Stage 4 |
-| S5-11 | IPv4/IPv6 child planning/persistence and safe edit; overlap refusal | rich-scheduler after calculations; new children only | PENDING_PERMISSION | Stage 3 |
-| S5-12 | Request/review/allocation; current DHCP contradiction; stale/self-approval refusal; ambiguous retry | rich-scheduler for success; source-control for contradictions | PENDING_PERMISSION; record any needed derived input/response-loss scope | Stage 3 |
-| S5-13 | Actual exception transfer to fixed recipient, then recipient acknowledgement and audit | rich-scheduler or source-control | PENDING_PERMISSION | Stage 3 |
-| S5-14 | Confirm disabled/null-due schedule; stopped populated backup; manually advance/change copy; restore/restart with timer disabled; compare recorded snapshot state and retained replay | state-operations | PENDING_PERMISSION; enabled/due/overdue restoration belongs to separately authorized S5-09 harness | Core; Stage 4 restart |
-| S5-15 | Invalid/foreign source, missing/changed asset and altered-rich refusal, preserving prior success | source-control and isolated asset copies | PENDING_PERMISSION; no edits to original fixtures | Stage 4/data/core |
-| S5-16 | Recognized legacy snapshot restore/migrate on separate copies | legacy | PENDING_PERMISSION; legacy fixture creation/migration separately scoped | Core |
+| S5-01 | Frozen dependency install; one UI build; rich seed; ready API and rendered compiled UI | OBSERVED_PASS | `logs/`, `primary/ready.json`, `seeded-ui.*` | Foundation/core |
+| S5-02 | Setup 503/UI; stopped repeated-seed and active seed/backup lock refusals | OBSERVED_PASS | `primary/setup-*.json`, `active-lock-*` | Core |
+| S5-03 | First manual cycle at 06:00 scenario time; nine receipts, one run/operation | OBSERVED_PASS | `primary/cycle1-summary.json` | Stage 4 |
+| S5-04 | Exact replay, changed-keyed-payload conflict; actual browser retry through navigation/reload | OBSERVED_PASS | `primary/browser-recovery-summary.json` | Stage 4 |
+| S5-05 | Healthy/anomaly/unknown, scoped reuse/conflict and static-DHCP positive/silence controls | OBSERVED_PASS | `source-control/observations.json` | Stage 3/data |
+| S5-06 | Independent arithmetic; pinned run/detail/export; representative rendered parity; preset CSV/revision guard | OBSERVED_PASS | `source-control/independent-arithmetic.json`, `primary/preset-summary.json` | Stage 3/data |
+| S5-07 | North cycle 4 anomaly→5 unknown→6 healthy; Central cycle 7 complete acquisition but stale calculations | OBSERVED_PASS | `primary/evolution-summary.json` | Stage 4/Stage 3/data |
+| S5-08 | Save/interval/disable/re-enable/manual due; stale version and forbidden actor | OBSERVED_PASS | `primary/evolution.py`, config HTTP records | Stage 4 |
+| S5-09 | Controlled contention/config race/overdue-once/direct stop pass; timer's ordinary occupancy is harness-held guard; OS-signal-in-flight unrun | PARTIAL | `scheduler-harness/REPORT.md` | Stage 4 |
+| S5-10 | One post-run/queue injected fault rolled back all acquisition effects; one failure audit; retry succeeds | OBSERVED_PASS | `scheduler-harness/observations.json` | Stage 4 |
+| S5-11 | IPv4 create/resize, IPv6 preview/create, metadata and overlap guard; rendered search | OBSERVED_PASS | `primary/inventory-summary.json` | Stage 3 |
+| S5-12 | Request/independent approval/allocation; four negative guards; browser creation/decision replay in mounted UI | OBSERVED_PASS | `primary/workflow-recovery-summary.json`, source-control records | Stage 3 |
+| S5-13 | API transfer/recipient acknowledgement and audit; subsequent UI state; saved finding/run unchanged | OBSERVED_PASS | `primary/exception-summary.json` | Stage 3 |
+| S5-14 | Disabled populated snapshot; copy advancement; restore/restart/table equality and retained-key replay | OBSERVED_PASS | `preservation/` | Core/Stage 4 |
+| S5-15 | Invalid rows, foreign authority, missing/changed asset, altered rich geometry refused; asset cases only fresh initial state | PARTIAL | source-control and scheduler reports | Stage 4/data/core |
+| S5-16 | Genuine populated v3 backup/restore, refused pre-migration startup, explicit v4 migration and preservation | OBSERVED_PASS — v3 only | `legacy/README.md` | Core |
 
-Explicitly **unrun and not covered**: all entries above; reset; all legacy versions; cycle-1460 exhaustion/replay; deeper filesystem/copy/replace/fsync/WAL failures; failure-audit loss; crash recovery; storage-denial browser branch; exhaustive producer cycles; carrier scale/concurrency; Docker/Compose/Linux recipient startup. S5-10's one eventual injected failure cannot silently cover every transaction/failure-record branch. Capture only the smallest granted set; keep the remainder explicit.
+Unrun: reset; v1/v2; enabled-snapshot backup/restore; active ordinary reconciliation versus due timer; OS signal during acquisition; first-path-specific refusal; prior-success preservation under asset refusal; unavailable-asset committed replay; cycle-1460/exhaustive cycles; failure-audit loss; deeper commit/filesystem/WAL/fsync/crash; browser storage denial; endurance/scale/HA; Docker/Compose/Linux/recipient startup. No broad suite or extra build was run.
 
-## Required observation record
+## Candidate questionnaire links — lead assigns credit
 
-For each attempted scenario, append a short record here or a small sanitized Markdown record in this directory. Never fill an unknown result with an expected label.
+Denominator **111**. No questionnaire row, global status or accepted total was changed by this worker.
 
-```text
-Scenario ID / status / observed at UTC:
-Exact execution authorization reference and allowed mechanism:
-Application candidate / documentation SHA / any accepted correction SHA:
-Actual OS/architecture, Python, uv, Node/npm; install/build command and exit:
-Absolute worktree, data/static/feed/input/artifact paths and measured hashes:
-Service PID or owned session / actual loopback port / stop outcome:
-Actor, exact request payload/key, operation/cycle/run/batch/receipt IDs:
-Wall start/completion/due time AND synthetic scenario clock:
-Controlled time/network/fault mechanism (or real elapsed interval):
-Before state/counts/IDs; expected result and independent source of expectation:
-Actual HTTP/CLI status/body, request ID, after state/counts/IDs:
-UI/detail/export agreement and screenshot path where useful:
-Pass/fail/partial, limitations, exact evidence paths:
-Owner, failing input/output, review-approved correction, affected rerun only:
-```
-
-## Candidate questionnaire links — no new credit
-
-Denominator **111**. The lead decides final row status; these are evidence targets only. Current observed contribution is **zero**.
-
-| Scenarios | Candidate IDs | Clause limits |
+| Scenarios | Candidate IDs | Evidence boundary |
 |---|---|---|
-| S5-01/02 | 007, 010, 012, 013, 022 | Local compiled UI/API and readiness; no production alert transport or HA |
-| S5-03/04/07/08/09/10 | 033, 034, 037, 061, 063, 068, 069, 071 | Scheduled synthetic acquisition, not network discovery; manual run alone cannot establish timer behavior; general import callback 043 stays deferred |
-| S5-05/06 | 029, 062–066, 069, 071, 073–077 | Scope/time-specific calculations; hourly approximation; candidate space is not released or proven reclaimable; no traffic measurement |
-| S5-11 | 002, 003, 026–028, 030, 035, 084, 085, 095 | Prefix arithmetic/metadata, no IPv6 subscriber allocation or tenant security |
-| S5-12 | 001, 004, 005, 009, 053, 054, 059, 060, 078, 080, 084, 085 | Fixed demo roles and real local allocation/audit; external action simulated; no release/reclaim or SSO |
-| S5-13 | 072, 081, 082 | Actual fixed-team transfer plus recipient acknowledgement required; no external ticket/paging integration |
-| S5-14/15/16 | 018; 033/034/037/089 for applicable import refusals | Local whole-store preservation only; schema migration is not customer legacy-data migration; no measured RPO/RTO/DR |
-| Later Spencer/lead gate | 090, 091, 092, 104, 106 | Package, recipient operation, training/transfer and actual dependency disclosure remain pending; local success cannot substitute |
+| S5-01/02 | 007, 010, 012, 013, 022 | Local compiled UI/API/readiness; no production alert transport or HA |
+| S5-03/04/07/08/09/10 | 033, 034, 037, 061, 063, 068, 069, 071 | Actual synthetic acquisition and controlled timer evidence; no real interval endurance, live discovery or fleet |
+| S5-05/06 | 029, 062–066, 069, 071, 073–077 | Independent scoped/time-bound lease arithmetic; no traffic or reclaim claim |
+| S5-06/11 | 006, 031 | Rendered search for created metadata plus one preset; versioned inventory/source fields. No arbitrary report designer/organization rollout |
+| S5-03/15 | 036, 087 | Nine known source identities and canonical receipt counts/provenance; catalog UI separately unobserved, no automatic real-system discovery or arbitrary customer migration |
+| S5-11 | 002, 003, 026–028, 030, 035, 084, 085, 095 | Prefix arithmetic/versioned metadata; no IPv6 subscriber allocation/tenant security |
+| S5-12 | 001, 004, 005, 009, 053, 054, 059, 060, 078, 080, 084, 085 | Fixed demo actors; real local allocation/audit; external provisioning simulated; no SSO/release/reclaim |
+| S5-13 | 072, 081, 082 | Observed fixed-team owner transfer and recipient acknowledgement; no external tickets/paging |
+| S5-14/16 | 018 | Local whole-store preservation and recognized v3 schema migration; no customer migration or measured DR/RPO/RTO |
+| Later Spencer/lead | 090, 091, 092, 104, 106 | Package, target recipient operation/training/transfer and dependency disclosure remain separate |
 
-PR #9 remains NO MERGE. No package branch/checkpoint was registered in the inspected lead documents or matching remote branch/open-PR inventory. `PART6_READY=no`. This ledger does not assign a new stage or replace the persistent lead.
+RFP-043 general import callback remains deferred; explicit ordinary imports did not automatically reconcile. PR #9 remains **NO MERGE**. Spencer's package checkpoint remains missing in the governing handoff (`PART6_READY=no`); local success does not substitute for its portable-delivery gate. The lead owns final review, acceptance and integration.
