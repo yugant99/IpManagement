@@ -28,7 +28,7 @@ The following **proposed absolute paths have not been created**. At execution, c
 |---|---|
 | `rich-scheduler/` | Primary rich store; only nine pinned source authorities; use manual acquisition to reach cycles 1–7 |
 | `source-control/` | Separate rich store for invalid/competing-source and workflow contradiction inputs; never copy its evidence into the scheduler store |
-| `state-operations/` | Store restored from a stopped, populated snapshot; mutations and restore comparison happen here |
+| `state-operations/` | Store restored from a stopped, populated snapshot with scheduling confirmed disabled/null-due; explicit manual mutations and restore comparison happen here |
 | `setup-control/` | Disposable uninitialized store for setup/readiness refusal observations |
 | `harness/`, `legacy/` | Only create if the recorded scope separately covers controlled clock/fault work or legacy fixture creation/migration |
 | `snapshots/`, `logs/`, `browser/`, `requests/`, `observations/` | Whole-store snapshots, raw command/HTTP output, screenshots, exact retry payloads, and semantic before/after records; retained locally |
@@ -73,7 +73,7 @@ Status vocabulary: `PENDING_PERMISSION`, `NOT_RUN`, `OBSERVED_PASS`, `OBSERVED_F
 | S5-11 | IPv4/IPv6 child planning/persistence and safe edit; overlap refusal | rich-scheduler after calculations; new children only | PENDING_PERMISSION | Stage 3 |
 | S5-12 | Request/review/allocation; current DHCP contradiction; stale/self-approval refusal; ambiguous retry | rich-scheduler for success; source-control for contradictions | PENDING_PERMISSION; record any needed derived input/response-loss scope | Stage 3 |
 | S5-13 | Actual exception transfer to fixed recipient, then recipient acknowledgement and audit | rich-scheduler or source-control | PENDING_PERMISSION | Stage 3 |
-| S5-14 | Stopped populated backup; advance/change restored copy; restore/restart; compare full saved state and retained replay | state-operations | PENDING_PERMISSION | Core; Stage 4 restart |
+| S5-14 | Confirm disabled/null-due schedule; stopped populated backup; manually advance/change copy; restore/restart with timer disabled; compare recorded snapshot state and retained replay | state-operations | PENDING_PERMISSION; enabled/due/overdue restoration belongs to separately authorized S5-09 harness | Core; Stage 4 restart |
 | S5-15 | Invalid/foreign source, missing/changed asset and altered-rich refusal, preserving prior success | source-control and isolated asset copies | PENDING_PERMISSION; no edits to original fixtures | Stage 4/data/core |
 | S5-16 | Recognized legacy snapshot restore/migrate on separate copies | legacy | PENDING_PERMISSION; legacy fixture creation/migration separately scoped | Core |
 

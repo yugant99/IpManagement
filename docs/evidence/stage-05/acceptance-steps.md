@@ -70,6 +70,8 @@ Ordinary approved API interactions can save `/api/schedule` with:
 
 Replace version 1 with the **observed** current version. Save should increment config once and set due from wall save time without scenario advancement. Save interval 1 with the returned version; disable (null due); re-enable (new future due). Reusing an old version should return `STALE_SCHEDULE`; `demo-requester` should be forbidden. Record due after successful manual acquisition while enabled and ability to acquire while disabled. None of these observations establishes that a real timer interval elapsed.
 
+Finish these ordinary configuration observations by disabling scheduling with the current configuration version and recording `enabled:false`, `next_due_at:null`. Leave it disabled through inventory/workflow work; use the separate authorized harness copy for enabled-timer cases. Group 6 establishes a fresh disabled-state preservation baseline before its snapshot.
+
 The following require a **separately authorized disposable acceptance harness**, to be concretely scoped before use. No harness was created, no hook added to application code, and no host clock changed:
 
 | Scenario | Smallest controlled observation |
@@ -120,7 +122,9 @@ Then fetch the new version and acknowledge as `demo-approver` with `action:ackno
 
 ## 6. Whole-store preservation and refusals: S5-14/15/16
 
-Stop the acceptance-owned primary service after populated successful paths. Capture semantic IDs/content for inventory, allocations, requests/decisions, audit, exceptions, preset, source receipts/records, saved runs, seed envelope/baseline version, scenario clock, schedule config/due/cursor and committed replay results. Direct database inspection requires that the recorded acceptance scope covers it; a snapshot's existence alone cannot establish preservation.
+Before the primary preservation snapshot, explicitly disable scheduling on the populated rich-scheduler store: GET `/api/schedule`, then POST `/api/schedule` as `demo-approver` with a preservation reason, that current `expected_config_version`, `enabled:false` and the observed interval. Require a successful save; if busy or stale, let the owned operation settle, reload and retry with the current version. Read back and record `enabled:false`, `next_due_at:null`, the returned config version and `in_progress:false`. A submitted disable request without confirmed saved state is not this prerequisite.
+
+Capture semantic IDs/content **after that successful disable**, including its configuration audit: inventory, allocations, requests/decisions, audit, exceptions, preset, source receipts/records, saved runs, seed envelope/baseline version, scenario clock, schedule config/due/cursor and committed replay results. Stop the acceptance-owned primary service before backup. This recorded disabled/null-due state is the preservation baseline; an earlier enabled state is not the comparison target. Direct database inspection requires that the recorded acceptance scope covers it; a snapshot's existence alone cannot establish preservation.
 
 With explicit absolute `IPAM_DATA_DIR`, use the existing stopped-service interfaces:
 
@@ -129,7 +133,9 @@ python -m ipam_demo backup --output ABSOLUTE_NEW_SNAPSHOT_PATH
 python -m ipam_demo restore --input ABSOLUTE_SNAPSHOT_PATH --confirm
 ```
 
-These path labels are placeholders for **new, recorded paths under the acceptance artifact root**, never an existing user store. Back up rich-scheduler to a new file; restore it into empty state-operations; start that copy, advance once/change an owned record, record newer IDs and stop it. Restore the original snapshot over this copy. Capture the command's `preserved_database` for the newer state, `database_replaced`, schema and `migration_required`. Compare all recorded logical content/IDs to the original snapshot; file bytes can differ without a logical difference. Restart and read the restored data. Replay a key retained in the snapshot; keys created after it should be absent, so do not blindly reuse them and call the result exactly-once recovery. Controlled overdue behavior stays within group 4's separate gate.
+These path labels are placeholders for **new, recorded paths under the acceptance artifact root**, never an existing user store. Back up rich-scheduler to a new file; restore it into empty state-operations; start that copy with scheduling still disabled, explicitly advance once with manual Run now/change an owned record, record newer IDs and stop it. Restore the original snapshot over this copy. Capture the command's `preserved_database` for the newer state, `database_replaced`, schema and `migration_required`. Compare all recorded logical content/IDs to the disabled snapshot baseline; file bytes can differ without a logical difference. Restart without enabling scheduling, read back disabled/null-due state and compare the restored clock/cursor/receipts/runs/audit before any further mutation. Replay a key retained in the snapshot; keys created after it should be absent, so do not blindly reuse them and call the result exactly-once recovery.
+
+This primary round-trip does not establish preservation/startup behavior for an enabled schedule or saved due time. Keep enabled/due/overdue restore evidence on the separately authorized group 4 harness copy, where stopped snapshot state is compared before deliberately allowing controlled timer startup. A legitimate overdue acquisition must not be mistaken for restore corruption or allowed to change this primary comparison baseline.
 
 Use dedicated source-control/asset copies for focused refusals: invalid batch rows with explicit receipt counts; foreign/first-path authority makes scheduled acquisition ineligible; missing/altered copied feed asset fails visibly; original rich structure changed in a copied seed must not become its own authority. The reviewed concrete structural case is Coastal prefix `3eb2272d-8d3e-5f5e-bb5c-7fc1045e6b48` changed from `10.60.11.0/24` to `10.60.12.0/24`. Do not modify committed fixtures. Preserve prior successful clock/run/cursor and record any failure audit separately.
 
