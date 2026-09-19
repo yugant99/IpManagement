@@ -2,7 +2,7 @@
 
 A planned portable IP address inventory and reconciliation demonstration using synthetic data.
 
-**Current state:** Stage 1 source is submitted in [draft PR #5](https://github.com/yugant99/IpManagement/pull/5); the separate synthetic-data task is active. Main still contains documentation only. No application runtime or portable release is accepted yet. Start with [current status](docs/STATUS.md).
+**Current state:** Foundation [PR #5](https://github.com/yugant99/IpManagement/pull/5), synthetic-data [PR #7](https://github.com/yugant99/IpManagement/pull/7) and first-path [PR #8](https://github.com/yugant99/IpManagement/pull/8) are accepted source dependencies, all unmerged. The [Stage 3 kickoff](docs/handoffs/stage-03-kickoff.md) is approved; core state commands and packaging remain separate lanes. Main contains documentation only. Runtime and portable-release evidence remain pending. Start with [current status](docs/STATUS.md).
 
 ## Agent pickup
 
@@ -33,6 +33,6 @@ The demo scorecard and full external questionnaire have different denominators. 
 
 ## Runtime
 
-There is no working startup command yet. The intended delivery is a Python API serving a compiled React UI, SQLite stored outside the application image, deterministic synthetic inputs and documented reset/backup/restore. Do not treat planned commands in the contract as implemented software.
+Application entrypoint/seed/health/migration source exists on the unmerged branches; it has no accepted runtime evidence. The intended delivery is a Python API serving a compiled React UI, SQLite stored outside the image, deterministic synthetic inputs and explicit reset/backup/restore. Core state commands are a separate active source lane. Read checkpoint reports before treating a planned command as implemented or exercised.
 
 Private source documents, detailed assessment extracts, credentials and runtime data stay outside Git. Public documentation contains generic engineering scope and synthetic examples.
