@@ -2,40 +2,53 @@
 
 ## Authorization and evidence
 
-- Latest user direction: keep this original chat as overseer; Stage 1 has been handed off, and generate the richer synthetic data in parallel. The original **Build synthetic inventory demo** chat remains persistent project lead. Do not duplicate the active Stage 1 worker or repeat planning.
-- Status is a record, not independent authority. Current user instructions govern. Application tests/smoke/verification commands have not been explicitly requested; existing test limits remain. No container/VM operation, cloud spending or public deployment is granted by the stage handoff.
-- Stage 1 application implementation is in progress. The synthetic-data worktree is prepared for the user's separate task; the lead's initial data subagent stopped before writing or generating files so ownership can transfer cleanly. No application runtime, test, container build or deployment evidence has been accepted by the lead.
-- Do not interpret a goal, command or contract in these documents as an implemented capability.
-- Cloud rental/public deployment is outside the present work. Local source material remains outside the public repository.
+- Latest user direction: independently review exact PR #7/#8 source, route fixes to existing owners, record acceptance/dependencies/evidence, and approve Stage 3 without overlapping core state commands or Spencer. Keep the original task as persistent lead.
+- Three bounded independent reviews found no actionable defects. PR #7/#8 are accepted **unmerged source checkpoints only**. No runtime/browser/import/calculation/persistence result is accepted. See [review record](handoffs/stage-02-lead-review.md).
+- No tests, builds, runtime or infrastructure commands are authorized for this review or handoff. Source/Git/document inspection is distinct from application execution. Application PR merges still require evidence.
+- Status records decisions, not independent authority. No cloud rental, public deployment, external submission or provider commitment is granted. Private attachments and local assessment stay outside Git.
 
-## Integration
+## Integration and task registry
 
-- Repository: `yugant99/IpManagement`.
-- Project lead: the original **Build synthetic inventory demo** chat, persistent across all stages. It owns global status/acceptance/integration; worker chats own assigned implementation and reports.
-- Stage 0 planning complete; Stage 1 foundation active in **Build Stage 1 IPAM foundation**, task `01a0b8ae-bd65-7331-b548-da5dca1e0d5e` on host `local`, branch `codex/part-1-foundation`, integration base `d157f2c1d63f4797f50b0db166afafd02c6eff97`. Separate Stage 1 UI/seed worktrees are coordinated by that worker. A similarly located unrelated task is not a project worker.
-- Synthetic-data lane: awaiting the user's separate implementation task, branch `codex/part-2-synthetic-data` from the same integration base, isolated worktree. Initial subagent stopped with clean worktree and no artifacts/commits; do not restart it alongside the new worker. Owns `fixtures/`, `docs/SYNTHETIC_DATA.md` and `docs/handoffs/part-2-synthetic-data.md`. Stage 1 owns `backend/ipam_demo/data/baseline.json`; the data lane consumes its agreed shape/IDs and fixed clock `2026-09-01T00:00:00.000Z`. Richer observations are Stage 2 inputs, not an already connected import path. Use the [data pickup](handoffs/part-2-synthetic-data.md).
-- Read-only oversight heartbeat: created for this project-lead task; 30-minute checks through Monday morning, 2026-09-21. It reports meaningful checkpoints/blockers only and performs no implementation, tests, merges or deployment. The app automation is the live schedule source.
-- Initial integration branch: `main`, documentation bootstrap only.
-- Feature branches: `codex/part-N-description`; Spencer's planned branch is `codex/part-6-portability`.
-- Obtain the current baseline with Git at pickup; do not assume a hash from a prior chat.
+Repository: `yugant99/IpManagement`. Main is documentation only. All registered tasks use host `local`; sidebar titles do not reassign ownership.
 
-## Decisions and ownership
+| Owner / task | Branch and checkpoint | State |
+|---|---|---|
+| Persistent lead, **Synthetic data builder**, `01a0b845-6c8d-7021-a5c9-15e673db07c9` | Lead documentation branches into main | Global status/contracts, acceptance and main integration remain here |
+| Foundation 1, `01a0b8ae-bd65-7331-b548-da5dca1e0d5e` | `codex/part-1-foundation`, `c6131c38a460c13c3a189ee64a530042b2a2bf0f`, [PR #5](https://github.com/yugant99/IpManagement/pull/5) | Previously source-accepted; draft, unmerged; code checkpoint `ea51aa64b1780fa5c171e95ae59a619bf0109d52` |
+| Implement Stage 2 first path, `01a0b8c2-f283-7cf1-9128-85e9164f5fe9` | `codex/part-2-first-path`, `8a1a122737618748c58c5a8fc31b58a3b5f6f37e`, [PR #8](https://github.com/yugant99/IpManagement/pull/8) | Source-accepted; draft, unmerged, based on PR #5; code checkpoint `3c193c4ca320985e3dc258b39d8af1ec6632d155`; retained for fixes |
+| Overseer / data, `01a0b8b9-82fb-7a11-bc50-ec3a5b234729` | `codex/part-2-synthetic-data`, `907f6e7bf32f23f36d270da49c3177b015c8bfae`, [PR #7](https://github.com/yugant99/IpManagement/pull/7) | Fixture source-accepted; unmerged, based on main; generator/data checkpoint `60df87025a9a76187638bcad1921981b851f6cbb` |
+| Foundation 1 / state commands, same task above | `codex/part-1-state-commands`, worker-reported `0e139a85b445f7d07968c855e770c525c5e4d91c`, [draft PR #10](https://github.com/yugant99/IpManagement/pull/10), base PR #8 at `8a1a122737618748c58c5a8fc31b58a3b5f6f37e` | Source checkpoint received during this review; lead review pending, unmerged; not part of PR #7/#8 acceptance |
+| Create delivery-method documentation, `01a0b8db-76df-7511-b024-9d3deb589074` | `codex/delivery-method`, worker-reported `c3e45fa43a1e9f59e6c9af298b14e2c0857ebaa2`, [PR #9](https://github.com/yugant99/IpManagement/pull/9) | Documentary checkpoint received; lead review pending; user's no-merge restriction retained |
+| Stage 3 | [Approved kickoff](handoffs/stage-03-kickoff.md); no task registered yet | New user-started task, no automatic creation |
+| Spencer / Part 6 | Approved preparation branch `codex/part-6-container-startup`, base `8a1a122737618748c58c5a8fc31b58a3b5f6f37e` | Source preparation permitted; external task/PR not registered; do not infer work started |
 
-- The initial two-round discussion was followed by 75 individual questions and actual answers across three dependent batches of 25. Corrections and decisions are integrated into architecture, contracts and part handoffs; see `GRILL_75.md`. No user questionnaire or confirmation gate remains.
-- Persistent lead: contracts, integration coordination, acceptance, questionnaire evidence and global status. Stage workers implement their assigned portions, including Part 1, without replacing this role.
-- Data lane: Part 2. Rules lane: Part 3. UI/calculation lane: Part 4. Core workflow lane: Part 5.
-- Spencer: **Part 6, portable delivery**, approximately 6–8 hours. Earlier Part 5 assignments are superseded.
-- Primary coverage is the 111-row questionnaire, not 22/30 internal goals. The revised row map targets 65 rows with concrete scoped demo/document evidence, two conditional additions to 67, and optional scheduling to 68. These include partial/documentary evidence, not whole-row compliance. No row has yet been demonstrated by this project.
+No fixes were required by the PR #7/#8 review. Existing owners received the source-checkpoint decision and retain assigned corrections. Route later defects with file/line, consequence and dependency impact; do not race on shared files.
+
+The read-only heartbeat checks meaningful progress every 30 minutes through Monday morning, 2026-09-21. The app automation is the live schedule source; it does not implement, test, merge or grant permissions.
+
+## Ownership
+
+- Lead: global instructions/status/handoff, shared contract decisions, questionnaire accounting and main acceptance/integration.
+- Stage 3: bounded application delegation in the [kickoff](handoffs/stage-03-kickoff.md); one coordinator for store/schema/migrations/API/common UI, separate feature branches/worktrees. Preserve identity/locking helper contracts; coordinate changes affecting the state lane.
+- Core state commands: `backend/ipam_demo/state_ops.py`, `backend/ipam_demo/__main__.py`, `docs/STATE_OPERATIONS.md`, `docs/handoffs/part-1-state-commands.md`. Reset/backup/restore correctness stays here; preserve migrate. Backup also requires stopped service under the existing exclusive-lock design. Stage 3 supplies a rich seed helper and routes any CLI wiring to this owner.
+- Data: `fixtures/`, `docs/SYNTHETIC_DATA.md`, `docs/handoffs/part-2-synthetic-data.md`. Clock `2026-09-01T00:00:00.000Z`, original IDs retained. First-path inputs use six existing prefixes; rich inventory needs explicit safe fresh-store setup. Expected answers remain comparison-only.
+- Delivery method: `docs/DELIVERY_METHOD.md`, `docs/handoffs/delivery-method.md`; proposed documentary support for RFP-083/086/088/105, not application/live migration.
+- Spencer: `Dockerfile`, `compose.yaml`, `.dockerignore`, `scripts/ops/`, `docs/RUNNING.md`, `docs/parts/06-portability.md`, `docs/handoffs/part-6.md`. Approximately 6–8 hours; packaging/operator handoff only, no presentation or core state correctness. No build/pull/container/VM/deployment authority.
 
 ## Readiness
 
-| Gate | State | What is missing |
+| Gate | Accepted state | Missing |
 |---|---|---|
-| Architecture decisions | 75-question pass and questionnaire reprioritization integrated | Bounded implementation refinements; no new runtime services required |
-| Application build | Stage 1 in progress; no accepted runtime evidence | Foundation checkpoint, then first integrated source-to-finding path |
-| Synthetic scenario pack | Worktree prepared; awaiting separate task pickup | Generate artifacts, then contract review; application import/rule evidence later |
-| PART6_READY | No | Real app command, dependency locks, compiled UI path, seed/reset/backup commands and health endpoint |
-| Portable release | Not built | Implemented application, packaging and recorded startup/persistence evidence |
-| Questionnaire evidence | 0 rows demonstrated/substantiated by this project | Deliver planned behavior/documents and retain remaining gaps per row |
+| Architecture | 75-question pass and questionnaire reprioritization integrated | Bounded implementation refinements only |
+| Foundation / first path | Exact PR #5/#8 source reviewed | Runtime/import/migration/browser evidence, main integration |
+| Synthetic pack | PR #7 recipes/selected artifacts source-reviewed | Executed compatibility/results; rich bootstrap and DHCP support |
+| Main capabilities | Stage 3 scope approved | Shared calculations, remaining rules and prioritized application slices |
+| Core state commands | PR #10 worker checkpoint received | Lead source review and actual persistence evidence |
+| Delivery method | PR #9 worker checkpoint received | Lead review; no merge |
+| PART6_READY | **No** | Real core/state/UI prerequisites and evidence |
+| Portable release | Not accepted | Integrated candidate, compiled UI/startup/persistence/recipient evidence |
+| Questionnaire | **0 rows demonstrated/substantiated at this lead checkpoint** | Actual per-row evidence and remaining gaps |
 
-Next: active Stage 1 worker completes core entrypoints/locks, scoped schema, minimal seed and inventory API/UI connection; the data lane generates the richer pack alongside it. Use contract revision `demo-v2-questionnaire`; preserve the hour-14 freeze and integration reserve. Spencer can prepare packaging in parallel, but acceptance waits for real prerequisites/evidence. Workers submit pushed SHA/PR and reports to this persistent lead; the lead reviews claims, updates this status and generates the accepted next prompt. See `PROJECT_OVERSIGHT.md`.
+The denominator stays **111**. Plans target 65 addressed rows, two conditional additions to 67, optional scheduling to 68, including partial/documentary evidence. These are not fully satisfied-row counts. Source acceptance earns no demonstrated-row credit.
+
+Next: [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md). Preserve the overall weekend budget, hour-14 feature freeze and integration reserve. Do not start from application-empty main, recreate existing lanes, merge application PRs without evidence or rotate project ownership.

@@ -1,8 +1,8 @@
 # IpManagement
 
-A portable IP address inventory and reconciliation demonstration using synthetic data.
+A planned portable IP address inventory and reconciliation demonstration using synthetic data.
 
-**Current state:** Stage 1 foundation source is implemented: FastAPI/SQLite inventory, an explicit packaged seed, and a React/Vite API-backed view. Installation, builds and runtime behavior remain unverified. Imports, findings and workflow are later stages; packaging remains Spencer's Part 6. Start with [current status](docs/STATUS.md) and [foundation setup and limits](docs/FOUNDATION.md).
+**Current state:** Foundation [PR #5](https://github.com/yugant99/IpManagement/pull/5), synthetic-data [PR #7](https://github.com/yugant99/IpManagement/pull/7) and first-path [PR #8](https://github.com/yugant99/IpManagement/pull/8) are accepted source dependencies, all unmerged. The [Stage 3 kickoff](docs/handoffs/stage-03-kickoff.md) is approved; core state commands and packaging remain separate lanes. Main contains documentation only. Runtime and portable-release evidence remain pending. Start with [current status](docs/STATUS.md).
 
 ## Agent pickup
 
@@ -33,6 +33,6 @@ The demo scorecard and full external questionnaire have different denominators. 
 
 ## Runtime
 
-The implemented CLI provides `python -m ipam_demo serve` and `python -m ipam_demo seed --scenario baseline`. Follow [native installation and startup](docs/FOUNDATION.md) for the pinned dependencies, explicit local data directory and frontend build path. These commands have not been executed as acceptance evidence. `reset`, `backup` and `restore` are still missing; `PART6_READY=no`.
+Application entrypoint/seed/health/migration source exists on the unmerged branches; it has no accepted runtime evidence. The intended delivery is a Python API serving a compiled React UI, SQLite stored outside the image, deterministic synthetic inputs and explicit reset/backup/restore. Core state commands are a separate active source lane. Read checkpoint reports before treating a planned command as implemented or exercised.
 
 Private source documents, detailed assessment extracts, credentials and runtime data stay outside Git. Public documentation contains generic engineering scope and synthetic examples.
