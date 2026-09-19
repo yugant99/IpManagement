@@ -10,8 +10,8 @@ import sqlite3
 from .errors import AppError
 
 APPLICATION_ID = 0x4950414D
-SCHEMA_VERSION = 3
-MIGRATABLE_SCHEMA_VERSIONS = (1, 2)
+SCHEMA_VERSION = 4
+MIGRATABLE_SCHEMA_VERSIONS = (1, 2, 3)
 CONTRACT_REVISION = "demo-v2-questionnaire"
 DATABASE_NAME = "ipam_demo.sqlite3"
 
@@ -67,16 +67,20 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
     if identity != APPLICATION_ID:
         raise AppError("UNRECOGNIZED_DATABASE", "Database identity is not IPAM demo. Existing data was preserved.")
     if found_version != version:
-        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1 or 2, stop the service and run python -m ipam_demo migrate.",
+        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1, 2 or 3, stop the service and run python -m ipam_demo migrate.",
                        details={"found": found_version, "supported": version})
     expected = {"app_meta", "scopes", "prefixes", "pools", "allocations"}
     if version >= 2:
         expected.update({"source_batches", "source_coverage", "source_records", "calculation_runs"})
     if version >= 3:
         expected.update({"allocation_requests", "audit_events", "exceptions", "report_preset"})
+    if version >= 4:
+        expected.update({"schedule_status", "schedule_operations"})
     tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     if not expected.issubset(tables) or connection.execute("SELECT singleton FROM app_meta WHERE singleton=1").fetchone() is None:
         raise AppError("INVALID_SCHEMA", "Required inventory tables or metadata are missing. Existing data was preserved.")
+    if version >= 4 and connection.execute("SELECT singleton FROM schedule_status WHERE singleton=1").fetchone() is None:
+        raise AppError("INVALID_SCHEMA", "Required schedule metadata is missing. Existing data was preserved.")
 
 
 def initialize_schema(path: Path) -> None:
@@ -90,6 +94,7 @@ def initialize_schema(path: Path) -> None:
         schema = files("ipam_demo").joinpath("schema.sql").read_text(encoding="utf-8")
         schema += "\n" + files("ipam_demo").joinpath("schema_v2.sql").read_text(encoding="utf-8")
         schema += "\n" + files("ipam_demo").joinpath("schema_v3.sql").read_text(encoding="utf-8")
+        schema += "\n" + files("ipam_demo").joinpath("schema_v4.sql").read_text(encoding="utf-8")
         connection.execute("PRAGMA foreign_keys = OFF")
         connection.executescript(
             f"BEGIN IMMEDIATE;\nPRAGMA application_id = {APPLICATION_ID};\n"
@@ -106,7 +111,7 @@ def require_initialized(connection: sqlite3.Connection) -> None:
 
 
 def migrate_schema(directory: Path) -> dict:
-    """Explicit known-v1/v2 migration, never an implicit startup side effect."""
+    """Explicit known-v1/v2/v3 migration, never an implicit startup side effect."""
     with exclusive_data_access(directory) as path:
         if path.is_symlink() or not path.is_file():
             raise AppError("UNSAFE_DATABASE_PATH", "Migration needs an existing regular app database; nothing was changed.")

@@ -11,7 +11,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = ["fastapi==0.141.1", "uvicorn==0.50.1"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["backend/ipam_demo"]
+packages = ["backend/ipam_demo", "fixtures/evolving/ipam_synthetic_feed"]
 
 [tool.uv]
 package = true
