@@ -26,7 +26,7 @@ Planning only; companion to `CONTRACTS.md` revision `demo-v2-questionnaire`. [QU
 ## Conditional import trigger and schedule
 
 - RFP-043: after committing accepted DHCP/routing evidence, optionally invoke the same reconciler with `trigger=import` and the source-run ID. An idempotent whole-batch replay must not create duplicate triggered effects. Staged IPAM changes are not silently promoted. Import and reconciliation outcomes are separate: a run failure/busy result cannot undo a completed import or masquerade as a successful rerun.
-- RFP-068, later option: a small timer in the single API worker uses the same run lock, saved off/interval setting and last/next/error state. Wall time drives scheduling, while the explicit demo clock drives synthetic calculations. Do not duplicate timers under development reload or add a queue, missed-run catch-up system or worker service. Missing/failed runs remain visible.
+- RFP-068 is now required by the September 19 user change: an evolving synthetic feed, six-hour configurable wall interval and manual Run now. [SCHEDULING_CONTRACT.md](SCHEDULING_CONTRACT.md) governs producer ownership, fixed six-hour scenario steps, matching policy snapshots, same-source identities, atomic import/clock/run/cursor commit and durable replay. No OS cron, second worker service or catch-up queue. This scheduled acquisition is separate from the optional ordinary-import callback in 043; 043 remains deferred.
 
 ## Lead-owned delivery documents
 
@@ -36,6 +36,6 @@ The migration method is design evidence; changed-baseline promotion and live mig
 
 ## Estimates and readiness
 
-No runtime entrypoints or Part 6 ownership change. No new services or database. Product expansions are estimated at 4–7 focused lane hours plus 2–3 for shared delivery documents; short event/team extensions are conditional, scheduling last. These are included by prioritization and overlapping bounded lanes within the intended weekend, not by consuming all integration time.
+No runtime command or Part 6 ownership change. No new services or database. Earlier estimates covered the original prioritized additions; the required evolving-feed/time bridge is a new bounded lane within the remaining weekend budget. Preserve integration reserve and freeze all unrelated additions.
 
 Nothing in this revision authorizes application execution, tests, containers, infrastructure spending or external submissions. Current work remains planning. Later implementation reports exact commit/scenario evidence and row-level remaining gaps.

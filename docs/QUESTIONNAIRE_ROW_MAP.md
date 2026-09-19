@@ -1,10 +1,10 @@
 # Questionnaire row map
 
-Planning only. No questionnaire requirement has yet been demonstrated or substantiated by this project. The application is unbuilt; existing provider capabilities are unknown without evidence. Each row has one primary category; a link or proposed document is not full satisfaction. Original workbook text and vendor answers are unchanged and excluded from this public repository.
+Evidence plan. No questionnaire requirement has yet been demonstrated or substantiated at the current lead checkpoint. Application source exists on feature branches; build/runtime evidence and existing provider capabilities remain unestablished. Each row has one primary category; a link or proposed document is not full satisfaction. Original workbook text and vendor answers are unchanged and excluded from this public repository.
 
 Source locator: private questionnaire, Technical Requirements sheet, one-based row = RFP numeric ID + 2; requirement column B. Generic labels below paraphrase the engineering topic. Categories and priorities are analyst decisions.
 
-**Priority:** B = original 53-row plan; P1 = 12 prioritized additions (65 total); P2 = two conditional additions (67 total); P3 = optional scheduling (68 total); Later = outside selected weekend evidence. P1/P2 figures include partial and documentary evidence. Existing full/partial capability claims must be judged against the remaining gap, not the priority.
+**Priority:** B = original 53-row plan; P1 = 12 prioritized additions; P2 = two originally conditional additions; Required addition = user-selected evolving scheduling (068); Later = outside selected weekend evidence. The historical 65/67/68 bundles include partial/documentary evidence and are not achievement totals; the general import callback (043) is currently deferred. Judge each claim against its actual evidence and remaining gap, not priority.
 
 **Categories:** Application = product/data/workflow; Deployment = architecture/deployment/resilience; Integration = external systems/identity; Scale = capacity/performance evidence; Delivery = process/business/provider evidence.
 
@@ -77,7 +77,7 @@ Source locator: private questionnaire, Technical Requirements sheet, one-based r
 | RFP-065 | Stale allocation | Application | B | Eligible 30-day candidate plus unknown/healthy controls | Investigation candidate; no proven safe reclaim |
 | RFP-066 | Unassigned usage | Application | B | Observed-without-intended and policy discrepancies | Not a definitive unauthorized-use verdict |
 | RFP-067 | Cross-system validation | Integration | Later | Future combined DNS/DHCP/CMTS adapters and authority joins | Current three sources do not include DNS/CMTS |
-| RFP-068 | Run schedule | Application | P3 | Optional persisted timer calling existing runner with visible outcomes | No continuous discovery or worker fleet |
+| RFP-068 | Run schedule | Application | Required addition | Persisted six-hour configurable schedule, evolving synthetic acquisition and manual Run now; see SCHEDULING_CONTRACT.md | Source work pending; no runtime evidence, live discovery or worker fleet |
 | RFP-069 | Reconciliation reports | Application | B | Saved actual findings and selected-run export | No scheduled report delivery unless implemented |
 | RFP-070 | Remediation | Application | Later | Future approved correction/release and actual rerun | No automated external remediation |
 | RFP-071 | Run history | Application | P1 | Compare immutable runs by scoped rule/subject | Unknown evidence cannot mark a finding resolved |
