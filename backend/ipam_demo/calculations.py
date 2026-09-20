@@ -46,6 +46,8 @@ def calculate_pools(connection, views, clock_text):
     last_day_end = clock.replace(hour=0, minute=0, second=0, microsecond=0)
     subjects = {row["id"]: dict(row) for row in connection.execute(
         "SELECT p.*,s.name AS scope_name FROM prefixes p JOIN scopes s ON s.id=p.scope_id")}
+    history_versions = {row["id"]: row["capacity_history_version"] for row in connection.execute(
+        "SELECT id,capacity_history_version FROM pools")}
     results = []
     for pool in pools(connection):
         prefix = subjects[pool["prefix_id"]]
@@ -133,9 +135,10 @@ def calculate_pools(connection, views, clock_text):
                                      utilization_pct=100 * current / capacity)
         else:
             metric["current"]["reason"] = "incomplete_coverage; positive observations are a lower bound"
-        # Version changes conservatively invalidate history until reset/reseed.
-        # No historical capacity timeline is fabricated from today's geometry.
-        consistent = pool["pool_version"] == 1 and prefix["version"] == 1
+        # Concurrency versions also change for metadata and local assignments.
+        # Only the dedicated structural token establishes historical geometry.
+        # A token above one remains unsupported: no geometry timeline is inferred.
+        consistent = history_versions[pool["id"]] == 1
         eligible = lambda sample: bool(consistent and coverage["effective_complete"] and start <= sample < end)
         values = []
         for index in range(720):
@@ -149,7 +152,7 @@ def calculate_pools(connection, views, clock_text):
             value = _p95(values)
             metric["p95"].update(status="available", occupied_addresses=str(value), utilization_pct=100 * value / capacity)
         else:
-            metric["p95"]["reason"] = "scope_or_capacity_changed" if not consistent else "incomplete_30_day_sample_coverage"
+            metric["p95"]["reason"] = "capacity_history_changed" if not consistent else "incomplete_30_day_sample_coverage"
         positive_overlap = any(left < min(clock, end) and right > max(window_start, start) for left, right in prefix_leases)
         if positive_overlap:
             metric["lease_overlap_30d"] = True
@@ -175,7 +178,7 @@ def calculate_pools(connection, views, clock_text):
         elif current >= capacity:
             forecast.update(status="exhausted", days_to_full=0, baseline_addresses=str(current))
         elif not consistent:
-            forecast["reason"] = "scope_or_capacity_changed"
+            forecast["reason"] = "capacity_history_changed"
         elif daily and int(daily[-1]["occupied_addresses"]) >= capacity:
             forecast.update(status="exhausted", days_to_full=0, baseline_addresses=daily[-1]["occupied_addresses"])
         elif len(daily) < 14:
