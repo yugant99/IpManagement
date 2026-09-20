@@ -47,6 +47,27 @@ class EasyWinsDomainSourcesTests(unittest.TestCase):
         self.assertIn(item["freshness"], {"fresh", "stale"})
         self.assertEqual(item["evaluated_at"], envelope["demo_clock_at"])
 
+    def test_catalog_handles_staged_receipt_and_selects_latest_partial_batch(self):
+        staged = json.loads((ROOT / "fixtures/v1/inventory.json").read_text())
+        staged_receipt, replay = import_envelope(self.connection, json.dumps(staged).encode())
+        self.assertFalse(replay)
+        staged_item = next(value for value in source_catalog.catalog(self.connection)
+                           if value["batch_id"] == staged_receipt["id"])
+        self.assertEqual(staged_item["source_kind"], "inventory_staged")
+        self.assertIsNone(staged_item["scope_id"])
+        self.assertEqual(staged_item["completeness"], "unknown")
+        self.assertEqual(staged_item["freshness"], "not_applicable")
+
+        first = json.loads((ROOT / "fixtures/v1/first-path/routing-lab-partial.json").read_text())
+        first_receipt, _ = import_envelope(self.connection, json.dumps(first).encode())
+        second = {**first, "source_run_id": "first-path-v1-partial-newer"}
+        second_receipt, _ = import_envelope(self.connection, json.dumps(second).encode())
+        items = source_catalog.catalog(self.connection)
+        selected = [value for value in items if value["source_id"] == first["source_id"]]
+        self.assertTrue(selected)
+        self.assertTrue(all(value["batch_id"] == second_receipt["id"] for value in selected))
+        self.assertNotEqual(first_receipt["id"], second_receipt["id"])
+
 
 if __name__ == "__main__":
     unittest.main()
