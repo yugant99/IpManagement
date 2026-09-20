@@ -25,21 +25,21 @@ def catalog(connection, *, scope_id=None) -> list[dict]:
 
     # Staged intended inventory is not an active evidence view, but its receipt
     # remains visible with explicit non-active status and no invented freshness.
+    seen_staged = set()
     for row in connection.execute(
         "SELECT b.*, c.scope_id, c.window_start_at, c.window_end_at, "
         "c.declared_complete, c.effective_complete FROM source_batches b "
         "LEFT JOIN source_coverage c ON c.batch_id=b.id "
         "WHERE b.source_kind='inventory_staged' ORDER BY b.sequence DESC"
     ):
-        if scope_id and row["scope_id"] != scope_id:
+        if row["source_id"] in seen_staged:
+            continue
+        seen_staged.add(row["source_id"])
+        if scope_id:
             continue
         receipt = json.loads(row["receipt_json"])
-        coverage = {key: row[key] for key in ("scope_id", "window_start_at", "window_end_at",
-                                               "declared_complete", "effective_complete")}
-        coverage.update({"batch_id": row["id"], "source_id": row["source_id"],
-                         "source_run_id": row["source_run_id"]})
-        selected.append(_entry(receipt, coverage, evaluated_at, staged=True))
-    return sorted(selected, key=lambda value: (value["source_id"], value["scope_id"]))
+        selected.append(_staged_entry(receipt, evaluated_at))
+    return sorted(selected, key=lambda value: (value["source_id"], value["scope_id"] or ""))
 
 
 def _entry(receipt, coverage, evaluated_at, *, staged=False):
@@ -60,5 +60,21 @@ def _entry(receipt, coverage, evaluated_at, *, staged=False):
         "completeness": "complete" if complete else "partial", "coverage_grain": "scope/time-window",
         "window_start_at": coverage["window_start_at"], "window_end_at": coverage["window_end_at"],
         "declared_complete": bool(coverage["declared_complete"]), "effective_complete": complete,
+        "references": {"batch_id": receipt["id"], "receipt_id": receipt["id"]},
+    }
+
+
+def _staged_entry(receipt, evaluated_at):
+    return {
+        "source_id": receipt["source_id"], "source_name": None, "owner": None,
+        "source_kind": "inventory_staged", "authority": "not_applicable",
+        "authority_status": "not_applicable", "scope_id": None,
+        "source_run_id": receipt["source_run_id"], "batch_id": receipt["id"],
+        "application_status": "staged", "rejection_status": "accepted",
+        "rejected_rows": receipt["rejected_rows"], "duplicate_rows": receipt["duplicate_rows"],
+        "evaluated_at": evaluated_at, "freshness": "not_applicable",
+        "completeness": "unknown", "coverage_grain": "not_applicable",
+        "window_start_at": None, "window_end_at": None,
+        "declared_complete": None, "effective_complete": None,
         "references": {"batch_id": receipt["id"], "receipt_id": receipt["id"]},
     }

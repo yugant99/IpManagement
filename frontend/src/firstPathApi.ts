@@ -36,12 +36,12 @@ export interface Receipt {
 
 export interface SourceCatalogEntry {
   source_id: string;
-  source_name: string;
-  owner: string;
-  source_kind: "routing" | "route_policy" | "dhcp";
+  source_name: string | null;
+  owner: string | null;
+  source_kind: "routing" | "route_policy" | "dhcp" | "inventory_staged";
   authority: string;
-  authority_status: "declared";
-  scope_id: string;
+  authority_status: "declared" | "not_applicable";
+  scope_id: string | null;
   source_run_id: string;
   batch_id: string;
   application_status: "complete" | "partial" | "staged";
@@ -50,14 +50,16 @@ export interface SourceCatalogEntry {
   duplicate_rows: number;
   evaluated_at: string;
   freshness: "fresh" | "stale" | "not_applicable";
-  completeness: "complete" | "partial";
+  completeness: "complete" | "partial" | "unknown";
   coverage_grain: string;
-  window_start_at: string;
-  window_end_at: string;
-  declared_complete: boolean;
-  effective_complete: boolean;
+  window_start_at: string | null;
+  window_end_at: string | null;
+  declared_complete: boolean | null;
+  effective_complete: boolean | null;
   references: { batch_id: string; receipt_id: string };
 }
+
+export type SourceCatalogResponse = { items: SourceCatalogEntry[]; total: number; limit: number; offset: number; evaluated_at?: string; limitations?: string[] };
 
 export interface SourceRecord {
   id: string;
