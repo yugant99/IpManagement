@@ -13,6 +13,7 @@ from uuid import UUID, uuid4
 from .errors import AppError
 from .evidence import active_dhcp_claims
 from .inventory import pool_payload
+from .rules import comparable_findings, discrepancy_keys
 from .seed import _ranges
 
 STATIC_POOL_ID = "8821c420-18ea-4caa-9d97-83a331c0c002"
@@ -288,38 +289,128 @@ def decide_request(connection, object_id, payload):
 
 
 def sync_exceptions(connection, run):
-    """Notify once for each newly observed anomalous subject; never rewrite a run."""
-    created = 0
+    """Track current comparable evidence separately; notify on semantic changes."""
+    newest = connection.execute("SELECT id FROM calculation_runs ORDER BY rowid DESC LIMIT 1").fetchone()
+    if newest is None:
+        raise AppError("EXCEPTION_EVIDENCE_MISSING", "Save the calculation run before updating exceptions.", 500)
+    if newest["id"] != run["id"]:
+        # Immutable historical runs may be reread, never reapplied as current evidence.
+        return 0
+    current = {}
     for finding in run["findings"]:
-        if finding["evidence_state"] != "anomalous":
-            continue
         subject = finding["subject"]
         key = _json([finding["rule_id"], subject["scope_id"], subject["family"], subject["id"]])
-        if connection.execute("SELECT id FROM exceptions WHERE subject_key=?", (key,)).fetchone():
+        if key in current:
+            raise AppError("DUPLICATE_FINDING_IDENTITY", "Run contains duplicate scoped finding identities.", 500)
+        current[key] = finding
+    existing = {row["subject_key"]: row for row in connection.execute("SELECT * FROM exceptions")}
+    for key, row in existing.items():
+        if row["latest_run_id"] == run["id"]:
             continue
+        original = _saved_finding(connection, row["run_id"], row["finding_id"])
+        latest = current.get(key)
+        known = set(discrepancy_keys(original) if row["material_keys_json"] is None
+                    else json.loads(row["material_keys_json"]))
+        definitive = row["last_definitive_state"]
+        episode, notification = row["episode_count"], row["notification_version"]
+        notice_reason, closed_at = row["notification_reason"], row["closed_at"]
+        state, acknowledged_at = row["state"], row["acknowledged_at"]
+        event, additions = None, []
+        if comparable_findings(original, latest):
+            if latest["evidence_state"] == "healthy":
+                if definitive != "healthy":
+                    event = "evidence_resolved"
+                definitive = "healthy"
+            elif latest["evidence_state"] == "anomalous":
+                observed = set(discrepancy_keys(latest))
+                additions = sorted(observed - known)
+                if definitive == "healthy":
+                    event, notice_reason = "recurrence", "recurrence"
+                    episode += 1
+                    known = observed
+                elif additions:
+                    event, notice_reason = "new_discrepancy", "new_discrepancy"
+                    known.update(observed)
+                definitive = "anomalous"
+                if event:
+                    notification += 1
+                    closed_at, acknowledged_at = None, None
+                    state = "escalated" if state == "escalated" else "open"
+        now = _now()
+        connection.execute(
+            "UPDATE exceptions SET latest_run_id=?,latest_finding_id=?,last_definitive_state=?,material_keys_json=?,"
+            "notification_version=?,notification_reason=?,episode_count=?,closed_at=?,state=?,acknowledged_at=?,"
+            "version=version+1,updated_at=?,last_action_hash=NULL WHERE id=?",
+            (run["id"], latest["id"] if latest else None, definitive, _json(sorted(known)), notification, notice_reason,
+             episode, closed_at, state, acknowledged_at, now, row["id"]))
+        if event:
+            reasons = {"evidence_resolved": "Comparable healthy evidence establishes resolution; closure remains an owner action.",
+                       "recurrence": "Comparable anomalous evidence recurred after evidence-based resolution.",
+                       "new_discrepancy": "New semantic discrepancies appeared within the existing unresolved case."}
+            audit_event(connection, actor_id="system", action=f"exception.{event}", outcome="succeeded",
+                        reason=reasons[event], subject_id=row["id"], scope_id=original["subject"]["scope_id"],
+                        details={"original_run_id": row["run_id"], "original_finding_id": row["finding_id"],
+                                 "latest_run_id": run["id"], "latest_finding_id": latest["id"],
+                                 "new_material_keys": additions, "episode_count": episode,
+                                 "notification_version": notification,
+                                 "before": {"state": row["state"], "closed_at": row["closed_at"],
+                                            "last_definitive_state": row["last_definitive_state"]},
+                                 "after": {"state": state, "closed_at": closed_at, "last_definitive_state": definitive}})
+    created = 0
+    for key, finding in current.items():
+        if key in existing or finding["evidence_state"] != "anomalous":
+            continue
+        subject = finding["subject"]
         object_id, now = str(uuid4()), _now()
         connection.execute(
-            "INSERT INTO exceptions(id,subject_key,run_id,finding_id,owner_actor_id,state,version,created_at,updated_at) "
-            "VALUES (?,?,?,?,?,'open',1,?,?)", (object_id, key, run["id"], finding["id"], "demo-requester", now, now))
+            "INSERT INTO exceptions(id,subject_key,run_id,finding_id,owner_actor_id,state,version,created_at,updated_at,"
+            "latest_run_id,latest_finding_id,material_keys_json) VALUES (?,?,?,?,?,'open',1,?,?,?,?,?)",
+            (object_id, key, run["id"], finding["id"], "demo-requester", now, now, run["id"], finding["id"],
+             _json(discrepancy_keys(finding))))
         audit_event(connection, actor_id="system", action="exception.detected", outcome="succeeded",
                     reason="New calculated anomaly added to the in-app exception queue.", subject_id=object_id,
                     scope_id=subject["scope_id"], details={"run_id": run["id"], "finding_id": finding["id"],
+                        "notification_version": 1, "episode_count": 1,
                         "after": {"state": "open", "owner_actor_id": "demo-requester"}})
         created += 1
     return created
 
 
-def _exception_payload(connection, row):
-    item = dict(row)
-    saved = connection.execute("SELECT result_json FROM calculation_runs WHERE id=?", (item["run_id"],)).fetchone()
+def _saved_finding(connection, run_id, finding_id):
+    saved = connection.execute("SELECT result_json FROM calculation_runs WHERE id=?", (run_id,)).fetchone()
     finding = next((value for value in json.loads(saved["result_json"])["findings"]
-                    if value["id"] == item["finding_id"]), None) if saved else None
+                    if value["id"] == finding_id), None) if saved else None
     if finding is None:
         raise AppError("EXCEPTION_EVIDENCE_MISSING", "The saved finding referenced by this exception is unavailable.", 500)
+    return finding
+
+
+def _exception_payload(connection, row):
+    item = dict(row)
+    original = _saved_finding(connection, item["run_id"], item["finding_id"])
+    latest = (_saved_finding(connection, item["latest_run_id"], item["latest_finding_id"])
+              if item["latest_run_id"] and item["latest_finding_id"] else None)
+    comparable = comparable_findings(original, latest)
+    if item["latest_run_id"] is None:
+        latest_state, latest_reason = "unknown", "Not refreshed since migration; reconcile to obtain current evidence."
+    elif latest is None:
+        latest_state, latest_reason = "missing", "The latest run did not evaluate this scoped finding identity."
+    elif not comparable:
+        latest_state, latest_reason = "unknown", "The latest finding changed rule or subject geometry and is not comparable to the original."
+    else:
+        latest_state, latest_reason = latest["evidence_state"], latest["explanation"]
     item.pop("subject_key")
-    item["finding"] = finding
+    item.pop("last_action_hash")
+    item["material_keys"] = json.loads(item.pop("material_keys_json") or "[]")
+    item["finding"] = item["original_finding"] = original
+    item["latest_finding"] = latest
+    item["latest_comparable"] = comparable
+    item["latest_evidence_state"] = latest_state
+    item["latest_evidence_reason"] = latest_reason
+    item["evidence_resolution"] = "resolved" if latest_state == "healthy" else "active" if latest_state == "anomalous" else "unknown"
+    item["lifecycle_state"] = "closed" if item["closed_at"] else "open"
     item["owner"] = require_actor(item["owner_actor_id"])
-    item["notification_pending"] = item["acknowledged_at"] is None
+    item["notification_pending"] = item["acknowledged_at"] is None and item["closed_at"] is None and latest_state != "healthy"
     item["synthetic"] = True
     return item
 
@@ -334,38 +425,58 @@ def update_exception(connection, object_id, payload):
     actor = require_actor(payload.get("actor_id"), "exception")
     version, reason = _version(payload.get("version"), "version"), _text(payload.get("reason"), "reason")
     action = payload.get("action")
-    if action not in ("acknowledge", "escalate", "handoff"):
-        raise AppError("INVALID_INPUT", "Use acknowledge, escalate or handoff for exception actions.", 422)
+    if action not in ("acknowledge", "escalate", "handoff", "close", "reopen"):
+        raise AppError("INVALID_INPUT", "Use acknowledge, escalate, handoff, close or reopen for exception actions.", 422)
+    recipient = require_actor(payload.get("recipient_actor_id"), "exception") if action == "handoff" else None
+    if action != "handoff" and payload.get("recipient_actor_id") is not None:
+        raise AppError("INVALID_INPUT", "Only handoff accepts a recipient.", 422)
+    digest = _hash({"actor_id": actor["id"], "version": version, "action": action, "reason": reason,
+                    "recipient_actor_id": recipient["id"] if recipient else None})
     row = connection.execute("SELECT * FROM exceptions WHERE id=?", (object_id,)).fetchone()
     if row is None:
         raise AppError("NOT_FOUND", "No exception exists with that ID.", 404)
+    if row["version"] == version + 1 and row["last_action_hash"] == digest:
+        return {**_exception_payload(connection, row), "replay": True}
     if row["version"] != version:
         raise AppError("STALE_EXCEPTION", "Exception ownership or state changed. Refresh before deciding.", 409)
     if row["owner_actor_id"] != actor["id"]:
-        raise AppError("FORBIDDEN", "Only the assigned exception owner can acknowledge, escalate or hand it off.", 403)
+        raise AppError("FORBIDDEN", "Only the assigned exception owner can change its workflow state.", 403)
+    if row["closed_at"] and action != "reopen":
+        raise AppError("EXCEPTION_CLOSED", "Reopen the closed exception before another owner action.", 409)
     now = _now()
     if action == "handoff":
-        recipient = require_actor(payload.get("recipient_actor_id"), "exception")
         if recipient["team"] == actor["team"]:
             raise AppError("INVALID_HANDOFF", "Choose the named recipient on the other fictional team.", 422)
         connection.execute(
-            "UPDATE exceptions SET owner_actor_id=?,state='open',version=version+1,updated_at=?,"
-            "handoff_from_actor_id=?,handoff_at=?,acknowledged_at=NULL WHERE id=?",
-            (recipient["id"], now, actor["id"], now, object_id))
+            "UPDATE exceptions SET owner_actor_id=?,state=?,handoff_from_actor_id=?,handoff_at=?,acknowledged_at=NULL,"
+            "notification_version=notification_version+1,notification_reason='handoff' WHERE id=?",
+            (recipient["id"], "escalated" if row["state"] == "escalated" else "open", actor["id"], now, object_id))
     elif action == "acknowledge":
         if row["acknowledged_at"] is not None:
             raise AppError("EXCEPTION_ALREADY_ACKNOWLEDGED", "This owner has already acknowledged the exception.", 409)
         # Acknowledging an escalated exception retains its escalation state.
         state = "escalated" if row["state"] == "escalated" else "acknowledged"
-        connection.execute("UPDATE exceptions SET state=?,version=version+1,updated_at=?,acknowledged_at=? WHERE id=?",
-                           (state, now, now, object_id))
-    else:
+        connection.execute("UPDATE exceptions SET state=?,acknowledged_at=? WHERE id=?", (state, now, object_id))
+    elif action == "escalate":
         if row["state"] == "escalated":
             raise AppError("EXCEPTION_ALREADY_ESCALATED", "This exception is already escalated.", 409)
-        connection.execute("UPDATE exceptions SET state='escalated',version=version+1,updated_at=? WHERE id=?", (now, object_id))
+        connection.execute("UPDATE exceptions SET state='escalated' WHERE id=?", (object_id,))
+    elif action == "close":
+        if _exception_payload(connection, row)["evidence_resolution"] != "resolved":
+            raise AppError("RESOLUTION_NOT_ESTABLISHED", "Close requires healthy comparable evidence in the latest run.", 409)
+        connection.execute("UPDATE exceptions SET closed_at=? WHERE id=?", (now, object_id))
+    else:
+        if not row["closed_at"]:
+            raise AppError("EXCEPTION_ALREADY_OPEN", "The exception is already open.", 409)
+        connection.execute(
+            "UPDATE exceptions SET closed_at=NULL,state=?,acknowledged_at=NULL,notification_version=notification_version+1,"
+            "notification_reason='owner_reopen' WHERE id=?",
+            ("escalated" if row["state"] == "escalated" else "open", object_id))
+    connection.execute("UPDATE exceptions SET version=version+1,updated_at=?,last_action_hash=? WHERE id=?",
+                       (now, digest, object_id))
     updated = connection.execute("SELECT * FROM exceptions WHERE id=?", (object_id,)).fetchone()
     result = _exception_payload(connection, updated)
     audit_event(connection, actor_id=actor["id"], action=f"exception.{action}", outcome="succeeded", reason=reason,
                 subject_id=object_id, scope_id=result["finding"]["subject"]["scope_id"],
                 details={"before": dict(row), "after": dict(updated), "run_id": row["run_id"], "finding_id": row["finding_id"]})
-    return result
+    return {**result, "replay": False}

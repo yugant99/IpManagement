@@ -189,12 +189,20 @@ def create_app() -> FastAPI:
                     actor_id = "unknown"
                 def record_failure(connection):
                     fields = ("pool_id", "scope_id", "candidate", "pool_version", "baseline_version", "idempotency_key",
-                              "expected_baseline_version", "expected_version", "expected_parent_version", "parent_id", "cidr", "action")
+                              "expected_baseline_version", "expected_version", "expected_parent_version", "parent_id", "cidr", "action",
+                              "source_run_id", "source_finding_id")
                     context = {key: value for key, value in payload.items() if key in fields and (
                         type(value) in (int, bool) or isinstance(value, str) and len(value) <= 500)}
                     if action == "allocation_decision" and subject_id:
                         try:
                             saved = workflow.get_request(connection, subject_id)
+                            context.update({key: saved[key] for key in fields if key in saved})
+                        except AppError as missing:
+                            if missing.code != "NOT_FOUND":
+                                raise
+                    if action == "correction_decision" and subject_id:
+                        try:
+                            saved = inventory_commands.get_correction(connection, subject_id)
                             context.update({key: saved[key] for key in fields if key in saved})
                         except AppError as missing:
                             if missing.code != "NOT_FOUND":
@@ -206,7 +214,7 @@ def create_app() -> FastAPI:
                     return workflow.audit_event(
                         connection, actor_id=actor_id, action=action, outcome="failed",
                         reason=f"{error.code}: {error.message}", subject_id=subject_id,
-                        request_id=subject_id if action.startswith("allocation") else None,
+                        request_id=subject_id if action.startswith(("allocation", "correction")) else None,
                         scope_id=context.get("scope_id"), pool_id=context.get("pool_id"), address=context.get("candidate"),
                         details={"error_code": error.code, "error_details": {key: value for key, value in error.details.items() if key != "audit_recorded"},
                                  "attempt": context, "http_request_id": request.state.request_id})
@@ -270,6 +278,31 @@ def create_app() -> FastAPI:
     @app.get("/api/workflow")
     def workflow_status(connection=Depends(database)):
         return workflow.workflow_status(connection)
+
+    @app.get("/api/correction-context")
+    def correction_context(run_id: UUID, finding_id: UUID, connection=Depends(database)):
+        return inventory_commands.correction_context(connection, str(run_id), str(finding_id))
+
+    @app.get("/api/correction-requests")
+    def correction_requests(limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+        return inventory.page(inventory_commands.list_corrections(connection), limit, offset)
+
+    @app.post("/api/correction-requests", status_code=201)
+    def create_correction(request: Request, payload: dict):
+        result, replay = audited_write(request, payload, "correction_request",
+            lambda connection: inventory_commands.create_correction(connection, payload))
+        return JSONResponse(result, status_code=200 if replay else 201,
+                            headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.get("/api/correction-requests/{object_id}")
+    def get_correction(object_id: UUID, connection=Depends(database)):
+        return inventory_commands.get_correction(connection, str(object_id))
+
+    @app.post("/api/correction-requests/{object_id}/decision")
+    def decide_correction(object_id: UUID, request: Request, payload: dict):
+        result, replay = audited_write(request, payload, "correction_decision",
+            lambda connection: inventory_commands.decide_correction(connection, str(object_id), payload), str(object_id))
+        return JSONResponse(result, headers={"X-Decision-Replay": str(replay).lower()})
 
     @app.get("/api/allocation-requests")
     def requests(limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
