@@ -307,7 +307,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
             <button type="button" className="secondary" disabled={locked || !mayDecide || !decisionReason.trim()} onClick={() => decide("reject")}>Reject proposal</button></div>
           {!mayDecide && <p className="filter-help">Select a different actor with approval permission.</p>}</>}
         <FindingEvidence finding={selected.source_finding} title="Original evidence attached to the proposal" />
-        {selected.result_finding ? <FindingEvidence finding={selected.result_finding} title="First comparable result after approval — retained" />
+        {selected.result_finding ? <FindingEvidence finding={selected.result_finding} title="First result after approval — retained" />
           : <p>No comparable result is linked to this correction yet. Approval alone does not establish finding resolution.</p>}
         <p className="quiet">The first linked result is retained. The latest evidence below is evaluated separately and can change after another reconciliation.</p>
         <section className="detail-section"><h3>Latest saved post-approval evidence</h3>
@@ -320,7 +320,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
     </section>
 
     <section className="path-step" aria-labelledby="correction-outcome-heading"><h2 id="correction-outcome-heading">4. Reconcile actual inventory and inspect the outcome</h2>
-      <p>Reconciliation reads the stored inventory and source evidence. It saves a new run and links pending approved corrections to their first subsequent comparable finding. It does not advance the synthetic clock.</p>
+      <p>Reconciliation reads the stored inventory and source evidence. It saves a new run and links pending approved corrections to their first subsequent saved run, evaluated for comparability. It does not advance the synthetic clock.</p>
       <button type="button" disabled={locked || selected?.state !== "approved"} onClick={() => void reconcile()}>Reconcile stored inventory</button>
       <p className="quiet">A new prefix has no intended announcement policy. Its missing-route result can remain unknown even after a perimeter discrepancy becomes healthy. No pool or external provisioning is created.</p>
     </section>
