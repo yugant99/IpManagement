@@ -1,0 +1,14 @@
+Supported launcher: `uv run --no-sync python -m ipam_demo serve --host 127.0.0.1 --port 8765`
+Candidate store: `/private/tmp/ipam-easy-wins-browser.7d5s14`
+Command path: GET /api/schedule -> POST /api/schedule -> GET /api/audit/export?subject_id=synthetic-schedule
+
+Response header:
+X-Request-ID: dbcb9bb7-e6aa-417d-93b3-9fc048234167
+
+Supported-launcher access log:
+INFO:ipam_demo:HTTP POST /api/schedule status=200 request_id=dbcb9bb7-e6aa-417d-93b3-9fc048234167
+
+Persisted audit CSV row (sanitized):
+action=schedule.configure,outcome=saved,reason=supported CLI schedule correlation,request_id=(empty),details.http_request_id=dbcb9bb7-e6aa-417d-93b3-9fc048234167
+
+The CSV was nonempty and the response/header ID, access log ID and persisted audit detail matched exactly. The service was stopped after capture.
