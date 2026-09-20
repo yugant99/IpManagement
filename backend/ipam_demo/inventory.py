@@ -42,9 +42,10 @@ def page(items: list, limit: int, offset: int) -> dict:
     return {"items": items[offset:offset + limit], "total": len(items), "limit": limit, "offset": offset}
 
 
-def prefixes(connection, *, scope_id=None, family=None, owner=None, tag=None, q=None) -> list:
+def prefixes(connection, *, scope_id=None, family=None, owner=None, tag=None,
+             domain=None, region=None, q=None) -> list:
     rows = connection.execute(
-        "SELECT p.*, s.name AS scope_name FROM prefixes p JOIN scopes s ON s.id=p.scope_id "
+        "SELECT p.*, s.name AS scope_name, s.domain, s.region FROM prefixes p JOIN scopes s ON s.id=p.scope_id "
         "ORDER BY p.scope_id, p.family, p.network_hex, p.prefix_length, p.id"
     )
     # Small, bounded demo ledger. IP/CIDR filtering uses real address arithmetic.
@@ -58,6 +59,10 @@ def prefixes(connection, *, scope_id=None, family=None, owner=None, tag=None, q=
     for row in rows:
         item = prefix_payload(row)
         if scope_id and item["scope_id"] != scope_id:
+            continue
+        if domain and row["domain"].casefold() != domain.casefold():
+            continue
+        if region and row["region"].casefold() != region.casefold():
             continue
         if family and item["family"] != family:
             continue
@@ -75,11 +80,16 @@ def prefixes(connection, *, scope_id=None, family=None, owner=None, tag=None, q=
     return result
 
 
-def pools(connection, *, scope_id=None, prefix_id=None) -> list:
-    rows = connection.execute("SELECT * FROM pools ORDER BY scope_id, prefix_id, id")
+def pools(connection, *, scope_id=None, prefix_id=None, domain=None, region=None) -> list:
+    rows = connection.execute(
+        "SELECT p.*, s.domain, s.region FROM pools p JOIN scopes s ON s.id=p.scope_id "
+        "ORDER BY p.scope_id, p.prefix_id, p.id"
+    )
     return [pool_payload(row) for row in rows
             if (not scope_id or row["scope_id"] == scope_id)
-            and (not prefix_id or row["prefix_id"] == prefix_id)]
+            and (not prefix_id or row["prefix_id"] == prefix_id)
+            and (not domain or row["domain"].casefold() == domain.casefold())
+            and (not region or row["region"].casefold() == region.casefold())]
 
 
 def allocations(connection, *, scope_id=None, prefix_id=None, pool_id=None, q=None) -> list:
