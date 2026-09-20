@@ -177,7 +177,8 @@ def _install_seed(directory, envelope) -> dict:
                                     json.dumps(record["custom_fields"]), record["version"], origin(record)))
             for record in envelope["pools"]:
                 family = next(p["family"] for p in envelope["prefixes"] if p["id"] == record["prefix_id"])
-                connection.execute("INSERT INTO pools VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                connection.execute("INSERT INTO pools (id,scope_id,prefix_id,family,name,management_mode,"
+                                   "allocation_authority,ranges,exclusions,pool_version,origin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                    (record["id"], record["scope_id"], record["prefix_id"], family, record["name"],
                                     record["management_mode"], record["allocation_authority"], json.dumps(record["ranges"]),
                                     json.dumps(record["exclusions"]), record["pool_version"], origin(record)))
