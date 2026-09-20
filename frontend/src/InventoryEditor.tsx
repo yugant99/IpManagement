@@ -35,6 +35,8 @@ function PrefixCommandForm({ context, actors, onSaved }: { context: EditContext;
   const previewOperation = useRef<AbortController | null>(null);
   const populated = Boolean(context.children_count || prefix.pools.length || prefix.allocations.length);
   const actor = actors.find((item) => item.id === actorId);
+  const structuralChange = mode === "child" || cidr.trim() !== prefix.cidr;
+  const affectedPools = context.history_impact?.structural;
 
   useEffect(() => () => { operation.current?.abort(); previewOperation.current?.abort(); }, []);
 
@@ -69,6 +71,10 @@ function PrefixCommandForm({ context, actors, onSaved }: { context: EditContext;
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
+    if (structuralChange && !affectedPools) {
+      setError(new ApiError("History impact is unavailable. Reload saved inventory before changing prefix structure.", "INCOMPLETE_RESPONSE"));
+      return;
+    }
     const names = fields.map(([key]) => key.trim());
     if (new Set(names).size !== names.length || names.some((key) => !key)) {
       setError(new ApiError("Custom field names must be distinct and nonempty.", "INVALID_INPUT"));
@@ -129,7 +135,15 @@ function PrefixCommandForm({ context, actors, onSaved }: { context: EditContext;
         </div>)}
         <button type="button" className="secondary" disabled={fields.length >= 32} onClick={() => setFields((current) => [...current, ["", ""]])}>Add metadata field</button>
         <label className="field-label">Reason for this change<input required maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
-        <button type="submit" disabled={!actor?.permissions.includes("inventory_edit") || !cidr.trim()}>{busy ? "Saving intended inventory…" : mode === "child" ? "Save child prefix" : "Save prefix changes"}</button>
+        <div className={structuralChange ? "run-warning" : "quiet"} role="status">
+          {!structuralChange ? <p>Changing only owner, purpose, tags or custom metadata preserves eligible historical p95 and forecast. Existing evidence requirements still apply.</p> : !affectedPools ?
+            <p>The server did not provide the affected-pool review. Reload saved inventory before creating a child or changing prefix bounds. Metadata corrections remain available.</p> : affectedPools.length > 0 ? <>
+              <p>{mode === "child" ? "Creating this child changes relevant prefix structure and invalidates" : "If the submitted CIDR changes prefix bounds, it invalidates"} historical p95 and forecast eligibility for these pools on this prefix or its ancestors:</p>
+              <ul>{affectedPools.map((pool) => <li key={pool.pool_id}>{pool.name} · <code>{pool.cidr}</code></li>)}</ul>
+              <p>Current occupancy may remain available, and positive lease evidence can still show activity. Previously saved runs remain unchanged.</p>
+            </> : <p>The server lists no affected pools for {mode === "child" ? "this child creation" : "a bounds change to this prefix"} at the reviewed inventory version. Previously saved runs remain unchanged.</p>}
+        </div>
+        <button type="submit" disabled={!actor?.permissions.includes("inventory_edit") || !cidr.trim() || (structuralChange && !affectedPools)}>{busy ? "Saving intended inventory…" : mode === "child" ? "Save child prefix" : "Save prefix changes"}</button>
       </fieldset>
     </form>
     {error && <><ErrorNotice error={error} /><p className="run-warning">No write is confirmed by this response. Reload saved inventory before retrying; a timed-out request may have committed. Stale changes require a new review.</p></>}

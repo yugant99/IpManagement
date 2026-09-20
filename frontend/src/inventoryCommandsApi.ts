@@ -14,6 +14,10 @@ export interface EditContext {
   scope: Scope;
   baseline_version: number;
   children_count: number;
+  history_impact: {
+    metadata: [];
+    structural: { pool_id: string; name: string; cidr: string }[];
+  };
 }
 
 export interface ChildPreview {
