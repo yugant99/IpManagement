@@ -13,6 +13,59 @@ from .inventory import pools
 RULE_VERSION = 1
 
 
+def comparable_findings(before, after):
+    """Identity/definition compatibility only; healthy evidence must resolve separately."""
+    if before is None or after is None:
+        return False
+    for field in ("rule_id", "rule_version"):
+        if before.get(field) is None or before.get(field) != after.get(field):
+            return False
+    left, right = before.get("subject", {}), after.get("subject", {})
+    for field in ("id", "scope_id", "family", "cidr"):
+        if left.get(field) is None or left.get(field) != right.get(field):
+            return False
+    return left.get("kind", "prefix") == right.get("kind", "prefix")
+
+
+def discrepancy_keys(finding):
+    """Current positive semantic atoms; the queue owns episode union and notification."""
+    if finding["evidence_state"] != "anomalous":
+        return []
+    rule = finding["rule_id"]
+    policy = finding.get("policy") or {}
+    observations = finding.get("observations", [])
+    atoms = []
+    if rule == "ghost_scope":
+        atoms = [["address", str(ip_address(item["address"]))] for item in observations]
+    elif rule == "unregistered_managed_route":
+        atoms = [["cidr", str(ip_network(item["cidr"]))] for item in observations]
+    elif rule == "assignment_conflict":
+        atoms = [["address_clients", str(ip_address(item["address"])), sorted(set(item["clients"]))]
+                 for item in observations]
+    elif rule == "pool_assignment_discrepancy":
+        atoms = [["dhcp_claim", str(ip_address(item["address"])), item["client_id"]] for item in observations]
+    elif rule == "metadata_gap":
+        atoms = [["missing_field", field] for field in policy["missing_fields"]]
+    elif rule == "pool_pressure":
+        if policy.get("p95_branch") is True:
+            atoms.append(["p95_at_least", policy["p95_at_least_pct"]])
+        if policy.get("forecast_branch") is True:
+            atoms.append(["forecast_below", policy["forecast_below_days"]])
+    elif rule == "oversized_pool":
+        atoms = [["p95_below", policy["p95_below_pct"], policy["required_samples"]]]
+    elif rule == "zombie_candidate":
+        atoms = [["announced_without_lease_overlap", policy["zero_lease_days"], policy["route_match_policy"]]]
+    elif rule == "missing_expected_route":
+        atoms = [["missing_expected_route", policy["route_match_policy"]]]
+    else:
+        raise ValueError("No material-discrepancy identity is defined for rule: " + rule)
+    # Geometry is material, while concurrency tokens, generated IDs, renewal
+    # windows, provenance timestamps and numeric utilization jitter are not.
+    cidr = str(ip_network(finding["subject"]["cidr"]))
+    return sorted({json.dumps([rule, cidr, atom], sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+                   for atom in atoms})
+
+
 def _finding(run_id, clock_text, rule, subject, references, coverage, severity="high"):
     return {"id": str(uuid4()), "run_id": run_id, "rule_id": rule, "rule_version": RULE_VERSION,
             "subject": subject, "severity": severity, "evidence_state": "unknown",
