@@ -1,6 +1,6 @@
 # S5-09 supplemental process observations
 
-**Three targeted scenarios observed pass; awaiting lead acceptance.** Candidate `a279f32df0ac7d2147b580dbff36dd88772bdeb2`, read-only worktree `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-gap-process-checks`. Successful run: 2026-09-20 00:54:36–00:55:00 UTC (2026-09-19 local). The 35 assertions support these three scenarios, not additional questionnaire or catalog counts.
+**Three targeted scenarios observed pass; accepted by Main Lead 2.0 after independent artifact review on 2026-09-19.** Candidate `a279f32df0ac7d2147b580dbff36dd88772bdeb2`, read-only worktree `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-gap-process-checks`. Successful run: 2026-09-20 00:54:36–00:55:00 UTC (2026-09-19 local). The 35 assertions support these three scenarios, not additional questionnaire or catalog counts.
 
 Local evidence root:
 
@@ -22,7 +22,7 @@ The ordinary SQLite writer blocked the separate failure-record transaction for i
 
 Releasing the ordinary barrier committed exactly one ordinary run (`9e8fd96b-d30a-4cbe-9370-cb338f45fe56`), with no source acquisition, cursor/clock advancement or operation record. A wake at the same controlled instant made no new timer attempt. Moving to the guarded later deadline yielded one cycle-2 acquisition (`5325993e-7ef9-4fe3-b986-642043a6529b`, run `a472938a-55bc-48ce-b5db-6254c1020432`), adding nine batches and one acquired run. This establishes forward recovery without falsely claiming the blocked audit was saved.
 
-The owned process stopped, and an independent process acquired its data lock after exit. Its retained controlled-time store is evidence, not a presentation store; do not start it casually with its saved timer settings.
+Scheduling was disabled and the owned process stopped; an independent process acquired its data lock after exit. Final state is disabled, configuration 3, cursor 2, null due. Its retained controlled-time store is evidence, not a presentation store.
 
 ## Actual OS signals during acquisition
 
@@ -43,6 +43,8 @@ These cases demonstrate the **finish-and-commit** shutdown branch. They do not c
 
 The first ordinary-run attempt paused after the large saved-run/queue writes. With those writes pending, SQLite also blocked the timer's initial status read, so it reported `STORE_BUSY` before reaching the expected acquisition/failure-record marker. The observer timed out waiting for that marker. This was an incorrect barrier assumption, not evidence of an application defect. The original attempt, logs, traceback and stopped process remain retained.
 
-One fresh attempt moved the ordinary barrier earlier, after actual pool calculation within the same real API transaction. The three successful scenarios above then ran once. No application source was changed or broad passing suite rerun. All successful-run child processes and the initial-attempt child are stopped; no broad process cleanup occurred.
+One fresh attempt moved the ordinary barrier earlier, after actual pool calculation within the same real API transaction. The three successful scenarios above then ran once. No application source was changed or broad passing suite rerun. All five successful-run child processes and the initial-attempt child are stopped; no broad process cleanup occurred. The three completed-case stores finish disabled/configuration 3/null due (ordinary cursor 2; signal cases cursor 1). **Do not start the retained first-attempt store:** it remains enabled/configuration 2/cursor 1 with controlled due `2031-01-01T01:00:00.000Z`.
+
+Independent read-only review recounted 13 ordinary/timer, 11 SIGTERM and 11 SIGINT assertions; matched actual receipt IDs to operation and saved-run selected batches; and confirmed all 15 tables unchanged across each restart. `supporting-stopped-state.json` records final-state checks and `artifact-sha256.json` pins 31 retained artifacts. This review did not rerun application behavior.
 
 Historical S5-09 remains recorded as partial in its original report. These specifically missing observations are a separate lead-review addendum, not evidence for all untested scheduler/filesystem/exhaustion/portable branches.

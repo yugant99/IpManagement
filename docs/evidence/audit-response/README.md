@@ -8,8 +8,8 @@ Stage 5 task `01a0baff-2143-7073-ad3d-4963a9cc0ca5` owns this ledger, `docs/DEMO
 
 | Evidence | Candidate | State |
 |---|---|---|
-| [S5-15 missing asset/first-path cases](source-refusals.md) | `a279f32df0ac7d2147b580dbff36dd88772bdeb2` | Observed; new supplemental evidence |
-| [Active ordinary reconciliation versus timer and actual OS shutdown](process-gaps.md) | Same baseline, separate read-only source worktree | Observed; new supplemental evidence |
+| [S5-15 missing asset/first-path cases](source-refusals.md) | `a279f32df0ac7d2147b580dbff36dd88772bdeb2` | Lead accepted after independent artifact review; new supplemental evidence |
+| [Active ordinary reconciliation versus timer and actual OS shutdown](process-gaps.md) | Same baseline, separate read-only source worktree | Lead accepted after independent artifact review; new supplemental evidence |
 | [Focused F1–F5 acceptance plan](focused-plan.md) | Await reviewed integrated candidate | Planned; owner evidence will be reused where sufficient |
 | [Native demo runbook](../../DEMO_RUNBOOK.md) | Await reviewed integrated candidate | Preparation draft; no final rehearsal/readiness claim |
 | Schema/state compatibility | Foundation-owned exact candidate | Owner evidence pending |

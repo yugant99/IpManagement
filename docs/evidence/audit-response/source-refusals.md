@@ -1,6 +1,6 @@
 # S5-15 supplemental observations: prior-success assets and first-path authority
 
-**Observed pass, awaiting lead acceptance.** Exact application baseline: `a279f32df0ac7d2147b580dbff36dd88772bdeb2`. Executed on 2026-09-19 local time (2026-09-20 00:53 UTC). This closes the two specifically missing source-refusal observations as new evidence; it does not rewrite the historical S5-15 partial record or substitute for final F1–F7 rehearsal.
+**Observed pass; accepted by Main Lead 2.0 after independent artifact review on 2026-09-19.** Exact application baseline: `a279f32df0ac7d2147b580dbff36dd88772bdeb2`. Executed on 2026-09-19 local time (2026-09-20 00:53 UTC). This closes the two specifically missing source-refusal observations as new evidence; it does not rewrite the historical S5-15 partial record or substitute for final F1–F7 rehearsal.
 
 Observer: external stdlib Python harness driving the actual installed CLI and localhost HTTP API on port `18874`. A newly locked environment imports this acceptance checkout and its producer; `import-origins.txt` records both paths. No production monkeypatch, fixture expected-answer input, application edit or frontend build was involved. The absent new static build is intentionally not a UI readiness claim.
 
@@ -43,4 +43,4 @@ For both, GET eligibility, enable and new Run now refused scheduling. Only expli
 
 Evidence subdirectories: `first-path-baseline/`, `first-path-rich-authority/`. Services were stopped with SIGINT after requests completed; this is cleanup, not the separate in-flight OS-shutdown proof.
 
-No observer failures occurred in this S5-15 run. These checks do not cover every filesystem failure, feed exhaustion, real-time endurance, live source or portable runtime condition.
+Independent read-only review compared retained snapshots and corroborated all 34 assertions, the exact two added failure audits per refusal pair and all six zero-exit shutdowns. The pristine recovery's single observed advance added 9 batches, 12 coverage rows, 2,272 source records, 1 run, 1 operation and 1 success audit. The cycle-2 key itself was not replayed; the prior cycle-1 key was replayed twice. No observer failures occurred in this S5-15 run. These checks do not cover every filesystem failure, feed exhaustion, real-time endurance, live source or portable runtime condition.

@@ -1,6 +1,6 @@
 # Stage 5 — F1–F7 acceptance follow-up
 
-**Checkpoint only: missing baseline cases observed; final integrated rehearsal pending.** Worker task `01a0baff-2143-7073-ad3d-4963a9cc0ca5` remains the acceptance/rehearsal owner. Main Lead 2.0 `01a0bb80-cf0d-7f60-8e46-1e825f42d276` owns review, integration and global accounting. This worker does not declare global completion or replace the lead.
+**Checkpoint only: missing baseline cases accepted by the lead after independent artifact review; final integrated rehearsal pending.** Worker task `01a0baff-2143-7073-ad3d-4963a9cc0ca5` remains the acceptance/rehearsal owner. Main Lead 2.0 `01a0bb80-cf0d-7f60-8e46-1e825f42d276` owns review, integration and global accounting. This worker does not declare global completion or replace the lead.
 
 ## Source and ownership
 
@@ -21,7 +21,7 @@ The latest user grant explicitly authorizes focused local tests, necessary build
 | Active ordinary reconciliation versus timer | [S5-09 process cases](../evidence/audit-response/process-gaps.md) | Real HTTP transaction blocked timer and failure-audit persistence; loss visible, retry guard prevented immediate loop, later controlled acquisition succeeded |
 | Actual OS shutdown during acquisition | Same evidence | SIGTERM and SIGINT held data lock until acquisition completion/join; atomic committed state and unchanged controlled restart observed |
 
-S5-15: 34 assertions across four refusal variants/recovery, six services stopped. S5-09: 35 assertions across three targeted scenarios; first-attempt observer barrier correction is disclosed and retained. Assertions are not additional acceptance-case/requirement counts. All owned processes are stopped.
+S5-15: 34 assertions across four refusal variants/recovery, six services stopped. S5-09: 35 assertions across three targeted scenarios; first-attempt observer barrier correction is disclosed and retained. Assertions are not additional acceptance-case/requirement counts. All owned processes are stopped. Main Lead 2.0 accepted these bounded baseline observations on 2026-09-19; unchanged scheduler behavior does not need a rerun merely for a new task. Only the failed observer's stopped controlled-time store remains enabled and is excluded from demo use.
 
 ## Final acceptance still to perform
 
