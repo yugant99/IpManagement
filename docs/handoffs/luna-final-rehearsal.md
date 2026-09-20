@@ -1,6 +1,6 @@
 # Luna final native rehearsal handoff
 
-Status: completed focused procedural evidence; F4 presentation readiness remains pending the separately dispatched agent reproduction. This is not portable Linux/container acceptance and not human presenter acceptance.
+Status: completed focused procedural evidence; the separate agent reproduction is complete with explicit preset/browser limitations, so F4 presentation readiness remains pending. This is not portable Linux/container acceptance and not human presenter acceptance.
 
 ## Checkpoint
 
@@ -37,6 +37,7 @@ API request/response records, browser observations, semantic snapshots, exports 
 ## Limits and defects
 
 - This was an agent procedural reproduction, not a human presenter/recipient walkthrough.
+- Separate reproduction: `/Users/yuganthareshsoni/Documents/Codex/2026-09-19/luna-independent-reproduction-20260919/outputs/independent-agent-procedural-reproduction.md`, using `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-independent-agent-reproduction-20260919`. It verified stopped restore, health, disabled cycle 1, initial run and Central `.240.10` via API, then stopped cleanly. The pristine snapshot has no report preset; browser selection was not completed after an AX/session interruption. This is partial independent agent evidence, not human acceptance.
 - No portable Linux/container/recipient startup or external provisioning was established; downstream provisioning remained simulated.
 - The first recorder restart did not persist its child after shell exit; a foreground owned session was used thereafter. This is a recorder/process-lifecycle defect, not an observed application defect.
 - One intentional allocation attempt used occupied `10.40.2.2` and correctly returned `CANDIDATE_OCCUPIED`; the successful request used free `10.40.2.3`.
