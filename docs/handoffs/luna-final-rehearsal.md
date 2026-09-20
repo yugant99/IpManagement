@@ -1,6 +1,6 @@
 # Luna final native rehearsal handoff
 
-Status: completed focused rehearsal; ready for project-lead review. This is procedural native evidence, not portable Linux/container acceptance and not human presenter acceptance.
+Status: completed focused procedural evidence; F4 presentation readiness remains pending the separately dispatched agent reproduction. This is not portable Linux/container acceptance and not human presenter acceptance.
 
 ## Checkpoint
 
@@ -21,10 +21,10 @@ No application source was changed. The branch adds this sanitized handoff only.
 - Controlled acquisitions: cycle 2 `e25f6397-0f9e-4257-8d9d-4e51f9553230`, cycle 3 `c8101c55-e53e-43cb-aa93-960c852da420`, cycle 4 `5b1e253c-7e7b-4bd1-b757-979685cc07fd` (North anomaly), cycle 5 `efadc3fa-b215-4f6a-b191-37892786d432` (North unknown/partial), cycle 6 `82e4a57f-d357-4153-814a-dc874cd64ba6` (North healthy and new Central `.243.10` ghost).
 - Central `.243.10`: finding `ed9551be-2a8a-490a-9fdc-47a9dae687a6`, correction `0fc0e038-4632-453c-906d-f7013f7c586b`, reconciliation `ddd4afac-ca8a-435a-b60c-dee0586a3895`; both `.240` and `.243` were covered before closure.
 - Allocation: request `a8ace63c-3893-465c-90b0-80840e073aae`, local allocation `68b33058-8ca3-4e71-8c76-eac7ef78545b`, candidate `10.40.2.3`; downstream status was explicitly `simulated_success`.
-- Final cycle 7: operation `936322a6-e1de-4494-815f-2e31dcd7ea0c`, run `ab3ae7bd-5ed1-454c-9cc1-80d07f96d210`, clock `2026-09-02T18:00:00.000Z`. Final preset revision: `fffa84479ab3406d119f068a416921d53a7222eaa024fe314d5d70dcc2b57831`.
+- Final cycle 7: operation `936322a6-e1de-4494-815f-2e31dcd7ea0c`, run `ab3ae7bd-5ed1-454c-9cc1-80d07f96d210`, clock `2026-09-02T18:00:00.000Z`. Central ghost evidence was `unknown` under stale/incomplete source evidence; the application did not reuse an older healthy result. Final preset revision: `fffa84479ab3406d119f068a416921d53a7222eaa024fe314d5d70dcc2b57831`.
 - Initial preset revision: `7232911f9ebb408e473a951987667d00539ca8e3285aaa9128725431eef2b089`.
 
-API request/response records, browser observations, semantic snapshots, exports and command logs are retained under the private raw evidence root. The browser observation after recovery visibly showed the restored synthetic inventory (60 prefixes) and the UI disclaimer that it is intended inventory, not live-use evidence.
+API request/response records, browser observations, semantic snapshots, exports and command logs are retained under the private raw evidence root. Named restore and browser records are `commands/final-restore.json` and `browser-restored-observation.json`; the browser observation after recovery visibly showed the restored synthetic inventory (60 prefixes) and the UI disclaimer that it is intended inventory, not live-use evidence.
 
 ## Snapshots and recovery
 
@@ -32,7 +32,7 @@ API request/response records, browser observations, semantic snapshots, exports 
 - Final evidence snapshot: `snapshots/demo-final-evidence-cycle7.sqlite3`, SHA-256 `e5e50c01b4a7bc8a561b9ba4c2bcc96f317e165e3385b8e7ce39457148946a2d`.
 - Restore completed while stopped: `database_replaced:true`, schema 5, `migration_required:false`.
 - Rehearsal state was preserved at `data/ipam_demo.before-restore-20260920T012552-1896cd02967a4e18a754b50ec0ca27ed.sqlite3`.
-- Restored state was left stopped after the final UI observation; scheduler remains disabled in the restored cycle-1 baseline.
+- Restored state was left stopped after the final UI observation; scheduler remains disabled in the restored cycle-1 baseline. `snapshots/restored-semantic-comparison.json` compares 16 application tables plus `sqlite_sequence`; restored rows match the initial snapshot and the preserved final database differs as expected.
 
 ## Limits and defects
 

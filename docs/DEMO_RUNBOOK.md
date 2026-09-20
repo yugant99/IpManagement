@@ -1,6 +1,6 @@
-# Native local demo — preparation draft
+# Native local demo — completed rehearsal record
 
-**Not yet rehearsed or ready for presentation.** This draft supports the authorized F1–F7 response on the presenting Mac. Fill the candidate, paths, IDs and evidence below after reviewed integration; then perform one connected rehearsal. Commands here describe existing native interfaces, not actions performed while writing this document. New correction and exception UI labels remain pending inspection of the integrated candidate.
+**Focused agent procedural evidence completed on 2026-09-19/20.** F4 presentation readiness remains pending the separate-copy agent reproduction below. This runbook records the actual native candidate, paths, IDs and evidence. It is not human presenter acceptance or portable deployment acceptance.
 
 Stage 5 owns this native demo procedure and focused evidence. Main Lead 2.0 accepts the candidate. Stage 4 owns shared schema/migration; Foundation owns state-command compatibility. Spencer retains packaging, `docs/RUNNING.md`, `scripts/ops/` and portable recipient delivery. An unregistered package checkpoint is a visibility gap, not proof that Spencer has done no work.
 
@@ -8,25 +8,31 @@ Stage 5 owns this native demo procedure and focused evidence. Main Lead 2.0 acce
 
 | Item | Required value / current state |
 |---|---|
-| Reviewed application SHA and PRs | **Pending**; do not substitute a moving branch or mix worker heads |
-| Presenting Mac and operator | **Pending**; record macOS/architecture and operator |
-| `DEMO_CHECKOUT` | **Pending** absolute checkout of that exact candidate |
-| `DEMO_ROOT` | **Pending** new absolute local directory for this demo's environment, data, snapshots and evidence |
-| `DEMO_NODE_BIN` | **Pending** absolute directory containing supported Node/npm executables |
-| `DEMO_PORT` | **Pending** unused loopback port; do not stop another owner's listener |
-| Python / Node / npm / uv paths and versions | **Pending refresh**; historical working versions were 3.12.10 / 22.14.0 / 10.9.2 / 0.7.13 |
-| Installed package origin, locks, compiled UI | **Pending** candidate paths and hashes; Python requires 3.12, Node 22.12+ within major 22 or major 24, npm 10.9.2 |
-| Schema version / migration compatibility | Schema v5 specified in the lead contract; **pending** reviewed implementation and Foundation evidence |
-| Initial prepared snapshot path and SHA256 | **Pending** `demo-initial-cycle1.sqlite3`, standalone, disabled, before corrections or allocation |
-| Final evidence snapshot path and SHA256 | **Pending** distinct `demo-final-evidence-cycle7.sqlite3`, preserving the completed rehearsal before recovery |
-| Ready-state schedule | **Pending observed** disabled, null due, no in-flight work, cycle 1; record config version and scenario clock |
-| Run IDs | **Pending** every acquisition cycle 1–7 plus ordinary correction/metadata reconciliation runs |
-| Report preset | **Pending** initial cycle-1 run/revision and later updated final cycle-7 run/revision; record name, filters and columns for both |
-| Correction / finding / audit / exception IDs | **Pending** actual retained identities from the final candidate |
-| Native rehearsal / independent walkthrough | **Pending** evidence paths, operator and result; human versus agent explicitly identified |
-| Spencer checkpoint / portable acceptance | **Pending registration or refresh** / not established by native success |
+| Reviewed application SHA and PRs | Candidate `289f53c7c5db1bd414c938add1ea207d591f9e64`; acceptance base `94a34b8a35d631b3b9b5bb987ba458f73484c324`; docs PR #47 |
+| Presenting Mac and operator | macOS 14.5 arm64; Codex Luna agent procedural operator |
+| `DEMO_CHECKOUT` | `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-acceptance` |
+| `DEMO_ROOT` | `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-artifacts/run-20260919-zzeadfai/final-rehearsal` |
+| `DEMO_NODE_BIN` | Existing supported Node 22.14.0 installation on PATH; no reinstall performed |
+| `DEMO_PORT` | `18880`, loopback only; owned service PID 3112 initially, later foreground PID 5733/6591 |
+| Python / Node / npm / uv paths and versions | Python `.../environment/bin/python` 3.12.10; Node 22.14.0; npm 10.9.2; uv 0.7.13 |
+| Installed package origin, locks, compiled UI | Frozen environment under `final-rehearsal/environment`; static candidate `frontend/dist`; identity hashes retained in `identity.json` |
+| Schema version / migration compatibility | Schema v5; restore reported `migration_required:false` |
+| Initial prepared snapshot path and SHA256 | `snapshots/demo-initial-cycle1.sqlite3`; `8f652f649c36af0a0d515098e3c2c32fea1a8a437eec3e2599b6978fea5e0239` |
+| Final evidence snapshot path and SHA256 | `snapshots/demo-final-evidence-cycle7.sqlite3`; `e5e50c01b4a7bc8a561b9ba4c2bcc96f317e165e3385b8e7ce39457148946a2d` |
+| Ready-state schedule | Observed disabled, config version 1, null due, no in-flight work, cycle 1 at `2026-09-01T06:00:00.000Z` |
+| Run IDs | Cycle 1 `004246ef`; cycle 2 `e25f6397`; cycle 3 `c8101c55`; cycle 4 `5b1e253c`; cycle 5 `efadc3fa`; cycle 6 `82e4a57f`; cycle 7 `ab3ae7bd`; full IDs in the evidence handoff |
+| Report preset | Initial revision `7232911f...2b089`; final revision `fffa8447...57831`; both used all eight supported columns and empty filters |
+| Correction / finding / audit / exception IDs | Exact IDs are recorded in `docs/handoffs/luna-final-rehearsal.md` and raw HTTP records; no IDs are invented here |
+| Native rehearsal / independent walkthrough | Primary agent procedural evidence is complete; independent second-agent reproduction is dispatched and remains pending |
+| Spencer checkpoint / portable acceptance | Not established by native success; remains separate |
 
 Keep absolute machine paths, process IDs and raw synthetic stores in a local execution record. Public handoffs may reference sanitized evidence and synthetic IDs; do not commit databases, private assessment, customer material or credentials. Preserve historical Stage 5 evidence at `Ip_inventory-stage-5-artifacts/run-20260919-O8RVgx` unchanged. Never use one of its stores as the working demo directory, and do not start its enabled scheduler-harness stores.
+
+## Completed evidence boundary
+
+The primary rehearsal used both browser and API evidence. Browser observations covered restored startup, `/healthz`, rendered inventory, the intended-inventory disclaimer and the 60-prefix listing; the named record is `browser-restored-observation.json`. Mutating workflow actions were recorded through the native API recorder under `http/`; this includes correction proposals/decisions, exception actions, metadata edit, reconciliations, acquisitions, allocation, presets and all three exports. The browser did not submit the mutating story, so this record must not claim that every action was clicked through the UI.
+
+The private evidence root is `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-artifacts/run-20260919-zzeadfai/final-rehearsal`. It contains `identity.json`, `observations.json`, `cycles.json`, HTTP responses, command logs, semantic snapshots and restore records. The faithful restore output is `commands/final-restore.json`; the final evidence database was preserved by restore at `data/ipam_demo.before-restore-20260920T012552-1896cd02967a4e18a754b50ec0ca27ed.sqlite3`.
 
 ## Prepare the reviewed candidate once
 
@@ -103,7 +109,7 @@ The destination must be new; do not overwrite an earlier snapshot. Record the ex
 
 ## One integrated rehearsal after review
 
-Complete the candidate/ID table and replace pending new-control descriptions with their observed labels before handing this to a presenter. Capture real UI/API actions and outcomes; do not invent routes or claim a planned action ran.
+For a future human presenter, use the completed candidate/ID table above and the observed labels below. Capture any additional UI/API actions and outcomes; do not invent routes or claim a planned action ran.
 
 1. **Orient and handle the original case.** Start the prepared state, confirm disabled cycle 1, open the pinned fresh run and inspect Central `.240.10` source provenance. Show original saved evidence separately from latest evidence. On that case exercise owner escalation, handoff and recipient acknowledgement with refreshed versions and reasons; retain audit and ownership history.
 2. **Approve the first correction and establish resolution (F1/F5).** As requester, propose top-level `10.80.240.0/24` from the actual anomalous finding, supplying owner, purpose, reason and reviewed inventory version. Pending must leave inventory unchanged; a different authorized actor approves. Inspect prefix/decision/audit, then reconcile at the same cycle-1 clock. Show original, first subsequent result and latest result distinctly. Close as current owner only after the latest comparable finding is actually healthy, with current version and reason. Demonstrate explicit owner reopen without inventing anomalous evidence, then close again while evidence is still healthy so the cycle-6 recurrence starts from a closed case. Refresh the version after each action or reconciliation.
@@ -141,6 +147,14 @@ Require a successful restore result; retain `database_replaced`, schema, `migrat
 Compare restored logical rows/IDs with the initial disabled cycle-1 baseline before further mutation, then start with the same command. Confirm disabled/null-due state, cycle-1 cursor/clock, initial saved run and initial preset revision. Rehearsal corrections, later runs and actions must be absent from this reset store and remain available in the separate final evidence and pre-restore preservation snapshots. SQLite file bytes may differ while logical content is equal. Only replay keys present in the restored history retain their deduplication meaning; post-snapshot operations are no longer present.
 
 ## Independent walkthrough and remaining gates
+
+### Primary rehearsal result
+
+The primary agent rehearsal completed the documented path. Central `.240.10` finding `60409eed-4098-48eb-8cb6-c0defaf227a3` was corrected by request `dc4ef177-1b96-461c-906d-f7013f7c586b`, then reconciled healthy at the same scenario clock; the exception was escalated, handed off, acknowledged, closed, explicitly reopened and closed again. Lab `10.40.15.0/24` metadata was edited from the actual gap and reconciled; the original cycle-1 run remains immutable in the saved-run records. Cycle 6 produced material `.243.10` recurrence with notification reason `recurrence`; correction `0fc0e038-4632-453c-906d-f7013f7c586b` and reconciliation `ddd4afac-ca8a-435a-b60c-dee0586a3895` produced comparable healthy evidence for both ghost addresses before closure. Cycle 7 `ab3ae7bd-5ed1-454c-9cc1-80d07f96d210` was deliberately acquired at the latest clock and final preset; Central ghost evidence was `unknown` under stale/incomplete source evidence and did not reuse the older healthy result. The separate `.241.0/24` routing discrepancy stayed visible.
+
+F3 metadata/history evidence is in the API records for `GET /api/prefixes/a1526294-9c3c-5588-98b5-c0fa7cae2aa9/edit-context` and the subsequent edit; the returned metadata impact was separate from structural impact and the saved calculation/run records were retained. The designated structural-ancestor control remains a separate disposable-store gate and was not silently folded into this rehearsal. The initial, final and restored semantic comparison is `snapshots/restored-semantic-comparison.json`: 16 application tables plus the SQLite bookkeeping table `sqlite_sequence` were compared, restored state matched the initial snapshot for every table, and the preserved final database differed as expected. The comparison is an artifact-level logical check; the faithful CLI restore response is separately named in `commands/final-restore.json`.
+
+The three distinct exports are recorded in the HTTP evidence: final preset findings CSV, final run JSON and audit CSV. The initial preset revision was `7232911f9ebb408e473a951987667d00539ca8e3285aaa9128725431eef2b089`; final revision was `fffa84479ab3406d119f068a416921d53a7222eaa024fe314d5d70dcc2b57831`.
 
 Give a second operator this completed runbook, the reviewed candidate/toolchain paths and **initial cycle-1** snapshot. Use a separate new data directory, restore while stopped, and record startup, initial pinned-run/preset selection, one assigned demo path and stopped recovery. Identify the final evidence snapshot separately so it cannot be mistaken for the starting state. Record elapsed time and every undocumented intervention. An independent **agent procedural check** can establish that the documented sequence is machine-reproducible; label it separately from an observed **human presenter/recipient walkthrough**. Neither establishes a portable Linux/container deployment.
 
