@@ -51,6 +51,7 @@ export interface InputReference {
   source_id: string;
   source_run_id: string;
   source_record_id?: string;
+  audit_id?: string;
 }
 
 export interface Finding {
