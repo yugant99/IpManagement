@@ -1,6 +1,6 @@
 # Current project status
 
-**Active bounded follow-up — 2026-09-20:** the user authorized [easy-win implementation and focused local evidence](EASY_WINS_CONTRACT.md) for RFP-005/006/026/033/035/036/043/077/078. Four visible GPT-5.6 Luna/medium workers have disjoint ownership and one app.py integrator; registry and behavior contracts are linked there. No new numbered stage or broad E2E. VM planning/checks, Docker, cloud/spending, deployment/TLS and hot snapshots stay out of this round. Previous evidence/accounting and Part 6 source acceptance below remain intact; row upgrades await exact-clause lead review.
+**Bounded follow-up accepted — 2026-09-20:** reporting/search, domain filters, imported-source catalog, saved-run summary, opt-in import reconciliation and request logging are integrated through PR #58 with focused native evidence. [Lead review and exact provenance](handoffs/easy-wins-lead-review.md). Current accounting is **38 Demonstrated / 17 Partial / 10 Documentary / 46 Missing = 111**. The four visible Luna/medium tasks are retained for assigned fixes; no new feature/stage or broad E2E cycle follows. Docker/VM work remains deferred, `PART6_READY=no`, and oversight remains PAUSED.
 
 **Current authority — 2026-09-20:** Main Lead 3.0, `01a0c0c1-3952-7720-93c8-ff49192b8e13`, is the user-authorized persistent lead. Main Lead 2.0 and the original lead are reference-only. [Current transfer and readiness map](handoffs/main-lead-3.0.md) supersedes older ownership, monitor and package-visibility statements below. Main at takeover: `376dd52f9457dd0b7fecc8d83a3e0d6970bb487e`; accepted application remains `289f53c7c5db1bd414c938add1ea207d591f9e64`. PRs #44/#47/#48 are merged. Existing oversight is **PAUSED** and was reattached to this task; saved target/status and unchanged schedule/expiry were read back on 2026-09-20.
 
@@ -80,7 +80,7 @@ Exact PR #22 is now normally integrated into Stage 4; see [core review](handoffs
 | Delivery method | PR #9 reviewed as a substantive proposal | NO MERGE; adoption/execution/provider outcomes absent |
 | PART6_READY | **No**; package source accepted | Target-host startup/persistence, packaged recovery and recipient evidence remain unverified |
 | Portable release | Application and Part 6 source integrated; native local evidence accepted | Target-host startup/persistence, packaged recovery, complete dependency notices and recipient evidence |
-| Questionnaire | **Final bounded adjudication: 32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing = 111** | [Every row and remaining clause](QUESTIONNAIRE_ROW_MAP.md); no customer/production or 60%-satisfied claim |
+| Questionnaire | **Current bounded adjudication: 38 Demonstrated / 17 Partial / 10 Documentary / 46 Missing = 111** | [Every row and remaining clause](QUESTIONNAIRE_ROW_MAP.md); no customer/production or 60%-satisfied claim |
 
 Denominator **111**. Historical 65/67/68 bundles are planning arithmetic, not fully satisfied-row counts. RFP-043's general import callback stays deferred; 081 has observed fixed-team transfer/acknowledgement and 068 has bounded controlled timer evidence. RFP-092 is Documentary for substantive user/operator guidance, not delivered training. None of these earns live discovery, scale, external team integration or provider credit. A 60% fully satisfied-row claim is not established.
 

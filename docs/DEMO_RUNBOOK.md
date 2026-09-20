@@ -1,5 +1,7 @@
 # Native local demo — completed rehearsal record
 
+**Later focused follow-up:** [easy-win acceptance](handoffs/easy-wins-lead-review.md) adds domain/region search, family-filtered reports and a saved-run summary, the imported-source catalog, opt-in reconciliation after ordinary imports, and request-log correlation. Those observations used a separate disposable native candidate. The prepared presenter store, historical snapshot hashes and rehearsal commands below retain their original provenance; this follow-up did not replace them.
+
 **Focused agent procedural evidence completed on 2026-09-19/20 and accepted within bounds.** F4 native presentation readiness includes the separate-copy agent reproduction below. This runbook records the actual native candidate, paths, IDs and evidence. It is not human presenter acceptance or portable deployment acceptance.
 
 Stage 5 owns this native demo procedure and focused evidence. Main Lead 2.0 accepts the candidate. Stage 4 owns shared schema/migration; Foundation owns state-command compatibility. Spencer retains packaging, `docs/RUNNING.md`, `scripts/ops/` and portable recipient delivery. An unregistered package checkpoint is a visibility gap, not proof that Spencer has done no work.
