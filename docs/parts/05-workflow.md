@@ -1,6 +1,6 @@
 # Part 5: allocation, review and audit
 
-Owner: core workflow agent, **not Spencer**. Original core: G21–G22. Current questionnaire priority includes the bounded G25 exception/notification/escalation queue (072/082), with actual cross-team handoff (081) conditional. G23 reclaim/remediation and G24 configurable lifecycle remain deferred. Branch: `codex/part-5-workflow`, with separate branches per feature.
+Owner: core workflow agent, **not Spencer**. Original core: G21–G22. Current scope includes the bounded G25 exception/notification/escalation queue (072/082), actual fixed-team handoff (081), and the user-authorized F1 missing-prefix registration slice of G23. Reclamation, external remediation and G24 configurable lifecycle remain deferred. Follow the [audit-response contract](../AUDIT_RESPONSE_CONTRACT.md) and [current acceptance](../STATUS.md); the historical G23 label is not a blanket exclusion of this new local correction. Use separate branches per feature.
 
 ## Win
 
@@ -22,6 +22,8 @@ Show downstream provisioning as simulated and distinct from the actual local all
 
 Persisted decisions survive restart; unauthorized/self approval fails; rejection and conflict do not leave partial allocations. A fixed state machine is sufficient. No live provisioning, SSO, configurable workflow designer, broad reclamation engine or customer process claim.
 
-The additional queue stores finding reference, owner, acknowledgement/escalation and reason/history. These operational states never overwrite the rule's evidence state. Conditional 081 requires an actual recipient handoff and acknowledgement between named fictional teams; a team label is insufficient. Reuse the existing audit path. See `docs/QUESTIONNAIRE_SCOPE_DELTA.md`.
+The queue retains original evidence, latest evidence, ownership, acknowledgement/escalation and audit. Healthy comparable evidence can resolve a finding; the owner separately closes or reopens the case. Missing/unknown/incomparable evidence never resolves it. Recurrence after healthy evidence or a new material discrepancy renews a notice; unchanged generated IDs do not. Fixed-team handoff includes recipient acknowledgement, not merely a team label. See the F5 contract for stable identity and exact retry/version rules.
+
+The F1 correction path proposes one concrete missing top-level prefix inside an existing managed perimeter. A different authorized actor approves or rejects against current scope, overlap and reviewed versions. Approval atomically registers intended inventory with decision/audit; pending and rejected requests leave inventory unchanged. Subsequent reconciliation evaluates actual evidence. Original, first linked and latest results remain separate, and every current ghost member must be accounted for before calling its perimeter healthy. New prefixes without route policy remain unknown. Allocation approval and simulated external provisioning keep their existing semantics.
 
 Handoff: transaction boundaries, role/actor contract, API examples, audit storage and unverified limits. Part 6 must preserve these records across startup/restart/backup; it must not know business logic to do so.

@@ -46,7 +46,7 @@ The next two additions are the preferred route from 65 to 67, only after the und
 
 - Reuse the inventory form, one dashboard shell and saved-run data. Keep visual polish to readability; no bespoke executive layout, animation pass or separate reporting platform.
 - Keep assessment and delivery material as a small shared document pack with explicit fictional examples. Do not build a maturity-assessment wizard or duplicate every document as a UI screen.
-- Defer 057/070's local reclaim/remediation extension, 111's configurable workflow designer, live external connectors, tenant isolation, enterprise identity, HA and scale work. Do not trade allocation correctness or evidence provenance for these rows.
+- Reclamation (057), configurable workflow design (111), live external connectors, tenant isolation, enterprise identity, HA and scale remain deferred. The later user-authorized [F1 contract](AUDIT_RESPONSE_CONTRACT.md) adds bounded approved local missing-prefix registration relevant to 070; it supersedes the original blanket remediation deferral only for that slice. Do not trade allocation correctness or evidence provenance for these rows.
 - Keep saved reports to one filter/column preset and CSV export. Keep IPv6 to prefix arithmetic and bounded prefix assignment, with no host enumeration or IPv6 subscriber allocator.
 - At hour 6, require the original source-to-finding browser path. At hour 11, select remaining additions based on working prerequisites. Freeze new features at hour 14. Unfinished rows remain missing/partial; do not lower the denominator or fill a gap with a label.
 
