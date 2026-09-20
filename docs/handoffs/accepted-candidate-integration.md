@@ -49,9 +49,8 @@ PR #9's head is not an ancestor of the integration and its two unique files are 
 
 ## Preserved evidence limits
 
-- **S5-09 partial:** timer contention used the real ordinary-run guard held by a harness; active ordinary reconciliation was unrun. Stop was direct scheduler/lifespan behavior, not an OS signal during acquisition.
-- **S5-15 partial:** asset/authority refusals used fresh initial states; preservation after prior success and first-path-specific refusal remain unrun.
-- Representative v3 migration only; v1/v2, reset and enabled-snapshot restore remain unrun. Disabled snapshot round trip and controlled overdue restart are distinct observations.
+- **Historical S5-09/S5-15 partials:** the original Stage 5 report remains 14 observed passes and two partial cases. Later accepted addenda close active ordinary reconciliation versus timer, graceful SIGTERM/SIGINT during acquisition, prior-success asset-refusal preservation and first-path authority refusal, without establishing exhaustive crash/endurance/live-source coverage.
+- Representative v3 migration only; v1/v2, reset and enabled-snapshot restore remain outside accepted evidence. Disabled snapshot round trip and controlled overdue restart are distinct observations.
 - Workflow response-loss recovery was in the mounted UI. Schedule recovery separately covered navigation/reload. Exception writes used API followed by UI observation. CSV content proof was unfiltered/default-column API capture; the browser showed the download request.
 - Controlled time is not elapsed-hour endurance. No Docker/Compose/Linux/recipient, live-network, carrier-scale, HA, production or customer-migration proof.
 

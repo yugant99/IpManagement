@@ -22,7 +22,9 @@
 
 ## Remaining gates
 
-**S5-09 partial:** the timer saw a harness-held ordinary-run guard; active ordinary reconciliation versus timer and an OS signal during acquisition were not exercised. **S5-15 partial:** asset/authority refusals were observed on fresh initial states; prior-success preservation under asset refusal and first-path-specific refusal remain unrun. Other documented limits include representative v3 only, mounted-UI workflow recovery, controlled scheduler time and unfiltered/default-column export. No automatic wider suite or repeated build is needed.
+Historical Stage 5 remains **14 observed passes, two partial scenarios, no observed application defect** at `fe50cd6`. The later accepted S5-09/S5-15 addenda close the four specifically missing observations: ordinary reconciliation versus timer, graceful SIGTERM/SIGINT during acquisition, prior-success asset-refusal preservation and first-path authority refusal. They do not rewrite the historical result into an exhaustive runtime suite.
+
+Remaining limits include representative v3 only, reset/v1/v2/enabled-snapshot restore outside accepted evidence, mounted-UI workflow recovery, controlled scheduler time, unfiltered/default-column export, no SIGKILL/fsync/crash/endurance matrix, no live sources and no portable/customer acceptance. No automatic wider suite or repeated build is needed.
 
 Spencer owns **Part 6 portable delivery**, not a new sequential Stage 6 task. Its package checkpoint and target-host/recipient proof remain missing; `PART6_READY=no`. Local macOS success cannot establish Docker/Compose/Linux or recipient startup. Cloud/VM/Docker execution and existing user-store mutations remain outside the [local execution grant](handoffs/stage-05-execution-authorization.md).
 

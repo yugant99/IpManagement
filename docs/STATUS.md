@@ -67,9 +67,9 @@ Exact PR #22 is now normally integrated into Stage 4; see [core review](handoffs
 |---|---|---|
 | Foundation / first path / frozen data | Source accepted; actual local setup/import/rule/browser evidence through Stage 5 | Untouched first-path-specific refusal branch |
 | Main capabilities | Source plus scoped calculations, UI/export, inventory, allocation/audit and team handoff evidence accepted | Remaining clauses recorded in final per-row adjudication; no broad UI/production claim |
-| Rich CLI and core state | Local populated preservation/restart/replay and representative v3 migration accepted | Reset, v1/v2, enabled-snapshot restore, deeper filesystem/crash cases unrun |
-| Evolving scheduled acquisition | Source plus manual cycles/replay and controlled timer/rollback evidence accepted | S5-09/S5-15 partial cases; real endurance, live sources and exhaustive failures unrun |
-| Local acceptance | `fe50cd6`: 14 observed passes, two partial; bounded lead review accepted | Partial scenario limits remain explicit; this is not exhaustive runtime acceptance |
+| Rich CLI and core state | Local populated preservation/restart/replay, representative v3 migration and later schema/state addenda accepted within their bounds | Reset, v1/v2 migration, enabled-snapshot restore and deeper filesystem/crash cases remain outside accepted evidence |
+| Evolving scheduled acquisition | Source plus manual cycles/replay, controlled timer/rollback evidence and accepted S5-09/S5-15 addenda for the four specifically missing observations | Real endurance, live sources, SIGKILL/fsync/crash matrices and exhaustive failure branches remain unrun |
+| Local acceptance | Historical `fe50cd6`: 14 observed passes, two partial; later addenda and final rehearsal are separate accepted bounded evidence | Partial/exhaustive scenario limits remain explicit; this is not exhaustive runtime acceptance |
 | Delivery method | PR #9 reviewed as a substantive proposal | NO MERGE; adoption/execution/provider outcomes absent |
 | PART6_READY | **No** | Published package checkpoint and target-host/recipient evidence; scoped local prerequisite evidence is now available |
 | Portable release | Application source integrated; native local evidence accepted | Spencer package, target-host startup/persistence and recipient evidence |
