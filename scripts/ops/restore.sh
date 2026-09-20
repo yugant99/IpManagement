@@ -74,7 +74,7 @@ esac
 require_service_stopped
 
 log "Restoring from ${input} (container path). The current database will be preserved."
-compose run --rm --no-deps --entrypoint "" "${SERVICE_NAME}" \
+compose run --rm --no-deps --pull never --entrypoint "" "${SERVICE_NAME}" \
   python -m ipam_demo restore --input "${input}" --confirm "${passthrough[@]}"
 log "Restore complete. Inspect JSON output for database_replaced/preserved_database/migration_required."
 log "If migration_required is true, stop the service and run scripts/ops/migrate.sh."

@@ -6,9 +6,9 @@ Assignment: **portable delivery**, approximately 6–8 hours. No presentation wo
 
 ## Current pickup state
 
-The repository currently contains planning/coordination documents. There is no application to run yet. Read `docs/STATUS.md` first on every pickup; the lead will set `PART6_READY` when actual runtime prerequisites exist.
+The accepted application is on main at `376dd52f9457dd0b7fecc8d83a3e0d6970bb487e`. Core schema-5 state commands and feed interfaces exist. Read `docs/STATUS.md` and the latest lead instruction on pickup; `PART6_READY=no` denotes missing portable runtime/recipient evidence, not missing core source.
 
-During the present planning stage, this document is a handoff specification, not a request to provision a VM or execute containers. During an authorized implementation turn, you can prepare packaging against the frozen contract while core finishes the app.
+This source/operator handoff does not authorize VM provisioning or container execution. Runtime evidence requires a separate authorization.
 
 ## Read order
 
@@ -22,13 +22,13 @@ During the present planning stage, this document is a handoff specification, not
 
 Do not require the previous chat, source customer files or a separate planning interview. Facts come from the repo; missing core interfaces go to the lead.
 
-The original **Build synthetic inventory demo** chat remains persistent project lead. Report pushed branch/SHA/PR, implemented versus observed behavior, gaps and blockers through the repository handoff. The lead reviews acceptance, global status and main integration; Spencer's agent does not replace this ownership. External agent conversations need not be accessible. See `docs/PROJECT_OVERSIGHT.md`.
+Main Lead 3.0 (`01a0c0c1-3952-7720-93c8-ff49192b8e13`) is the user-authorized lead; prior leads are reference-only. Report pushed branch/SHA/PR, implemented versus observed behavior, gaps and blockers through the repository handoff. The lead reviews acceptance, global status and main integration; Spencer's agent does not replace this ownership. External agent conversations need not be accessible. See `docs/PROJECT_OVERSIGHT.md`.
 
 ## Branch and ownership
 
-The project lead has approved starting the first Part 6 feature from the unmerged Stage 2 checkpoint (`codex/part-2-first-path`, commit `8a1a1227`) so packaging can be prepared against the actual application code. `main` is documentation-only and would not contain the Python/React sources being packaged; do not restart Part 6 from `main`.
+Historical PR #49 began at Stage 2 `8a1a1227`. PR #50 incorporated accepted main and compatibility fixes; PR #51 includes both exact histories and the operator handoff. Current source review must use that combined candidate, not the old Stage 2 application.
 
-First feature: `codex/part-6-container-startup`, branched from `8a1a1227`. Later backup/operator improvements use a separate `codex/part-6-...` branch after their prerequisite (Stage 2 merge, and the core `reset`/`backup`/`restore` commands) lands. Use an isolated worktree if another agent shares the checkout.
+Use isolated `codex/part-6-...` branches for further changes and preserve the existing coherent commits.
 
 Own root `Dockerfile`, `compose.yaml`, `.dockerignore`, `scripts/ops/`, `docs/RUNNING.md`, this handoff and the Part 6 task page. Coordinate small README runtime updates with the lead. Do not edit business rules, shared schemas, application entrypoints, frontend dependencies or locks independently.
 
@@ -48,7 +48,7 @@ One coherent change per commit; push after three changes/commits, earlier on han
 | Dependencies | Core-committed backend lock/install metadata and frontend lock |
 | First packaged target | Ordinary Linux amd64; report additional platform evidence separately |
 
-These are planned interfaces until status marks them implemented. A placeholder web server or fabricated health response cannot satisfy Part 6.
+These core interfaces exist in the accepted source; their presence does not establish container runtime success.
 
 ## Minimum deliverable
 
@@ -87,7 +87,7 @@ Implemented on this branch (source and documentation, unrun):
 - `scripts/ops/seed.sh` now defaults to the accepted rich scenario (`python -m ipam_demo seed --scenario rich --inventory /app/fixtures/v1/inventory.json`); `--scenario baseline` remains available for the older foundation scenario. It checks that the service is stopped and refuses when it is not.
 - New `scripts/ops/acquire.sh` posts the accepted rich-demo payload (`actor_id=demo-approver`, `reason="Prepare initial rich demo"`, operator-supplied `idempotency_key`) to `POST /api/schedule/run`, distinguishing 200/201 success, 409 in-progress and transport failures.
 - New `scripts/ops/backup.sh`, `restore.sh`, `reset.sh` wrappers around the core state commands with stopped-service enforcement and explicit `--confirm` handling. Snapshots live under `/data/snapshots/` (0700, created on first backup) inside the existing `ipam_demo_data` named volume; the preserved pre-restore database and lock file are documented as never removed automatically.
-- New `scripts/ops/snapshots.sh` covers `list`, `export`, `import` and `remove` for the snapshot subdirectory using `docker compose cp`.
+- New `scripts/ops/snapshots.sh` covers `list`, `export`, `import` and `remove` for the snapshot subdirectory using locked one-shot container streams.
 - `scripts/ops/common.sh` now enforces Docker Compose v2 and provides `service_is_running` / `require_service_stopped`; the previously claimed unverified `docker-compose` legacy fallback is removed.
 - `scripts/ops/start.sh` no longer implies "seed after start" (seed needs the exclusive lock and refuses to run alongside the service). `scripts/ops/migrate.sh` describes v1/v2/v3/v4 → current, not the stale v1→v2 claim.
 - `docs/RUNNING.md` rewritten: rich-demo first-time setup, manual acquisition procedure, corrected logs/tail example, full state-command section referencing `docs/STATE_OPERATIONS.md`, snapshot storage semantics, dependency and license notes, and clearly separated "unverified behavior" recipient checks.
@@ -97,4 +97,32 @@ Not run: no image build, container start, seed, migrate, health check, restart, 
 
 Blockers: recipient/target-host evidence session — image build on linux/amd64, seed→start→health→acquire, restart preserving G21/G22 allocation/audit, backup→restore cycle and confirmed refusal paths — is not authorized in this turn. `PART6_READY` remains `no`. Questionnaire accounting stays 32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing out of 111.
 
-Next action: open a focused PR against `codex/part-6-build-compat-fix` (Main Lead 2.0 owns integration/merge). The recipient session, when authorized, exercises the flow documented above and records results into a follow-up handoff.
+Next action: Main Lead 3.0 reviews the bounded correction candidate before a history-preserving source merge. The recipient session, when authorized, exercises the flow documented above and records results into a follow-up handoff.
+
+## Independent source correction of PR #51
+
+Reviewed original `7f79f38bbde62dd0b3c13f7892a48ccfb6a19038` against
+`376dd52f9457dd0b7fecc8d83a3e0d6970bb487e`. The original build/module/feed
+fixes are present. The correction branch `codex/part-6-review-fixes` retains
+the exact #49/#50/#51 heads and fixes these source findings:
+
+- Snapshot export/import used `compose cp` although `stop.sh` removes the
+  service container. Imports could overwrite existing snapshots and copied
+  ownership did not establish app-user readability. One-shot app-user streams
+  now work independently of a retained service container; imports are private,
+  hash/size checked and published without overwrite. All transfer actions use
+  the core data lock; restore alone owns SQLite validation.
+- Backup/remove interpolated unrestricted filenames into `sh -c`. Backup
+  now passes positional arguments and transfers never interpolate filenames
+  into executable shell text. Linked files/companion files are refused.
+- Stopped-service detection hid Compose failures as stopped. It now fails
+  visibly. Startup and one-shot operations refuse image pulls; offline
+  save/load instructions record source/image identity and checksums.
+- Pickup instructions incorrectly said main was documentation-only; those
+  instructions now point to the accepted application and current lead.
+
+Source inspection only: no application tests, helper execution, Docker
+commands, image builds/pulls, containers, VM/cloud operations or runtime
+checks were performed. The lead must review the corrective delta before
+merge. Runtime/recipient evidence and dependency license/notices inventory
+remain open; source merge does not change `PART6_READY=no`.

@@ -34,17 +34,24 @@ compose() {
 # Returns 0 running, 1 stopped-or-absent, other codes on docker failure.
 service_is_running() {
   local state
-  state="$(compose ps --status running --services 2>/dev/null || true)"
-  [[ "${state}" == *"${SERVICE_NAME}"* ]]
+  state="$(compose ps --status running --services "${SERVICE_NAME}")" || return 2
+  [[ "${state}" == "${SERVICE_NAME}" ]]
 }
 
 # Fail fast when a state command would collide with the running service.
 # The container's exclusive .ipam_demo.lock enforces this too; refusing
 # early gives a clearer error and skips a wasted container start.
 require_service_stopped() {
+  local status
   if service_is_running; then
     echo "error: ${SERVICE_NAME} is running. Stop it first with scripts/ops/stop.sh." >&2
     return 1
+  else
+    status=$?
+    if [[ ${status} -ne 1 ]]; then
+      echo "error: could not establish that the service is stopped." >&2
+      return "${status}"
+    fi
   fi
 }
 

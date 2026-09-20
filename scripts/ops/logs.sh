@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Tail service logs. Defaults to follow-mode; forward extra flags to
-# `docker compose logs` for one-shot inspection (e.g. `-n 200 --no-follow`).
+# `docker compose logs` for one-shot inspection (e.g. `--tail 200`).
 
 source "$(dirname -- "$0")/common.sh"
 

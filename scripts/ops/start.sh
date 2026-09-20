@@ -17,6 +17,6 @@
 source "$(dirname -- "$0")/common.sh"
 
 log "Starting ${SERVICE_NAME} (published on 127.0.0.1:8000)"
-compose up --detach --no-build --wait-timeout 30 "${SERVICE_NAME}" "$@"
-log "Service running. Data volume: ipam_demo_data -> /data"
+compose up --detach --no-build --pull never "${SERVICE_NAME}" "$@"
+log "Start requested. Data volume: ipam_demo_data -> /data"
 log "If /healthz reports SETUP_NEEDED, stop the service and run scripts/ops/seed.sh."

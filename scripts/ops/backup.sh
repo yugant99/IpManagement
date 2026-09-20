@@ -25,12 +25,13 @@
 
 source "$(dirname -- "$0")/common.sh"
 
+if [[ $# -gt 1 ]]; then echo "usage: backup.sh [snapshot-filename]" >&2; exit 2; fi
 require_service_stopped
 
 filename="${1:-ipam-backup-$(date -u +%Y%m%dT%H%M%SZ).sqlite3}"
 
 case "${filename}" in
-  */*|"")
+  */*|""|.|..)
     echo "error: filename must be a plain name, not a path. Got: '${filename}'" >&2
     exit 2
     ;;
@@ -42,9 +43,11 @@ log "Backing up to ${output} (container path)."
 # Two steps in one one-shot container: ensure the snapshot directory
 # exists with 0700 permissions (owned by the uid 10001 app user), then
 # run the backup. `install -d -m 0700` is idempotent.
-compose run --rm --no-deps --entrypoint "" "${SERVICE_NAME}" \
-  sh -c "install -d -m 0700 '${SNAPSHOT_DIR_CONTAINER}' && \
-         exec python -m ipam_demo backup --output '${output}'"
+compose run --rm --no-deps --pull never --entrypoint "" "${SERVICE_NAME}" \
+  sh -c 'if test -L "$1"; then echo "error: snapshot directory must not be a symlink" >&2; exit 1; fi
+         install -d -m 0700 "$1" &&
+         exec python -m ipam_demo backup --output "$2"' \
+  sh "${SNAPSHOT_DIR_CONTAINER}" "${output}"
 
 log "Backup written inside volume ipam_demo_data at ${output}."
 log "Copy it off the host with: scripts/ops/snapshots.sh export '${filename}' /path/on/host"
