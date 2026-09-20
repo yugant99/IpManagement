@@ -1,6 +1,6 @@
 # Easy-wins reports focused evidence
 
-Code checkpoint: `00c8dd9` (`Add family-aware saved report filtering`). Current branch: `codex/easy-wins-reports` at `d3a4a5a7ebe8897bfed2593584b9adf85edb4bd0` (local worker checkout).
+Code checkpoint: `a9c9fab` (`Test real family export and preset helpers`). Current branch is `codex/easy-wins-reports`; the provenance-doc commit records its updated head separately.
 
 Command:
 
@@ -12,8 +12,9 @@ Observed result: 3 tests passed.
 
 Covered behavior:
 
-- family `4` selects only IPv4 finding subjects;
+- family `4` selects only IPv4 finding subjects and calculations through the actual JSON export helper;
 - invalid family values are rejected with `INVALID_INPUT`;
-- saved-run summary retains run ID, saved timestamp, demo clock and filter provenance, and counts only anomalous/unknown findings plus anomalous `pool_pressure` subjects in the selected family/scope.
+- an older preset without `family` retains its stored filter shape and stable revision when read;
+- the actual preset CSV helper applies a saved `family=6` filter.
 
 Not covered here: app.py HTTP wiring, persisted report-preset round trip, browser interaction, or a frontend build. The frontend build attempt stopped before compilation because `tsc` is not installed in this checkout. Inputs are synthetic/local and do not establish production or customer acceptance.
