@@ -145,7 +145,7 @@ export default function Workflow() {
     try {
       const updated = await actOnException(attempt.id, attempt.payload, new AbortController().signal);
       setSelectedException(updated); setExceptionReason(""); setExceptionAttempt(null);
-      setMessage(`Case ${updated.lifecycle_state}; disposition ${updated.state}; latest evidence ${updated.latest_evidence_state}, resolution ${updated.evidence_resolution}. Assigned to ${updated.owner.name}, ${updated.owner.team}. Original evidence is unchanged.`);
+      setMessage(`${updated.replay ? "Previous exception action recovered. " : ""}Case ${updated.lifecycle_state}; disposition ${updated.state}; latest evidence ${updated.latest_evidence_state}, resolution ${updated.evidence_resolution}. Assigned to ${updated.owner.name}, ${updated.owner.team}. Original evidence is unchanged.`);
       history(updated.id); setRevision(value => value + 1);
     } catch (failure) {
       setError(readableError(failure));
@@ -223,13 +223,14 @@ export default function Workflow() {
         {exceptions && <><p role="status">{exceptions.items.filter(item => item.notification_pending).length} notifications awaiting owner acknowledgement on this page.</p>
           <div className="table-scroll"><table><thead><tr><th>Original finding / subject</th><th>Latest evidence / resolution</th><th>Owner</th><th>Case / disposition</th><th>Action</th></tr></thead><tbody>
             {exceptions.items.map(item => <tr key={item.id}><td>{item.original_finding.rule_id}<div><code>{item.original_finding.subject.cidr}</code> · {item.original_finding.subject.scope_name}</div><div>Original: {item.original_finding.evidence_state} · {item.original_finding.severity}</div></td>
-              <td>{item.latest_evidence_state}<div>{item.evidence_resolution === "resolved" ? "Resolved by healthy evidence" : item.evidence_resolution === "active" ? "Active discrepancy" : "Resolution unknown"}</div></td>
+              <td>{item.latest_evidence_state}<div>{item.evidence_resolution === "resolved" ? "Resolved by healthy evidence" : item.evidence_resolution === "active" ? "Active discrepancy" : "Resolution unknown"}</div><div className="quiet">{item.latest_evidence_reason.replaceAll("_", " ")}</div></td>
               <td>{item.owner.name} · {item.owner.team}</td><td>{item.lifecycle_state} · disposition {item.state}<div>Notification {item.notification_version}{item.notification_pending ? " · acknowledgement due" : " · none pending"}</div></td>
               <td><button className="secondary" disabled={busy || !!exceptionAttempt} onClick={() => { setSelectedException(item); setExceptionReason(""); history(item.id); }}>Open exception</button></td></tr>)}
           </tbody></table></div>{!exceptions.total && <p>No calculated anomalies have entered the queue. Create a reconciliation run from imported evidence to produce findings.</p>}<PageButtons page={exceptions} change={setExceptionOffset} /></>}
         {selectedException && <div className="notice"><h3>{selectedException.original_finding.rule_id} · case {selectedException.lifecycle_state}</h3>
           <p>Owner: {selectedException.owner.name}, {selectedException.owner.team}. Operational disposition: {selectedException.state}; reviewed version {selectedException.version}.</p>
           <dl className="facts"><dt>Latest evidence</dt><dd>{selectedException.latest_evidence_state}</dd>
+            <dt>Latest evidence reason</dt><dd>{selectedException.latest_evidence_reason.replaceAll("_", " ")}</dd>
             <dt>Evidence resolution</dt><dd>{selectedException.evidence_resolution === "resolved" ? "Resolved by healthy comparable evidence" : selectedException.evidence_resolution === "active" ? "Active discrepancy in the latest evidence" : "Unknown — current evidence does not establish resolution"}</dd>
             <dt>Case closed at</dt><dd>{selectedException.closed_at ?? "Case is open"}</dd>
             <dt>Notification / episode</dt><dd>Notification {selectedException.notification_version} · episode {selectedException.episode_count} · {selectedException.notification_pending ? "owner acknowledgement due" : "no notification pending"}</dd>
@@ -238,20 +239,24 @@ export default function Workflow() {
           {selectedException.evidence_resolution === "unknown" && <p className="run-warning">Missing, unknown or not-applicable evidence does not establish resolution, even if the case was previously closed.</p>}
           {selectedException.lifecycle_state === "open" && selectedException.evidence_resolution === "resolved" && <p>Healthy evidence supports closure. The case stays open until its owner explicitly closes it with a reason.</p>}
           <ExceptionEvidence title="Original anomaly · preserved evidence" finding={selectedException.original_finding} />
-          {selectedException.latest_finding ? <ExceptionEvidence title="Latest comparable finding" finding={selectedException.latest_finding} /> :
-            <section className="detail-section"><h4>Latest comparable finding</h4><p>{selectedException.latest_run_id ? "The latest run contains no comparable finding. Resolution remains unknown." : "No latest evaluation has been recorded for this case. Reconcile current inputs to refresh its evidence."}</p>
+          {selectedException.latest_finding ? selectedException.latest_comparable ? <ExceptionEvidence title="Latest comparable finding" finding={selectedException.latest_finding} /> :
+            <section className="detail-section"><h4>Latest finding · not comparable</h4><p className="run-warning">{selectedException.latest_evidence_reason.replaceAll("_", " ")}. This finding does not establish current resolution for the original case.</p>
+              <p>Saved run <a href={`/api/runs/${encodeURIComponent(selectedException.latest_finding.run_id)}`} target="_blank" rel="noreferrer"><code>{selectedException.latest_finding.run_id}</code></a>; finding <a href={`/api/runs/${encodeURIComponent(selectedException.latest_finding.run_id)}/findings/${encodeURIComponent(selectedException.latest_finding.id)}`} target="_blank" rel="noreferrer"><code>{selectedException.latest_finding.id}</code></a>. Links open the saved JSON in a new tab.</p>
+            </section> :
+            <section className="detail-section"><h4>Latest comparable finding unavailable</h4><p>{selectedException.latest_run_id ? "The latest run contains no comparable finding. Resolution remains unknown." : "No latest evaluation has been recorded for this case. Reconcile current inputs to refresh its evidence."}</p>
               {selectedException.latest_run_id && <p>Latest evaluated run: <a href={`/api/runs/${encodeURIComponent(selectedException.latest_run_id)}`} target="_blank" rel="noreferrer"><code>{selectedException.latest_run_id}</code></a>.</p>}
             </section>}
           {selectedException.handoff_at && <p>Handed off from {status.actors.find(item => item.id === selectedException.handoff_from_actor_id)?.name} at {selectedException.handoff_at}. Recipient acknowledgement: {selectedException.acknowledged_at ?? "pending"}.</p>}
           <label>Action reason<input value={exceptionAttempt?.payload.reason ?? exceptionReason} maxLength={500} disabled={busy || !mayHandle || !!exceptionAttempt} onChange={event => setExceptionReason(event.target.value)} /></label>
           {!mayHandle && <p>Switch to the assigned recipient to acknowledge or handle this exception.</p>}
           <fieldset disabled={busy || !mayHandle || !!exceptionAttempt}><legend>Owner actions · findings remain unchanged</legend>
-            <div className="pagination"><button disabled={!exceptionReason.trim() || !!selectedException.acknowledged_at} onClick={() => void exceptionAction("acknowledge")}>Acknowledge as owner</button>
-              <button className="secondary" disabled={!exceptionReason.trim() || selectedException.state === "escalated"} onClick={() => void exceptionAction("escalate")}>Escalate exception</button>
-              <button className="secondary" disabled={!exceptionReason.trim()} onClick={() => void exceptionAction("handoff")}>Hand off to {status.actors.find(item => item.id !== actorId)?.name}</button></div>
-            <div className="pagination"><button disabled={!exceptionReason.trim() || selectedException.lifecycle_state !== "open" || selectedException.latest_evidence_state !== "healthy" || selectedException.evidence_resolution !== "resolved"} onClick={() => void exceptionAction("close")}>Close case from healthy evidence</button>
+            <div className="pagination"><button disabled={selectedException.lifecycle_state === "closed" || !exceptionReason.trim() || !!selectedException.acknowledged_at} onClick={() => void exceptionAction("acknowledge")}>Acknowledge as owner</button>
+              <button className="secondary" disabled={selectedException.lifecycle_state === "closed" || !exceptionReason.trim() || selectedException.state === "escalated"} onClick={() => void exceptionAction("escalate")}>Escalate exception</button>
+              <button className="secondary" disabled={selectedException.lifecycle_state === "closed" || !exceptionReason.trim()} onClick={() => void exceptionAction("handoff")}>Hand off to {status.actors.find(item => item.id !== actorId)?.name}</button></div>
+            <div className="pagination"><button disabled={!exceptionReason.trim() || selectedException.lifecycle_state !== "open" || !selectedException.latest_comparable || selectedException.latest_evidence_state !== "healthy" || selectedException.evidence_resolution !== "resolved"} onClick={() => void exceptionAction("close")}>Close case from healthy evidence</button>
               <button className="secondary" disabled={!exceptionReason.trim() || selectedException.lifecycle_state !== "closed"} onClick={() => void exceptionAction("reopen")}>Reopen case</button></div>
             <p className="quiet">Close requires a latest healthy finding. Reopen starts operational review again; it does not turn healthy or unknown evidence into an anomaly.</p>
+            {selectedException.lifecycle_state === "closed" && <p>Reopen the case before acknowledging, escalating or handing it off.</p>}
           </fieldset>
         </div>}
       </section>

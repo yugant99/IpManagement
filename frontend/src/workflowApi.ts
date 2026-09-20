@@ -82,12 +82,15 @@ export interface ExceptionRecord {
   acknowledged_at: string | null;
   notification_pending: boolean;
   notification_version: number;
-  notification_reason: string;
+  notification_reason: "initial" | "new_discrepancy" | "recurrence" | "handoff" | "owner_reopen";
   episode_count: number;
+  material_keys: string[];
   lifecycle_state: "open" | "closed";
   closed_at: string | null;
   evidence_resolution: "resolved" | "active" | "unknown";
   latest_evidence_state: EvidenceState | "missing";
+  latest_comparable: boolean;
+  latest_evidence_reason: string;
   latest_run_id: string | null;
   latest_finding_id: string | null;
   original_finding: ExceptionFinding;
@@ -134,6 +137,6 @@ export function decideAllocation(id: string, payload: AllocationDecision, signal
 }
 
 export function actOnException(id: string, payload: ExceptionAction, signal: AbortSignal) {
-  return request<ExceptionRecord>(`/api/exceptions/${id}`, signal, false,
+  return request<ExceptionRecord & { replay: boolean }>(`/api/exceptions/${id}`, signal, false,
     { method: "POST", body: JSON.stringify(payload) });
 }
