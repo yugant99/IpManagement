@@ -2,7 +2,7 @@
 
 Final lead adjudication of the **current accepted candidate**, 2026-09-19. This replaces the earlier evidence plan; it is not final project, customer or portable acceptance. Application pickup: `117d05295473cf25d362adb320e6fef26ecdd74c`. Accepted evidence/report: `fe50cd6828016a25fee9086f499e2e865b4a16e4`. The unchanged application lineage is integrated into main through [PR #34](https://github.com/yugant99/IpManagement/pull/34), merge `e0ba2d99440c84c90ebe449f7442e247e2828b3f`.
 
-The lead and two bounded reviewers compared original private clauses, public contracts and accepted observations. Public topics remain generic; original workbook text/answers and source attachments are unchanged and excluded from Git. No application checks were rerun for this accounting. The resumed final native rehearsal is a separate evidence gate: readiness and the disabled-scheduler state are observed, but no new acquisition beyond the established cycle 1 has yet been credited here.
+The lead and two bounded reviewers compared original private clauses, public contracts and accepted observations. Public topics remain generic; original workbook text/answers and source attachments are unchanged and excluded from Git. No application checks were rerun for this accounting. The final rehearsal is recorded as focused procedural evidence; F4 presentation readiness and an independent second-operator pickup remain pending.
 
 **Source locator:** private questionnaire, Technical Requirements sheet, **one-based Excel row = numeric RFP ID + 2**, requirement column B. For example RFP-001 is row 3 and RFP-111 is row 113. ID, topic and evidence status are separate from the workbook's existing vendor answers.
 
@@ -15,24 +15,21 @@ Each row has exactly one evidence class and one primary category:
 - **Documentary:** substantive design/process/disclosure material is supplied; the requested operational or adopted outcome is not demonstrated. PR #9 proposals remain unadopted and NO MERGE.
 - **Missing:** no qualifying evidence for the requested outcome was identified. Nearby code, a plan or a candidate link does not earn credit. Missing is not an assignment to expand scope.
 
-**29 Demonstrated; 24 Partial; 9 Documentary; 49 Missing = 111.** Do not sum the first three classes into a requirements-completion percentage. The worker's **51 candidate IDs** were a pointer set, not a satisfied-row total; adjudication also considers supplied documents and native deployment evidence outside that set. Historical 65/67/68 targets remain planning arithmetic. A 60% fully satisfied claim is not established.
+**32 Demonstrated; 22 Partial; 9 Documentary; 48 Missing = 111.** This bounded update credits verified requester-subnet UI evidence (RFP-009), final-rehearsal local correction/reconciliation (RFP-070) and exercised escalation procedure (RFP-082). Do not sum the first three classes into a requirements-completion percentage. The worker's **51 candidate IDs** were a pointer set, not a satisfied-row total; adjudication also considers supplied documents and native deployment evidence outside that set. Historical 65/67/68 targets remain planning arithmetic. A 60% fully satisfied claim is not established.
 
-### Accounting freeze during final rehearsal
+### Post-rehearsal accounting boundary
 
-The current classes remain authoritative until the lead reviews the completed candidate rehearsal and its retained run/snapshot pointers. The following are conditional review candidates only, not current upgrades:
+The current classes below are bounded evidence classes for lead review, not final project or customer acceptance. The remaining conditional candidate is RFP-092 only; it requires accepted user/admin material.
 
 | Row | Possible change | Required evidence before any class change |
 |---|---|---|
-| RFP-009 | Partial → Demonstrated | Actual requester-subnet request and approval UI path in the final candidate, with the existing independent-approval controls retained |
-| RFP-070 | Missing → Demonstrated | Approved local missing-prefix registration, reconciliation outcome and audit, with no claim of external remediation or reclamation |
-| RFP-082 | Partial → Demonstrated | Actual escalation transition/procedure, acknowledgement and retained audit; external paging and adopted customer process remain outside scope |
 | RFP-092 | Missing → Documentary | Accepted user/admin material; this does not establish delivered training, recipient practice or knowledge-transfer acceptance |
 
-RFP-037 and RFP-072 remain Demonstrated. RFP-104 remains Missing unless a separately accepted recipient knowledge-transfer outcome is evidenced; a proposed handoff or worker registration is not enough. If all four conditional changes are justified, the arithmetic would become **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing**, but that is not the current result.
+RFP-009, RFP-037, RFP-070, RFP-072 and RFP-082 are Demonstrated within their stated local bounds. RFP-104 remains Missing unless a separately accepted recipient knowledge-transfer outcome is evidenced; a proposed handoff or worker registration is not enough. If RFP-092 later earns Documentary, the arithmetic would become **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing**.
 
 | Primary category | Demonstrated | Partial | Documentary | Missing | Total |
 |---|---:|---:|---:|---:|---:|
-| Application | 27 | 17 | 0 | 5 | 49 |
+| Application | 30 | 15 | 0 | 4 | 49 |
 | Deployment | 2 | 3 | 0 | 10 | 15 |
 | Integration | 0 | 1 | 0 | 18 | 19 |
 | Scale | 0 | 0 | 0 | 5 | 5 |
@@ -45,7 +42,7 @@ All S5 references resolve through the [scenario ledger](evidence/stage-05/README
 
 **S5-09 stays partial:** contention used a harness-held real ordinary-run guard; active ordinary reconciliation against the timer and an OS signal during acquisition were unrun. **S5-15 stays partial:** asset/authority refusal was observed on fresh initial states; preservation after prior success and first-path-specific refusal remain unrun. A row may have direct positive evidence from one part of a partial scenario without closing the scenario's other branches.
 
-Representative migration is v3 only. Reset, v1/v2 and enabled-snapshot restore remain unrun. Workflow recovery was mounted-UI only; schedule recovery separately covered navigation/reload. Exception changes were API-driven with later UI observation. CSV content proof was API-captured, unfiltered/default-column; browser evidence confirms the request. Controlled time is not elapsed-hour endurance. No Docker/Compose/Linux/recipient, live-network, traffic, carrier-scale, HA or production claim follows.
+Representative migration is v3 only. Reset, v1/v2 and enabled-snapshot restore remain unrun. Workflow recovery was mounted-UI only; schedule recovery separately covered navigation/reload. Exception changes were API-driven with later UI observation. CSV content proof was API-captured, unfiltered/default-column; browser evidence confirms the request. Final snapshot/restore equality is supported by retained database comparison; the raw root lacks a complete restore command response and post-restore browser transcript. Controlled time is not elapsed-hour endurance. No independent second-operator pickup, Docker/Compose/Linux/recipient, live-network, traffic, carrier-scale, HA or production claim follows.
 
 PR #9 documentary evidence is the [reviewed proposal at exact head](https://github.com/yugant99/IpManagement/blob/c3e45fa43a1e9f59e6c9af298b14e2c0857ebaa2/docs/DELIVERY_METHOD.md), outside main. See [the documentary review](handoffs/delivery-method-lead-review.md). NO MERGE remains in force; review does not establish operational adoption, provider commitments or customer acceptance.
 
@@ -63,7 +60,7 @@ PR #9 documentary evidence is the [reviewed proposal at exact head](https://gith
 | RFP-006 | Search and reports | Application | B | Partial | S5-06/11: `primary/inventory-filter.txt`, `primary/preset-summary.json`, `primary/preset-csv.json`; metadata search and one pinned report preset/export | Evidence exercised unfiltered/default columns and preset naming; advanced search variants and report filter/column customization were not observed |
 | RFP-007 | Browser interface | Application | B | Demonstrated | S5-01/04/11/12: `primary/seeded-ui.txt`, `primary/browser-recovery-summary.json`, `primary/inventory-filter.txt`, `primary/workflow-recovery-summary.json`; compiled browser UI used for supported tasks and retries | Bounded observed task usability, not broad user research/accessibility or every-view acceptance |
 | RFP-008 | Tenant isolation | Deployment | Later | Missing | No qualifying artifact identified; `docs/FOUNDATION_API.md` payload boundary | No tenant security model or isolation evidence; address namespaces do not supply this |
-| RFP-009 | Request portal | Application | B | Partial | S5-12: `primary/workflow-recovery-summary.json` and `primary/workflow-create-recovered.txt`; browser IP request and approval | Subnet request/approval portal absent |
+| RFP-009 | Request portal | Application | B | Demonstrated | S5-12 browser request/approval plus shared-integration browser evidence: requester submits `.241.0/24`, requester approval is disabled, independent approver approves and reconciliation is inspected | Bounded local requester/approver subnet flow only; no enterprise portal, identity or external provisioning claim |
 | RFP-010 | Central service | Deployment | B | Demonstrated | S5-01/11/12: `primary/ready.json`, `primary/seeded-ui.txt`, inventory/workflow HTTP records; one central API and persisted shared state served compiled UI | Single local service only; no HA/distributed architecture claim |
 | RFP-011 | DNS/DHCP management | Integration | Later | Missing | `docs/PHASE_COVERAGE.md` §7.3/7.4 gaps; Stage 5 observed-results unrun limits | Synthetic DHCP observations are not integrated DNS/DHCP management; actual management adapters absent |
 | RFP-012 | API access | Application | B | Demonstrated | S5-03/11/12: `primary/cycle1-summary.json`, `primary/inventory-summary.json`, `primary/workflow-recovery-summary.json`; retained successful HTTP resource reads/mutations; `docs/STAGE3_API.md` | Local documented resource API only; no external consumer or production security claim |

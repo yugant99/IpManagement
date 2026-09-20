@@ -1,8 +1,8 @@
 # Native demonstration story and claim boundaries
 
-**Status: preparation draft.** The sequence below is not a completed final rehearsal or human presenter acceptance. Promote it only after [DEMO_RUNBOOK.md](DEMO_RUNBOOK.md) records the observed candidate run, retained artifacts and recovery state reviewed by the lead.
+**Status: final procedural draft.** The observed candidate run, retained artifacts and recovery state are recorded in the [final rehearsal handoff](handoffs/luna-final-rehearsal.md). This is not human presenter training or recipient acceptance; promote it to a live presentation only after lead review.
 
-Use the exact candidate, prepared state, saved IDs and recovery procedure in [the native runbook](DEMO_RUNBOOK.md). The [lead review](handoffs/audit-response-lead-review.md) determines which observations are accepted. This is a presentation guide, not an assertion that a human presenter has completed training or a timed rehearsal. The target is 8–10 minutes; use retained runs for later cycles rather than advancing them unpredictably in front of an audience. Until the resumed final rehearsal is reviewed, describe later-cycle, correction and escalation steps as planned/retained evidence paths, not as newly observed final-candidate actions.
+Use the exact candidate, saved IDs and recovery procedure in the [final rehearsal handoff](handoffs/luna-final-rehearsal.md). The [lead review](handoffs/audit-response-lead-review.md) determines which observations are accepted. This is a presentation guide, not an assertion that a human presenter has completed training or a recipient has accepted the workflow. The target is 8–10 minutes; use retained runs for later cycles rather than advancing them unpredictably in front of an audience.
 
 ## Suggested sequence
 

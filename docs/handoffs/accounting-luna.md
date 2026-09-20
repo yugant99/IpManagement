@@ -1,6 +1,6 @@
 # Accounting Luna handoff
 
-Status: **ready for project-lead review; accounting classes intentionally unchanged while the final rehearsal continues.**
+Status: **ready for project-lead review; bounded final-rehearsal adjudication recorded.**
 
 ## Checkpoint facts
 
@@ -14,13 +14,13 @@ Status: **ready for project-lead review; accounting classes intentionally unchan
 
 The public accounting now states, in one place and without customer text:
 
-- the current 111-row result remains **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing**;
-- the resumed final rehearsal has only readiness, disabled scheduling and the established cycle-1 acquisition at its current checkpoint;
-- no later correction, escalation, allocation, recovery or catalog closure is credited before retained artifacts are reviewed;
+- the current 111-row result is **32 Demonstrated / 22 Partial / 9 Documentary / 48 Missing**;
+- final evidence supports bounded requester/approver UI, local correction/reconciliation and exception escalation;
+- catalog scenarios 11 and 14 are observed within bounded local scope;
 - RFP-037 and RFP-072 remain Demonstrated;
-- RFP-009, 070, 082 and 092 are conditional review candidates only;
+- RFP-009, 070 and 082 are upgraded on direct retained evidence; RFP-092 and RFP-104 remain unchanged;
 - RFP-104 is not automatically credited from a proposed handoff or worker registration;
-- the native story is a preparation draft, not human presenter training or final rehearsal acceptance;
+- the native story is a final procedural draft, not human presenter training or final F4 acceptance;
 - customer Phase 1/2 remains incomplete and separate from the 111-row denominator.
 
 ## Changed paths
@@ -38,18 +38,18 @@ The lead-owned `docs/STATUS.md` and `docs/CURRENT_HANDOFF.md` were only carried 
 
 ## Evidence and limits
 
-Observed directly from the resumed rehearsal artifact root `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-artifacts/run-20260919-zzeadfai/final-rehearsal`:
+Observed directly from the completed rehearsal handoff and artifact root `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-artifacts/run-20260919-zzeadfai/final-rehearsal`:
 
 - candidate `289f53c7c5db1bd414c938add1ea207d591f9e64` and acceptance head `94a34b8a35d631b3b9b5bb987ba458f73484c324` are recorded;
 - the runtime diff is empty and the toolchain is retained;
 - readiness passed and the scheduler was disabled;
 - cycle 1 is established as run `004246ef-9089-40ac-b029-a412d5c2d38d`, operation `1b0f76b2-bfbc-40ac-b9bf-a566dccfa5d3`, at `2026-09-01T06:00:00.000Z`;
-- no later rehearsal evidence was available at this checkpoint.
+- cycles 2–6, final cycle 7, correction/reconciliation, exception lifecycle, allocation, exports and stopped restore are recorded in `docs/handoffs/luna-final-rehearsal.md` at `a2e53fbf310a310b59c0d405b59c04766aa808c1`.
 
 No application tests, builds, browser checks, infrastructure actions or new runtime acquisition were run by this lane. Historical evidence remains historical; no class upgrade follows from source review or task registration.
 
 ## Suggested lead action
 
-After Stage 5 publishes the final observed runbook and retained artifact pointers, review only the four conditional row candidates and the two provisional catalog scenarios. Preserve the 111 denominator, private-clause boundary, DOCX phase gaps, portable `PART6_READY=no` gate and PR #44's separate merge decision. If the required evidence is absent, retain this accounting unchanged.
+Review the three bounded row upgrades against the final rehearsal handoff, then preserve the 111 denominator, private-clause boundary, DOCX phase gaps, portable `PART6_READY=no` gate and PR #44's separate merge decision. Keep RFP-092 and RFP-104 unchanged unless separate accepted evidence appears.
 
 Suggested next prompt for the lead: “Review `accounting-luna.md` and the final Stage 5 artifact publication. Compare only RFP-009/070/082/092 and catalog scenarios 11/14 against their stated evidence gates; keep every other class and denominator unchanged unless direct retained evidence justifies a bounded correction.”
