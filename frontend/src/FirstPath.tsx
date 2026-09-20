@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { ApiError, request } from "./api";
 import type { Page, Scope } from "./api";
-import { computeRun, uploadSource } from "./firstPathApi";
-import type { Coverage, EvidenceState, Finding, Receipt, RunSummary, SavedRun, SourceRecord } from "./firstPathApi";
+import { computeRun, uploadSourceWithReconciliation } from "./firstPathApi";
+import type { Coverage, EvidenceState, Finding, Receipt, RunSummary, SavedRun, SourceCatalogEntry, SourceRecord } from "./firstPathApi";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 const PAGE_SIZE = 20;
@@ -149,6 +149,16 @@ function RunHistory({ revision, currentId, busy, onSelect, refresh }: { revision
   </details>;
 }
 
+function SourceCatalog({ scopes }: { scopes: Scope[] }) {
+  const catalog = useApiResource<Page<SourceCatalogEntry>>("/api/source-catalog?limit=200&offset=0");
+  return <section className="inventory-panel" aria-labelledby="source-catalog-heading" aria-busy={catalog.status === "loading"}>
+    <div className="section-heading"><div><h2 id="source-catalog-heading">Imported-source catalog</h2><p className="quiet">Receipt-derived source identity and per-scope coverage. This is not automatic discovery.</p></div></div>
+    {catalog.status === "loading" && <p className="panel-message" role="status">Loading source catalog…</p>}
+    {catalog.status === "error" && <ErrorNotice error={catalog.error} />}
+    {catalog.status === "ready" && <div className="table-scroll" tabIndex={0} role="region" aria-label="Imported source catalog"><table><caption className="sr-only">Imported sources selected at the seeded demo clock.</caption><thead><tr><th>Source / run</th><th>Scope</th><th>Authority / status</th><th>Freshness / completeness</th></tr></thead><tbody>{catalog.data.items.map((item) => <tr key={`${item.batch_id}-${item.scope_id}`}><td><strong>{item.source_name}</strong><div className="table-secondary mono">{item.source_id} · {item.source_run_id}</div><div className="table-secondary">{item.source_kind} · batch <code>{item.batch_id}</code></div></td><td>{scopes.find((scope) => scope.id === item.scope_id)?.name ?? item.scope_id}</td><td>{item.authority} · {item.authority_status}<div className="table-secondary">{item.application_status} · {item.rejection_status}</div></td><td>{item.freshness} · {item.completeness}<div className="table-secondary">{item.window_start_at} → {item.window_end_at}</div></td></tr>)}</tbody></table></div>}
+  </section>;
+}
+
 function FindingDetail({ runId, findingId, scopes, onClose }: { runId: string; findingId: string; scopes: Scope[]; onClose: () => void }) {
   const [revision, setRevision] = useState(0);
   const [rawId, setRawId] = useState<string | null>(null);
@@ -230,6 +240,7 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
   const [runBusy, setRunBusy] = useState<"computing" | "opening" | null>(null);
   const [runError, setRunError] = useState<ApiError | null>(null);
   const [newImport, setNewImport] = useState(false);
+  const [reconcileAfterImport, setReconcileAfterImport] = useState(false);
   const uploadController = useRef<AbortController | null>(null);
   const runController = useRef<AbortController | null>(null);
   useEffect(() => () => { uploadController.current?.abort(); runController.current?.abort(); }, []);
@@ -249,7 +260,7 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
       try { body = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes); }
       catch { throw new ApiError("The selected file is not valid UTF-8. No upload was sent; save the source as UTF-8 JSON and try again.", "INVALID_ENCODING"); }
       try { JSON.parse(body); } catch { throw new ApiError("The selected file is not valid JSON. No upload was sent.", "INVALID_JSON"); }
-      const result = await uploadSource(body, controller.signal);
+      const result = await uploadSourceWithReconciliation(body, controller.signal, reconcileAfterImport);
       if (controller.signal.aborted) return;
       setImportResult(result);
       setReceiptId(result.receipt.id);
@@ -280,13 +291,14 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
     <div className="page-heading"><div><p className="eyebrow">Source evidence → saved calculation</p><h1>Source evidence and findings</h1><p className="intro">Import synthetic DHCP, routing and intended policy, then inspect saved calculations and findings.</p></div></div>
     <div className="evidence-banner"><strong>Synthetic inputs · Fixed demo clock</strong><span>Scope, policy and fresh complete coverage determine whether absence can be established. Missing evidence stays unknown.</span></div>
     <section className="path-step" aria-labelledby="import-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">1</span><div><h2 id="import-heading">Import a source envelope</h2><p className="quiet">Choose a DHCP, routing or intended-policy JSON file. Intended-inventory uploads are staged and never overwrite the active ledger.</p></div></div>
-      <form className="source-upload" onSubmit={(event) => { void importFile(event); }}><label className="field-label">Source JSON<input type="file" accept=".json,application/json" disabled={importing || runBusy !== null} onChange={(event) => { setFile(event.target.files?.[0] ?? null); setImportError(null); }} aria-describedby="source-help" /></label><button disabled={!file || importing || runBusy !== null} type="submit">{importing ? "Importing…" : "Import source"}</button></form>
+      <form className="source-upload" onSubmit={(event) => { void importFile(event); }}><label className="field-label">Source JSON<input type="file" accept=".json,application/json" disabled={importing || runBusy !== null} onChange={(event) => { setFile(event.target.files?.[0] ?? null); setImportError(null); }} aria-describedby="source-help" /></label><label className="checkbox-field"><input type="checkbox" checked={reconcileAfterImport} disabled={importing || runBusy !== null} onChange={(event) => setReconcileAfterImport(event.target.checked)} /> Reconcile after this import</label><button disabled={!file || importing || runBusy !== null} type="submit">{importing ? "Importing…" : "Import source"}</button></form>
       <p className="filter-help" id="source-help">ipam-synthetic-v1 · Up to 10 MiB / 10,000 records · Expected-answer files are not rule inputs.</p>
       {importError && <><ErrorNotice error={importError} title="No new import receipt confirmed" /><p className="quiet">If the request timed out or lost its connection, it may have been saved. Reload saved imports before retrying; identical replay returns the original receipt.</p></>}
-      {importResult && <div className={`notice import-result ${importResult.receipt.application_status}`} role="status"><h3>{importResult.replay ? "Identical replay — original receipt returned" : importResult.receipt.application_status === "partial" ? "Saved a partial import" : "Source import saved"}</h3><p><code>{importResult.receipt.source_id}</code> · {importResult.receipt.input_rows} input rows: {importResult.receipt.accepted_rows} accepted, {importResult.receipt.rejected_rows} rejected, {importResult.receipt.duplicate_rows} duplicate.</p><p>{importResult.replay ? "No new ingestion sequence was created." : "No calculation was triggered. Compute reconciliation when the intended inputs are ready."}</p>{importError && <p>This is the last confirmed receipt, from before the failed request.</p>}<button className="text-button" onClick={() => setReceiptId(importResult.receipt.id)}>Open this receipt</button></div>}
+      {importResult && <div className={`notice import-result ${importResult.receipt.application_status}`} role="status"><h3>{importResult.replay ? "Identical replay — original receipt returned" : importResult.receipt.application_status === "partial" ? "Saved a partial import" : "Source import saved"}</h3><p><code>{importResult.receipt.source_id}</code> · {importResult.receipt.input_rows} input rows: {importResult.receipt.accepted_rows} accepted, {importResult.receipt.rejected_rows} rejected, {importResult.receipt.duplicate_rows} duplicate.</p><p>{importResult.replay ? "No new ingestion sequence was created." : reconcileAfterImport ? "Import committed; the separate reconciliation result is shown below." : "No calculation was triggered. Compute reconciliation when the intended inputs are ready."}</p>{importResult.receipt.reconciliation && <p><strong>Reconciliation:</strong> {importResult.receipt.reconciliation.status}{importResult.receipt.reconciliation.run_id && <> · run <code>{importResult.receipt.reconciliation.run_id}</code></>}{importResult.receipt.reconciliation.error && <> · {importResult.receipt.reconciliation.error.message}</>}</p>}{importError && <p>This is the last confirmed receipt, from before the failed request.</p>}<button className="text-button" onClick={() => setReceiptId(importResult.receipt.id)}>Open this receipt</button></div>}
       <ImportHistory revision={importRevision} selectedId={receiptId} onSelect={setReceiptId} refresh={() => setImportRevision((value) => value + 1)} />
       {receiptId && <ReceiptDetail key={receiptId} id={receiptId} scopes={scopes} onClose={() => setReceiptId(null)} />}
     </section>
+    <SourceCatalog scopes={scopes} />
     <section className="path-step" aria-labelledby="compute-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">2</span><div><h2 id="compute-heading">Compute and save reconciliation</h2><p className="quiet">The API saves a new run using the current intended ledger and selected source batches.</p></div></div>
       <div className="compute-actions"><button disabled={runBusy !== null || importing} onClick={() => { void loadRun(); }}>{runBusy === "computing" ? "Computing and saving…" : "Compute reconciliation"}</button><span className="quiet">Explicit trigger · Saved evidence · No network changes</span></div>
       {runBusy && <p role="status" className="loading-line">{runBusy === "computing" ? "Waiting for a saved calculation result…" : "Opening the saved calculation…"}{run && " The previous run remains below until this request succeeds."}</p>}

@@ -31,6 +31,32 @@ export interface Receipt {
   synthetic: true;
   coverage: Coverage[];
   limitations: string[];
+  reconciliation?: { batch_id: string; status: "succeeded" | "busy" | "failed" | "skipped"; run_id?: string; replay: boolean; audit_recorded?: boolean; error?: { code: string; message: string } };
+}
+
+export interface SourceCatalogEntry {
+  source_id: string;
+  source_name: string;
+  owner: string;
+  source_kind: "routing" | "route_policy" | "dhcp";
+  authority: string;
+  authority_status: "declared";
+  scope_id: string;
+  source_run_id: string;
+  batch_id: string;
+  application_status: "complete" | "partial" | "staged";
+  rejection_status: "accepted" | "rejected";
+  rejected_rows: number;
+  duplicate_rows: number;
+  evaluated_at: string;
+  freshness: "fresh" | "stale" | "not_applicable";
+  completeness: "complete" | "partial";
+  coverage_grain: string;
+  window_start_at: string;
+  window_end_at: string;
+  declared_complete: boolean;
+  effective_complete: boolean;
+  references: { batch_id: string; receipt_id: string };
 }
 
 export interface SourceRecord {
@@ -97,6 +123,15 @@ export interface SavedRun extends RunSummary { findings: Finding[] }
 export async function uploadSource(body: string, signal: AbortSignal) {
   let replay = false;
   const receipt = await request<Receipt>("/api/imports", signal, false, {
+    method: "POST", body,
+    onResponse: (response) => { replay = response.headers.get("X-Import-Replay") === "true"; },
+  });
+  return { receipt, replay };
+}
+
+export async function uploadSourceWithReconciliation(body: string, signal: AbortSignal, reconcileAfterImport: boolean) {
+  let replay = false;
+  const receipt = await request<Receipt>(`/api/imports${reconcileAfterImport ? "?reconcile_after_import=true" : ""}`, signal, false, {
     method: "POST", body,
     onResponse: (response) => { replay = response.headers.get("X-Import-Replay") === "true"; },
   });
