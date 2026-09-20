@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { ApiError, request } from "./api";
 import type { Page, Scope } from "./api";
 import { computeRun, uploadSourceWithReconciliation } from "./firstPathApi";
-import type { Coverage, EvidenceState, Finding, Receipt, RunSummary, SourceCatalogResponse, SourceRecord } from "./firstPathApi";
+import type { Coverage, EvidenceState, Finding, Receipt, RunSummary, SavedRun, SourceCatalogResponse, SourceRecord } from "./firstPathApi";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 const PAGE_SIZE = 20;
