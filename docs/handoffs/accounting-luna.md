@@ -44,7 +44,8 @@ Observed directly from the completed rehearsal handoff and artifact root `/Users
 - the runtime diff is empty and the toolchain is retained;
 - readiness passed and the scheduler was disabled;
 - cycle 1 is established as run `004246ef-9089-40ac-b029-a412d5c2d38d`, operation `1b0f76b2-bfbc-40ac-b9bf-a566dccfa5d3`, at `2026-09-01T06:00:00.000Z`;
-- cycles 2–6, final cycle 7, correction/reconciliation, exception lifecycle, allocation, exports and stopped restore are recorded in `docs/handoffs/luna-final-rehearsal.md` at updated Stage 5 head `4654b48cb65381e32b1fb02ecef227d531e68b6d`.
+- cycles 2–6, final cycle 7, correction/reconciliation, exception lifecycle, allocation, exports and stopped restore are recorded in `docs/handoffs/luna-final-rehearsal.md` at updated Stage 5 head `a13c642f9ef2fc53d37a904cb1db9dee34c580e9`.
+- Presenter-ready cycle-1 snapshot: `ready-cycle1-with-preset-v2/snapshots/demo-ready-cycle1-with-preset.sqlite3`, SHA-256 `ee8134aa583dbf4711251f8bcd23e9bec6305ce77672e40e7cd3def91f655b37`, preset revision `147f2054b8edf4f186bc3c8ac8b11d86bed4f08972f20e47da7cba763d6c71c6`. Fresh independent browser selected-preset verification remains pending.
 - The separate Luna procedural reproduction verified restore/health/disabled cycle 1, initial run, Central `.240` API and clean stop; its browser selected-preset completion is unverified and it is not human acceptance.
 
 No application tests, builds, browser checks, infrastructure actions or new runtime acquisition were run by this lane. Historical evidence remains historical; no class upgrade follows from source review or task registration.
