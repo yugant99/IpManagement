@@ -5,7 +5,7 @@ Status: implemented and three focused local tests passed; independent review, sh
 ## Exact source and ownership
 
 - Branch/worktree: `codex/audit-capacity-history`, `/Users/yuganthareshsoni/Downloads/Ip_inventory-audit-history`.
-- Code checkpoint: `d9b0c1743bc0ba17a636aa2954eb456ece703014`.
+- Initial code checkpoint: `d9b0c1743bc0ba17a636aa2954eb456ece703014`; the saved-provenance follow-up is included in [PR #40](https://github.com/yugant99/IpManagement/pull/40).
 - Starting main: `a279f32df0ac7d2147b580dbff36dd88772bdeb2`.
 - Shared schema dependency merged normally: `7dc057c6b18b0b3f0c0425bb17d0b427c4908969`, from `codex/audit-shared-integration`. Stage 4 owns schema/store/seed compatibility and frontend integration.
 - Inventory/history agent owns `calculations.py`, `tests/test_capacity_history.py` and this handoff. The coordinator authored the included `inventory_commands.py` changes and explicitly delegated their inclusion in this coherent F3 checkpoint.
@@ -14,6 +14,8 @@ Status: implemented and three focused local tests passed; independent review, sh
 ## Contract and resulting behavior
 
 `pools.capacity_history_version` is an integer, defaults to `1` and must be at least `1`. This token describes support for historical geometry; existing pool, prefix and ledger versions retain their concurrency purpose. Calculations read the token directly from the pool table rather than depending on an HTTP response model.
+
+Every newly saved pool metric records `capacity_history_version` beside `pool_version`, pinning the exact eligibility token used by that run. This follow-up changes no response models and does not rewrite older saved results.
 
 - Metadata-only changes to owner, purpose, tags or custom fields continue to bump the existing concurrency versions and append audit, but leave the capacity-history token unchanged. Previously eligible p95/history/forecast therefore remain eligible when the source coverage remains valid.
 - Child creation and supported empty-prefix bounds changes increment the capacity-history token for pools attached to the affected prefix or its ancestors. Unrelated pools are unaffected. These structural changes conservatively invalidate unsupported historical calculations.
@@ -25,13 +27,15 @@ Status: implemented and three focused local tests passed; independent review, sh
 
 ## Focused verification actually performed
 
-The latest audit-follow-up request authorized focused local tests using disposable synthetic stores. The following command ran once after the exact coordinated schema merge and final code edits:
+The latest audit-follow-up request authorized focused local tests using disposable synthetic stores. The following command ran after the exact coordinated schema merge:
 
 ```sh
 PYTHONPATH=backend PYTHONDONTWRITEBYTECODE=1 /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -m unittest discover -s tests -p test_capacity_history.py -v
 ```
 
 Observed: **3 tests passed**, `Ran 3 tests in 0.368s`, `OK`.
+
+The saved-provenance follow-up added assertions for token `1` before/after metadata edits and token `2` after structural changes; that focused rerun passed all three tests in `0.288s`. The tests were then strengthened to read metrics back from persisted `calculation_runs.result_json`, so the assertions cover saved provenance rather than only the returned result. The final relevant rerun passed **3/3 tests in `0.253s`**, `OK`.
 
 | Test | Observed assertions |
 |---|---|

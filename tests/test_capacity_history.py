@@ -95,7 +95,9 @@ class CapacityHistoryTests(unittest.TestCase):
 
     def _run(self):
         result = self._write(lambda: create_run(self.connection))
-        return result, {metric["pool_id"]: metric for metric in result["calculations"]}
+        saved = json.loads(self.connection.execute(
+            "SELECT result_json FROM calculation_runs WHERE id=?", (result["id"],)).fetchone()[0])
+        return result, {metric["pool_id"]: metric for metric in saved["calculations"]}
 
     def _edit_payload(self, prefix_id, **changes):
         context = edit_context(self.connection, prefix_id)
@@ -137,6 +139,8 @@ class CapacityHistoryTests(unittest.TestCase):
         self.assertEqual(stale_allocation.exception.code, "STALE_REVIEW")
         _, after = self._run()
         for pool_id in (NORTH_POOL, ANCESTOR_POOL, LAB_POOL):
+            self.assertEqual(before[pool_id]["capacity_history_version"], 1)
+            self.assertEqual(after[pool_id]["capacity_history_version"], 1)
             for field in ("history", "p95", "forecast"):
                 self.assertEqual(after[pool_id][field], before[pool_id][field])
         self.assertEqual(self.connection.execute("SELECT result_json FROM calculation_runs WHERE id=?", (original_run["id"],)).fetchone()[0], old_json)
@@ -155,6 +159,8 @@ class CapacityHistoryTests(unittest.TestCase):
         _, after = self._run()
         for pool_id in (NORTH_POOL, ANCESTOR_POOL):
             self.assertGreater(self._history_tokens()[pool_id][0], 1)
+            self.assertEqual(before[pool_id]["capacity_history_version"], 1)
+            self.assertEqual(after[pool_id]["capacity_history_version"], 2)
             self.assertEqual(after[pool_id]["current"], before[pool_id]["current"])
             self.assertTrue(after[pool_id]["lease_overlap_30d"])
             for field in ("p95", "forecast"):
@@ -173,6 +179,7 @@ class CapacityHistoryTests(unittest.TestCase):
         _, changed = self._run()
         for pool_id in (NORTH_POOL, ANCESTOR_POOL):
             self.assertGreater(self._history_tokens()[pool_id][0], before_versions[pool_id][0])
+            self.assertEqual(changed[pool_id]["capacity_history_version"], 2)
             self.assertEqual(changed[pool_id]["p95"]["reason"], "capacity_history_changed")
             self.assertEqual(changed[pool_id]["current"]["status"], "available")
             self.assertEqual(changed[pool_id]["current"]["utilization_pct"], 100)
@@ -184,6 +191,7 @@ class CapacityHistoryTests(unittest.TestCase):
         _, after_metadata = self._run()
         for pool_id in (NORTH_POOL, ANCESTOR_POOL):
             self.assertEqual(self._history_tokens()[pool_id][0], tokens[pool_id][0])
+            self.assertEqual(after_metadata[pool_id]["capacity_history_version"], 2)
             self.assertEqual(after_metadata[pool_id]["p95"]["reason"], "capacity_history_changed")
         self.assertEqual(after_metadata[LAB_POOL]["p95"]["status"], "available")
 
