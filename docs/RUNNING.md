@@ -1,25 +1,25 @@
 # Running the IPAM demo container
 
-Owner: Part 6 (Spencer). Packaging targets accepted main
-`376dd52f9457dd0b7fecc8d83a3e0d6970bb487e` (runtime equivalent to
-application candidate `289f53c7c5db1bd414c938add1ea207d591f9e64`) as
-one Docker service: a compiled React UI and the Python FastAPI/Uvicorn
-API in the same process, with SQLite persisted through `IPAM_DATA_DIR`.
+Owner: Part 6 (Spencer). One Docker service serves the compiled React UI
+and Python FastAPI/Uvicorn API, with SQLite persisted through `IPAM_DATA_DIR`.
 
-**Status: source files and documented procedures only.** No image has
-been built, run, health-checked or restarted from this branch.
-`PART6_READY` stays `no` until a target-host recipient session records
-image build/startup/rich acquisition/allocation-restart/backup-restore
-evidence. Native macOS rehearsal (see
-[`docs/DEMO_RUNBOOK.md`](DEMO_RUNBOOK.md)) does not close the portable
-gate. See [Limitations](#limitations-and-unverified-behavior).
+**Bounded VM execution observed:** exact accepted source
+`eab1d3376633bf3280ff7bd8834fe46c88353d9a` built and ran on Linux amd64
+in the authorized September 21 experiment. Rich acquisition, representative
+UI/API flows, same-ID restart, stopped backup, populated restore and isolated
+same-host agent reproduction were observed. A new disposable macOS snapshot
+also restored on that VM. See [exact evidence and limits](handoffs/vm-portability.md).
+Human recipient acceptance, full outage recovery and sustained hybrid operation
+are not established. The lead owns readiness/accounting decisions.
 
 ## Supported target
 
 - Host OS/architecture: **Linux `amd64`** with Docker Engine ≥ 24 and
-  the Compose plugin (`docker compose`, v2). Legacy `docker-compose`
+  the Compose plugin (`docker compose`). The experiment used Engine 29.8.1
+  and Compose plugin 5.5.1; earlier source guidance specified v2, which was
+  not exercised in this experiment. Legacy `docker-compose`
   is not exercised here and is not supported by these scripts.
-- macOS `arm64` and Windows/WSL2 hosts are stretch and not exercised.
+- Container execution on macOS `arm64` and Windows/WSL2 is not exercised.
   The package fixes its build target to Linux amd64; other host
   architectures need separately authorized emulation evidence.
 - Host tools: Bash, curl, Python 3.11+ (acquisition JSON and snapshot
@@ -139,6 +139,14 @@ setup-needed view instead of erroring out.
 
 - Container path: `/data` (writable, owned by uid/gid `10001`).
 - Named volume: `ipam_demo_data` — managed by Docker on the host.
+  This name is global to the engine: a different Compose project name does
+  **not** isolate data. Before first use, establish that this volume is absent
+  on a dedicated engine or select a separate disposable source copy and change
+  only `volumes.ipam_data.name` to a unique name. Record the diff/hash and use
+  a distinct `COMPOSE_PROJECT_NAME` too. The wrappers set their Compose file
+  explicitly, so an environment-only `COMPOSE_FILE` override is insufficient.
+  Some wrapper log messages name the default volume literally; use the rendered
+  Compose configuration and actual mount inspection as the identity evidence.
 - Files under `/data`:
   - `ipam_demo.sqlite3` — the application database.
   - `snapshots/` — populated by `scripts/ops/backup.sh` (0700, uid 10001).
@@ -153,9 +161,12 @@ setup-needed view instead of erroring out.
 
 To inspect the volume from the host: `docker volume inspect ipam_demo_data`.
 
-To provide a bind mount instead of the named volume (development only),
-override the `volumes:` entry in a local Compose override file and point
-`/data` at an existing local directory writable by uid `10001`.
+For an unverified development-only bind-mount variant, edit the service
+`volumes:` entry in a separate disposable source copy's `compose.yaml` and
+point `/data` at an existing local directory writable by uid `10001`. The
+wrappers do not automatically consume a Compose override file. Record the
+exact source-copy diff, rendered configuration, runtime UID and actual mount
+before using such a variant; this experiment used named volumes only.
 Missing/unwritable paths surface `DATA_PATH_UNAVAILABLE` or
 `DATA_PATH_UNWRITABLE` with the resolved path and runtime UID — the
 service never silently falls back to ephemeral storage.
@@ -253,12 +264,13 @@ identity, schema and integrity. Keep the source unchanged during transfer.
 Follow with `scripts/ops/restore.sh foo.sqlite3 --confirm` to bring it
 online.
 
-## Offline recipient handoff (procedure only, unrun)
+## Offline recipient handoff
 
 On an authorized Linux amd64 build host, build the reviewed source once.
 Record the full source commit and image ID, then save the already-built
-image. Use a new output directory; commands below are instructions, not
-recorded execution evidence:
+image. Use a new output directory. The linked experiment followed this procedure
+using a distinct source copy and volume on the same host; it was agent
+reproduction, not a human recipient session:
 
 ```sh
 mkdir part6-transfer
@@ -369,22 +381,19 @@ do not assume the compiled bundle contains a complete notices file.
 
 ## Limitations and unverified behavior
 
-- **Nothing has been executed on this branch.** No image has been
-  built, run, seeded, health-checked, backed up or restored. All
-  behavior above is derived from source and current contracts; no
-  container runtime evidence is claimed. This is deliberate: the
-  colleague scope explicitly forbids Docker/VM/cloud execution and
-  external spending in this turn.
-- Core state commands (`backup`, `restore`, `reset`) exist and have
-  bounded local schema-compat evidence recorded in
-  [`docs/STATE_OPERATIONS.md`](STATE_OPERATIONS.md). Their behavior
-  under the container's exclusive volume, at target-host scale and
-  with G21/G22 allocation/audit records, is not established here.
-- Recipient checks not yet run: image build/pull, `/healthz` on
-  `linux/amd64`, unseeded `SETUP_NEEDED` UI, rich seed + first
-  acquisition, restart preserving allocation/audit rows,
-  backup → restore cycle, `--confirm` refusal paths and
-  `DATA_PATH_UNAVAILABLE`/`DATA_PATH_UNWRITABLE` on a bad mount.
+- The [VM handoff](handoffs/vm-portability.md) records one baseline build and
+  bounded runtime observations. No runtime source repair or rebuild was needed.
+  Its timing starts with a prepared host, loaded image and imported snapshot;
+  it does not measure provisioning, transfer or full business recovery.
+- Core state commands have separate bounded native evidence in
+  [STATE_OPERATIONS.md](STATE_OPERATIONS.md). This VM experiment adds stopped
+  backup/restore, populated prior-state preservation and missing-confirmation
+  refusal. It does not add reset, hot backup, corrupt-file, bad-mount,
+  crash/endurance or enabled-schedule recovery coverage.
+- Same-host image/source/snapshot reproduction does not establish a second
+  independent engine or human recipient acknowledgement/practice/training.
+  Native macOS-to-Linux snapshot transfer does not establish an ARM container
+  or sustained hybrid-cloud networking and operation.
 - Cross-architecture (`arm64`), non-Linux hosts, network filesystem
   mounts, multi-worker deployments, TLS/authentication and public
   exposure are **not** supported by this package.
@@ -397,7 +406,5 @@ do not assume the compiled bundle contains a complete notices file.
   `curl` is a small add; if the recipient security profile disallows
   it, replace with a `python -c "urllib.request..."` invocation and
   note the change here.
-- `PART6_READY=no`. Questionnaire accounting stands at
-  32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing out of
-  111 (per the lead review); this branch does not change that
-  accounting. Portable-runtime success is not claimed.
+- The lead owns `PART6_READY` and the questionnaire accounting in
+  [STATUS.md](STATUS.md). This operator runbook does not adjudicate either.
