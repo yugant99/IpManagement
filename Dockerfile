@@ -23,7 +23,7 @@ RUN npm run build
 # The resulting virtualenv is copied verbatim into the runtime image.
 ##############################################################################
 FROM --platform=linux/amd64 python:3.12.10-slim-bookworm AS python-build
-COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.7.13 /uv /usr/local/bin/uv
 
 ENV UV_LINK_MODE=copy \
     UV_COMPILE_BYTECODE=1 \
@@ -34,7 +34,9 @@ ENV UV_LINK_MODE=copy \
 WORKDIR /build
 COPY pyproject.toml uv.lock README.md ./
 COPY backend ./backend
-RUN uv sync --frozen --no-dev
+COPY fixtures/evolving/ipam_synthetic_feed ./fixtures/evolving/ipam_synthetic_feed
+# Install both declared packages into the venv, without /build source links.
+RUN uv sync --frozen --no-dev --no-editable
 
 ##############################################################################
 # Stage 3: minimal runtime image. Non-root user, /data mount, loopback default.
@@ -59,12 +61,16 @@ WORKDIR /app
 # Prebuilt virtualenv (Python deps) and the compiled UI assets.
 COPY --from=python-build --chown=ipam:ipam /opt/ipam-venv /opt/ipam-venv
 COPY --from=frontend-build --chown=ipam:ipam /work/frontend/dist /app/static
+# Only the committed runtime inputs; expected answers and opt-in cases stay out.
+COPY fixtures/v1/inventory.json fixtures/v1/inventory-policy.json /app/fixtures/v1/
+COPY fixtures/v1/observations/ /app/fixtures/v1/observations/
 
 ENV PATH="/opt/ipam-venv/bin:${PATH}" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     IPAM_DATA_DIR=/data \
-    IPAM_STATIC_DIR=/app/static
+    IPAM_STATIC_DIR=/app/static \
+    IPAM_SYNTHETIC_FEED_DIR=/app/fixtures/v1
 
 VOLUME ["/data"]
 EXPOSE 8000

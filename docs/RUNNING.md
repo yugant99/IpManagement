@@ -1,15 +1,18 @@
 # Running the IPAM demo container
 
-Owner: Part 6 (Spencer). This runbook packages the checkpoint recorded
-in [Stage 2](handoffs/stage-02-report.md) (commit `8a1a1227`) as one
+Owner: Part 6 (Spencer). Packaging now targets accepted main
+`376dd52f9457dd0b7fecc8d83a3e0d6970bb487e` (runtime equivalent to
+`289f53c7c5db1bd414c938add1ea207d591f9e64`) as one
 Docker service: a compiled React UI and the Python FastAPI/Uvicorn
 API in the same process, with SQLite persisted through `IPAM_DATA_DIR`.
 
 **Status: source files only.** No image has been built, run, health-
 checked, or otherwise executed from this branch. `PART6_READY` remains
-`no` until core lands `reset`, `backup` and `restore` and the recipient
-evidence (startup, restart persistence, allocation/audit records) is
-recorded. See [Limitations](#limitations-and-unverified-behavior).
+`no` until package state-command procedures and recipient evidence
+(startup, restart persistence, allocation/audit records) are completed.
+Core already supplies schema-5 `reset`, `backup` and `restore`; the
+remaining package work is recorded in [the lead review](handoffs/part-6-pr49-review.md).
+See [Limitations](#limitations-and-unverified-behavior).
 
 ## Supported target
 
@@ -38,6 +41,13 @@ recorded. See [Limitations](#limitations-and-unverified-behavior).
 
 The application module, its dependency locks and its fixtures remain
 core-owned and are consumed unchanged.
+
+The image installs `ipam_demo` and `ipam_synthetic_feed` as non-editable
+packages. It includes the frozen rich inventory, policy and eight observation
+envelopes under `/app/fixtures/v1`, with `IPAM_SYNTHETIC_FEED_DIR` pointing
+there. Expected-answer files are not packaged. The baseline setup below is
+still the older foundation scenario, not the accepted rich demo; Spencer's
+remaining operator handoff must supply its explicit rich-seed/acquisition path.
 
 ## First-time setup
 
@@ -117,19 +127,19 @@ service never silently falls back to ephemeral storage.
   --scenario baseline` in a one-shot container that mounts the same
   `/data` volume. Re-running is refused with `ALREADY_INITIALIZED`
   and never rewrites persisted rows.
-- **Migrate** — `scripts/ops/migrate.sh` runs the explicit v1 → v2
-  schema migration under the same exclusive lock. Only needed on a
-  pre-existing v1 database.
+- **Migrate** — `scripts/ops/migrate.sh` calls the current CLI's explicit
+  recognized v1/v2/v3/v4 → v5 migration under the same exclusive lock.
+  See [state operations](STATE_OPERATIONS.md) for supported inputs and
+  the narrower set of migrations actually observed.
 
-### Not implemented yet
+### Package procedures still pending
 
-`reset`, `backup` and `restore` are core state commands and are being
-assigned separately. They are **not** available at commit
-`8a1a1227`; the CLI parser rejects the subcommands. Part 6 will add
-matching `scripts/ops/{reset,backup,restore}.sh` wrappers and update
-this section **after** core lands the commands and `docs/CONTRACTS.md`
-records them as implemented. Do not attempt to script around this by
-touching SQLite directly.
+`reset --confirm`, `backup --output PATH` and `restore --input PATH --confirm`
+already exist in core. Part 6 must finish matching wrappers/procedures,
+including usable container/host snapshot paths, stopped-service operation,
+explicit confirmation and preservation of the replaced database. Follow
+[the core semantics](STATE_OPERATIONS.md); do not copy live SQLite files or
+delete the volume as a substitute.
 
 ## Shutdown
 
@@ -151,13 +161,11 @@ must not do this.
   single request's trail.
 - Health JSON — `scripts/ops/health.sh` prints the raw body and
   exits with a distinguishable code per state (see above).
-- Recovering from a stuck lock — the lock file stays on disk after a
-  normal exit, which is fine. Only if a container was killed with
-  `SIGKILL` **and** a subsequent `seed`/`migrate` reports
-  `DATA_IN_USE` should you inspect: `docker compose ps` should show no
-  running `ipam` container, and there should be no `python -m
-  ipam_demo` process on the host. Only then remove the lock file from
-  inside a one-shot container that mounts `/data`.
+- `DATA_IN_USE` — the lock file normally remains after exit; the kernel
+  releases its lock when the holder exits, including after `SIGKILL`.
+  Identify and stop the process/container holding this data volume, then
+  retry. Never remove the lock file to bypass a lock: replacing its inode
+  can allow two writers to operate on the same database.
 - Symlinked database path — the app rejects a symlinked
   `ipam_demo.sqlite3` with `UNSAFE_DATABASE_PATH`. Store the SQLite
   file as a regular file directly on the mounted volume.
@@ -178,8 +186,9 @@ pin versions independently.
 - Extra apt packages installed into the runtime image: `tini`
   (init/signal handling) and `curl` (HEALTHCHECK). Both are Debian
   main.
-- Build helpers: `ghcr.io/astral-sh/uv:0.5.11` copied in to run
-  `uv sync --frozen`; not present in the runtime image.
+- Build helper: `ghcr.io/astral-sh/uv:0.7.13`, matching the accepted native
+  rehearsal tool version, runs `uv sync --frozen --no-dev --no-editable`;
+  not present in the runtime image. Application dependency locks are unchanged.
 
 License review of every transitive dependency is out of scope for
 this branch and needs a separate audit against `uv.lock` and
@@ -189,12 +198,11 @@ this branch and needs a separate audit against `uv.lock` and
 
 - **Nothing has been executed.** No image has been built, run,
   seeded, health-checked or restarted. All behavior above is derived
-  from source, contracts and the Stage 2 report; no runtime evidence
+  from source and current contracts; no container runtime evidence
   is claimed.
-- Core state commands `reset`, `backup` and `restore` are **not
-  implemented** at commit `8a1a1227`. `PART6_READY` stays `no` until
-  they land and G27 persistence evidence (G21/G22 allocation/audit
-  records surviving restart) exists.
+- Core state commands are available. Package wrappers/procedures and G27
+  target-host persistence evidence (G21/G22 allocation/audit records surviving
+  restart and snapshot recovery) remain pending. `PART6_READY` stays `no`.
 - Cross-architecture (`arm64`), non-Linux hosts, network filesystem
   mounts, multi-worker deployments, TLS/authentication and public
   exposure are **not** supported by this package.

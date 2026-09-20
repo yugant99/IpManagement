@@ -30,6 +30,7 @@ services:
     environment:
       IPAM_DATA_DIR: /data
       IPAM_STATIC_DIR: /app/static
+      IPAM_SYNTHETIC_FEED_DIR: /app/fixtures/v1
     volumes:
       - ipam_data:/data
     restart: unless-stopped

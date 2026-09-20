@@ -16,6 +16,8 @@
 /assessment/
 /private/
 /source_documents/
+/audit/
+/outputs/
 *.pptx
 *.xlsx
 *.docx
@@ -61,6 +63,6 @@ compose.yaml
 # Docs and scripts do not affect the runtime image contents.
 docs/
 scripts/
-README.md
+# README.md is required by pyproject.toml and the Python build COPY.
 AGENTS.md
 DEVELOPMENT_RULES.md
