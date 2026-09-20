@@ -18,7 +18,7 @@ Implemented:
 - The saved-run summary reports anomalous findings, unknown findings, affected scopes, and unique anomalous `pool_pressure` subjects. It shows the selected run ID, `created_at`, and `demo_clock_at`; it does not merge current exception state or infer pressure from unavailable capacity evidence.
 - The integration owner has the proposed app.py contract: add `family` to `/api/runs/{run_id}/export` and `/api/runs/{run_id}/findings`, preserve JSON export media type, and preserve pagination totals.
 
-Actually observed and evidence pointers: code checkpoint `a9c9fab` contains the backend implementation and focused tests; UI checkpoint `318f48c` contains the frontend implementation; the current branch head is recorded separately in the provenance evidence after the documentation commit. Focused unit evidence is recorded in `docs/evidence/easy-wins/reports/focused-check.md`.
+Actually observed and evidence pointers: code checkpoint `a9c9fab` contains the backend implementation and focused tests; UI checkpoint `318f48c` contains the frontend implementation; current branch head is `27d0b482039a167f161e8d3838ecf538107bc0b9`. Focused unit evidence is recorded in `docs/evidence/easy-wins/reports/focused-check.md`.
 
 Synthetic / simulated / partial / unverified: report data and source evidence remain synthetic/local. No browser evidence or integrated HTTP route evidence was produced in this isolated worker because app.py is outside ownership. Frontend build was attempted once and is unverified because `frontend` dependencies are absent (`tsc: command not found`).
 
