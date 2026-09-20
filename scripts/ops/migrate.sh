@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
-# Explicit schema v1 → v2 migration under the same exclusive data lock.
+# Explicit stopped-service schema migration under the exclusive data lock.
+# The current CLI migrates recognized v1, v2, v3 and v4 stores forward to
+# the schema version supplied by the installed application (v5 at time of
+# writing). Startup refuses to serve an older-schema store without this
+# step; state operations refuse to advance a schema themselves.
+#
 # Preconditions:
 #   - Image is built.
-#   - Service is stopped.
+#   - Service is stopped (this wrapper checks and fails visibly).
 # Effects:
-#   - Adds Stage 2 tables to an existing v1 database. Never runs implicitly
-#     at startup; the app refuses to serve a v1 store without this step.
+#   - Adds the newer-schema tables/columns to an existing recognized
+#     legacy database. See docs/STATE_OPERATIONS.md for supported input
+#     versions and the narrower set of migrations actually exercised by
+#     core focused checks.
 
 source "$(dirname -- "$0")/common.sh"
+
+require_service_stopped
 
 log "Running explicit schema migrate. Service must be stopped."
 compose run --rm --no-deps --entrypoint "" "${SERVICE_NAME}" \

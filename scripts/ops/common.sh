@@ -13,16 +13,38 @@ COMPOSE_FILE="${REPO_ROOT}/compose.yaml"
 COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-ipam-demo}"
 SERVICE_NAME="ipam"
 
-# Detect the compose CLI variant. Prefer the modern `docker compose`
-# subcommand; fall back to the legacy `docker-compose` binary.
+# Path inside the container where snapshots live. Kept under the data
+# volume so backups persist alongside the database across host restarts
+# and never need a second volume/bind-mount at Compose level.
+SNAPSHOT_DIR_CONTAINER="/data/snapshots"
+
+# Require Docker Compose v2 (`docker compose`). The legacy `docker-compose`
+# binary is out of scope for this package: it uses different flag semantics
+# and hasn't been exercised against the compose.yaml here.
 compose() {
-  if docker compose version >/dev/null 2>&1; then
-    docker compose --file "${COMPOSE_FILE}" --project-name "${COMPOSE_PROJECT_NAME}" "$@"
-  elif command -v docker-compose >/dev/null 2>&1; then
-    docker-compose --file "${COMPOSE_FILE}" --project-name "${COMPOSE_PROJECT_NAME}" "$@"
-  else
-    echo "error: docker compose (or docker-compose) is required and not on PATH" >&2
+  if ! docker compose version >/dev/null 2>&1; then
+    echo "error: Docker Compose v2 ('docker compose') is required and not on PATH." >&2
+    echo "       Install Docker Engine 24+ with the Compose plugin." >&2
     return 127
+  fi
+  docker compose --file "${COMPOSE_FILE}" --project-name "${COMPOSE_PROJECT_NAME}" "$@"
+}
+
+# True when the ipam service has a running container in this project.
+# Returns 0 running, 1 stopped-or-absent, other codes on docker failure.
+service_is_running() {
+  local state
+  state="$(compose ps --status running --services 2>/dev/null || true)"
+  [[ "${state}" == *"${SERVICE_NAME}"* ]]
+}
+
+# Fail fast when a state command would collide with the running service.
+# The container's exclusive .ipam_demo.lock enforces this too; refusing
+# early gives a clearer error and skips a wasted container start.
+require_service_stopped() {
+  if service_is_running; then
+    echo "error: ${SERVICE_NAME} is running. Stop it first with scripts/ops/stop.sh." >&2
+    return 1
   fi
 }
 
