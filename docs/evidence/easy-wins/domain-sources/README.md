@@ -2,9 +2,9 @@
 
 This directory records the bounded source checks for the domain/source slice.
 
-- `PYTHONPATH=backend python3 -m unittest tests.test_easy_wins_domain_sources` passed two focused scenarios: domain/region intersection for prefixes and pools, and receipt provenance/partial catalog state.
-- Frontend build was attempted with `npm run build`; it was blocked before compilation because the checkout has no `frontend/node_modules/.bin/tsc`.
-- No browser, integrated endpoint or deployment evidence is claimed. The catalog endpoint and API query wiring are pending the app owner’s `app.py` integration.
+- `PYTHONPATH=backend python3 -m unittest tests.test_easy_wins_domain_sources` passed three focused scenarios, including staged receipt safety and latest partial selection.
+- The integrated frontend build passed after `npm ci` from the unchanged lockfile; Node 23.11.0 is outside the repository's declared supported range.
+- Connected browser and integrated endpoint evidence is recorded below; no deployment evidence is claimed.
 
 ## Minimal connected browser observation
 
