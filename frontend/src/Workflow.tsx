@@ -35,7 +35,7 @@ function ExceptionEvidence({ title, finding }: { title: string; finding: Excepti
   </section>;
 }
 
-export default function Workflow() {
+export default function Workflow({ active = true }: { active?: boolean }) {
   const [status, setStatus] = useState<WorkflowStatus | null>(null);
   const [actorId, setActorId] = useState("demo-requester");
   const [requests, setRequests] = useState<Page<AllocationRequest> | null>(null);
@@ -65,6 +65,7 @@ export default function Workflow() {
   const [exceptionAttempt, setExceptionAttempt] = useState<{ id: string; payload: ExceptionAction } | null>(null);
 
   useEffect(() => {
+    if (!active) return;
     const controller = new AbortController();
     setLoading(true);
     Promise.all([
@@ -80,9 +81,10 @@ export default function Workflow() {
       if (!controller.signal.aborted) setError(`Refresh failed; previously shown data retains its earlier state. ${readableError(failure)}`);
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [revision, requestOffset, exceptionOffset]);
+  }, [active, revision, requestOffset, exceptionOffset]);
 
   useEffect(() => {
+    if (!active) return;
     const controller = new AbortController();
     const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(auditOffset) });
     if (auditSubject) params.set("subject_id", auditSubject);
@@ -91,7 +93,7 @@ export default function Workflow() {
       .then(items => { if (!controller.signal.aborted) setAudit(items); })
       .catch((failure: unknown) => { if (!controller.signal.aborted) setError(`Audit history failed to load. ${readableError(failure)}`); });
     return () => controller.abort();
-  }, [revision, auditOffset, auditSubject]);
+  }, [active, revision, auditOffset, auditSubject]);
 
   function refresh() { setError(""); setRevision(value => value + 1); }
   function history(id: string) { setAuditSubject(id); setAuditOffset(0); }
@@ -164,6 +166,7 @@ export default function Workflow() {
       <p className="intro">Request an exact IPv4 address, review it as a second demo actor, and inspect the stored audit trail.</p></div>
       <button className="secondary" disabled={loading || busy} onClick={refresh}>Refresh workflow</button></div>
     <div className="evidence-banner"><strong>Synthetic workflow</strong><span>Local allocations are real database changes. External provisioning is simulated. Queue actions leave calculated findings unchanged.</span></div>
+    <p className="quiet">The queue shows evidence from its last refresh. Returning to this view refreshes it; use Refresh workflow to include runs acquired while this view stays open.</p>
     {error && <div className="notice" role="alert"><strong>Action or refresh failed</strong><p>{error}</p></div>}
     {message && <div className="notice" role="status">{message}</div>}
     {decisionAttempt && !selectedRequest && <div className="notice" role="status"><p>The decision response for request <code>{decisionAttempt.id}</code> is uncertain. Its row is outside the current page; the exact decision remains available for a safe retry.</p>

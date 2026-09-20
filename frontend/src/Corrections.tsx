@@ -75,7 +75,7 @@ function FindingEvidence({ finding, title }: { finding: Finding; title: string }
   </section>;
 }
 
-export default function Corrections() {
+export default function Corrections({ active = true }: { active?: boolean }) {
   const [restored] = useState(readAttempt);
   const [attempt, setAttempt] = useState<Attempt | null>(restored.attempt);
   const [storageError, setStorageError] = useState(restored.error);
@@ -105,6 +105,7 @@ export default function Corrections() {
   useEffect(() => () => operation.current?.abort(), []);
 
   useEffect(() => {
+    if (!active) return;
     const controller = new AbortController();
     setLoading(true);
     Promise.all([
@@ -119,34 +120,37 @@ export default function Corrections() {
       if (!controller.signal.aborted) setError(`Refresh failed; previously displayed records may be stale. ${readableError(failure)}`);
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [revision, runOffset, requestOffset]);
+  }, [active, revision, runOffset, requestOffset]);
 
   useEffect(() => {
+    if (!active) return;
     const controller = new AbortController();
     setRun(null);
     if (runId) request<SavedRun>(`/api/runs/${encodeURIComponent(runId)}`, controller.signal).then(value => {
       if (!controller.signal.aborted) setRun(value);
     }).catch((failure: unknown) => { if (!controller.signal.aborted) setError(`Saved run could not be loaded. ${readableError(failure)}`); });
     return () => controller.abort();
-  }, [runId, revision]);
+  }, [active, runId, revision]);
 
   useEffect(() => {
+    if (!active) return;
     const controller = new AbortController();
     setContext(null);
     if (runId && findingId) loadCorrectionContext(runId, findingId, controller.signal).then(value => {
       if (!controller.signal.aborted) setContext(value);
     }).catch((failure: unknown) => { if (!controller.signal.aborted) setError(`Correction review context could not be loaded. ${readableError(failure)}`); });
     return () => controller.abort();
-  }, [runId, findingId, revision]);
+  }, [active, runId, findingId, revision]);
 
   useEffect(() => {
+    if (!active) return;
     const controller = new AbortController();
     setSelected(null);
     if (selectedId) loadCorrection(selectedId, controller.signal).then(value => {
       if (!controller.signal.aborted) setSelected(value);
     }).catch((failure: unknown) => { if (!controller.signal.aborted) setError(`Correction request could not be loaded. ${readableError(failure)}`); });
     return () => controller.abort();
-  }, [selectedId, revision]);
+  }, [active, selectedId, revision]);
 
   function retain(value: Attempt) {
     const saved = readAttempt();
@@ -243,6 +247,7 @@ export default function Corrections() {
       <p className="intro">Propose missing registered space, obtain an independent decision, then reconcile and inspect the evidence.</p></div>
       <button type="button" className="secondary" disabled={busy || loading} onClick={() => { setError(""); setRevision(value => value + 1); }}>Refresh corrections</button></div>
     <div className="evidence-banner"><strong>Local synthetic workflow</strong><span>Approval registers a prefix in this application's inventory. It does not change DHCP, routers or any external system. Resolution requires a subsequent comparable finding.</span></div>
+    <p className="quiet">Evidence is a loaded snapshot. Returning to this view refreshes it; use Refresh corrections to include runs acquired while this view stays open.</p>
     {error && <div className="notice error" role="alert">{error}</div>}
     {message && <div className="notice" role="status">{message}</div>}
     {storageError && <div className="notice error" role="alert"><p>{storageError}</p><button type="button" className="secondary" disabled={busy} onClick={reloadRetry}>Reload saved retry</button></div>}

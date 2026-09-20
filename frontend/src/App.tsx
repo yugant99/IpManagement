@@ -319,8 +319,8 @@ export default function App() {
         )}
         {evidenceScopes && <div hidden={view !== "first-path"}><FirstPath scopes={evidenceScopes} /></div>}
         {/* Preserve unresolved workflow retries after initial readiness, including refresh failures. */}
-        {evidenceScopes && <div hidden={view !== "workflow" || bootstrap.status !== "ready"}><Workflow /></div>}
-        {evidenceScopes && <div hidden={view !== "corrections" || bootstrap.status !== "ready"}><Corrections /></div>}
+        {evidenceScopes && <div hidden={view !== "workflow" || bootstrap.status !== "ready"}><Workflow active={view === "workflow" && bootstrap.status === "ready"} /></div>}
+        {evidenceScopes && <div hidden={view !== "corrections" || bootstrap.status !== "ready"}><Corrections active={view === "corrections" && bootstrap.status === "ready"} /></div>}
         {evidenceScopes && <div hidden={view !== "schedule" || bootstrap.status !== "ready"}><Schedule /></div>}
         {bootstrap.status === "ready" && <>
           <div hidden={view !== "planning"}><InventoryEditor scopes={bootstrap.scopes} onChanged={() => { setListRevision((value) => value + 1); setSelectedId(null); }} /></div>
