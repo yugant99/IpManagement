@@ -30,6 +30,10 @@ The catalog endpoint should call `source_catalog.catalog`, page the returned sou
 - Frontend build attempted with `npm run build` but could not start because `frontend/node_modules/.bin/tsc` is absent. No dependency installation was performed.
 - No browser or integrated API evidence was run. Endpoint wiring and connected-candidate behavior remain unverified until the app owner integrates `app.py`.
 
+## Connected evidence addendum
+
+The integrator-owned disposable candidate at `http://127.0.0.1:8765` was task `01a0c0f0-5735-7e52-9f5a-ec45ac8ac99c`, integration code chain ending `506c137`. Only the bounded selector, source evidence/catalog, staged import callback, and saved-run report actions were exercised. The staged callback result was `skipped`: the opt-in request was handled and safely skipped, with no saved run created by that staged import. Sanitized observations are recorded in `docs/evidence/easy-wins/domain-sources/README.md`.
+
 ## Remaining limits
 
 Domain/region labels remain scope metadata filters; they do not establish tenant security, domain orchestration or cross-domain operations. Catalog entries are known imported receipts, not automatic discovery, and declared authority is not proof of unique authority. Reconciliation backend remains sibling-owned.
