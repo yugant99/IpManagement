@@ -6,7 +6,7 @@ Checkout/worktree and owned paths: `/Users/yuganthareshsoni/.codex/worktrees/bb9
 
 Questionnaire IDs changed: RFP-035 address-family filtering and report/export parity; RFP-077 saved-run executive summary.
 
-Branch / exact pushed SHA / PR: `codex/easy-wins-reports`; see the final commit below after push. PR is not opened by this worker unless the lead requests it; the branch is ready for the integration owner to merge or open a bounded PR.
+Branch / exact pushed SHA / PR: `codex/easy-wins-reports` / `a3073d6b5fdd710845171d03ed809aaa2c185222`; PR is not opened by this worker. The branch is ready for the integration owner to merge or open a bounded PR.
 
 Integration base / unmerged dependencies: baseline `852010a311065a9cc0258fc4e3f5c1c1a889329a`; app.py route wiring remains with integration owner `01a0c0f0-5735-7e52-9f5a-ec45ac8ac99c`.
 
