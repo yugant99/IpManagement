@@ -1,6 +1,6 @@
 # Easy-wins reports focused evidence
 
-Code checkpoint: `a9c9fab` (`Test real family export and preset helpers`). Current branch is `codex/easy-wins-reports`; the provenance-doc commit records its updated head separately.
+Code checkpoint: `a9c9fab` (`Test real family export and preset helpers`). Current branch: `codex/easy-wins-reports` at `27d0b482039a167f161e8d3838ecf538107bc0b9` (provenance documentation checkpoint).
 
 Command:
 
