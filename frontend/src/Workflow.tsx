@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { ApiError, request } from "./api";
 import type { Page } from "./api";
@@ -61,6 +61,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const [simulateFailure, setSimulateFailure] = useState(false);
   const [decisionAttempt, setDecisionAttempt] = useState<{ id: string; payload: AllocationDecision } | null>(null);
   const [selectedException, setSelectedException] = useState<ExceptionRecord | null>(null);
+  const [exceptionOpenRevision, setExceptionOpenRevision] = useState(0);
   const [exceptionReason, setExceptionReason] = useState("");
   const [exceptionAttempt, setExceptionAttempt] = useState<{ id: string; payload: ExceptionAction } | null>(null);
 
@@ -160,6 +161,12 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const actor = status?.actors.find(item => item.id === actorId);
   const mayDecide = actor?.permissions.includes("approve") && selectedRequest?.actor_id !== actorId;
   const mayHandle = selectedException?.owner_actor_id === actorId && actor?.permissions.includes("exception");
+  const exceptionHeading = useRef<HTMLHeadingElement | null>(null);
+  useEffect(() => {
+    if (!selectedException) return;
+    exceptionHeading.current?.focus({ preventScroll: true });
+    exceptionHeading.current?.scrollIntoView({ block: "start" });
+  }, [selectedException?.id, exceptionOpenRevision]);
 
   return <section aria-labelledby="workflow-heading">
     <div className="page-heading"><div><p className="eyebrow">Current workflow · saved evidence boundary</p><h1 id="workflow-heading">Allocation and review</h1>
@@ -225,12 +232,12 @@ export default function Workflow({ active = true }: { active?: boolean }) {
         <p className="quiet">Recurrence or a materially new discrepancy renews the owner's notification. Repeating an unchanged anomaly does not create another notification.</p>
         {exceptions && <><p role="status">{exceptions.items.filter(item => item.notification_pending).length} notifications awaiting owner acknowledgement on this page.</p>
           <div className="table-scroll"><table><thead><tr><th>Original finding / subject</th><th>Latest evidence / resolution</th><th>Owner</th><th>Case / disposition</th><th>Action</th></tr></thead><tbody>
-            {exceptions.items.map(item => <tr key={item.id}><td>{item.original_finding.rule_id}<div><code>{item.original_finding.subject.cidr}</code> · {item.original_finding.subject.scope_name}</div><div>Original: {item.original_finding.evidence_state} · {item.original_finding.severity}</div></td>
+            {exceptions.items.map(item => <tr key={item.id} data-selected={selectedException?.id === item.id}><td>{item.original_finding.rule_id}<div><code>{item.original_finding.subject.cidr}</code> · {item.original_finding.subject.scope_name}</div><div>Original: {item.original_finding.evidence_state} · {item.original_finding.severity}</div></td>
               <td>{item.latest_evidence_state}<div>{item.evidence_resolution === "resolved" ? "Resolved by healthy evidence" : item.evidence_resolution === "active" ? "Active discrepancy" : "Resolution unknown"}</div><div className="quiet">{item.latest_evidence_reason.replaceAll("_", " ")}</div></td>
               <td>{item.owner.name} · {item.owner.team}</td><td>{item.lifecycle_state} · disposition {item.state}<div>Notification {item.notification_version}{item.notification_pending ? " · acknowledgement due" : " · none pending"}</div></td>
-              <td><button className="secondary" disabled={busy || !!exceptionAttempt} onClick={() => { setSelectedException(item); setExceptionReason(""); history(item.id); }}>Open exception</button></td></tr>)}
+              <td><button className="secondary" aria-expanded={selectedException?.id === item.id} aria-controls={selectedException?.id === item.id ? "exception-detail" : undefined} disabled={busy || !!exceptionAttempt} onClick={() => { setSelectedException(item); setExceptionOpenRevision(value => value + 1); setExceptionReason(""); history(item.id); }}>{selectedException?.id === item.id ? "Opened" : "Open exception"}</button></td></tr>)}
           </tbody></table></div>{!exceptions.total && <p>No calculated anomalies have entered the queue. Create a reconciliation run from imported evidence to produce findings.</p>}<PageButtons page={exceptions} change={setExceptionOffset} /></>}
-        {selectedException && <div className="notice"><h3>{selectedException.original_finding.rule_id} · case {selectedException.lifecycle_state}</h3>
+        {selectedException && <section className="notice exception-detail" id="exception-detail" aria-labelledby="exception-detail-heading"><h3 id="exception-detail-heading" ref={exceptionHeading} tabIndex={-1}>{selectedException.original_finding.rule_id} · {selectedException.original_finding.subject.cidr} · {selectedException.original_finding.subject.scope_name} · case {selectedException.lifecycle_state}</h3>
           <p>Owner: {selectedException.owner.name}, {selectedException.owner.team}. Operational disposition: {selectedException.state}; reviewed version {selectedException.version}.</p>
           <dl className="facts"><dt>Latest evidence</dt><dd>{selectedException.latest_evidence_state}</dd>
             <dt>Latest evidence reason</dt><dd>{selectedException.latest_evidence_reason.replaceAll("_", " ")}</dd>
@@ -261,7 +268,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <p className="quiet">Close requires a latest healthy finding. Reopen starts operational review again; it does not turn healthy or unknown evidence into an anomaly.</p>
             {selectedException.lifecycle_state === "closed" && <p>Reopen the case before acknowledging, escalating or handing it off.</p>}
           </fieldset>
-        </div>}
+        </section>}
       </section>
     </>}
 
