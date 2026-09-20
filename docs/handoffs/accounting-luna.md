@@ -44,12 +44,13 @@ Observed directly from the completed rehearsal handoff and artifact root `/Users
 - the runtime diff is empty and the toolchain is retained;
 - readiness passed and the scheduler was disabled;
 - cycle 1 is established as run `004246ef-9089-40ac-b029-a412d5c2d38d`, operation `1b0f76b2-bfbc-40ac-b9bf-a566dccfa5d3`, at `2026-09-01T06:00:00.000Z`;
-- cycles 2–6, final cycle 7, correction/reconciliation, exception lifecycle, allocation, exports and stopped restore are recorded in `docs/handoffs/luna-final-rehearsal.md` at `a2e53fbf310a310b59c0d405b59c04766aa808c1`.
+- cycles 2–6, final cycle 7, correction/reconciliation, exception lifecycle, allocation, exports and stopped restore are recorded in `docs/handoffs/luna-final-rehearsal.md` at updated Stage 5 head `4654b48cb65381e32b1fb02ecef227d531e68b6d`.
+- The separate Luna procedural reproduction verified restore/health/disabled cycle 1, initial run, Central `.240` API and clean stop; its browser selected-preset completion is unverified and it is not human acceptance.
 
 No application tests, builds, browser checks, infrastructure actions or new runtime acquisition were run by this lane. Historical evidence remains historical; no class upgrade follows from source review or task registration.
 
 ## Suggested lead action
 
-Review the three bounded row upgrades against the final rehearsal handoff, then preserve the 111 denominator, private-clause boundary, DOCX phase gaps, portable `PART6_READY=no` gate and PR #44's separate merge decision. Keep RFP-092 and RFP-104 unchanged unless separate accepted evidence appears.
+Review the three bounded row upgrades against the updated final rehearsal handoff, then preserve the 111 denominator, private-clause boundary, DOCX phase gaps, portable `PART6_READY=no` gate and PR #44's separate merge decision. Keep RFP-092 and RFP-104 unchanged unless separate accepted evidence appears.
 
 Suggested next prompt for the lead: “Review `accounting-luna.md` and the final Stage 5 artifact publication. Compare only RFP-009/070/082/092 and catalog scenarios 11/14 against their stated evidence gates; keep every other class and denominator unchanged unless direct retained evidence justifies a bounded correction.”

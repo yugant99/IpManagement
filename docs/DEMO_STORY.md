@@ -1,6 +1,6 @@
 # Native demonstration story and claim boundaries
 
-**Status: final procedural draft.** The observed candidate run, retained artifacts and recovery state are recorded in the [final rehearsal handoff](handoffs/luna-final-rehearsal.md). This is not human presenter training or recipient acceptance; promote it to a live presentation only after lead review.
+**Status: final procedural draft.** The observed candidate run, retained artifacts, recovery state and actual runbook are recorded in the [final rehearsal handoff](handoffs/luna-final-rehearsal.md). Browser selected-preset completion remains unverified. This is not human presenter training or recipient acceptance; promote it to a live presentation only after lead review.
 
 Use the exact candidate, saved IDs and recovery procedure in the [final rehearsal handoff](handoffs/luna-final-rehearsal.md). The [lead review](handoffs/audit-response-lead-review.md) determines which observations are accepted. This is a presentation guide, not an assertion that a human presenter has completed training or a recipient has accepted the workflow. The target is 8–10 minutes; use retained runs for later cycles rather than advancing them unpredictably in front of an audience.
 
