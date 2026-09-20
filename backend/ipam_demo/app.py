@@ -544,21 +544,22 @@ def create_app() -> FastAPI:
 
     @app.get("/api/runs/{run_id}/export")
     def export_run(run_id: UUID, scope_id: TextFilter = None, rule_id: TextFilter = None,
-                   severity: TextFilter = None, evidence_state: TextFilter = None, connection=Depends(database)):
+                   severity: TextFilter = None, evidence_state: TextFilter = None, family: TextFilter = None,
+                   connection=Depends(database)):
         filters = {key: value for key, value in {"scope_id": scope_id, "rule_id": rule_id,
-                   "severity": severity, "evidence_state": evidence_state}.items() if value}
+                   "severity": severity, "evidence_state": evidence_state, "family": family}.items() if value}
         return JSONResponse(reports.export_run(connection, str(run_id), filters), headers={
             "Content-Disposition": f'attachment; filename="ipam-run-{run_id}.json"'})
 
     @app.get("/api/runs/{run_id}/findings")
     def list_findings(run_id: UUID, scope_id: UUID | None = None, evidence_state: str | None = None,
-                       rule_id: TextFilter = None, severity: TextFilter = None,
+                       rule_id: TextFilter = None, severity: TextFilter = None, family: TextFilter = None,
                        limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
         if evidence_state is not None and evidence_state not in {"anomalous", "healthy", "unknown", "not_applicable"}:
             raise AppError("INVALID_INPUT", "Unknown finding evidence state.", 422)
         items = reports.filtered_findings(reconciliation.get_run(connection, str(run_id)),
                 {"scope_id": str(scope_id) if scope_id else "", "evidence_state": evidence_state or "",
-                 "rule_id": rule_id or "", "severity": severity or ""})
+                 "rule_id": rule_id or "", "severity": severity or "", "family": family or ""})
         return inventory.page(items, limit, offset)
 
     @app.get("/api/runs/{run_id}/findings/{finding_id}")
