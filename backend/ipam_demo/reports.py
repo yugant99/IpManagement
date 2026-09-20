@@ -39,28 +39,6 @@ def _filtered_calculations(run, filters):
             and (not scope_id or metric.get("scope_id") == scope_id)]
 
 
-def summarize_run(run, filters):
-    """Summarize only the selected immutable run; never consult current state."""
-    findings = filtered_findings(run, filters)
-    affected_scopes = {finding["subject"]["scope_id"] for finding in findings
-                       if finding["evidence_state"] in {"anomalous", "unknown"}}
-    pressure_subjects = {(finding["subject"]["scope_id"], finding["subject"]["id"])
-                         for finding in findings
-                         if finding["rule_id"] == "pool_pressure" and finding["evidence_state"] == "anomalous"}
-    return {
-        "run_id": run["id"],
-        "saved_at": run["created_at"],
-        "demo_clock_at": run["demo_clock_at"],
-        "filters": filters,
-        "anomalous_findings": sum(item["evidence_state"] == "anomalous" for item in findings),
-        "unknown_findings": sum(item["evidence_state"] == "unknown" for item in findings),
-        "affected_scopes": len(affected_scopes),
-        "pressure_pools": len(pressure_subjects),
-        "limitations": ["Counts are from this saved run and selected filters only; no live or latest exception state is included.",
-                        "Pressure pools count unique saved pool_pressure subjects with anomalous evidence; this is not a traffic or reclaimability claim."],
-    }
-
-
 def compare_runs(connection, before_id, after_id):
     before, after = get_run(connection, before_id), get_run(connection, after_id)
     if before_id == after_id or before["created_at"] > after["created_at"]:
