@@ -6,7 +6,7 @@ Checkout/worktree and owned paths: `/Users/yuganthareshsoni/.codex/worktrees/bb9
 
 Questionnaire IDs changed: RFP-035 address-family filtering and report/export parity; RFP-077 saved-run executive summary.
 
-Branch / exact pushed SHA / PR: `codex/easy-wins-reports` / `a3073d6b5fdd710845171d03ed809aaa2c185222`; PR is not opened by this worker. The branch is ready for the integration owner to merge or open a bounded PR.
+Branch / exact pushed SHA / PR: `codex/easy-wins-reports` / `d3a4a5a7ebe8897bfed2593584b9adf85edb4bd0`; PR is not opened by this worker. The branch is ready for the integration owner to merge or open a bounded PR.
 
 Integration base / unmerged dependencies: baseline `852010a311065a9cc0258fc4e3f5c1c1a889329a`; app.py route wiring remains with integration owner `01a0c0f0-5735-7e52-9f5a-ec45ac8ac99c`.
 
@@ -18,7 +18,7 @@ Implemented:
 - The saved-run summary reports anomalous findings, unknown findings, affected scopes, and unique anomalous `pool_pressure` subjects. It shows the selected run ID, `created_at`, and `demo_clock_at`; it does not merge current exception state or infer pressure from unavailable capacity evidence.
 - The integration owner has the proposed app.py contract: add `family` to `/api/runs/{run_id}/export` and `/api/runs/{run_id}/findings`, preserve JSON export media type, and preserve pagination totals.
 
-Actually observed and evidence pointers: focused unit check passed in `docs/evidence/easy-wins/reports/focused-check.md`.
+Actually observed and evidence pointers: code checkpoint `00c8dd9` contains the backend implementation and focused tests; UI checkpoint `318f48c` contains the frontend implementation; current branch head is `d3a4a5a7ebe8897bfed2593584b9adf85edb4bd0`. Focused unit evidence is recorded in `docs/evidence/easy-wins/reports/focused-check.md`.
 
 Synthetic / simulated / partial / unverified: report data and source evidence remain synthetic/local. No browser evidence or integrated HTTP route evidence was produced in this isolated worker because app.py is outside ownership. Frontend build was attempted once and is unverified because `frontend` dependencies are absent (`tsc: command not found`).
 
