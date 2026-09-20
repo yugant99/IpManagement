@@ -1,5 +1,6 @@
 import { request } from "./api";
 import type { Pool } from "./api";
+import type { EvidenceState } from "./firstPathApi";
 
 export interface DemoActor {
   id: string;
@@ -56,6 +57,16 @@ export interface AllocationDecision {
   simulate_failure: boolean;
 }
 
+export interface ExceptionFinding {
+  id: string;
+  run_id: string;
+  rule_id: string;
+  severity: string;
+  evidence_state: EvidenceState;
+  explanation: string;
+  subject: { id: string; scope_id: string; family: number; cidr: string; scope_name: string };
+}
+
 export interface ExceptionRecord {
   id: string;
   run_id: string;
@@ -70,21 +81,24 @@ export interface ExceptionRecord {
   handoff_at: string | null;
   acknowledged_at: string | null;
   notification_pending: boolean;
-  finding: {
-    id: string;
-    run_id: string;
-    rule_id: string;
-    severity: string;
-    evidence_state: string;
-    explanation: string;
-    subject: { id: string; scope_id: string; family: number; cidr: string; scope_name: string };
-  };
+  notification_version: number;
+  notification_reason: string;
+  episode_count: number;
+  lifecycle_state: "open" | "closed";
+  closed_at: string | null;
+  evidence_resolution: "resolved" | "active" | "unknown";
+  latest_evidence_state: EvidenceState | "missing";
+  latest_run_id: string | null;
+  latest_finding_id: string | null;
+  original_finding: ExceptionFinding;
+  latest_finding: ExceptionFinding | null;
+  finding: ExceptionFinding;
 }
 
 export interface ExceptionAction {
   actor_id: string;
   version: number;
-  action: "acknowledge" | "escalate" | "handoff";
+  action: "acknowledge" | "escalate" | "handoff" | "close" | "reopen";
   reason: string;
   recipient_actor_id?: string;
 }
