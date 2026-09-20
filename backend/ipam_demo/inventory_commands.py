@@ -151,17 +151,26 @@ def _validate_position(connection, scope_id, network, parent, *, editing_id=None
                        {"conflicting_prefix_id": row["id"], "conflicting_cidr": row["cidr"]})
 
 
-def _bump_ledger(connection, affected_prefix_ids):
+def _bump_ledger(connection, affected_prefix_ids, *, structural=False):
     connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
     for prefix_id in affected_prefix_ids:
         connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE prefix_id=?", (prefix_id,))
+        if structural:
+            connection.execute("UPDATE pools SET capacity_history_version=capacity_history_version+1 WHERE prefix_id=?", (prefix_id,))
     return _baseline(connection)
 
 
 def edit_context(connection, prefix_id):
     prefix = prefix_detail(connection, _prefix(connection, prefix_id)["id"])
     scope = connection.execute("SELECT * FROM scopes WHERE id=?", (prefix["scope_id"],)).fetchone()
+    affected_ids = _ancestors(connection, prefix) | {prefix["id"]}
+    affected_pools = [{"pool_id": row["id"], "name": row["name"], "cidr": row["cidr"]}
+                      for row in connection.execute(
+                          "SELECT p.id,p.name,p.prefix_id,n.cidr FROM pools p JOIN prefixes n ON n.id=p.prefix_id "
+                          "WHERE p.family=4 AND p.management_mode='dhcp' ORDER BY p.id")
+                      if row["prefix_id"] in affected_ids]
     return {"prefix": prefix, "scope": scope_payload(scope), "baseline_version": _baseline(connection),
+            "history_impact": {"metadata": [], "structural": affected_pools},
             "children_count": connection.execute("SELECT COUNT(*) FROM prefixes WHERE parent_id=?", (prefix["id"],)).fetchone()[0]}
 
 
@@ -183,7 +192,7 @@ def create_child(connection, payload):
          parent["id"], owner, purpose, json.dumps(tags), json.dumps(fields, sort_keys=True), 1, json.dumps(origin)),
     )
     connection.execute("UPDATE prefixes SET version=version+1 WHERE id=?", (parent["id"],))
-    baseline = _bump_ledger(connection, _ancestors(connection, parent) | {parent["id"]})
+    baseline = _bump_ledger(connection, _ancestors(connection, parent) | {parent["id"]}, structural=True)
     result = prefix_detail(connection, prefix_id)
     audit = audit_event(connection, actor_id=payload["actor_id"], action="prefix_created", outcome="success", reason=reason,
                         subject_id=prefix_id, scope_id=scope_id,
@@ -216,7 +225,7 @@ def edit_prefix(connection, prefix_id, payload):
         (str(network), f"{int(network.network_address):032x}", network.prefixlen, owner, purpose,
          json.dumps(tags), json.dumps(fields, sort_keys=True), prefix["id"]),
     )
-    baseline = _bump_ledger(connection, _ancestors(connection, prefix) | {prefix["id"]})
+    baseline = _bump_ledger(connection, _ancestors(connection, prefix) | {prefix["id"]}, structural=changed_bounds)
     result = prefix_detail(connection, prefix["id"])
     audit = audit_event(connection, actor_id=payload["actor_id"], action="prefix_edited", outcome="success", reason=reason,
                         subject_id=prefix["id"], scope_id=prefix["scope_id"],
