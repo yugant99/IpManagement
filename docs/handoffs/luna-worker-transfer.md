@@ -2,6 +2,17 @@
 
 The user authorized new visible GPT-5.6 Luna worker tasks on 2026-09-19 after exhausting the previous reset. Main Lead 2.0 remains `01a0bb80-cf0d-7f60-8e46-1e825f42d276`. Previous worker tasks are reference-only for this follow-up; send future fixes and continuation to the new Luna tasks. GPT-5.5 is an allowed fallback. Keep prompts/results compact and reuse accepted evidence. This is an execution transfer, not a new stage or architecture plan.
 
+## Registered replacement tasks
+
+| Visible task | Task ID | Assigned work |
+|---|---|---|
+| stage_3_luna | `01a0bc66-f115-7831-b351-040a3365c07b` | Future concrete backend fixes; no current defect or repeat checks |
+| stage_4_luna | `01a0bc66-f8b0-7830-ba45-1727b1202492` | Shared/UI fixes; bounded story-versus-controls review |
+| stage_5_luna | `01a0bc67-01b8-7212-8c4f-a9222fa480bf` | Resume final rehearsal, native state/runbook and procedural pickup |
+| accounting_luna | `01a0bc67-0cd9-73e0-816c-5716c279c7ec` | F6/F7 evidence accounting and current documentation |
+
+All use **GPT-5.6 Luna**. They are visible projectless tasks because app-managed worktree setup could not resolve the saved project's HEAD; repository edits still require manually created isolated worktrees. Main Lead 2.0 remains the accepting coordinator. Old worker IDs in historical records remain provenance, not destinations for new work. Keep Foundation/data/delivery checkpoints as references; create a cheap replacement only if an actual new owned fix is needed. Spencer's ownership is unchanged.
+
 ## Collected source and evidence
 
 - Main remains `eabe4f4fe157025fcd044ee9497e464181a48e87` (contract PR #38). Application PR #44 is **not yet merged**.
