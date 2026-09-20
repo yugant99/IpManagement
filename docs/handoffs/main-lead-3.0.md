@@ -1,5 +1,7 @@
 # Main Lead 3.0 transfer and readiness
 
+**Current checkpoint, 2026-09-21:** [portable demonstration acceptance](vm-portability-lead-review.md) supersedes the earlier no-execution and pending technical-gate wording below. All nine wins and Atlas are accepted; bounded Linux startup/persistence/recovery and transfer passed. The authorized disposable host was destroyed. `PART6_READY=yes` within that tested scope; human/customer outcomes remain separate and oversight stays PAUSED.
+
 Registered 2026-09-20 under the user's explicit transfer authorization. Current lead: **Main Lead 3.0**, task `01a0c0c1-3952-7720-93c8-ff49192b8e13`, host `local`. The active task ID was read from `CODEX_THREAD_ID` and confirmed in the app task registry. Main Lead 2.0 (`01a0bb80-cf0d-7f60-8e46-1e825f42d276`) and the original lead (`01a0b845-6c8d-7021-a5c9-15e673db07c9`) are reference-only. The current lead owns coordination, acceptance, integration, all 111 questionnaire rows and demo readiness.
 
 Repository: `yugant99/IpManagement`. Canonical checkout: `/Users/yuganthareshsoni/Downloads/Ip_inventory`, `main` at takeover `376dd52f9457dd0b7fecc8d83a3e0d6970bb487e`. Its untracked `audit/` and `outputs/` are preserved; private `assessment/` stays excluded. Registration uses isolated `/Users/yuganthareshsoni/Downloads/Ip_inventory-lead-3`, branch `codex/main-lead-3-registration`, and only lead-owned documentation.

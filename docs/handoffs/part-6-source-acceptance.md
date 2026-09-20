@@ -1,5 +1,7 @@
 # Part 6 source acceptance and remaining portable evidence
 
+**Current runtime addendum, 2026-09-21:** [the lead acceptance](vm-portability-lead-review.md) now records bounded Linux amd64 startup, allocation/audit persistence, stopped recovery and agent reproduction; `PART6_READY=yes` for that tested target. The disposable host was destroyed after verified export. Human recipient acceptance and unexercised platform/operator cases remain explicit. Source-only statements below describe the earlier checkpoint.
+
 Accepted by Main Lead 3.0 on 2026-09-20: **packaging/operator source integrated; container and recipient behavior UNVERIFIED**. `PART6_READY=no`. No new implementation stage or broad application E2E run follows.
 
 ## Exact source lineage and review
