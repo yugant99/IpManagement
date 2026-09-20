@@ -5,6 +5,7 @@ successful audit and intended-ledger revision commit with the prefix mutation.
 """
 
 from datetime import datetime, timezone
+from hashlib import sha256
 from ipaddress import IPv6Network, ip_network
 import json
 import re
@@ -12,7 +13,8 @@ from uuid import UUID, uuid4
 
 from .errors import AppError
 from .inventory import prefix_detail, scope_payload
-from .workflow import audit_event, require_actor
+from .workflow import actors, audit_event, require_actor
+from .rules import comparable_findings
 
 
 _RESERVED = {
@@ -149,17 +151,26 @@ def _validate_position(connection, scope_id, network, parent, *, editing_id=None
                        {"conflicting_prefix_id": row["id"], "conflicting_cidr": row["cidr"]})
 
 
-def _bump_ledger(connection, affected_prefix_ids):
+def _bump_ledger(connection, affected_prefix_ids, *, structural=False):
     connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
     for prefix_id in affected_prefix_ids:
         connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE prefix_id=?", (prefix_id,))
+        if structural:
+            connection.execute("UPDATE pools SET capacity_history_version=capacity_history_version+1 WHERE prefix_id=?", (prefix_id,))
     return _baseline(connection)
 
 
 def edit_context(connection, prefix_id):
     prefix = prefix_detail(connection, _prefix(connection, prefix_id)["id"])
     scope = connection.execute("SELECT * FROM scopes WHERE id=?", (prefix["scope_id"],)).fetchone()
+    affected_ids = _ancestors(connection, prefix) | {prefix["id"]}
+    affected_pools = [{"pool_id": row["id"], "name": row["name"], "cidr": row["cidr"]}
+                      for row in connection.execute(
+                          "SELECT p.id,p.name,p.prefix_id,n.cidr FROM pools p JOIN prefixes n ON n.id=p.prefix_id "
+                          "WHERE p.family=4 AND p.management_mode='dhcp' ORDER BY p.id")
+                      if row["prefix_id"] in affected_ids]
     return {"prefix": prefix, "scope": scope_payload(scope), "baseline_version": _baseline(connection),
+            "history_impact": {"metadata": [], "structural": affected_pools},
             "children_count": connection.execute("SELECT COUNT(*) FROM prefixes WHERE parent_id=?", (prefix["id"],)).fetchone()[0]}
 
 
@@ -181,7 +192,7 @@ def create_child(connection, payload):
          parent["id"], owner, purpose, json.dumps(tags), json.dumps(fields, sort_keys=True), 1, json.dumps(origin)),
     )
     connection.execute("UPDATE prefixes SET version=version+1 WHERE id=?", (parent["id"],))
-    baseline = _bump_ledger(connection, _ancestors(connection, parent) | {parent["id"]})
+    baseline = _bump_ledger(connection, _ancestors(connection, parent) | {parent["id"]}, structural=True)
     result = prefix_detail(connection, prefix_id)
     audit = audit_event(connection, actor_id=payload["actor_id"], action="prefix_created", outcome="success", reason=reason,
                         subject_id=prefix_id, scope_id=scope_id,
@@ -214,7 +225,7 @@ def edit_prefix(connection, prefix_id, payload):
         (str(network), f"{int(network.network_address):032x}", network.prefixlen, owner, purpose,
          json.dumps(tags), json.dumps(fields, sort_keys=True), prefix["id"]),
     )
-    baseline = _bump_ledger(connection, _ancestors(connection, prefix) | {prefix["id"]})
+    baseline = _bump_ledger(connection, _ancestors(connection, prefix) | {prefix["id"]}, structural=changed_bounds)
     result = prefix_detail(connection, prefix["id"])
     audit = audit_event(connection, actor_id=payload["actor_id"], action="prefix_edited", outcome="success", reason=reason,
                         subject_id=prefix["id"], scope_id=prefix["scope_id"],
@@ -267,3 +278,181 @@ def preview_children(connection, parent_id, prefix_length, limit=10):
             "scope_id": parent["scope_id"], "baseline_version": _baseline(connection), "prefix_length": prefix_length,
             "total_children": str(total), "blocked_children": str(used), "free_children": str(total - used),
             "items": items, "limit": limit, "synthetic": True}
+
+
+def _saved_finding(connection, run_id, finding_id):
+    row = connection.execute("SELECT result_json FROM calculation_runs WHERE id=?", (run_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "The saved reconciliation run does not exist.", 404)
+    run = json.loads(row["result_json"])
+    finding = next((item for item in run["findings"] if item["id"] == finding_id), None)
+    if finding is None:
+        raise AppError("NOT_FOUND", "The finding does not belong to the selected saved run.", 404)
+    return run, finding
+
+
+def correction_context(connection, run_id, finding_id):
+    _, finding = _saved_finding(connection, run_id, finding_id)
+    if (finding["rule_id"] not in ("ghost_scope", "unregistered_managed_route")
+            or finding["evidence_state"] != "anomalous" or finding["subject"].get("kind") != "managed_perimeter"):
+        raise AppError("CORRECTION_NOT_SUPPORTED", "Select an anomalous ghost-scope or unregistered-route finding for top-level registration.", 422)
+    scope = connection.execute("SELECT * FROM scopes WHERE id=?", (finding["subject"]["scope_id"],)).fetchone()
+    if scope is None:
+        raise AppError("NOT_FOUND", "The finding's intended network scope no longer exists.", 404)
+    return {"source_run_id": run_id, "source_finding": finding, "scope": scope_payload(scope),
+            "baseline_version": _baseline(connection), "actors": actors(), "synthetic": True,
+            "limitations": ["Propose one top-level prefix inside the existing managed perimeter; pending proposals do not change inventory.",
+                            "Independent approval changes local intended inventory only. Reconcile afterward to inspect every remaining discrepancy.",
+                            "Registration does not create intended route policy or establish external authorization."]}
+
+
+def _correction_position(connection, payload):
+    context = correction_context(connection, payload["source_run_id"], payload["source_finding_id"])
+    finding = context["source_finding"]
+    network = _network(payload["cidr"])
+    boundary = ip_network(finding["subject"]["cidr"])
+    if (payload["scope_id"] != finding["subject"]["scope_id"] or network.version != boundary.version
+            or not network.subnet_of(boundary)):
+        raise AppError("CORRECTION_SCOPE_MISMATCH", "The prefix must belong to the finding's scope, family and managed perimeter.", 422)
+    observations = [ip_network(item["cidr"]) if "cidr" in item else ip_network(item["address"])
+                    for item in finding.get("observations", [])]
+    if not any(item.version == network.version and item.subnet_of(network) for item in observations):
+        raise AppError("CORRECTION_TARGET_MISMATCH", "The proposed prefix must register at least one discrepancy in the reviewed finding.", 422)
+    if payload["expected_baseline_version"] != context["baseline_version"]:
+        raise AppError("STALE_INVENTORY", "Inventory changed after review. Reload and submit a new reviewed proposal.", 409,
+                       {"baseline_version": context["baseline_version"]})
+    _validate_position(connection, payload["scope_id"], network, None)
+    return network
+
+
+def _correction_result(source, run):
+    if run is None:
+        return None, "pending_reconciliation"
+    finding = next((item for item in run["findings"] if item["rule_id"] == source["rule_id"]
+                    and item["subject"]["scope_id"] == source["subject"]["scope_id"]
+                    and item["subject"]["family"] == source["subject"]["family"]
+                    and item["subject"]["id"] == source["subject"]["id"]), None)
+    if not comparable_findings(source, finding):
+        return finding, "resolution_unknown"
+    return finding, {"healthy": "resolved_by_evidence", "anomalous": "still_anomalous"}.get(
+        finding["evidence_state"], "resolution_unknown")
+
+
+def get_correction(connection, object_id):
+    row = connection.execute("SELECT * FROM correction_requests WHERE id=?", (object_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "No inventory correction exists with that ID.", 404)
+    item = dict(row)
+    item["payload"] = json.loads(item.pop("payload_json"))
+    item.pop("payload_hash")
+    item.pop("decision_hash")
+    _, source = _saved_finding(connection, item["source_run_id"], item["source_finding_id"])
+    item.update(source_finding=source, result_finding=None, latest_finding=None, latest_run_id=None,
+                resolution_state="not_approved", latest_resolution_state="not_approved",
+                local_outcome="registered" if item["state"] == "approved" else "unchanged", synthetic=True)
+    if item["state"] == "approved":
+        saved = connection.execute("SELECT result_json FROM calculation_runs WHERE id=?", (item["result_run_id"],)).fetchone()
+        first = json.loads(saved[0]) if saved else None
+        item["result_finding"], item["resolution_state"] = _correction_result(source, first)
+        saved = connection.execute("SELECT result_json FROM calculation_runs ORDER BY rowid DESC LIMIT 1").fetchone()
+        latest = json.loads(saved[0]) if saved else None
+        if latest and latest["ledger_version"] < item["approved_baseline_version"]:
+            latest = None
+        item["latest_run_id"] = latest["id"] if latest else None
+        item["latest_finding"], item["latest_resolution_state"] = _correction_result(source, latest)
+    return item
+
+
+def list_corrections(connection):
+    return [get_correction(connection, row["id"]) for row in connection.execute(
+        "SELECT id FROM correction_requests ORDER BY created_at DESC,id DESC")]
+
+
+def create_correction(connection, payload):
+    allowed = {"actor_id", "idempotency_key", "scope_id", "cidr", "owner", "purpose", "reason",
+               "expected_baseline_version", "source_run_id", "source_finding_id"}
+    if not isinstance(payload, dict) or set(payload) != allowed:
+        _invalid("Supply exactly the documented correction fields and reviewed inventory version.", "body")
+    actor = require_actor(payload["actor_id"], "request")
+    normalized = {"actor_id": actor["id"], "cidr": str(_network(payload["cidr"]))}
+    for field, limit in (("idempotency_key", 200), ("owner", 120), ("purpose", 500), ("reason", 500)):
+        normalized[field] = _text(payload[field], field, limit, required=True)
+    for field in ("scope_id", "source_run_id", "source_finding_id"):
+        normalized[field] = _uuid(payload[field], field)
+    if type(payload["expected_baseline_version"]) is not int or payload["expected_baseline_version"] < 1:
+        _invalid("expected_baseline_version must be a positive integer.", "expected_baseline_version")
+    normalized["expected_baseline_version"] = payload["expected_baseline_version"]
+    encoded = json.dumps(normalized, sort_keys=True, separators=(",", ":"))
+    digest = sha256(encoded.encode("utf-8")).hexdigest()
+    previous = connection.execute("SELECT * FROM correction_requests WHERE actor_id=? AND idempotency_key=?",
+                                  (actor["id"], normalized["idempotency_key"])).fetchone()
+    if previous:
+        if previous["payload_hash"] != digest:
+            raise AppError("IDEMPOTENCY_CONFLICT", "This correction key already identifies a different proposal.", 409)
+        return get_correction(connection, previous["id"]), True
+    _correction_position(connection, normalized)
+    object_id = str(uuid4())
+    now = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    connection.execute(
+        "INSERT INTO correction_requests(id,actor_id,idempotency_key,payload_hash,payload_json,scope_id,source_run_id,"
+        "source_finding_id,baseline_version,state,created_at) VALUES (?,?,?,?,?,?,?,?,?,'pending',?)",
+        (object_id, actor["id"], normalized["idempotency_key"], digest, encoded, normalized["scope_id"],
+         normalized["source_run_id"], normalized["source_finding_id"], normalized["expected_baseline_version"], now))
+    audit_event(connection, actor_id=actor["id"], action="correction.proposed", outcome="succeeded", reason=normalized["reason"],
+                request_id=object_id, subject_id=object_id, scope_id=normalized["scope_id"],
+                details={"before": None, "after": {"state": "pending", "proposal": normalized}})
+    return get_correction(connection, object_id), False
+
+
+def decide_correction(connection, object_id, payload):
+    if not isinstance(payload, dict) or set(payload) != {"actor_id", "action", "reason"}:
+        _invalid("Supply actor_id, action and reason for the correction decision.", "body")
+    actor = require_actor(payload["actor_id"], "approve")
+    action = payload["action"]
+    if action not in ("approve", "reject"):
+        _invalid("Use approve or reject for a correction decision.", "action")
+    reason = _text(payload["reason"], "reason", 500, required=True)
+    row = connection.execute("SELECT * FROM correction_requests WHERE id=?", (object_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "No inventory correction exists with that ID.", 404)
+    if row["actor_id"] == actor["id"]:
+        raise AppError("SELF_APPROVAL", "A different authorized actor must review this correction.", 403)
+    digest = sha256(json.dumps({"actor_id": actor["id"], "action": action, "reason": reason},
+                              sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    if row["state"] != "pending":
+        if row["decision_hash"] == digest:
+            return get_correction(connection, object_id), True
+        raise AppError("DECISION_CONFLICT", "This correction already has an immutable decision.", 409)
+    proposed = json.loads(row["payload_json"])
+    prefix_id, baseline, registered = None, None, None
+    now = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    if action == "approve":
+        require_actor(actor["id"], "inventory_edit")
+        network = _correction_position(connection, proposed)
+        prefix_id = str(uuid4())
+        clock = connection.execute("SELECT demo_clock_at FROM app_meta WHERE singleton=1").fetchone()[0]
+        origin = {"source_id": "local-inventory-correction", "source_run_id": object_id, "source_record_id": prefix_id,
+                  "observed_at": clock, "ingested_at": now, "synthetic": True}
+        connection.execute(
+            "INSERT INTO prefixes(id,scope_id,family,cidr,network_hex,prefix_length,parent_id,owner,purpose,tags,custom_fields,version,origin) "
+            "VALUES (?,?,?,?,?,?,NULL,?,?,'[]','{}',1,?)",
+            (prefix_id, proposed["scope_id"], network.version, str(network), f"{int(network.network_address):032x}",
+             network.prefixlen, proposed["owner"], proposed["purpose"], json.dumps(origin)))
+        baseline = _bump_ledger(connection, set())
+        registered = prefix_detail(connection, prefix_id)
+    state = "approved" if action == "approve" else "rejected"
+    connection.execute(
+        "UPDATE correction_requests SET state=?,prefix_id=?,decided_at=?,decision_actor_id=?,decision_hash=?,decision_reason=?,"
+        "approved_baseline_version=? WHERE id=?", (state, prefix_id, now, actor["id"], digest, reason, baseline, object_id))
+    audit_event(connection, actor_id=actor["id"], action=f"correction.{action}", outcome="succeeded", reason=reason,
+                request_id=object_id, subject_id=prefix_id or object_id, scope_id=row["scope_id"],
+                details={"before": {"state": "pending", "prefix": None, "baseline_version": _baseline(connection) if baseline is None else baseline - 1},
+                         "after": {"state": state, "prefix": registered, "baseline_version": _baseline(connection)},
+                         "source_run_id": row["source_run_id"], "source_finding_id": row["source_finding_id"]})
+    return get_correction(connection, object_id), False
+
+
+def link_correction_results(connection, run):
+    """Link first post-approval run without treating approval as evidence resolution."""
+    connection.execute("UPDATE correction_requests SET result_run_id=? WHERE state='approved' AND result_run_id IS NULL "
+                       "AND approved_baseline_version<=?", (run["id"], run["ledger_version"]))
