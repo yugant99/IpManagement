@@ -2,7 +2,7 @@
 
 An IP address inventory and reconciliation demonstration using synthetic data, with real local calculations and persistence.
 
-**Current state:** Stage 5 bounded local acceptance is complete: **14 observed passes, two partial scenarios, no observed application defects**. [Application integration PR #34](https://github.com/yugant99/IpManagement/pull/34) is merged and brings the exact tested lineage into main with current lead documentation. Portable packaging and recipient proof remain pending with Spencer. Read [current status](docs/STATUS.md), [readiness and integration](docs/handoffs/accepted-candidate-integration.md), and [accepted evidence limits](docs/handoffs/stage-05-lead-review.md).
+**Current state:** Historical Stage 5 bounded local acceptance remains **14 observed passes, two partial scenarios, no observed application defects**. The F1–F7 candidate is in a separate final native rehearsal; its accounting is still frozen at **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing** until Main Lead 2.0 reviews the retained evidence. [Application integration PR #34](https://github.com/yugant99/IpManagement/pull/34) is merged; PR #44 remains a separate candidate. Portable packaging and recipient proof remain pending with Spencer. Read [current status](docs/STATUS.md), [readiness and integration](docs/handoffs/accepted-candidate-integration.md), and [accepted evidence limits](docs/handoffs/stage-05-lead-review.md).
 
 ## Agent pickup
 

@@ -1,6 +1,6 @@
 # Questionnaire-first delivery plan
 
-Status: **historical planning priorities, with final current-candidate accounting on 2026-09-19.** The controlling [111-row evidence table](QUESTIONNAIRE_ROW_MAP.md) records **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing** from the accepted local candidate. The unchanged application is integrated in main through PR #34. These classes are not a percentage of fully satisfied customer requirements. Use [status](STATUS.md) and the separate [DOCX phase gaps](PHASE_COVERAGE.md) for current acceptance. The original 30 goals and planning bundles below remain work references, not achievement totals.
+Status: **historical planning priorities, with current-candidate accounting frozen on 2026-09-19 pending final rehearsal review.** The controlling [111-row evidence table](QUESTIONNAIRE_ROW_MAP.md) records **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing** from the accepted local candidate. The resumed rehearsal has not yet supplied evidence for a class change. The unchanged application is integrated in main through PR #34; the final audit candidate remains a separate lead merge decision. These classes are not a percentage of fully satisfied customer requirements. Use [status](STATUS.md) and the separate [DOCX phase gaps](PHASE_COVERAGE.md) for current acceptance. The original 30 goals and planning bundles below remain work references, not achievement totals.
 
 ## What the 111 rows require
 

@@ -2,7 +2,7 @@
 
 This catalog tracks the generic demonstration outcomes agreed in the private decision memo. It does not reproduce customer clauses. Its **15 scenarios**, the **16 historical Stage 5 acceptance cases**, and the **111 questionnaire rows** are different sets.
 
-The historical catalog baseline was 12 observed scenarios, one bounded IPv6 scenario and two missing outcomes. New metadata and correction implementation is reviewed; **final connected rehearsal is pending**, so the two catalog upgrades below remain provisional. The [lead review](handoffs/audit-response-lead-review.md) controls acceptance. Historical observations resolve through [Stage 5 results](evidence/stage-05/observed-results.md); new owner checks resolve through the linked handoffs.
+The historical catalog baseline was 12 observed scenarios, one bounded IPv6 scenario and two missing outcomes. New metadata and correction implementation is reviewed; **final connected rehearsal is pending**, so the two catalog upgrades below remain provisional. At the resumed rehearsal checkpoint, readiness and the disabled-scheduler state were observed, while cycle 1 is the only established acquisition; no catalog closure is credited yet. The [lead review](handoffs/audit-response-lead-review.md) controls acceptance. Historical observations resolve through [Stage 5 results](evidence/stage-05/observed-results.md); new owner checks resolve through the linked handoffs.
 
 | # | Scenario | Evidence and bounded outcome | Current disposition |
 |---|---|---|---|

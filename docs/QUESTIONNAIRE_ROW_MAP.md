@@ -2,7 +2,7 @@
 
 Final lead adjudication of the **current accepted candidate**, 2026-09-19. This replaces the earlier evidence plan; it is not final project, customer or portable acceptance. Application pickup: `117d05295473cf25d362adb320e6fef26ecdd74c`. Accepted evidence/report: `fe50cd6828016a25fee9086f499e2e865b4a16e4`. The unchanged application lineage is integrated into main through [PR #34](https://github.com/yugant99/IpManagement/pull/34), merge `e0ba2d99440c84c90ebe449f7442e247e2828b3f`.
 
-The lead and two bounded reviewers compared original private clauses, public contracts and accepted observations. Public topics remain generic; original workbook text/answers and source attachments are unchanged and excluded from Git. No application checks were rerun for this accounting.
+The lead and two bounded reviewers compared original private clauses, public contracts and accepted observations. Public topics remain generic; original workbook text/answers and source attachments are unchanged and excluded from Git. No application checks were rerun for this accounting. The resumed final native rehearsal is a separate evidence gate: readiness and the disabled-scheduler state are observed, but no new acquisition beyond the established cycle 1 has yet been credited here.
 
 **Source locator:** private questionnaire, Technical Requirements sheet, **one-based Excel row = numeric RFP ID + 2**, requirement column B. For example RFP-001 is row 3 and RFP-111 is row 113. ID, topic and evidence status are separate from the workbook's existing vendor answers.
 
@@ -16,6 +16,19 @@ Each row has exactly one evidence class and one primary category:
 - **Missing:** no qualifying evidence for the requested outcome was identified. Nearby code, a plan or a candidate link does not earn credit. Missing is not an assignment to expand scope.
 
 **29 Demonstrated; 24 Partial; 9 Documentary; 49 Missing = 111.** Do not sum the first three classes into a requirements-completion percentage. The worker's **51 candidate IDs** were a pointer set, not a satisfied-row total; adjudication also considers supplied documents and native deployment evidence outside that set. Historical 65/67/68 targets remain planning arithmetic. A 60% fully satisfied claim is not established.
+
+### Accounting freeze during final rehearsal
+
+The current classes remain authoritative until the lead reviews the completed candidate rehearsal and its retained run/snapshot pointers. The following are conditional review candidates only, not current upgrades:
+
+| Row | Possible change | Required evidence before any class change |
+|---|---|---|
+| RFP-009 | Partial → Demonstrated | Actual requester-subnet request and approval UI path in the final candidate, with the existing independent-approval controls retained |
+| RFP-070 | Missing → Demonstrated | Approved local missing-prefix registration, reconciliation outcome and audit, with no claim of external remediation or reclamation |
+| RFP-082 | Partial → Demonstrated | Actual escalation transition/procedure, acknowledgement and retained audit; external paging and adopted customer process remain outside scope |
+| RFP-092 | Missing → Documentary | Accepted user/admin material; this does not establish delivered training, recipient practice or knowledge-transfer acceptance |
+
+RFP-037 and RFP-072 remain Demonstrated. RFP-104 remains Missing unless a separately accepted recipient knowledge-transfer outcome is evidenced; a proposed handoff or worker registration is not enough. If all four conditional changes are justified, the arithmetic would become **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing**, but that is not the current result.
 
 | Primary category | Demonstrated | Partial | Documentary | Missing | Total |
 |---|---:|---:|---:|---:|---:|

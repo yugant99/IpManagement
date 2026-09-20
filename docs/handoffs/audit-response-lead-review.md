@@ -1,6 +1,6 @@
 # F1–F7 lead review and native handoff
 
-Status: **connected source/checks reviewed; final native rehearsal and main merge pending**. Main Lead 2.0 remains the accepting owner. Stage 5 is rehearsing the exact candidate below. The user-authorized [contract](../AUDIT_RESPONSE_CONTRACT.md) and [execution scope](audit-response-authorization.md) govern this follow-up.
+Status: **connected source/checks reviewed; final native rehearsal and main merge pending**. Main Lead 2.0 remains the accepting owner. Stage 5 is rehearsing the exact candidate below. The user-authorized [contract](../AUDIT_RESPONSE_CONTRACT.md) and [execution scope](audit-response-authorization.md) govern this follow-up. Accounting remains frozen at **29 Demonstrated / 24 Partial / 9 Documentary / 49 Missing** until the lead reviews the final retained rehearsal evidence; readiness and a disabled scheduler alone do not change a row class.
 
 ## Source identity and review
 
@@ -27,9 +27,9 @@ Status: **connected source/checks reviewed; final native rehearsal and main merg
 | F5 | Original/latest evidence separation, healthy-only closure, owner reopen, recurrence/new-member notification, unchanged-member suppression, retained ownership/escalation and safe retries | Source/service/API and initial UI observations accepted; final owner/story flow pending |
 | F4 | Dedicated native state, initial/final stopped snapshots, exact run/preset plan and independent procedural pickup | Final candidate/rehearsal pending; portable recipient evidence separate |
 | F6 | Presenter language distinguishes real local mutations, simulated provisioning, fixed thresholds, configurable schedule, exports, evidence state and operational closure | Private draft updated; final action/evidence map pending |
-| F7 | Original-clause accounting with separate 15 catalog / 16 historical Stage 5 / 111 questionnaire denominators | Historical classes retained until new integrated evidence is adjudicated |
+| F7 | Original-clause accounting with separate 15 catalog / 16 historical Stage 5 / 111 questionnaire denominators | Historical classes retained until new integrated evidence is adjudicated; conditional candidates are RFP-009, 070, 082 and 092 only |
 
-The audit identified important missing capability and evidence. Its broad statements are not adopted blindly: missing package registration does not prove inactivity; metadata edits did not erase saved runs or necessarily remove current occupancy/positive lease evidence; the prior exception UI already labeled original evidence as saved. Historical RFP-037 quality/duplication and RFP-072 notification classifications remain justified by their actual clauses. The new features strengthen those rows rather than retroactively failing old evidence.
+The audit identified important missing capability and evidence. Its broad statements are not adopted blindly: missing package registration does not prove inactivity; metadata edits did not erase saved runs or necessarily remove current occupancy/positive lease evidence; the prior exception UI already labeled original evidence as saved. Historical RFP-037 quality/duplication and RFP-072 notification classifications remain justified by their actual clauses. The new features strengthen those rows rather than retroactively failing old evidence. The resumed rehearsal has currently established readiness, disabled scheduling and the existing cycle-1 acquisition only; no later correction, escalation, allocation, recovery or catalog closure is credited until its retained artifacts are published and reviewed.
 
 ## Historical missing-case follow-up
 
