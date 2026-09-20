@@ -177,7 +177,7 @@ export default function Schedule() {
   }
 
   return <section aria-labelledby="schedule-heading">
-    <div className="page-heading"><div><p className="eyebrow">Evolving synthetic observations</p><h1 id="schedule-heading">Acquisition schedule</h1>
+    <div className="page-heading"><div><p className="eyebrow">Current workflow · evolving synthetic observations</p><h1 id="schedule-heading">Acquisition schedule</h1>
       <p className="intro">Advance the synthetic feed, import its observations and save a reconciliation result in one operation.</p></div>
       <button type="button" className="secondary" disabled={loading || !!busy} onClick={() => setRevision(value => value + 1)}>Refresh status</button></div>
     <div className="evidence-banner"><strong>Synthetic acquisition</strong><span>Wall time controls the schedule. Each committed cycle advances scenario time by six hours, regardless of the schedule interval. No live network discovery occurs.</span></div>
