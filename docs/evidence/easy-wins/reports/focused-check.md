@@ -1,6 +1,6 @@
 # Easy-wins reports focused evidence
 
-Candidate: `codex/easy-wins-reports` (local worker checkout).
+Code checkpoint: `00c8dd9` (`Add family-aware saved report filtering`). Current branch: `codex/easy-wins-reports` at `d3a4a5a7ebe8897bfed2593584b9adf85edb4bd0` (local worker checkout).
 
 Command:
 
