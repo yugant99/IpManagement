@@ -26,7 +26,9 @@ The original **Build synthetic inventory demo** chat remains persistent project 
 
 ## Branch and ownership
 
-Start each distinct feature from current `main` on a separate branch. First feature: `codex/part-6-container-startup`. Later backup/operator improvements can use a separate `codex/part-6-...` branch after their prerequisite is merged. Use an isolated worktree if another agent shares the checkout.
+The project lead has approved starting the first Part 6 feature from the unmerged Stage 2 checkpoint (`codex/part-2-first-path`, commit `8a1a1227`) so packaging can be prepared against the actual application code. `main` is documentation-only and would not contain the Python/React sources being packaged; do not restart Part 6 from `main`.
+
+First feature: `codex/part-6-container-startup`, branched from `8a1a1227`. Later backup/operator improvements use a separate `codex/part-6-...` branch after their prerequisite (Stage 2 merge, and the core `reset`/`backup`/`restore` commands) lands. Use an isolated worktree if another agent shares the checkout.
 
 Own root `Dockerfile`, `compose.yaml`, `.dockerignore`, `scripts/ops/`, `docs/RUNNING.md`, this handoff and the Part 6 task page. Coordinate small README runtime updates with the lead. Do not edit business rules, shared schemas, application entrypoints, frontend dependencies or locks independently.
 
@@ -78,4 +80,18 @@ Second CPU architecture, second host or Sunday VM are stretch. No cloud resource
 
 ## Current lane handoff
 
-Owner: Spencer / Part 6. Branch/commit: not started; choose current `origin/main` at pickup. Contract revision: `demo-v2-questionnaire`; runtime CLI/data ownership is unchanged. Pushed implementation: none. Working application: none yet. The lead owns added delivery-method/roadmap documents; no HA, carrier-scale or enterprise identity work is assigned to this lane. Next action: read status and contracts, then take the first authorized packaging feature once assigned. Replace this line with exact pushed SHA, integration base SHA, contract revision, dependencies and results when work starts.
+Owner: Spencer / Part 6. Feature: container startup packaging. Branch: `codex/part-6-container-startup`, based on Stage 2 checkpoint `codex/part-2-first-path @ 8a1a1227` (draft [PR #8](https://github.com/yugant99/IpManagement/pull/8)); the lead approved that unmerged base for packaging preparation. Contract revision: `demo-v2-questionnaire`.
+
+Implemented (source only, unrun):
+
+- Three-stage `Dockerfile` targeting `linux/amd64`: `node:22.12.0-bookworm-slim` frontend build → `python:3.12.10-slim-bookworm` + `ghcr.io/astral-sh/uv:0.5.11` Python install via `uv sync --frozen` → minimal runtime image running as uid `10001`, read-only rootfs, `tini` init, `curl`-based `HEALTHCHECK` against `/healthz`.
+- `compose.yaml` publishes `127.0.0.1:8000` only, mounts named volume `ipam_demo_data` at `/data`, exports `IPAM_DATA_DIR=/data` and `IPAM_STATIC_DIR=/app/static`, drops all Linux capabilities and sets `no-new-privileges`. `restart: unless-stopped` is intentionally not health-driven so an unseeded 503 does not trigger a restart loop.
+- `.dockerignore` mirrors `.gitignore` and additionally excludes `docs/`, `scripts/` and the Compose/Dockerfile themselves from the build context.
+- `scripts/ops/`: `common.sh`, `build.sh`, `start.sh`, `stop.sh`, `health.sh` (interpreted exit codes for `SETUP_NEEDED` vs other 5xx vs transport failure), `logs.sh`, `seed.sh`, `migrate.sh`, plus a directory `README.md`. `reset`/`backup`/`restore` wrappers are deliberately absent until core lands the commands.
+- `docs/RUNNING.md` covers target platform, first-time setup, normal operation, health/readiness semantics, data location, state commands, shutdown, diagnostics, dependency inventory and limitations.
+
+Not run: no image build, container start, seed, migrate, health check, restart, backup or restore has been executed on this branch. No application logic, schema, fixture, dependency lock, `frontend/`, `backend/` file or `docs/STATUS.md`/`docs/CURRENT_HANDOFF.md` was edited.
+
+Blockers: core `reset`, `backup` and `restore` commands are not present in `8a1a1227`. `PART6_READY` remains `no`. G27 persistence acceptance still needs Stage 5 allocation/audit records surviving restart.
+
+Next action: open a focused PR for `codex/part-6-container-startup` against the Stage 2 branch (or whichever base the lead selects), request review, and prepare a follow-up branch to add the state-command wrappers once core publishes them.

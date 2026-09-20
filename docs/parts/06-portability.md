@@ -1,6 +1,8 @@
 # Part 6: portable delivery — Spencer
 
-Owner: Spencer and his agent. Budget: approximately 6–8 hours. Core goals: G26–G28 and G30. Stretch: G29. Branch: `codex/part-6-portability`.
+Owner: Spencer and his agent. Budget: approximately 6–8 hours. Core goals: G26–G28 and G30. Stretch: G29.
+
+Lane label: `codex/part-6-portability`. Feature branches follow `codex/part-6-<feature>`; the first is `codex/part-6-container-startup` (this deliverable), branched from Stage 2 checkpoint `8a1a1227` at the lead's direction so packaging can consume real application source.
 
 Start at [the pickup handoff](../handoffs/part-6.md). No presentation work is assigned. Parts 1–5 belong to the core team.
 
@@ -31,3 +33,7 @@ Primary packaged target is Linux amd64. The development Mac is arm64; cross-arch
 ## Timebox
 
 0.5–1 hour context/contracts; 1–2 hours packaging/startup; 1–2 hours persistence/backup/reset; 0.5–1 hour health/diagnostics; 0.5–1 hour operator/agent docs; remainder integration repairs. If core entrypoints are missing, prepare files/docs and report the exact blocker. Do not claim startup succeeds against a placeholder service.
+
+## Current state on `codex/part-6-container-startup`
+
+Source files delivered (unrun): `Dockerfile`, `compose.yaml`, `.dockerignore`, `scripts/ops/{common,build,start,stop,health,logs,seed,migrate}.sh` plus `scripts/ops/README.md`, `docs/RUNNING.md`, this task page and `docs/handoffs/part-6.md`. No `reset`/`backup`/`restore` wrappers are shipped: those commands do not exist in `8a1a1227`; a follow-up feature branch will add wrappers once core lands them and `CONTRACTS.md` records them as implemented. No image was built, run, seeded or migrated on this branch; `PART6_READY=no`.

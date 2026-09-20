@@ -1,0 +1,52 @@
+# One-service Compose deployment for the IPAM demo.
+#
+# Design invariants (see docs/CONTRACTS.md and docs/RUNNING.md):
+#   - Single Python API process serves compiled UI and /api/*.
+#   - Persistent SQLite lives under IPAM_DATA_DIR (mounted at /data).
+#   - Published port binds to loopback only; no public exposure.
+#   - Explicit seed. The service never seeds/resets on its own.
+#   - Restart policy fires only on actual process exit, never on the
+#     503 SETUP_NEEDED readiness reply Docker reports as "unhealthy".
+#
+# Runtime prerequisites (before `docker compose up`):
+#   1. Build the image: `docker compose build ipam` (Linux amd64).
+#   2. Ensure the data volume exists (Compose creates it on first up).
+#   3. Seed once: `scripts/ops/seed.sh` (see docs/RUNNING.md).
+
+name: ipam-demo
+
+services:
+  ipam:
+    image: ipam-demo:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    # Loopback-only publish. Change the left-hand address ONLY through a
+    # separate authorized deployment decision, never as a convenience edit.
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      IPAM_DATA_DIR: /data
+      IPAM_STATIC_DIR: /app/static
+    volumes:
+      - ipam_data:/data
+    restart: unless-stopped
+    stop_grace_period: 15s
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    # Keep the container to what the app actually needs. Feel free to add
+    # to this list only if the app surfaces an error citing a syscall.
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # Container-side HEALTHCHECK is defined in the Dockerfile.
+
+volumes:
+  # Named volume — do NOT bind-mount a network filesystem here. Local
+  # filesystem or a local Docker volume only (docs/CONTRACTS.md).
+  ipam_data:
+    name: ipam_demo_data
