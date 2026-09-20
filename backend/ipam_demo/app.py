@@ -16,7 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import __version__, inventory, inventory_commands, reconciliation, reports, workflow
+from . import __version__, inventory, inventory_commands, reconciliation, reports, source_catalog, workflow
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
 from .models import Allocation, Page, Pool, Prefix, PrefixDetail, Scope
@@ -147,12 +147,13 @@ def create_app() -> FastAPI:
 
     @app.get("/api/prefixes", response_model=Page[Prefix])
     def list_prefixes(scope_id: UUID | None = None, family: int | None = None,
-                      owner: TextFilter = None, tag: TextFilter = None, q: TextFilter = None,
+                      owner: TextFilter = None, tag: TextFilter = None, domain: TextFilter = None,
+                      region: TextFilter = None, q: TextFilter = None,
                       limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
         if family is not None and family not in (4, 6):
             raise AppError("INVALID_INPUT", "Family must be 4 or 6.", 422, {"field": "family"})
         items = inventory.prefixes(connection, scope_id=str(scope_id) if scope_id else None,
-                                   family=family, owner=owner, tag=tag, q=q)
+                                   family=family, owner=owner, tag=tag, domain=domain, region=region, q=q)
         return inventory.page(items, limit, offset)
 
     @app.get("/api/prefixes/{object_id}", response_model=PrefixDetail)
@@ -161,9 +162,11 @@ def create_app() -> FastAPI:
 
     @app.get("/api/pools", response_model=Page[Pool])
     def list_pools(scope_id: UUID | None = None, prefix_id: UUID | None = None,
+                   domain: TextFilter = None, region: TextFilter = None,
                    limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
         return inventory.page(inventory.pools(connection, scope_id=str(scope_id) if scope_id else None,
-                              prefix_id=str(prefix_id) if prefix_id else None), limit, offset)
+                              prefix_id=str(prefix_id) if prefix_id else None,
+                              domain=domain, region=region), limit, offset)
 
     @app.get("/api/allocations", response_model=Page[Allocation])
     def list_allocations(scope_id: UUID | None = None, prefix_id: UUID | None = None, pool_id: UUID | None = None,
@@ -484,6 +487,16 @@ def create_app() -> FastAPI:
         items = [json.loads(row[0]) for row in connection.execute(
             "SELECT receipt_json FROM source_batches ORDER BY sequence DESC LIMIT ? OFFSET ?", (limit, offset))]
         return {"items": items, "total": total, "limit": limit, "offset": offset}
+
+    @app.get("/api/source-catalog")
+    def list_source_catalog(scope_id: UUID | None = None, limit: Limit = 50, offset: Offset = 0,
+                            connection=Depends(database)):
+        items = source_catalog.catalog(connection, scope_id=str(scope_id) if scope_id else None)
+        evaluated_at = connection.execute("SELECT demo_clock_at FROM app_meta WHERE singleton=1").fetchone()[0]
+        page = inventory.page(items, limit, offset)
+        return {**page, "evaluated_at": evaluated_at,
+                "limitations": ["Receipt-derived synthetic source catalog; this is not automatic discovery.",
+                                "Declared authority does not prove unique or live system authority."]}
 
     @app.get("/api/imports/{batch_id}")
     def get_import(batch_id: UUID, connection=Depends(database)):
