@@ -1,6 +1,6 @@
 # Luna final native rehearsal handoff
 
-Status: completed focused procedural evidence; a separate presenter-ready cycle-1 snapshot with pinned preset is now prepared, and fresh independent browser/recovery verification is in progress. This is not human presenter acceptance or portable Linux/container acceptance.
+Status: completed focused procedural evidence; a separate presenter-ready cycle-1 snapshot with pinned preset is prepared and independently verified through API/recovery plus one browser attempt. Saved-run selector interaction remains locator-unverified. This is not human presenter acceptance or portable Linux/container acceptance.
 
 ## Checkpoint
 
@@ -30,6 +30,7 @@ API request/response records, browser observations, semantic snapshots, exports 
 
 - Initial recovery target: `snapshots/demo-initial-cycle1.sqlite3`, SHA-256 `8f652f649c36af0a0d515098e3c2c32fea1a8a437eec3e2599b6978fea5e0239`.
 - Presenter-ready recovery target: `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-audit-artifacts/run-20260919-zzeadfai/ready-cycle1-with-preset-v2/snapshots/demo-ready-cycle1-with-preset.sqlite3`, SHA-256 `ee8134aa583dbf4711251f8bcd23e9bec6305ce77672e40e7cd3def91f655b37`; cycle-1 run `004246ef-9089-40ac-b029-a412d5c2d38d`, preset revision `147f2054b8edf4f186bc3c8ac8b11d86bed4f08972f20e47da7cba763d6c71c6`, scheduler disabled.
+- Fresh independent verification copy: `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-independent-ready-verification-20260919`; evidence includes browser rendering of 60 prefixes and the pinned preset, API readback of the expected revision/finding/schedule, stopped recovery and 17-table comparison. Saved-run selector interaction hit a locator timeout; no retry was made. Full note: `/Users/yuganthareshsoni/Documents/Codex/2026-09-19/luna-independent-reproduction-20260919/outputs/independent-agent-procedural-reproduction.md`.
 - Final evidence snapshot: `snapshots/demo-final-evidence-cycle7.sqlite3`, SHA-256 `e5e50c01b4a7bc8a561b9ba4c2bcc96f317e165e3385b8e7ce39457148946a2d`.
 - Restore completed while stopped: `database_replaced:true`, schema 5, `migration_required:false`.
 - Rehearsal state was preserved at `data/ipam_demo.before-restore-20260920T012552-1896cd02967a4e18a754b50ec0ca27ed.sqlite3`.
@@ -38,7 +39,7 @@ API request/response records, browser observations, semantic snapshots, exports 
 ## Limits and defects
 
 - This was an agent procedural reproduction, not a human presenter/recipient walkthrough.
-- Prior separate reproduction: `/Users/yuganthareshsoni/Documents/Codex/2026-09-19/luna-independent-reproduction-20260919/outputs/independent-agent-procedural-reproduction.md`, using `/Users/yuganthareshsoni/Downloads/Ip_inventory-stage-5-independent-agent-reproduction-20260919`; it verified stopped restore, health, disabled cycle 1, initial run and Central `.240.10` via API, then stopped cleanly, but the pristine historical snapshot had no preset and browser selection was interrupted. A fresh verification is now assigned against the presenter-ready snapshot above.
+- Prior historical-copy reproduction remains in the same note for provenance; the fresh ready-copy verification supersedes it for presenter-ready snapshot evidence. The browser selector limitation and human acceptance gap remain explicit.
 - No portable Linux/container/recipient startup or external provisioning was established; downstream provisioning remained simulated.
 - The first recorder restart did not persist its child after shell exit; a foreground owned session was used thereafter. This is a recorder/process-lifecycle defect, not an observed application defect.
 - One intentional allocation attempt used occupied `10.40.2.2` and correctly returned `CANDIDATE_OCCUPIED`; the successful request used free `10.40.2.3`.
