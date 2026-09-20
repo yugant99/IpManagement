@@ -2,6 +2,8 @@
 
 **Worker routing update:** the user authorized visible GPT-5.6 Luna replacement tasks to reduce token use. Follow [the collected checkpoints and new task registry](handoffs/luna-worker-transfer.md). New fixes/continuation go to `stage_3_luna`, `stage_4_luna`, `stage_5_luna` and `accounting_luna`; old worker chats are reference-only for this follow-up. Main Lead 2.0 remains lead. PR #44 candidate `289f53c7c5db1bd414c938add1ea207d591f9e64` is reviewed; final rehearsal and main acceptance remain pending.
 
+**Historical baseline below:** references to completed PR #34 integration, Stage 5 acceptance and 29/24/9/49 accounting describe the earlier accepted application only. Main at this transfer is `eabe4f4` after documentation PR #38; none of those historical completion statements accepts the new PR #44 behavior. The current follow-up remains pending final rehearsal.
+
 **Active follow-up:** the user authorized the substantive [F1–F7 audit response](handoffs/audit-response-authorization.md), including local inventory-correction approval, metadata findings/history preservation, exception lifecycle, focused local tests and final native rehearsal. Existing owners continue; Stage 4 is the sole new schema/migration owner. New behavior and acceptance are in progress. Historical checkpoints below stay unchanged; infrastructure and portable runtime execution remain outside the grant.
 
 ## Authorization and evidence
