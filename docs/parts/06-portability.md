@@ -2,7 +2,7 @@
 
 Owner: Spencer and his agent. Budget: approximately 6–8 hours. Core goals: G26–G28 and G30. Stretch: G29.
 
-Lane label: `codex/part-6-portability`. Feature branches follow `codex/part-6-<feature>`; the first is `codex/part-6-container-startup` (this deliverable), branched from Stage 2 checkpoint `8a1a1227` at the lead's direction so packaging can consume real application source.
+Lane label: `codex/part-6-portability`. Feature branches follow `codex/part-6-<feature>`. Delivered so far: `codex/part-6-container-startup` (PR #49, packaging skeleton), superseded on packaging plumbing by `codex/part-6-build-compat-fix` (PR #50, Main Lead 2.0 compat repair with the rich feed producer and inventory packaging). The current branch `codex/part-6-operator-handoff` adds the rich-seed wrapper, state-command wrappers and the corrected runbook on top of PR #50.
 
 Start at [the pickup handoff](../handoffs/part-6.md). No presentation work is assigned. Parts 1–5 belong to the core team.
 
@@ -34,6 +34,16 @@ Primary packaged target is Linux amd64. The development Mac is arm64; cross-arch
 
 0.5–1 hour context/contracts; 1–2 hours packaging/startup; 1–2 hours persistence/backup/reset; 0.5–1 hour health/diagnostics; 0.5–1 hour operator/agent docs; remainder integration repairs. If core entrypoints are missing, prepare files/docs and report the exact blocker. Do not claim startup succeeds against a placeholder service.
 
-## Current state on `codex/part-6-container-startup`
+## Current state on `codex/part-6-operator-handoff`
 
-Source files delivered (unrun): `Dockerfile`, `compose.yaml`, `.dockerignore`, `scripts/ops/{common,build,start,stop,health,logs,seed,migrate}.sh` plus `scripts/ops/README.md`, `docs/RUNNING.md`, this task page and `docs/handoffs/part-6.md`. No `reset`/`backup`/`restore` wrappers are shipped: those commands do not exist in `8a1a1227`; a follow-up feature branch will add wrappers once core lands them and `CONTRACTS.md` records them as implemented. No image was built, run, seeded or migrated on this branch; `PART6_READY=no`.
+Source and documentation only, unrun. On top of PR #50 this branch adds:
+
+- `scripts/ops/seed.sh` defaults to the accepted rich scenario (`--scenario rich --inventory /app/fixtures/v1/inventory.json`); `--scenario baseline` remains available.
+- New `scripts/ops/acquire.sh` for the first manual acquisition against `POST /api/schedule/run`, preserving the caller's idempotency key across retries.
+- New `scripts/ops/backup.sh`, `restore.sh`, `reset.sh` wrappers around the core state commands, with stopped-service enforcement, explicit `--confirm` handling and snapshots under `/data/snapshots/`.
+- New `scripts/ops/snapshots.sh` (`list`/`export`/`import`/`remove`) for moving snapshots in and out of the data volume via `docker compose cp`.
+- `scripts/ops/common.sh` enforces Docker Compose v2 (drops the unverified `docker-compose` legacy fallback) and exposes `require_service_stopped`.
+- `scripts/ops/start.sh` and `migrate.sh` corrected: no more "seed after start" implication; migrate advertises the real v1/v2/v3/v4 → current range.
+- `docs/RUNNING.md` rewritten around the rich demo, manual acquisition, state commands, snapshot storage and dependency/license inventory. Handoff and this task page updated.
+
+`Dockerfile`, `compose.yaml` and `.dockerignore` are left exactly as PR #50 delivered them; this branch does not duplicate those fixes. No image was built, run, seeded, migrated, backed up or restored. `PART6_READY=no`. Questionnaire accounting unchanged.

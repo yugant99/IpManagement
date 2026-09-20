@@ -80,18 +80,21 @@ Second CPU architecture, second host or Sunday VM are stretch. No cloud resource
 
 ## Current lane handoff
 
-Owner: Spencer / Part 6. Feature: container startup packaging. Branch: `codex/part-6-container-startup`, based on Stage 2 checkpoint `codex/part-2-first-path @ 8a1a1227` (draft [PR #8](https://github.com/yugant99/IpManagement/pull/8)); the lead approved that unmerged base for packaging preparation. Contract revision: `demo-v2-questionnaire`.
+Owner: Spencer / Part 6. Feature: operator handoff (rich-seed wrapper, state-command wrappers, corrected runbook). Branch: `codex/part-6-operator-handoff`, based on `codex/part-6-build-compat-fix @ 3e129d9` (PR #50, which itself packages current accepted main plus the Main Lead 2.0 compat fixes on top of the earlier PR #49 commits). Contract revision: `demo-v2-questionnaire`. Predecessor: `codex/part-6-container-startup` (PR #49, superseded by PR #50's compat fixes).
 
-Implemented (source only, unrun):
+Implemented on this branch (source and documentation, unrun):
 
-- Three-stage `Dockerfile` targeting `linux/amd64`: `node:22.12.0-bookworm-slim` frontend build → `python:3.12.10-slim-bookworm` + `ghcr.io/astral-sh/uv:0.5.11` Python install via `uv sync --frozen` → minimal runtime image running as uid `10001`, read-only rootfs, `tini` init, `curl`-based `HEALTHCHECK` against `/healthz`.
-- `compose.yaml` publishes `127.0.0.1:8000` only, mounts named volume `ipam_demo_data` at `/data`, exports `IPAM_DATA_DIR=/data` and `IPAM_STATIC_DIR=/app/static`, drops all Linux capabilities and sets `no-new-privileges`. `restart: unless-stopped` is intentionally not health-driven so an unseeded 503 does not trigger a restart loop.
-- `.dockerignore` mirrors `.gitignore` and additionally excludes `docs/`, `scripts/` and the Compose/Dockerfile themselves from the build context.
-- `scripts/ops/`: `common.sh`, `build.sh`, `start.sh`, `stop.sh`, `health.sh` (interpreted exit codes for `SETUP_NEEDED` vs other 5xx vs transport failure), `logs.sh`, `seed.sh`, `migrate.sh`, plus a directory `README.md`. `reset`/`backup`/`restore` wrappers are deliberately absent until core lands the commands.
-- `docs/RUNNING.md` covers target platform, first-time setup, normal operation, health/readiness semantics, data location, state commands, shutdown, diagnostics, dependency inventory and limitations.
+- `scripts/ops/seed.sh` now defaults to the accepted rich scenario (`python -m ipam_demo seed --scenario rich --inventory /app/fixtures/v1/inventory.json`); `--scenario baseline` remains available for the older foundation scenario. It checks that the service is stopped and refuses when it is not.
+- New `scripts/ops/acquire.sh` posts the accepted rich-demo payload (`actor_id=demo-approver`, `reason="Prepare initial rich demo"`, operator-supplied `idempotency_key`) to `POST /api/schedule/run`, distinguishing 200/201 success, 409 in-progress and transport failures.
+- New `scripts/ops/backup.sh`, `restore.sh`, `reset.sh` wrappers around the core state commands with stopped-service enforcement and explicit `--confirm` handling. Snapshots live under `/data/snapshots/` (0700, created on first backup) inside the existing `ipam_demo_data` named volume; the preserved pre-restore database and lock file are documented as never removed automatically.
+- New `scripts/ops/snapshots.sh` covers `list`, `export`, `import` and `remove` for the snapshot subdirectory using `docker compose cp`.
+- `scripts/ops/common.sh` now enforces Docker Compose v2 and provides `service_is_running` / `require_service_stopped`; the previously claimed unverified `docker-compose` legacy fallback is removed.
+- `scripts/ops/start.sh` no longer implies "seed after start" (seed needs the exclusive lock and refuses to run alongside the service). `scripts/ops/migrate.sh` describes v1/v2/v3/v4 → current, not the stale v1→v2 claim.
+- `docs/RUNNING.md` rewritten: rich-demo first-time setup, manual acquisition procedure, corrected logs/tail example, full state-command section referencing `docs/STATE_OPERATIONS.md`, snapshot storage semantics, dependency and license notes, and clearly separated "unverified behavior" recipient checks.
+- `scripts/ops/README.md` updated to list every wrapper and drop the "Deliberately absent" reset/backup/restore claim.
 
-Not run: no image build, container start, seed, migrate, health check, restart, backup or restore has been executed on this branch. No application logic, schema, fixture, dependency lock, `frontend/`, `backend/` file or `docs/STATUS.md`/`docs/CURRENT_HANDOFF.md` was edited.
+Not run: no image build, container start, seed, migrate, health check, restart, backup, restore or reset has been executed on this branch. No application logic, schema, fixture, dependency lock, `frontend/`, `backend/` file, or lead-owned status/handoff/task page (except this one and `docs/parts/06-portability.md`) was edited. `Dockerfile`, `compose.yaml` and `.dockerignore` are left as PR #50 delivered them; this branch does not duplicate those fixes.
 
-Blockers: core `reset`, `backup` and `restore` commands are not present in `8a1a1227`. `PART6_READY` remains `no`. G27 persistence acceptance still needs Stage 5 allocation/audit records surviving restart.
+Blockers: recipient/target-host evidence session — image build on linux/amd64, seed→start→health→acquire, restart preserving G21/G22 allocation/audit, backup→restore cycle and confirmed refusal paths — is not authorized in this turn. `PART6_READY` remains `no`. Questionnaire accounting stays 32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing out of 111.
 
-Next action: open a focused PR for `codex/part-6-container-startup` against the Stage 2 branch (or whichever base the lead selects), request review, and prepare a follow-up branch to add the state-command wrappers once core publishes them.
+Next action: open a focused PR against `codex/part-6-build-compat-fix` (Main Lead 2.0 owns integration/merge). The recipient session, when authorized, exercises the flow documented above and records results into a follow-up handoff.
