@@ -81,7 +81,7 @@ Key artifact hashes:
 - RFP-006 CSV: `02eeba7b245652dab8ad84ec0861116c85ce17635eedbeb69338f8fb1fe1562c`
 - RFP-078 CSV: `bcc7e086a940948ae6630610edfde49288dc62cab88cf35d1779fc6f9113646f`
 
-The root contains `summary.json`, raw API artifacts, derived input envelope,
+The root contains `artifacts/summary.json`, raw API artifacts, derived input envelope,
 and service log. The service was stopped by the runner's `finally` cleanup;
 port `18942` is no longer owned by this check. The SQLite store and raw bulky
 artifacts remain outside Git for lead inspection and can be removed after the
@@ -92,5 +92,8 @@ lead no longer needs them.
 The project lead should review the exact artifacts, decide whether to update
 the three row-map entries, and coordinate any merge. The evidence does not
 close the broader limitations recorded in the row map and does not alter the
-controlling 32/22/10/47 accounting. No PR was opened or pushed from this lane
-yet; the next action is lead review of this commit and the disposable root.
+controlling 32/22/10/47 accounting. PR #56 is open for the original evidence
+commit; this handoff's later runner-safety correction is a follow-up commit on
+the same branch. The captured evidence run predates that correction; the
+correction changes only reproducibility guards and was not rerun as a new
+application-evidence claim.

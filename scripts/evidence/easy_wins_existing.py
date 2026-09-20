@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import socket
 import subprocess
 import sys
 import time
@@ -59,6 +60,8 @@ def main() -> int:
     args = parser.parse_args()
     root = args.root.resolve()
     checkout = args.checkout.resolve()
+    if root.exists():
+        raise RuntimeError(f"Evidence root must not already exist: {root}")
     data = root / "data"
     root.mkdir(parents=True, exist_ok=True)
     data.mkdir(parents=True, exist_ok=True)
@@ -74,14 +77,35 @@ def main() -> int:
         cwd=checkout, env=env, capture_output=True, text=True, check=True,
     )
     write(root, "seed.json", seed.stdout.encode())
-    process = subprocess.Popen(
-        [str(python), "-m", "ipam_demo", "serve", "--host", "127.0.0.1", "--port", str(args.port)],
-        cwd=checkout, env=env, stdout=(root / "artifacts/server.log").open("wb"), stderr=subprocess.STDOUT,
-    )
+    server_log_path = root / "artifacts/server.log"
+    with server_log_path.open("wb") as server_log:
+        # Check immediately before spawning so an existing service cannot be
+        # mistaken for this run's child process.
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+            try:
+                probe.bind(("127.0.0.1", args.port))
+            except OSError as exc:
+                raise RuntimeError(f"Loopback port {args.port} is not free") from exc
+        process = subprocess.Popen(
+            [str(python), "-m", "ipam_demo", "serve", "--host", "127.0.0.1", "--port", str(args.port)],
+            cwd=checkout, env=env, stdout=server_log, stderr=subprocess.STDOUT,
+        )
     write(root, "runtime.json", json.dumps({"python": str(python), "checkout": str(checkout), "pid": process.pid,
                                               "port": args.port}, indent=2).encode())
     base = f"http://127.0.0.1:{args.port}"
     try:
+        startup_marker = f"Uvicorn running on http://127.0.0.1:{args.port}"
+        for _ in range(60):
+            if process.poll() is not None:
+                raise RuntimeError("Owned API child exited before startup; inspect artifacts/server.log")
+            startup_log = server_log_path.read_text(errors="replace")
+            if "Application startup complete." in startup_log and startup_marker in startup_log:
+                write(root, "startup.json", json.dumps({"pid": process.pid, "startup_confirmed": True,
+                                                          "marker": startup_marker}).encode())
+                break
+            time.sleep(0.1)
+        else:
+            raise RuntimeError("Owned API child did not report completed startup; inspect artifacts/server.log")
         for _ in range(60):
             status, headers, body = call(base, "GET", "/healthz")
             if status == 200:
@@ -226,12 +250,13 @@ def main() -> int:
         print(json.dumps(summary, indent=2))
         return 0
     finally:
-        process.terminate()
-        try:
-            process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
 
 
 if __name__ == "__main__":
