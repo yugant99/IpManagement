@@ -395,20 +395,21 @@ def create_app() -> FastAPI:
                 workflow.audit_event(
                     connection, actor_id="system", action="source.import.reconcile", outcome=outcome,
                     reason=f"Import-triggered reconciliation {outcome}: {error.message}", subject_id=batch_id,
-                    request_id=request.state.request_id,
                     details={"batch_id": batch_id, "trigger": "import", "error": {
-                        "code": error.code, "message": error.message, "details": error.details}})
+                        "code": error.code, "message": error.message, "details": error.details},
+                             "http_request_id": request.state.request_id})
             write_operation(request, save_failure)
-            return True
-        except Exception:
-            logger.exception("Import reconciliation failure audit could not be stored; request_id=%s",
+            return {"audit_recorded": True}
+        except Exception as audit_error:
+            logger.exception("Import reconciliation failure audit could not be stored; http_request_id=%s",
                              request.state.request_id)
-            return False
+            return {"audit_recorded": False, "audit_error": {
+                "code": "AUDIT_RECORD_FAILED",
+                "message": "The reconciliation attempt result was not written to the audit store.",
+                "details": {"cause": type(audit_error).__name__}}}
 
-    def reconcile_import(request, batch_id, *, import_replay):
-        with connect(request.app.state.database) as connection:
-            batch = connection.execute("SELECT source_kind FROM source_batches WHERE id=?", (batch_id,)).fetchone()
-        if batch["source_kind"] == "inventory_staged":
+    def reconcile_import(request, batch_id, source_kind, *, import_replay):
+        if source_kind == "inventory_staged":
             return {"batch_id": batch_id, "status": "skipped", "replay": False,
                     "error": {"code": "STAGED_INVENTORY",
                                "message": "Staged intended inventory is not promoted or reconciled by an import callback.",
@@ -418,7 +419,7 @@ def create_app() -> FastAPI:
             logger.warning("Import reconciliation busy batch_id=%s request_id=%s", batch_id, request.state.request_id)
             recorded = record_import_reconciliation_failure(request, batch_id, error, outcome="busy")
             return {"batch_id": batch_id, "status": "busy", "replay": False,
-                    "audit_recorded": recorded, "error": error.body(request.state.request_id)["error"]}
+                    **recorded, "error": error.body(request.state.request_id)["error"]}
         try:
             def save_run(connection):
                 linked = import_reconciliation_link(connection, batch_id)
@@ -429,9 +430,8 @@ def create_app() -> FastAPI:
                 workflow.audit_event(
                     connection, actor_id="system", action="source.import.reconcile", outcome="succeeded",
                     reason="Import-triggered reconciliation completed.", subject_id=batch_id,
-                    request_id=request.state.request_id,
                     details={"batch_id": batch_id, "run_id": result["id"], "trigger": "import",
-                             "replay": import_replay})
+                             "replay": import_replay, "http_request_id": request.state.request_id})
                 return result
             result = write_operation(request, save_run)
             if "status" in result:
@@ -443,7 +443,7 @@ def create_app() -> FastAPI:
             logger.warning("Import reconciliation failed batch_id=%s code=%s request_id=%s",
                            batch_id, error.code, request.state.request_id)
             return {"batch_id": batch_id, "status": "failed", "replay": False,
-                    "audit_recorded": recorded, "error": error.body(request.state.request_id)["error"]}
+                    **recorded, "error": error.body(request.state.request_id)["error"]}
         except Exception as exc:
             logger.exception("Import reconciliation failed unexpectedly batch_id=%s request_id=%s",
                              batch_id, request.state.request_id)
@@ -453,7 +453,7 @@ def create_app() -> FastAPI:
             logger.warning("Import reconciliation failed batch_id=%s code=%s request_id=%s",
                            batch_id, error.code, request.state.request_id)
             return {"batch_id": batch_id, "status": "failed", "replay": False,
-                    "audit_recorded": recorded, "error": error.body(request.state.request_id)["error"]}
+                    **recorded, "error": error.body(request.state.request_id)["error"]}
         finally:
             run_lock.release()
 
@@ -477,7 +477,7 @@ def create_app() -> FastAPI:
         receipt, replay = await run_in_threadpool(write_operation, request, save_import)
         if reconcile_after_import:
             receipt = {**receipt, "reconciliation": await run_in_threadpool(
-                reconcile_import, request, receipt["id"], import_replay=replay)}
+                reconcile_import, request, receipt["id"], receipt["source_kind"], import_replay=replay)}
         return JSONResponse(receipt, status_code=200 if replay else 201,
                             headers={"X-Import-Replay": "true" if replay else "false"})
 
