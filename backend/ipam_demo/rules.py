@@ -43,6 +43,40 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
     prefixes = [dict(row) for row in connection.execute(
         "SELECT p.*,s.name AS scope_name FROM prefixes p JOIN scopes s ON s.id=p.scope_id")]
     by_id = {prefix["id"]: prefix for prefix in prefixes}
+    ledger_version = connection.execute("SELECT baseline_version FROM app_meta WHERE singleton=1").fetchone()[0]
+    for prefix in prefixes:
+        subject = {key: prefix[key] for key in ("id", "scope_id", "scope_name", "family", "cidr", "version")}
+        subject.update(kind="prefix", origin=json.loads(prefix["origin"]))
+        values = {field: prefix[field] for field in ("owner", "purpose")}
+        missing = [field for field, value in values.items() if not value.strip()]
+        references = [{"kind": "original_inventory", **subject["origin"]}]
+        metadata_audit = None
+        for audit in connection.execute(
+            "SELECT * FROM audit_events WHERE subject_id=? AND outcome IN ('success','succeeded') "
+            "ORDER BY created_at DESC,rowid DESC", (prefix["id"],)
+        ):
+            after = json.loads(audit["details_json"]).get("after")
+            if (isinstance(after, dict) and after.get("id") == prefix["id"]
+                    and all(after.get(field) == value for field, value in values.items())):
+                metadata_audit = {key: audit[key] for key in ("id", "created_at", "actor_id", "action", "outcome")}
+                metadata_audit["prefix_version_after"] = after.get("version")
+                references.append({"kind": "inventory_audit", "source_id": "local-audit",
+                                   "source_run_id": audit["id"], "source_record_id": prefix["id"],
+                                   "audit_id": audit["id"]})
+                break
+        finding = _finding(run_id, clock_text, "metadata_gap", subject, references, [], "warning")
+        finding["policy"] = {"required_fields": ["owner", "purpose"], "missing_fields": missing,
+                             "evaluated_values": values, "evaluated_prefix_version": prefix["version"],
+                             "evaluated_ledger_version": ledger_version,
+                             "evaluation_source": "current_intended_inventory", "matching_metadata_audit": metadata_audit}
+        finding["limitations"] = ["Checks only blank owner and purpose on the saved intended-inventory snapshot; nonblank text does not prove metadata accuracy.",
+                                  "Original inventory references retain creation provenance; evaluated values and matching audit describe later local metadata."]
+        finding["proposed_action"] = ("Assign the missing owner or purpose in the inventory editor with a reason; the edit is audited. Reconcile again to inspect evidence-based resolution."
+                                      if missing else "No missing owner/purpose under this rule; retain the audited inventory record.")
+        _state(finding, "anomalous" if missing else "healthy",
+               "The evaluated intended prefix is missing: " + ", ".join(missing) + "." if missing else
+               "The evaluated intended prefix has nonblank owner and purpose.")
+        findings.append(finding)
     for metric in calculations:
         prefix = by_id[metric["prefix_id"]]
         subject = {key: prefix[key] for key in ("id", "scope_id", "scope_name", "family", "cidr", "version")}
