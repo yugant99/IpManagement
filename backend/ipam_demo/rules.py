@@ -13,6 +13,59 @@ from .inventory import pools
 RULE_VERSION = 1
 
 
+def comparable_findings(before, after):
+    """Identity/definition compatibility only; healthy evidence must resolve separately."""
+    if before is None or after is None:
+        return False
+    for field in ("rule_id", "rule_version"):
+        if before.get(field) is None or before.get(field) != after.get(field):
+            return False
+    left, right = before.get("subject", {}), after.get("subject", {})
+    for field in ("id", "scope_id", "family", "cidr"):
+        if left.get(field) is None or left.get(field) != right.get(field):
+            return False
+    return left.get("kind", "prefix") == right.get("kind", "prefix")
+
+
+def discrepancy_keys(finding):
+    """Current positive semantic atoms; the queue owns episode union and notification."""
+    if finding["evidence_state"] != "anomalous":
+        return []
+    rule = finding["rule_id"]
+    policy = finding.get("policy") or {}
+    observations = finding.get("observations", [])
+    atoms = []
+    if rule == "ghost_scope":
+        atoms = [["address", str(ip_address(item["address"]))] for item in observations]
+    elif rule == "unregistered_managed_route":
+        atoms = [["cidr", str(ip_network(item["cidr"]))] for item in observations]
+    elif rule == "assignment_conflict":
+        atoms = [["address_clients", str(ip_address(item["address"])), sorted(set(item["clients"]))]
+                 for item in observations]
+    elif rule == "pool_assignment_discrepancy":
+        atoms = [["dhcp_claim", str(ip_address(item["address"])), item["client_id"]] for item in observations]
+    elif rule == "metadata_gap":
+        atoms = [["missing_field", field] for field in policy["missing_fields"]]
+    elif rule == "pool_pressure":
+        if policy.get("p95_branch") is True:
+            atoms.append(["p95_at_least", policy["p95_at_least_pct"]])
+        if policy.get("forecast_branch") is True:
+            atoms.append(["forecast_below", policy["forecast_below_days"]])
+    elif rule == "oversized_pool":
+        atoms = [["p95_below", policy["p95_below_pct"], policy["required_samples"]]]
+    elif rule == "zombie_candidate":
+        atoms = [["announced_without_lease_overlap", policy["zero_lease_days"], policy["route_match_policy"]]]
+    elif rule == "missing_expected_route":
+        atoms = [["missing_expected_route", policy["route_match_policy"]]]
+    else:
+        raise ValueError("No material-discrepancy identity is defined for rule: " + rule)
+    # Geometry is material, while concurrency tokens, generated IDs, renewal
+    # windows, provenance timestamps and numeric utilization jitter are not.
+    cidr = str(ip_network(finding["subject"]["cidr"]))
+    return sorted({json.dumps([rule, cidr, atom], sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+                   for atom in atoms})
+
+
 def _finding(run_id, clock_text, rule, subject, references, coverage, severity="high"):
     return {"id": str(uuid4()), "run_id": run_id, "rule_id": rule, "rule_version": RULE_VERSION,
             "subject": subject, "severity": severity, "evidence_state": "unknown",
@@ -43,6 +96,40 @@ def evaluate_rules(connection, views, calculations, run_id, clock_text):
     prefixes = [dict(row) for row in connection.execute(
         "SELECT p.*,s.name AS scope_name FROM prefixes p JOIN scopes s ON s.id=p.scope_id")]
     by_id = {prefix["id"]: prefix for prefix in prefixes}
+    ledger_version = connection.execute("SELECT baseline_version FROM app_meta WHERE singleton=1").fetchone()[0]
+    for prefix in prefixes:
+        subject = {key: prefix[key] for key in ("id", "scope_id", "scope_name", "family", "cidr", "version")}
+        subject.update(kind="prefix", origin=json.loads(prefix["origin"]))
+        values = {field: prefix[field] for field in ("owner", "purpose")}
+        missing = [field for field, value in values.items() if not value.strip()]
+        references = [{"kind": "original_inventory", **subject["origin"]}]
+        metadata_audit = None
+        for audit in connection.execute(
+            "SELECT * FROM audit_events WHERE subject_id=? AND outcome IN ('success','succeeded') "
+            "ORDER BY created_at DESC,rowid DESC", (prefix["id"],)
+        ):
+            after = json.loads(audit["details_json"]).get("after")
+            if (isinstance(after, dict) and after.get("id") == prefix["id"]
+                    and all(after.get(field) == value for field, value in values.items())):
+                metadata_audit = {key: audit[key] for key in ("id", "created_at", "actor_id", "action", "outcome")}
+                metadata_audit["prefix_version_after"] = after.get("version")
+                references.append({"kind": "inventory_audit", "source_id": "local-audit",
+                                   "source_run_id": audit["id"], "source_record_id": prefix["id"],
+                                   "audit_id": audit["id"]})
+                break
+        finding = _finding(run_id, clock_text, "metadata_gap", subject, references, [], "warning")
+        finding["policy"] = {"required_fields": ["owner", "purpose"], "missing_fields": missing,
+                             "evaluated_values": values, "evaluated_prefix_version": prefix["version"],
+                             "evaluated_ledger_version": ledger_version,
+                             "evaluation_source": "current_intended_inventory", "matching_metadata_audit": metadata_audit}
+        finding["limitations"] = ["Checks only blank owner and purpose on the saved intended-inventory snapshot; nonblank text does not prove metadata accuracy.",
+                                  "Original inventory references retain creation provenance; evaluated values and matching audit describe later local metadata."]
+        finding["proposed_action"] = ("Assign the missing owner or purpose in the inventory editor with a reason; the edit is audited. Reconcile again to inspect evidence-based resolution."
+                                      if missing else "No missing owner/purpose under this rule; retain the audited inventory record.")
+        _state(finding, "anomalous" if missing else "healthy",
+               "The evaluated intended prefix is missing: " + ", ".join(missing) + "." if missing else
+               "The evaluated intended prefix has nonblank owner and purpose.")
+        findings.append(finding)
     for metric in calculations:
         prefix = by_id[metric["prefix_id"]]
         subject = {key: prefix[key] for key in ("id", "scope_id", "scope_name", "family", "cidr", "version")}
