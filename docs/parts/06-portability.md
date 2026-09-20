@@ -41,7 +41,7 @@ Source and documentation only, unrun. On top of PR #50 this branch adds:
 - `scripts/ops/seed.sh` defaults to the accepted rich scenario (`--scenario rich --inventory /app/fixtures/v1/inventory.json`); `--scenario baseline` remains available.
 - New `scripts/ops/acquire.sh` for the first manual acquisition against `POST /api/schedule/run`, preserving the caller's idempotency key across retries.
 - New `scripts/ops/backup.sh`, `restore.sh`, `reset.sh` wrappers around the core state commands, with stopped-service enforcement, explicit `--confirm` handling and snapshots under `/data/snapshots/`.
-- New `scripts/ops/snapshots.sh` (`list`/`export`/`import`/`remove`) for moving snapshots in and out of the data volume via `docker compose cp`.
+- New `scripts/ops/snapshots.sh` (`list`/`export`/`import`/`remove`) for moving snapshots in and out of the data volume through locked one-shot container streams.
 - `scripts/ops/common.sh` enforces Docker Compose v2 (drops the unverified `docker-compose` legacy fallback) and exposes `require_service_stopped`.
 - `scripts/ops/start.sh` and `migrate.sh` corrected: no more "seed after start" implication; migrate advertises the real v1/v2/v3/v4 → current range.
 - `docs/RUNNING.md` rewritten around the rich demo, manual acquisition, state commands, snapshot storage and dependency/license inventory. Handoff and this task page updated.

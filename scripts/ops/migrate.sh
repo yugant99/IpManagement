@@ -19,6 +19,6 @@ source "$(dirname -- "$0")/common.sh"
 require_service_stopped
 
 log "Running explicit schema migrate. Service must be stopped."
-compose run --rm --no-deps --entrypoint "" "${SERVICE_NAME}" \
+compose run --rm --no-deps --pull never --entrypoint "" "${SERVICE_NAME}" \
   python -m ipam_demo migrate "$@"
 log "Migration step complete."

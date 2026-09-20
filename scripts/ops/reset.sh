@@ -43,6 +43,6 @@ fi
 require_service_stopped
 
 log "Removing recognized application database. Snapshots and lock file will remain."
-compose run --rm --no-deps --entrypoint "" "${SERVICE_NAME}" \
+compose run --rm --no-deps --pull never --entrypoint "" "${SERVICE_NAME}" \
   python -m ipam_demo reset --confirm "${passthrough[@]}"
 log "Reset complete. Run scripts/ops/seed.sh or scripts/ops/restore.sh before starting the service."

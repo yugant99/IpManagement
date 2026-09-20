@@ -63,7 +63,7 @@ esac
 require_service_stopped
 
 log "Seeding scenario=${scenario}. Service must be stopped."
-compose run --rm --no-deps --entrypoint "" "${SERVICE_NAME}" \
+compose run --rm --no-deps --pull never --entrypoint "" "${SERVICE_NAME}" \
   python -m ipam_demo seed "${seed_args[@]}" "${passthrough[@]}"
 log "Seed complete. Start the service with scripts/ops/start.sh."
 if [[ "${scenario}" == "rich" ]]; then

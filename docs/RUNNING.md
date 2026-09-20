@@ -20,8 +20,10 @@ gate. See [Limitations](#limitations-and-unverified-behavior).
   the Compose plugin (`docker compose`, v2). Legacy `docker-compose`
   is not exercised here and is not supported by these scripts.
 - macOS `arm64` and Windows/WSL2 hosts are stretch and not exercised.
-  A cross-architecture build must pass `--platform=linux/amd64` and
-  accept the emulation penalty.
+  The package fixes its build target to Linux amd64; other host
+  architectures need separately authorized emulation evidence.
+- Host tools: Bash, curl, Python 3.11+ (acquisition JSON and snapshot
+  transfer metadata), and GNU coreutils for the Linux snapshot export.
 - Local filesystem or a local Docker named volume for persistent data.
   Network mounts (NFS, SMB, cloud object stores) are **not** supported;
   the app's exclusive `flock` lock is Unix-local.
@@ -109,7 +111,8 @@ with `scripts/ops/seed.sh --scenario baseline` instead. The rich
 | Poll readiness | `scripts/ops/health.sh` |
 
 The service must be **stopped** before running any state command
-(`seed.sh`, `migrate.sh`, `backup.sh`, `restore.sh`, `reset.sh`).
+(`seed.sh`, `migrate.sh`, `backup.sh`, `restore.sh`, `reset.sh`)
+and all `snapshots.sh` operations.
 The wrappers check this and refuse with a clear message; the app's
 exclusive `.ipam_demo.lock` inside `IPAM_DATA_DIR` enforces the same
 invariant server-side and returns `DATA_IN_USE`.
@@ -195,7 +198,8 @@ Writes a standalone snapshot to `/data/snapshots/<name>` using
 SQLite's backup API. Existing files at that destination are refused
 (`OUTPUT_EXISTS`); the core command never overwrites a prior snapshot.
 
-To copy a snapshot out of the volume:
+To copy a snapshot out of the volume (service still stopped; use a new
+host filename in an existing directory):
 
 ```sh
 scripts/ops/snapshots.sh list
@@ -234,9 +238,61 @@ Reset never reseeds; run `scripts/ops/seed.sh` or
 ### Bringing a snapshot back in
 
 `scripts/ops/snapshots.sh import /host/path/foo.sqlite3` copies a
-snapshot from the host into `/data/snapshots/` inside the volume.
+standalone snapshot from the host into `/data/snapshots/` inside the
+volume. Stop the service first. Transfer uses a one-shot container running
+as the app user, so it works after `stop.sh` has removed the service
+container. All snapshot operations take the existing app-data lock.
+Import/export refuse symlinks, multi-link files and SQLite companion files;
+import checks source size/SHA-256 before publishing a new mode-0600 file.
+Existing destinations are never overwritten. Export stages a private host
+file and publishes it only after the transfer exits successfully. An
+interrupted import may leave a `.import-*` scratch file; it is not a usable
+snapshot and is never promoted automatically. This is file transport, not
+an additional SQLite implementation: core restore validates application
+identity, schema and integrity. Keep the source unchanged during transfer.
 Follow with `scripts/ops/restore.sh foo.sqlite3 --confirm` to bring it
 online.
+
+## Offline recipient handoff (procedure only, unrun)
+
+On an authorized Linux amd64 build host, build the reviewed source once.
+Record the full source commit and image ID, then save the already-built
+image. Use a new output directory; commands below are instructions, not
+recorded execution evidence:
+
+```sh
+mkdir part6-transfer
+git rev-parse HEAD > part6-transfer/source-commit.txt
+git archive --format=tar --output=part6-transfer/source.tar HEAD
+docker image inspect ipam-demo:local --format '{{.Id}}' > part6-transfer/image-id.txt
+docker image save --output part6-transfer/image.tar ipam-demo:local
+(cd part6-transfer && sha256sum source-commit.txt source.tar image-id.txt image.tar > SHA256SUMS)
+```
+
+Transfer that directory through the approved local/offline channel. The
+recipient must already have Docker Engine/Compose and the host tools
+listed above. Check the checksums, extract the source into a fresh directory,
+load the image, and compare its ID with `image-id.txt` before using it:
+
+```sh
+(cd part6-transfer && sha256sum -c SHA256SUMS)
+mkdir recipient-source
+tar -xf part6-transfer/source.tar -C recipient-source
+docker image load --input part6-transfer/image.tar
+docker image inspect ipam-demo:local --format '{{.Id}}'
+```
+
+Use the extracted scripts. Skip `build.sh`: startup and one-shot wrappers
+use `--pull never` and require the loaded `ipam-demo:local` image. For a new
+demo follow seed → start → health → acquire. For saved state, transfer an
+exported standalone snapshot separately with its checksum, then import →
+restore (explicit confirmation) → migrate only if required → start → health.
+Do not seed a restored database. Snapshot restoration also restores schedule
+settings; an enabled overdue schedule may acquire on startup. Use a known
+disabled snapshot for the bounded manual demo; enabled-snapshot recovery
+remains unverified. The image archive does not contain the data volume.
+Source/image checksums identify the transfer; they do not establish runtime
+acceptance, signatures, license clearance or customer readiness.
 
 ## Shutdown
 
@@ -308,8 +364,8 @@ the license text lives in each package's site-packages metadata after
 formal notices file, generate it against the locked graph on the
 target host with `uv pip list --format=json` plus a metadata scan
 (e.g. `pip-licenses` in a disposable environment reading `/opt/ipam-venv`).
-Frontend licenses ship inside `frontend/dist/` for the vendored
-runtime bundle.
+Frontend dependency notices have not been extracted or verified either;
+do not assume the compiled bundle contains a complete notices file.
 
 ## Limitations and unverified behavior
 
