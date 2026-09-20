@@ -101,7 +101,6 @@ export default function Corrections() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [lastRun, setLastRun] = useState<SavedRun | null>(null);
   const operation = useRef<AbortController | null>(null);
   useEffect(() => () => operation.current?.abort(), []);
 
@@ -222,7 +221,7 @@ export default function Corrections() {
     try {
       const computed = await computeRun(controller.signal);
       if (controller.signal.aborted) return;
-      setLastRun(computed); setRunOffset(0);
+      setRunOffset(0);
       setMessage(`Reconciliation saved run ${computed.id} at scenario time ${computed.demo_clock_at}. Review the linked correction result and every remaining discrepancy.`);
     } catch (failure) {
       if (!controller.signal.aborted) setError(`Reconciliation response was not confirmed. ${readableError(failure)} Refresh saved requests and runs before starting another reconciliation; a timed-out response may still have committed a run.`);
@@ -237,8 +236,6 @@ export default function Corrections() {
   const availableFindings = run?.findings.filter(finding => CORRECTION_RULES.includes(finding.rule_id) && finding.evidence_state === "anomalous") ?? [];
   const related = context && run ? run.findings.filter(finding => CORRECTION_RULES.includes(finding.rule_id)
     && finding.subject.id === context.source_finding.subject.id && finding.id !== context.source_finding.id) : [];
-  const recentFinding = selected && lastRun ? lastRun.findings.find(finding => finding.rule_id === selected.source_finding.rule_id
-    && finding.subject.id === selected.source_finding.subject.id && finding.subject.scope_id === selected.scope_id) : null;
   const locked = busy || !!attempt || !!storageError;
 
   return <section aria-labelledby="corrections-heading">
@@ -321,9 +318,6 @@ export default function Corrections() {
       <p>Reconciliation reads the stored inventory and source evidence. It saves a new run and links pending approved corrections to their first subsequent comparable finding. It does not advance the synthetic clock.</p>
       <button type="button" disabled={locked || selected?.state !== "approved"} onClick={() => void reconcile()}>Reconcile stored inventory</button>
       <p className="quiet">A new prefix has no intended announcement policy. Its missing-route result can remain unknown even after a perimeter discrepancy becomes healthy. No pool or external provisioning is created.</p>
-      {lastRun && <div className="notice"><h3>Most recent reconciliation computed in this tab</h3><p>Run <code>{lastRun.id}</code> · scenario {lastRun.demo_clock_at} · ledger {lastRun.ledger_version}.</p>
-        {recentFinding ? <FindingEvidence finding={recentFinding} title="Comparable finding in this computed run" /> : <p>No comparable finding for the selected correction is shown in this run. This does not establish resolution.</p>}
-        <p><a href={`/api/runs/${encodeURIComponent(lastRun.id)}/export`}>Inspect this complete saved run (JSON)</a></p></div>}
     </section>
   </section>;
 }
