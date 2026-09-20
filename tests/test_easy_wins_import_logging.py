@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import json
 from pathlib import Path
 import tempfile
@@ -103,6 +104,27 @@ class EasyWinsImportLoggingTests(unittest.TestCase):
         self.assertEqual(result["status"], "failed")
         self.assertFalse(result["audit_recorded"])
         self.assertEqual(result["audit_error"]["code"], "AUDIT_RECORD_FAILED")
+
+    def test_busy_callback_keeps_import_and_records_separate_busy_audit(self):
+        envelope = json.loads((ROOT / "fixtures/v1/first-path/routing-north.json").read_text())
+        body = json.dumps(envelope).encode()
+        reconcile_import = inspect.getclosurevars(self.endpoint).nonlocals["reconcile_import"]
+        run_lock = inspect.getclosurevars(reconcile_import).nonlocals["run_lock"]
+        run_lock.acquire()
+        try:
+            response = asyncio.run(self.endpoint(request_for(self.app, body), reconcile_after_import=True))
+        finally:
+            run_lock.release()
+        result = json.loads(response.body)["reconciliation"]
+        self.assertEqual(result["status"], "busy")
+        self.assertTrue(result["audit_recorded"])
+        with connect(self.database) as connection:
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM source_batches").fetchone()[0], 1)
+            audit = connection.execute(
+                "SELECT outcome, details_json FROM audit_events WHERE action='source.import.reconcile'"
+            ).fetchone()
+            self.assertEqual(audit["outcome"], "busy")
+            self.assertEqual(json.loads(audit["details_json"])["http_request_id"], "request-import-focused")
 
     def test_schedule_audit_carries_http_request_id(self):
         with connect(self.database) as connection:
