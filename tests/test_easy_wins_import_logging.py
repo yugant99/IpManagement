@@ -75,7 +75,7 @@ class EasyWinsImportLoggingTests(unittest.TestCase):
     def test_failed_callback_keeps_import_and_retry_can_create_run(self):
         envelope = json.loads((ROOT / "fixtures/v1/first-path/routing-north.json").read_text())
         body = json.dumps(envelope).encode()
-        with patch("ipam_demo.app.reconciliation.create_run", side_effect=RuntimeError("controlled reconciliation failure")):
+        with patch("ipam_demo.app.workflow.sync_exceptions", side_effect=RuntimeError("controlled reconciliation failure")):
             failed = asyncio.run(self.endpoint(request_for(self.app, body), reconcile_after_import=True))
         failed_body = json.loads(failed.body)
         self.assertEqual(failed_body["reconciliation"]["status"], "failed")
