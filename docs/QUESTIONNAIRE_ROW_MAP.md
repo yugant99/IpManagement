@@ -34,7 +34,7 @@ RFP-009, RFP-037, RFP-070, RFP-072 and RFP-082 are Demonstrated within their sta
 | Integration | 0 | 1 | 0 | 18 | 19 |
 | Scale | 0 | 0 | 0 | 5 | 5 |
 | Delivery | 0 | 3 | 10 | 10 | 23 |
-| **Total** | **29** | **24** | **9** | **49** | **111** |
+| **Total** | **32** | **22** | **10** | **47** | **111** |
 
 ## Evidence references and preserved limits
 
