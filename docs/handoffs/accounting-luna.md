@@ -8,19 +8,19 @@ Status: **ready for project-lead review; bounded final-rehearsal adjudication re
 - Worktree: `/Users/yuganthareshsoni/Downloads/Ip_inventory-luna-f6-f7`.
 - Branch: `codex/luna-f6-f7-accounting`.
 - Base: `codex/audit-response-accounting` at `a0dc33d54c2d17414ab78e6f05cb0d2dc9740913`.
-- Registration carried forward: worker-registration history plus latest status clarification; application PR #44 remains pending. The worker-registration change is already merged to canonical main by the lead; this branch preserves the corresponding history.
+- Registration carried forward: worker-registration history plus latest status clarification; application PR #44 merged at `7eb3e8516ee63a5e803bad23dd7e44c161bc67fc`, native procedural PR #47 merged at `e4b57ac1edfac98379d173fda9fb23ca22b1676f`.
 
 ## Owned documentation outcome
 
 The public accounting now states, in one place and without customer text:
 
-- the current 111-row result is **32 Demonstrated / 22 Partial / 9 Documentary / 48 Missing**;
+- the current 111-row result is **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing**;
 - final evidence supports bounded requester/approver UI, local correction/reconciliation and exception escalation;
 - catalog scenarios 11 and 14 are observed within bounded local scope;
 - RFP-037 and RFP-072 remain Demonstrated;
-- RFP-009, 070 and 082 are upgraded on direct retained evidence; RFP-092 and RFP-104 remain unchanged;
+- RFP-009, 070 and 082 are upgraded on direct retained evidence; RFP-092 is Documentary for substantive guidance; RFP-104 remains Missing;
 - RFP-104 is not automatically credited from a proposed handoff or worker registration;
-- the native story is a final procedural draft, not human presenter training or final F4 acceptance;
+- the native story is accepted substantive user/operator guidance, not human presenter training or recipient acceptance;
 - customer Phase 1/2 remains incomplete and separate from the 111-row denominator.
 
 ## Changed paths
@@ -34,7 +34,7 @@ The public accounting now states, in one place and without customer text:
 - `docs/handoffs/audit-response-lead-review.md`
 - `docs/handoffs/accounting-luna.md`
 
-The lead-owned `docs/STATUS.md` and `docs/CURRENT_HANDOFF.md` were only carried through the already-published worker-registration/status-clarification commits; no new global status claim was added by this lane.
+The lead-owned `docs/STATUS.md` and `docs/CURRENT_HANDOFF.md` were updated in this final accounting publication with the accepted PR SHAs, final 111-row classes, F4/F6 limits and Spencer pickup boundary; no application behavior was changed.
 
 ## Evidence and limits
 
@@ -44,7 +44,7 @@ Observed directly from the completed rehearsal handoff and artifact root `/Users
 - the runtime diff is empty and the toolchain is retained;
 - readiness passed and the scheduler was disabled;
 - cycle 1 is established as run `004246ef-9089-40ac-b029-a412d5c2d38d`, operation `1b0f76b2-bfbc-40ac-b9bf-a566dccfa5d3`, at `2026-09-01T06:00:00.000Z`;
-- cycles 2–6, final cycle 7, correction/reconciliation, exception lifecycle, allocation, exports and stopped restore are recorded in `docs/handoffs/luna-final-rehearsal.md` at updated Stage 5 head `a13c642f9ef2fc53d37a904cb1db9dee34c580e9`.
+- cycles 2–6, final cycle 7, correction/reconciliation, exception lifecycle, allocation, exports and stopped restore are recorded in `docs/handoffs/luna-final-rehearsal.md` at accepted Stage 5 head `e4b57ac1edfac98379d173fda9fb23ca22b1676f`.
 - Presenter-ready cycle-1 snapshot: `ready-cycle1-with-preset-v2/snapshots/demo-ready-cycle1-with-preset.sqlite3`, SHA-256 `ee8134aa583dbf4711251f8bcd23e9bec6305ce77672e40e7cd3def91f655b37`, preset revision `147f2054b8edf4f186bc3c8ac8b11d86bed4f08972f20e47da7cba763d6c71c6`. Fresh copy verified API/recovery, all-17-table comparison and browser rendering of the pinned preset/60 prefixes; saved-run selector locator timed out once and was not retried.
 - The separate Luna procedural reproduction verified restore/health/disabled cycle 1, initial run, Central `.240` API and clean stop; its browser selected-preset completion is unverified and it is not human acceptance.
 
@@ -52,6 +52,6 @@ No application tests, builds, browser checks, infrastructure actions or new runt
 
 ## Suggested lead action
 
-Review the three bounded row upgrades against the updated final rehearsal handoff, then preserve the 111 denominator, private-clause boundary, DOCX phase gaps, portable `PART6_READY=no` gate and PR #44's separate merge decision. Keep RFP-092 and RFP-104 unchanged unless separate accepted evidence appears.
+Preserve the 111 denominator, private-clause boundary, DOCX phase gaps, portable `PART6_READY=no` gate and the human presenter/recipient limits. RFP-092 is Documentary for supplied substantive guidance; RFP-104 remains Missing.
 
 Suggested next prompt for the lead: “Review `accounting-luna.md` and the final Stage 5 artifact publication. Compare only RFP-009/070/082/092 and catalog scenarios 11/14 against their stated evidence gates; keep every other class and denominator unchanged unless direct retained evidence justifies a bounded correction.”

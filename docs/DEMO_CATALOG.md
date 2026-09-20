@@ -2,7 +2,7 @@
 
 This catalog tracks the generic demonstration outcomes agreed in the private decision memo. It does not reproduce customer clauses. Its **15 scenarios**, the **16 historical Stage 5 acceptance cases**, and the **111 questionnaire rows** are different sets.
 
-The historical catalog baseline was 12 observed scenarios, one bounded IPv6 scenario and two missing outcomes. The final connected rehearsal is recorded in the [sanitized handoff](handoffs/luna-final-rehearsal.md); the two provisional scenarios below are now observed within bounded local scope. The [lead review](handoffs/audit-response-lead-review.md) controls final integration. Historical observations resolve through [Stage 5 results](evidence/stage-05/observed-results.md); final owner checks resolve through the linked handoff.
+The final catalog is **14 observed scenarios plus one bounded IPv6 scenario**. The final connected rehearsal is recorded in the [sanitized handoff](handoffs/luna-final-rehearsal.md); scenarios 11 and 14 are observed within bounded local scope, while IPv6 remains bounded rather than a full delegated-record outcome. The [lead review](handoffs/audit-response-lead-review.md) controls final integration. Historical observations resolve through [Stage 5 results](evidence/stage-05/observed-results.md); final owner checks resolve through the linked handoff.
 
 | # | Scenario | Evidence and bounded outcome | Current disposition |
 |---|---|---|---|
@@ -24,6 +24,6 @@ The historical catalog baseline was 12 observed scenarios, one bounded IPv6 scen
 
 F3 metadata changes do not erase old saved runs, necessarily remove current occupancy, or necessarily make positive-lease zombie evidence unknown. Relevant structural changes conservatively invalidate unsupported history; metadata changes do not revive previously invalid history.
 
-The additional S5-09/S5-15 observations are in [the audit-response evidence](evidence/audit-response/README.md). The original report remains **14 observed passes / two partial cases** at its original candidate. New addenda close the four requested missing observations without rewriting that historical result or asserting exhaustive shutdown/refusal coverage.
+The additional S5-09/S5-15 observations are in [the audit-response evidence](evidence/audit-response/README.md). The original report remains **14 observed passes / two partial cases** at its original candidate; the separate final procedural rehearsal adds bounded evidence without rewriting that historical result or asserting exhaustive shutdown/refusal coverage.
 
 The [presenter guide](DEMO_STORY.md), [final procedural handoff](handoffs/luna-final-rehearsal.md), [questionnaire row map](QUESTIONNAIRE_ROW_MAP.md) and [customer phase gaps](PHASE_COVERAGE.md) must retain these boundaries. No 15/15, whole-questionnaire percentage, customer-phase completion or portable acceptance claim follows from a passing local story.

@@ -2,7 +2,7 @@
 
 Final lead adjudication of the **current accepted candidate**, 2026-09-19. This replaces the earlier evidence plan; it is not final project, customer or portable acceptance. Application pickup: `117d05295473cf25d362adb320e6fef26ecdd74c`. Accepted evidence/report: `fe50cd6828016a25fee9086f499e2e865b4a16e4`. The unchanged application lineage is integrated into main through [PR #34](https://github.com/yugant99/IpManagement/pull/34), merge `e0ba2d99440c84c90ebe449f7442e247e2828b3f`.
 
-The lead and two bounded reviewers compared original private clauses, public contracts and accepted observations. Public topics remain generic; original workbook text/answers and source attachments are unchanged and excluded from Git. No application checks were rerun for this accounting. The final rehearsal is recorded as focused procedural evidence; F4 presentation readiness and an independent second-operator pickup remain pending.
+The lead and two bounded reviewers compared original private clauses, public contracts and accepted observations. Public topics remain generic; original workbook text/answers and source attachments are unchanged and excluded from Git. No application checks were rerun for this accounting. PR #44 and the final native procedural handoff are accepted on their bounded evidence; human practice, portable delivery and customer acceptance remain separate limits.
 
 **Source locator:** private questionnaire, Technical Requirements sheet, **one-based Excel row = numeric RFP ID + 2**, requirement column B. For example RFP-001 is row 3 and RFP-111 is row 113. ID, topic and evidence status are separate from the workbook's existing vendor answers.
 
@@ -15,17 +15,17 @@ Each row has exactly one evidence class and one primary category:
 - **Documentary:** substantive design/process/disclosure material is supplied; the requested operational or adopted outcome is not demonstrated. PR #9 proposals remain unadopted and NO MERGE.
 - **Missing:** no qualifying evidence for the requested outcome was identified. Nearby code, a plan or a candidate link does not earn credit. Missing is not an assignment to expand scope.
 
-**32 Demonstrated; 22 Partial; 9 Documentary; 48 Missing = 111.** This bounded update credits verified requester-subnet UI evidence (RFP-009), final-rehearsal local correction/reconciliation (RFP-070) and exercised escalation procedure (RFP-082). Do not sum the first three classes into a requirements-completion percentage. The worker's **51 candidate IDs** were a pointer set, not a satisfied-row total; adjudication also considers supplied documents and native deployment evidence outside that set. Historical 65/67/68 targets remain planning arithmetic. A 60% fully satisfied claim is not established.
+**32 Demonstrated; 22 Partial; 10 Documentary; 47 Missing = 111.** This bounded update credits verified requester-subnet UI evidence (RFP-009), final-rehearsal local correction/reconciliation (RFP-070), exercised escalation procedure (RFP-082), and substantive user/operator guidance (RFP-092). Do not sum the first three classes into a requirements-completion percentage. The worker's **51 candidate IDs** were a pointer set, not a satisfied-row total; adjudication also considers supplied documents and native deployment evidence outside that set. Historical 65/67/68 targets remain planning arithmetic. A 60% fully satisfied claim is not established.
 
 ### Post-rehearsal accounting boundary
 
-The current classes below are bounded evidence classes for lead review, not final project or customer acceptance. The remaining conditional candidate is RFP-092 only; it requires accepted user/admin material.
+The current classes below are bounded evidence classes for lead review, not final project or customer acceptance. RFP-092 is Documentary because substantive user/operator guidance is supplied; it does not establish delivered training or recipient practice.
 
 | Row | Possible change | Required evidence before any class change |
 |---|---|---|
-| RFP-092 | Missing → Documentary | Accepted user/admin material; this does not establish delivered training, recipient practice or knowledge-transfer acceptance |
+| RFP-092 | Documentary | Supplied `DEMO_STORY.md`, `DEMO_RUNBOOK.md` and state-operation guidance; this does not establish delivered training, recipient practice or knowledge-transfer acceptance |
 
-RFP-009, RFP-037, RFP-070, RFP-072 and RFP-082 are Demonstrated within their stated local bounds. RFP-104 remains Missing unless a separately accepted recipient knowledge-transfer outcome is evidenced; a proposed handoff or worker registration is not enough. If RFP-092 later earns Documentary, the arithmetic would become **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing**.
+RFP-009, RFP-037, RFP-070, RFP-072 and RFP-082 are Demonstrated within their stated local bounds. RFP-104 remains Missing unless a separately accepted recipient knowledge-transfer outcome is evidenced; a proposed handoff or worker registration is not enough. RFP-092 remains Documentary, not Demonstrated or Partial.
 
 | Primary category | Demonstrated | Partial | Documentary | Missing | Total |
 |---|---:|---:|---:|---:|---:|
@@ -33,7 +33,7 @@ RFP-009, RFP-037, RFP-070, RFP-072 and RFP-082 are Demonstrated within their sta
 | Deployment | 2 | 3 | 0 | 10 | 15 |
 | Integration | 0 | 1 | 0 | 18 | 19 |
 | Scale | 0 | 0 | 0 | 5 | 5 |
-| Delivery | 0 | 3 | 9 | 11 | 23 |
+| Delivery | 0 | 3 | 10 | 10 | 23 |
 | **Total** | **29** | **24** | **9** | **49** | **111** |
 
 ## Evidence references and preserved limits
@@ -143,7 +143,7 @@ PR #9 documentary evidence is the [reviewed proposal at exact head](https://gith
 | RFP-089 | Migration validation | Application | B | Missing | `docs/handoffs/stage-05-lead-review.md` explicitly excludes 089 from final 51; `docs/PHASE_COVERAGE.md` §7.7; S5-16 `legacy/README.md` is not this outcome | No actual migrated customer dataset with before/after reconciliation or migration sign-off. Internal v3→v4 schema preservation and generic import rejection checks do not establish this requirement. |
 | RFP-090 | App deployment | Deployment | B | Partial | S5-01/14; `primary/ready.json`, `primary/seeded-ui.txt`, `preservation/preservation-report.md`; `docs/handoffs/stage-05-lead-review.md` Part 6 gate | Native macOS compiled UI/API startup and populated restart observed. Spencer package checkpoint, declared target-host/recipient startup and portable-delivery acceptance absent. No Docker/Compose/Linux claim. |
 | RFP-091 | Orchestration deployment | Deployment | B | Partial | S5-01/12/14; `primary/workflow-recovery-summary.json`, `preservation/preservation-report.md`; `docs/PHASE_COVERAGE.md` §§7.4/7.8 | Fixed local workflow runs inside the native app. No separately delivered broader orchestration platform, external orchestration integrations or portable package/target-host proof. |
-| RFP-092 | Training material | Delivery | B | Missing | `docs/PHASE_COVERAGE.md` §8 training-materials row; `docs/handoffs/part-6.md` planned deliverables only | No accepted user/admin training material, delivered training program or recipient practice/acceptance. Core state-operation instructions alone are not training delivery. |
+| RFP-092 | Training material | Delivery | B | Documentary | `DEMO_STORY.md`, `DEMO_RUNBOOK.md`, `STATE_OPERATIONS.md` and final procedural handoff | Substantive user/operator material is supplied; no delivered training program, human practice or recipient acceptance. |
 | RFP-093 | Very large active inventory | Scale | Later | Missing | `docs/QUESTIONNAIRE_PRIORITIES.md` architecture/scale limits; S5-05/06 bounded pools only | No required active-record workload, capacity design qualification or measured results. Address-space arithmetic is not stored active-address scale. |
 | RFP-094 | Millions of records | Scale | Later | Missing | `docs/QUESTIONNAIRE_PRIORITIES.md` scale limits; `docs/handoffs/stage-05-lead-review.md` unrun scale | No million-record import, storage, query or operational measurements. |
 | RFP-095 | Regional hierarchy | Application | P1 | Demonstrated | S5-11; `primary/inventory-summary.json` v4/v6 child creation and parent IDs; pickup `fixtures/v1/inventory.json` scope `region` and parents | Actual intended child prefixes persisted under a fictional regional parent with containment/overlap controls. No provider geographic policy, inter-region operational rollout or subscriber allocation. |

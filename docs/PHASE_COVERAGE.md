@@ -2,7 +2,7 @@
 
 Lead acceptance addendum, 2026-09-19. Both the phased requirements document and the questionnaire inform this project. **Neither customer Phase 1 nor customer Phase 2 is accepted as complete.** Engineering Stages 1–5 are our build checkpoints; they are not the customer's phases. The F1–F7 final rehearsal supplies focused procedural evidence, not a new customer-phase assessment.
 
-The questionnaire denominator remains **111**. The accepted local ledger associates observations with **51 candidate rows**, not 51 fully satisfied requirements. [Final current-candidate questionnaire adjudication](QUESTIONNAIRE_ROW_MAP.md) records **32 Demonstrated / 22 Partial / 9 Documentary / 48 Missing = 111**; these classes do not establish whole customer/production compliance. The phase sections below are a separate view of the same evidence: do not add them to 111, count them as extra rows, or turn section mentions into a completion percentage.
+The questionnaire denominator remains **111**. The accepted local ledger associates observations with **51 candidate rows**, not 51 fully satisfied requirements. [Final current-candidate questionnaire adjudication](QUESTIONNAIRE_ROW_MAP.md) records **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing = 111**; these classes do not establish whole customer/production compliance. The phase sections below are a separate view of the same evidence: do not add them to 111, count them as extra rows, or turn section mentions into a completion percentage.
 
 This is a generic, project-owned coverage summary, not a customer assessment report. Section numbers refer to the private phased requirements document. Source attachments, extracts, network names and estate counts remain outside the public repository. The lead compared the source sections with the existing evidence; focused rehearsal evidence does not establish independent presenter/recipient acceptance, portable delivery or customer adoption.
 
@@ -61,9 +61,9 @@ Existing engineering documents provide bounded design material. They do not esta
 | Automation/orchestration design | Fixed workflow and scheduled synthetic acquisition documented; external orchestration design/acceptance pending |
 | Migration strategy | Separate reviewed, unadopted delivery-method proposal in PR #9; customer-specific migration/cutover strategy pending |
 | Implementation plan | [Weekend demo plan](PLAN.md) supplied; customer implementation/rollout plan pending |
-| Operational runbooks | [Core state-operation instructions](https://github.com/yugant99/IpManagement/blob/117d05295473cf25d362adb320e6fef26ecdd74c/docs/STATE_OPERATIONS.md) supplied; Spencer's package/operator handoff and customer runbook acceptance pending |
+| Operational runbooks | [Core state-operation instructions](STATE_OPERATIONS.md) and the accepted [native demo runbook](DEMO_RUNBOOK.md) supplied; Spencer's package/operator handoff and customer runbook acceptance pending |
 | Reporting framework | [Demo dashboard scope](parts/04-dashboard.md) and actual saved-run/export evidence supplied; customer KPI/reporting framework acceptance pending |
-| Training materials | No accepted recipient training package or training delivery established |
+| Training materials | Substantive user/operator guidance is supplied in the demo story, runbook and state-operation documents; delivered training, human practice and recipient acceptance remain unestablished |
 | Executive roadmap | Separate reviewed, unadopted delivery-method proposal in PR #9; customer-approved roadmap/provider commitments pending |
 
 Delivery-method PR #9 remains a separate proposed document, **reviewed documentary-only / NO MERGE**; see [the review and four bounded rows](handoffs/delivery-method-lead-review.md). Its migration/governance/roadmap proposals are not executed customer operations or provider commitments. Spencer retains portable delivery, operator instructions and recipient handoff; core retains state-command correctness. Neither lane is assigned customer discovery, a full migration program or additional features by this record.
