@@ -1,0 +1,68 @@
+# Everything that must not enter the build context. Keep this list
+# aligned with .gitignore so `docker build` and Git see the same tree.
+
+# VCS metadata / editor scratch.
+.git
+.gitattributes
+.gitignore
+.github/
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Local source analysis and confidential attachments — never packaged.
+/assessment/
+/private/
+/source_documents/
+/audit/
+/outputs/
+*.pptx
+*.xlsx
+*.docx
+
+# Local secrets, virtualenvs, caches.
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+coverage/
+.coverage
+.tox/
+
+# Frontend build products and Node caches — the image rebuilds them.
+frontend/node_modules/
+frontend/dist/
+
+# Local runtime state — persistent data belongs on the bind mount, not
+# baked into the image.
+/data/
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+.ipam_demo.lock
+*.db
+*.db-wal
+*.db-shm
+
+# Scratch directories that some workflows leave in the tree.
+/artifacts/
+/tmp/
+
+# The Dockerfile and its compose config don't need themselves in-context.
+Dockerfile
+compose.yaml
+.dockerignore
+
+# Docs and scripts do not affect the runtime image contents.
+docs/
+scripts/
+# README.md is required by pyproject.toml and the Python build COPY.
+AGENTS.md
+DEVELOPMENT_RULES.md
