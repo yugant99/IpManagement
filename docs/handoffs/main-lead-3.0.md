@@ -1,0 +1,29 @@
+# Main Lead 3.0 transfer and readiness
+
+Registered 2026-09-20 under the user's explicit transfer authorization. Current lead: **Main Lead 3.0**, task `01a0c0c1-3952-7720-93c8-ff49192b8e13`, host `local`. The active task ID was read from `CODEX_THREAD_ID` and confirmed in the app task registry. Main Lead 2.0 (`01a0bb80-cf0d-7f60-8e46-1e825f42d276`) and the original lead (`01a0b845-6c8d-7021-a5c9-15e673db07c9`) are reference-only. The current lead owns coordination, acceptance, integration, all 111 questionnaire rows and demo readiness.
+
+Repository: `yugant99/IpManagement`. Canonical checkout: `/Users/yuganthareshsoni/Downloads/Ip_inventory`, `main` at takeover `376dd52f9457dd0b7fecc8d83a3e0d6970bb487e`. Its untracked `audit/` and `outputs/` are preserved; private `assessment/` stays excluded. Registration uses isolated `/Users/yuganthareshsoni/Downloads/Ip_inventory-lead-3`, branch `codex/main-lead-3-registration`, and only lead-owned documentation.
+
+## Accepted product and evidence
+
+- Parts 1–5 provide one installed FastAPI/Python application serving compiled React/TypeScript UI, persistent SQLite v5, scoped IPv4/IPv6 inventory and editing, imports/provenance, six Pool Watch rules, capacity/history, saved results/exports, independent approval/allocation/audit, exceptions and configurable deterministic acquisition.
+- F1–F7 corrections and final accounting are locally accepted. Application candidate `289f53c7c5db1bd414c938add1ea207d591f9e64` entered main through #44; #47 records native rehearsal/reproduction and #48 final accounting. See [accepted lead review](audit-response-lead-review.md), [native runbook](../DEMO_RUNBOOK.md), [story](../DEMO_STORY.md) and [catalog](../DEMO_CATALOG.md).
+- Preserve historical Stage 5: 14 observed passes, two partial cases, no observed application defect. Later S5-09/S5-15 addenda close four named missing observations separately. Audit response includes 22 focused backend checks, three core state checks and 27 recorded HTTP operations plus bounded browser/build evidence. None needs repetition merely for leadership transfer.
+- Final accounting is **32 Demonstrated / 22 Partial / 10 Documentary / 47 Missing = 111**. The catalog's 14 observed plus one bounded IPv6 scenario and Stage 5's 16 cases are separate denominators. No aggregate fully-satisfied percentage or customer/production claim follows.
+- Local changes and persistence are real; source data is synthetic and external provisioning simulated. Preserve the saved-run selector locator timeout as an unverified interaction, not an established application defect.
+
+## Pending delivery lane
+
+Spencer's #49 is `c123a39fee8943418deac3c71e6d6ff74213b72c`; repair #50 is `3e129d9e8a6ba05e7a33f01632b976f9939b224f`. New [#51](https://github.com/yugant99/IpManagement/pull/51), branch `codex/part-6-operator-handoff`, is `7f79f38bbde62dd0b3c13f7892a48ccfb6a19038`. Review the full delta and exact dependency inclusion before merge. The earlier offline native package check is not Docker proof.
+
+The previously unresolved reviewer setup is resolved: **Part 6 — Spencer PR review**, actual task `01a0c097-5159-7fc2-80e3-e9e65af26e6e`, isolated `/Users/yuganthareshsoni/.codex/worktrees/bce1/Ip_inventory`, GPT-6 Astra/low. It completed the original #49 review and now owns #51 source review, necessary bounded Part 6 fixes and authorized integration. No duplicate reviewer is needed. Corrected code comes back to the lead for delta review before merge. Preserve contributor commits and branches. PR #9 remains OPEN / NO MERGE.
+
+The user explicitly limits the current deliverable to packaging source/operator procedures: **no Docker commands or image pulls, VM/cloud provisioning, deployment or spending**. No broad application E2E rerun or Stage 6. Source integration cannot prove portable startup, allocation/audit persistence, packaged recovery or recipient reproduction; `PART6_READY=no` remains until appropriate actual evidence exists.
+
+After integration, the principal technical gate is focused portable startup/persistence and recipient proof. The requested next worker uses medium reasoning and an ordinary low-cost model: interpret the user's mixed name “5.5 Luna” as GPT-5.6 Luna unless they select GPT-5.5. Preparation may identify the exact candidate, fresh disposable data surfaces, evidence steps, persistence, cleanup and still-missing permission; it must not execute prohibited infrastructure work. Human presenter fluency, training, recipient acceptance, live connectors, production scale/identity and broad crash/endurance behavior remain unobserved. Customer Phase 1 assessment and Phase 2 transformation remain separate gaps in [phase coverage](../PHASE_COVERAGE.md).
+
+Deferred synthetic-label and IP-search ordering polish is not automatically assigned or a merge blocker. Original acceptance stores are never disposable test data; inspect runtime ownership before any authorized service/state operation.
+
+## Existing monitor
+
+Updated existing `ipam-project-oversight` to this registered task and current package facts; saved target/status and schedule were read back on 2026-09-20. Preserved **PAUSED**, the original every-30-minute schedule, original September 21, 2026, 17:00 UTC expiry and read-only scope. Stay quiet for unchanged/non-actionable state; notify only meaningful change, completion, failure or required user action. No edits, tests/builds/runtime, state operations, infrastructure, merges, assignments or external messages follow from a monitor run. Do not create a duplicate or resume it automatically.
