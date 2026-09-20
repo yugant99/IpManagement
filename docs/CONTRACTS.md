@@ -1,5 +1,7 @@
 # Shared engineering contracts
 
+The user-authorized [bounded easy-win contract](EASY_WINS_CONTRACT.md) supersedes prior deferrals only for its report/domain filters, imported-source catalog, saved-run summary, optional import callback and request logging/evidence scope. It preserves the shared guard, immutable receipts, source provenance and existing evidence limits.
+
 The user-authorized [F1–F7 follow-up](handoffs/audit-response-authorization.md) supersedes earlier exclusions only for its bounded local correction, metadata/history and exception-lifecycle scope. Its [approved implementation contract](AUDIT_RESPONSE_CONTRACT.md) pins schema/API and evidence semantics; older evidence is preserved.
 
 Status: implemented in the accepted application pickup `117d05295473cf25d362adb320e6fef26ecdd74c`, with bounded local evidence at `fe50cd6828016a25fee9086f499e2e865b4a16e4`. [Current integration and readiness](handoffs/accepted-candidate-integration.md) and [Stage 5 limits](handoffs/stage-05-lead-review.md) govern claims. Imports, calculations, inventory editing, workflow, scheduling and core state commands are supplied; not every command/failure branch has runtime proof. The lead records contract changes before another lane depends on them.
