@@ -9,6 +9,7 @@ from .errors import AppError
 from .calculations import calculate_pools
 from .evidence import selected_views as _selected_views, reference as _reference
 from .rules import evaluate_rules
+from .inventory_commands import link_correction_results
 
 RULE_ID = "missing_expected_route"
 RULE_VERSION = 1
@@ -138,4 +139,5 @@ def create_run(connection):
               "calculations": calculations, "candidate_space": candidate_space}
     connection.execute("INSERT INTO calculation_runs(id,created_at,demo_clock_at,result_json) VALUES (?,?,?,?)",
                        (run_id, created_at, clock_text, json.dumps(result, allow_nan=False)))
+    link_correction_results(connection, result)
     return result
