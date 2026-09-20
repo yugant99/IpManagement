@@ -102,7 +102,7 @@ class SyntheticScheduler:
         result["timer_error"] = self.timer_error
         return result
 
-    def configure(self, connection, payload):
+    def configure(self, connection, payload, http_request_id=None):
         """API owns immediate transaction, shared guard and failure audit."""
         workflow._payload(payload, {"actor_id", "reason", "enabled", "interval_hours", "expected_config_version"})
         actor = workflow.require_actor(payload.get("actor_id"), "inventory_edit")
@@ -123,7 +123,8 @@ class SyntheticScheduler:
             "UPDATE schedule_status SET enabled=?,interval_hours=?,config_version=config_version+1,next_due_at=? WHERE singleton=1",
             (int(enabled), hours, due))
         workflow.audit_event(connection, actor_id=actor["id"], action="schedule.configure", outcome="saved", reason=reason,
-                             subject_id="synthetic-schedule", details={"before": {key: current[key] for key in
+                             subject_id="synthetic-schedule", details={"http_request_id": http_request_id,
+                             "before": {key: current[key] for key in
                              ("enabled", "interval_hours", "config_version", "next_due_at")},
                              "after": {"enabled": enabled, "interval_hours": hours, "config_version": version + 1, "next_due_at": due}})
 

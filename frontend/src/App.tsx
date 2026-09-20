@@ -17,7 +17,7 @@ type Bootstrap =
   | { status: "error"; error: ApiError };
 
 const PAGE_SIZE = 25;
-const emptyFilters = { scope: "", family: "", query: "" };
+const emptyFilters = { scope: "", domain: "", region: "", family: "", query: "" };
 const displayCount = (value: string) => value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 const asError = (error: unknown) => error instanceof ApiError ? error : new ApiError("The inventory response could not be read. Retry to request it again.", "INVALID_RESPONSE");
 
@@ -204,6 +204,8 @@ export default function App() {
     const controller = new AbortController();
     const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) });
     if (filters.scope) params.set("scope_id", filters.scope);
+    if (filters.domain) params.set("domain", filters.domain);
+    if (filters.region) params.set("region", filters.region);
     if (filters.family) params.set("family", filters.family);
     if (filters.query) params.set("q", filters.query);
     setInventory({ status: "loading" });
@@ -245,7 +247,9 @@ export default function App() {
   }
 
   const activeScope = bootstrap.status === "ready" ? bootstrap.scopes.find((scope) => scope.id === filters.scope) : undefined;
-  const hasFilters = Boolean(filters.scope || filters.family || filters.query);
+  const hasFilters = Boolean(filters.scope || filters.domain || filters.region || filters.family || filters.query);
+  const domains = bootstrap.status === "ready" ? [...new Set(bootstrap.scopes.map((scope) => scope.domain))].sort() : [];
+  const regions = bootstrap.status === "ready" ? [...new Set(bootstrap.scopes.map((scope) => scope.region))].sort() : [];
   const health = bootstrap.status === "ready" || bootstrap.status === "not-ready" ? bootstrap.health : null;
 
   return (
@@ -290,6 +294,8 @@ export default function App() {
           <div hidden={view !== "inventory"}>
             <form className="filters" onSubmit={search} aria-label="Filter intended prefixes">
               <label>Network scope<select value={filters.scope} onChange={(event) => updateFilters({ ...filters, scope: event.target.value })}><option value="">All network scopes</option>{bootstrap.scopes.map((scope) => <option value={scope.id} key={scope.id}>{scope.name} · {scope.namespace}</option>)}</select></label>
+              <label>Domain<select value={filters.domain} onChange={(event) => updateFilters({ ...filters, domain: event.target.value })}><option value="">All domains</option>{domains.map((domain) => <option value={domain} key={domain}>{domain}</option>)}</select></label>
+              <label>Region<select value={filters.region} onChange={(event) => updateFilters({ ...filters, region: event.target.value })}><option value="">All regions</option>{regions.map((region) => <option value={region} key={region}>{region}</option>)}</select></label>
               <label>Address family<select value={filters.family} onChange={(event) => updateFilters({ ...filters, family: event.target.value })}><option value="">IPv4 and IPv6</option><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
               <label className="search-field">Prefix, IP, owner, purpose or tag<input type="search" placeholder="Search inventory" value={queryInput} onChange={(event) => setQueryInput(event.target.value)} aria-describedby="search-help" /></label>
               <button type="submit">Search</button>
@@ -303,7 +309,7 @@ export default function App() {
                 <div className="section-heading"><h2 id="prefix-list-heading">Prefixes</h2><span className="quiet" role="status">{inventory.status === "ready" ? `${inventory.data.total} matching ${inventory.data.total === 1 ? "prefix" : "prefixes"}` : inventory.status === "loading" ? "Loading…" : "Request failed"}</span></div>
                 {inventory.status === "loading" && <div className="table-loading" role="status"><span>Loading intended prefixes…</span><div className="skeleton-line" /><div className="skeleton-line" /><div className="skeleton-line" /></div>}
                 {inventory.status === "error" && <ErrorState error={inventory.error} onRetry={inventory.error.code === "SETUP_NEEDED" ? refresh : () => setListRevision((value) => value + 1)} />}
-                {inventory.status === "ready" && inventory.data.items.length === 0 && <div className="empty-state"><h3>{hasFilters ? "No prefixes match these filters" : "No prefixes on this page"}</h3><p>{hasFilters ? "Try a different scope, address family, or search." : "The API returned no prefixes for this page."}</p>{hasFilters ? <button className="secondary" onClick={clearFilters}>Clear filters</button> : <button className="secondary" onClick={refresh}>Reload inventory</button>}</div>}
+                {inventory.status === "ready" && inventory.data.items.length === 0 && <div className="empty-state"><h3>{hasFilters ? "No prefixes match these filters" : "No prefixes on this page"}</h3><p>{hasFilters ? "Try a different scope, domain, region, address family, or search." : "The API returned no prefixes for this page."}</p>{hasFilters ? <button className="secondary" onClick={clearFilters}>Clear filters</button> : <button className="secondary" onClick={refresh}>Reload inventory</button>}</div>}
                 {inventory.status === "ready" && inventory.data.items.length > 0 && (
                   <>
                     <div className="table-scroll" tabIndex={0} role="region" aria-label="Prefix inventory table">

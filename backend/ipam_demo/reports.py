@@ -12,16 +12,31 @@ from .rules import comparable_findings
 from .workflow import audit_event, require_actor
 
 COLUMNS = ("run_id", "rule_id", "scope_id", "subject", "severity", "evidence_state", "explanation", "proposed_action")
-FILTERS = {"scope_id", "rule_id", "severity", "evidence_state"}
+FILTERS = {"scope_id", "rule_id", "severity", "evidence_state", "family"}
+
+
+def _validate_filters(filters):
+    if not isinstance(filters, dict) or set(filters) - FILTERS or any(
+            not isinstance(value, str) or len(value) > 200 for value in filters.values()):
+        raise AppError("INVALID_INPUT", "Use scope_id, rule_id, severity, evidence_state and family string filters.", 422)
+    if "family" in filters and filters["family"] not in {"", "4", "6"}:
+        raise AppError("INVALID_INPUT", "Address family must be 4, 6 or empty.", 422)
 
 
 def filtered_findings(run, filters):
-    if not isinstance(filters, dict) or set(filters) - FILTERS or any(
-            not isinstance(value, str) or len(value) > 200 for value in filters.values()):
-        raise AppError("INVALID_INPUT", "Use scope_id, rule_id, severity and evidence_state string filters.", 422)
+    _validate_filters(filters)
     return [finding for finding in run["findings"] if all(
-        not value or (finding["subject"].get(key) if key == "scope_id" else finding.get(key)) == value
+        not value or (str(finding["subject"].get("family")) if key == "family" else
+                      finding["subject"].get(key) if key == "scope_id" else finding.get(key)) == value
         for key, value in filters.items())]
+
+
+def _filtered_calculations(run, filters):
+    family = filters.get("family", "")
+    scope_id = filters.get("scope_id", "")
+    return [metric for metric in run.get("calculations", [])
+            if (not family or str(metric.get("family")) == family)
+            and (not scope_id or metric.get("scope_id") == scope_id)]
 
 
 def compare_runs(connection, before_id, after_id):
@@ -90,10 +105,9 @@ def save_preset(connection, payload):
 def export_run(connection, run_id, filters):
     run = get_run(connection, run_id)
     findings = filtered_findings(run, filters)
-    scope_id = filters.get("scope_id")
     return {**run, "findings": findings, "filters": filters, "exported_findings": len(findings),
             "overview_scope": "Overview retains full saved-run totals; exported_findings is the filtered count.",
-            "calculations": [item for item in run.get("calculations", []) if not scope_id or item["scope_id"] == scope_id]}
+            "calculations": _filtered_calculations(run, filters)}
 
 
 def csv_text(columns, rows):

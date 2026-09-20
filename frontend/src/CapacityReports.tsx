@@ -5,7 +5,7 @@ import type { Page, Scope } from "./api";
 import type { Finding, RunSummary, SavedRun } from "./firstPathApi";
 
 interface Metric {
-  pool_id: string; scope_id: string; scope_name: string; cidr: string; name: string; capacity: string;
+  pool_id: string; scope_id: string; scope_name: string; family: 4 | 6; cidr: string; name: string; capacity: string;
   current: { status: string; occupied_addresses: string | null; utilization_pct: number | null; reason?: string };
   p95: { status: string; occupied_addresses: string | null; utilization_pct: number | null; eligible_samples: number; required_samples: number; window_start_at: string; window_end_at: string; reason?: string };
   forecast: { status: string; days_to_full: number | null; estimated_full_at: string | null; slope_addresses_per_day: number | null; baseline_addresses: number | string | null; complete_days: number; reason?: string };
@@ -16,6 +16,7 @@ interface CapacityRun extends SavedRun { calculations?: Metric[]; candidate_spac
 interface Actor { id: string; name?: string; role: string; team: string }
 interface Preset { name: string; run_id: string; filters: Record<string, string>; columns: string[]; revision: string }
 interface Comparison { before_run_id: string; after_run_id: string; limitations: string[]; items: { subject: Finding["subject"]; rule_id: string; transition: string; before: Finding | null; after: Finding | null }[] }
+interface ReportSummary { anomalous: number; unknown: number; affectedScopes: number; pressurePools: number }
 const columns = ["run_id", "rule_id", "scope_id", "subject", "severity", "evidence_state", "explanation", "proposed_action"];
 
 function History({ metric }: { metric: Metric }) {
@@ -48,7 +49,7 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [filters, setFilters] = useState({ scope_id: "", rule_id: "", severity: "", evidence_state: "" });
+  const [filters, setFilters] = useState({ scope_id: "", family: "", rule_id: "", severity: "", evidence_state: "" });
   const [before, setBefore] = useState("");
   const [after, setAfter] = useState("");
   const [comparison, setComparison] = useState<Comparison | null>(null);
@@ -127,7 +128,21 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
       setError(controller.signal.aborted ? "Export timed out after 12 seconds. Retry the displayed preset." : error instanceof Error ? error.message : "Could not download the saved preset.");
     } finally { window.clearTimeout(timeout); setBusy(false); }
   }
-  const visibleMetrics = (run?.calculations ?? []).filter((metric) => !filters.scope_id || metric.scope_id === filters.scope_id);
+  const visibleMetrics = (run?.calculations ?? []).filter((metric) =>
+    (!filters.scope_id || metric.scope_id === filters.scope_id) &&
+    (!filters.family || String(metric.family) === filters.family));
+  const filteredFindings = (run?.findings ?? []).filter((finding) =>
+    (!filters.scope_id || finding.subject.scope_id === filters.scope_id) &&
+    (!filters.family || String(finding.subject.family) === filters.family) &&
+    (!filters.rule_id || finding.rule_id === filters.rule_id) &&
+    (!filters.severity || finding.severity === filters.severity) &&
+    (!filters.evidence_state || finding.evidence_state === filters.evidence_state));
+  const reportSummary: ReportSummary | null = run ? {
+    anomalous: filteredFindings.filter((finding) => finding.evidence_state === "anomalous").length,
+    unknown: filteredFindings.filter((finding) => finding.evidence_state === "unknown").length,
+    affectedScopes: new Set(filteredFindings.filter((finding) => ["anomalous", "unknown"].includes(finding.evidence_state)).map((finding) => finding.subject.scope_id)).size,
+    pressurePools: new Set(filteredFindings.filter((finding) => finding.rule_id === "pool_pressure" && finding.evidence_state === "anomalous").map((finding) => `${finding.subject.scope_id}:${finding.subject.id}`)).size,
+  } : null;
   const exportParams = new URLSearchParams(Object.entries(filters).filter(([, value]) => value));
   return <section aria-labelledby="capacity-heading">
     <div className="page-heading"><div><p className="eyebrow">Saved calculations</p><h1 id="capacity-heading">Capacity and reports</h1><p className="intro">Inspect saved occupancy, compare two runs, and export the evidence you reviewed.</p></div><button className="secondary" disabled={busy} onClick={() => { void loadRuns(); }}>Reload run list</button></div>
@@ -139,7 +154,9 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
     {!runs.length && <p className="notice">No runs loaded. Import sources and compute a run in Source evidence, then reload this list.</p>}
     {run && <>
       <dl className="facts run-identity"><dt>Pinned run</dt><dd><code>{run.id}</code></dd><dt>Saved at</dt><dd>{run.created_at}</dd><dt>Demo clock</dt><dd>{run.demo_clock_at}</dd><dt>Ledger revision</dt><dd>{run.ledger_version}</dd></dl>
+      {reportSummary && <section className="inventory-panel report-summary" aria-labelledby="report-summary-heading"><h2 id="report-summary-heading">Saved-run summary</h2><p className="quiet">Selected run <code>{run.id}</code> · saved {run.created_at} · demo clock {run.demo_clock_at}</p><dl className="facts"><dt>Anomalous findings</dt><dd>{reportSummary.anomalous}</dd><dt>Unknown findings</dt><dd>{reportSummary.unknown}</dd><dt>Affected scopes</dt><dd>{reportSummary.affectedScopes}</dd><dt>Pressure pools</dt><dd>{reportSummary.pressurePools}</dd></dl><p className="quiet">Counts use this saved run and the selected scope, family, rule, severity and evidence-state filters. Pressure pools are unique saved pool_pressure subjects with anomalous evidence; this is not a traffic or reclaimability claim. No current exception state is included.</p></section>}
       <div className="filters"><label>Scope<select value={filters.scope_id} onChange={(event) => setFilters({ ...filters, scope_id: event.target.value })}><option value="">All scopes</option>{scopes.map((scope) => <option key={scope.id} value={scope.id}>{scope.name} · {scope.domain}</option>)}</select></label>
+        <label>Address family<select value={filters.family} onChange={(event) => setFilters({ ...filters, family: event.target.value })}><option value="">IPv4 and IPv6</option><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
         <label>Report rule<select value={filters.rule_id} onChange={(event) => setFilters({ ...filters, rule_id: event.target.value })}><option value="">All rules</option>{[...new Set(run.findings.map((finding) => finding.rule_id))].sort().map((id) => <option key={id}>{id}</option>)}</select></label>
         <label>Report evidence state<select value={filters.evidence_state} onChange={(event) => setFilters({ ...filters, evidence_state: event.target.value })}><option value="">All states</option>{["anomalous", "healthy", "unknown", "not_applicable"].map((state) => <option key={state}>{state}</option>)}</select></label>
         <label>Report severity<select value={filters.severity} onChange={(event) => setFilters({ ...filters, severity: event.target.value })}><option value="">All severities</option>{["critical", "high", "warning"].map((severity) => <option key={severity}>{severity}</option>)}</select></label>

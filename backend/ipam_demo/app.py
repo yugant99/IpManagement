@@ -16,7 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import __version__, inventory, inventory_commands, reconciliation, reports, workflow
+from . import __version__, inventory, inventory_commands, reconciliation, reports, source_catalog, workflow
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
 from .models import Allocation, Page, Pool, Prefix, PrefixDetail, Scope
@@ -80,6 +80,9 @@ def create_app() -> FastAPI:
             logger.exception("Unhandled request failure; request_id=%s", request.state.request_id)
             response = JSONResponse(AppError("INTERNAL_ERROR", "Request failed. See server logs with the request ID.", 500)
                                     .body(request.state.request_id), status_code=500)
+        log = logger.warning if response.status_code >= 400 else logger.info
+        log("HTTP %s %s status=%s request_id=%s", request.method, request.url.path,
+            response.status_code, request.state.request_id)
         response.headers["X-Request-ID"] = request.state.request_id
         return response
 
@@ -144,12 +147,13 @@ def create_app() -> FastAPI:
 
     @app.get("/api/prefixes", response_model=Page[Prefix])
     def list_prefixes(scope_id: UUID | None = None, family: int | None = None,
-                      owner: TextFilter = None, tag: TextFilter = None, q: TextFilter = None,
+                      owner: TextFilter = None, tag: TextFilter = None, domain: TextFilter = None,
+                      region: TextFilter = None, q: TextFilter = None,
                       limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
         if family is not None and family not in (4, 6):
             raise AppError("INVALID_INPUT", "Family must be 4 or 6.", 422, {"field": "family"})
         items = inventory.prefixes(connection, scope_id=str(scope_id) if scope_id else None,
-                                   family=family, owner=owner, tag=tag, q=q)
+                                   family=family, owner=owner, tag=tag, domain=domain, region=region, q=q)
         return inventory.page(items, limit, offset)
 
     @app.get("/api/prefixes/{object_id}", response_model=PrefixDetail)
@@ -158,9 +162,11 @@ def create_app() -> FastAPI:
 
     @app.get("/api/pools", response_model=Page[Pool])
     def list_pools(scope_id: UUID | None = None, prefix_id: UUID | None = None,
+                   domain: TextFilter = None, region: TextFilter = None,
                    limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
         return inventory.page(inventory.pools(connection, scope_id=str(scope_id) if scope_id else None,
-                              prefix_id=str(prefix_id) if prefix_id else None), limit, offset)
+                              prefix_id=str(prefix_id) if prefix_id else None,
+                              domain=domain, region=region), limit, offset)
 
     @app.get("/api/allocations", response_model=Page[Allocation])
     def list_allocations(scope_id: UUID | None = None, prefix_id: UUID | None = None, pool_id: UUID | None = None,
@@ -246,7 +252,9 @@ def create_app() -> FastAPI:
         if not run_lock.acquire(blocking=False):
             raise AppError("RUN_IN_PROGRESS", "Another acquisition or reconciliation is in progress. Retry after it completes.", 409)
         try:
-            audited_write(request, payload, "schedule.configure", lambda connection: service.configure(connection, payload), "synthetic-schedule")
+            audited_write(request, payload, "schedule.configure",
+                          lambda connection: service.configure(connection, payload, request.state.request_id),
+                          "synthetic-schedule")
             service.configuration_committed()
         finally:
             run_lock.release()
@@ -368,8 +376,89 @@ def create_app() -> FastAPI:
             raise AppError("NOT_FOUND", "Source import does not exist.", 404)
         return json.loads(row["receipt_json"])
 
+    def import_reconciliation_link(connection, batch_id):
+        row = connection.execute(
+            "SELECT details_json FROM audit_events "
+            "WHERE action='source.import.reconcile' AND subject_id=? AND outcome='succeeded' "
+            "ORDER BY created_at DESC, id DESC LIMIT 1", (batch_id,)).fetchone()
+        if row is None:
+            return None
+        details = json.loads(row["details_json"])
+        run_id = details.get("run_id")
+        if not run_id or connection.execute("SELECT 1 FROM calculation_runs WHERE id=?", (run_id,)).fetchone() is None:
+            return None
+        return {"batch_id": batch_id, "run_id": run_id, "status": "succeeded", "replay": True}
+
+    def record_import_reconciliation_failure(request, batch_id, error, outcome="failed"):
+        try:
+            def save_failure(connection):
+                workflow.audit_event(
+                    connection, actor_id="system", action="source.import.reconcile", outcome=outcome,
+                    reason=f"Import-triggered reconciliation {outcome}: {error.message}", subject_id=batch_id,
+                    details={"batch_id": batch_id, "trigger": "import", "error": {
+                        "code": error.code, "message": error.message, "details": error.details},
+                             "http_request_id": request.state.request_id})
+            write_operation(request, save_failure)
+            return {"audit_recorded": True}
+        except Exception as audit_error:
+            logger.exception("Import reconciliation failure audit could not be stored; http_request_id=%s",
+                             request.state.request_id)
+            return {"audit_recorded": False, "audit_error": {
+                "code": "AUDIT_RECORD_FAILED",
+                "message": "The reconciliation attempt result was not written to the audit store.",
+                "details": {"cause": type(audit_error).__name__}}}
+
+    def reconcile_import(request, batch_id, source_kind, *, import_replay):
+        if source_kind == "inventory_staged":
+            return {"batch_id": batch_id, "status": "skipped", "replay": False,
+                    "error": {"code": "STAGED_INVENTORY",
+                               "message": "Staged intended inventory is not promoted or reconciled by an import callback.",
+                               "details": {"reason": "The receipt remains staged until an explicit baseline workflow exists."}}}
+        if not run_lock.acquire(blocking=False):
+            error = AppError("RUN_IN_PROGRESS", "Import was committed, but reconciliation is busy. Retry the same import with reconciliation enabled.", 409)
+            logger.warning("Import reconciliation busy batch_id=%s request_id=%s", batch_id, request.state.request_id)
+            recorded = record_import_reconciliation_failure(request, batch_id, error, outcome="busy")
+            return {"batch_id": batch_id, "status": "busy", "replay": False,
+                    **recorded, "error": error.body(request.state.request_id)["error"]}
+        try:
+            def save_run(connection):
+                linked = import_reconciliation_link(connection, batch_id)
+                if linked is not None:
+                    return linked
+                result = reconciliation.create_run(connection)
+                workflow.sync_exceptions(connection, result)
+                workflow.audit_event(
+                    connection, actor_id="system", action="source.import.reconcile", outcome="succeeded",
+                    reason="Import-triggered reconciliation completed.", subject_id=batch_id,
+                    details={"batch_id": batch_id, "run_id": result["id"], "trigger": "import",
+                             "replay": import_replay, "http_request_id": request.state.request_id})
+                return result
+            result = write_operation(request, save_run)
+            if "status" in result:
+                return result
+            return {"batch_id": batch_id, "run_id": result["id"], "status": "succeeded", "replay": False}
+        except (AppError, sqlite3.Error) as exc:
+            error = exc if isinstance(exc, AppError) else store_error(exc)
+            recorded = record_import_reconciliation_failure(request, batch_id, error)
+            logger.warning("Import reconciliation failed batch_id=%s code=%s request_id=%s",
+                           batch_id, error.code, request.state.request_id)
+            return {"batch_id": batch_id, "status": "failed", "replay": False,
+                    **recorded, "error": error.body(request.state.request_id)["error"]}
+        except Exception as exc:
+            logger.exception("Import reconciliation failed unexpectedly batch_id=%s request_id=%s",
+                             batch_id, request.state.request_id)
+            error = AppError("IMPORT_RECONCILIATION_FAILED", "Import committed, but reconciliation failed. See server logs with the request ID.",
+                             500, {"cause": type(exc).__name__})
+            recorded = record_import_reconciliation_failure(request, batch_id, error)
+            logger.warning("Import reconciliation failed batch_id=%s code=%s request_id=%s",
+                           batch_id, error.code, request.state.request_id)
+            return {"batch_id": batch_id, "status": "failed", "replay": False,
+                    **recorded, "error": error.body(request.state.request_id)["error"]}
+        finally:
+            run_lock.release()
+
     @app.post("/api/imports", status_code=201)
-    async def create_import(request: Request):
+    async def create_import(request: Request, reconcile_after_import: bool = Query(False)):
         if request.headers.get("content-type", "").split(";", 1)[0].strip().lower() != "application/json":
             raise AppError("INVALID_INPUT", "Upload a versioned source envelope as application/json.", 422)
         body = bytearray()
@@ -386,6 +475,9 @@ def create_app() -> FastAPI:
                              "input_rows", "accepted_rows", "rejected_rows", "duplicate_rows", "coverage")})
             return receipt, replay
         receipt, replay = await run_in_threadpool(write_operation, request, save_import)
+        if reconcile_after_import:
+            receipt = {**receipt, "reconciliation": await run_in_threadpool(
+                reconcile_import, request, receipt["id"], receipt["source_kind"], import_replay=replay)}
         return JSONResponse(receipt, status_code=200 if replay else 201,
                             headers={"X-Import-Replay": "true" if replay else "false"})
 
@@ -395,6 +487,16 @@ def create_app() -> FastAPI:
         items = [json.loads(row[0]) for row in connection.execute(
             "SELECT receipt_json FROM source_batches ORDER BY sequence DESC LIMIT ? OFFSET ?", (limit, offset))]
         return {"items": items, "total": total, "limit": limit, "offset": offset}
+
+    @app.get("/api/source-catalog")
+    def list_source_catalog(scope_id: UUID | None = None, limit: Limit = 50, offset: Offset = 0,
+                            connection=Depends(database)):
+        items = source_catalog.catalog(connection, scope_id=str(scope_id) if scope_id else None)
+        evaluated_at = connection.execute("SELECT demo_clock_at FROM app_meta WHERE singleton=1").fetchone()[0]
+        page = inventory.page(items, limit, offset)
+        return {**page, "evaluated_at": evaluated_at,
+                "limitations": ["Receipt-derived synthetic source catalog; this is not automatic discovery.",
+                                "Declared authority does not prove unique or live system authority."]}
 
     @app.get("/api/imports/{batch_id}")
     def get_import(batch_id: UUID, connection=Depends(database)):
@@ -455,21 +557,22 @@ def create_app() -> FastAPI:
 
     @app.get("/api/runs/{run_id}/export")
     def export_run(run_id: UUID, scope_id: TextFilter = None, rule_id: TextFilter = None,
-                   severity: TextFilter = None, evidence_state: TextFilter = None, connection=Depends(database)):
+                   severity: TextFilter = None, evidence_state: TextFilter = None, family: TextFilter = None,
+                   connection=Depends(database)):
         filters = {key: value for key, value in {"scope_id": scope_id, "rule_id": rule_id,
-                   "severity": severity, "evidence_state": evidence_state}.items() if value}
+                   "severity": severity, "evidence_state": evidence_state, "family": family}.items() if value}
         return JSONResponse(reports.export_run(connection, str(run_id), filters), headers={
             "Content-Disposition": f'attachment; filename="ipam-run-{run_id}.json"'})
 
     @app.get("/api/runs/{run_id}/findings")
     def list_findings(run_id: UUID, scope_id: UUID | None = None, evidence_state: str | None = None,
-                       rule_id: TextFilter = None, severity: TextFilter = None,
+                       rule_id: TextFilter = None, severity: TextFilter = None, family: TextFilter = None,
                        limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
         if evidence_state is not None and evidence_state not in {"anomalous", "healthy", "unknown", "not_applicable"}:
             raise AppError("INVALID_INPUT", "Unknown finding evidence state.", 422)
         items = reports.filtered_findings(reconciliation.get_run(connection, str(run_id)),
                 {"scope_id": str(scope_id) if scope_id else "", "evidence_state": evidence_state or "",
-                 "rule_id": rule_id or "", "severity": severity or ""})
+                 "rule_id": rule_id or "", "severity": severity or "", "family": family or ""})
         return inventory.page(items, limit, offset)
 
     @app.get("/api/runs/{run_id}/findings/{finding_id}")
