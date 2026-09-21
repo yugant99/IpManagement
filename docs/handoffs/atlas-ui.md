@@ -6,8 +6,8 @@ Status: ready for project-lead review; this is a frontend presentation and inter
 
 - Branch: `codex/atlas-ui`
 - Initial shell checkpoint: `57e55103029396ddf267ac8450aa041b64164518` (PR #60)
-- Production/source checkpoint: `2e81cc289ccfe7829afc19945d157b56d5397b46` (view-scroll reset, panel gutter, token cleanup, and rail-label copy correction).
-- Docs-only publication head before this reproducibility correction: `7e1f1378b564fed5948132f2f75784eebe2415f2`; the final worker message reports the new docs-only head.
+- Production/source checkpoint: `0cf2f3e1f444d8199cd203d740ec87e9928c0f80` (includes the earlier view-scroll reset, panel gutter, token cleanup, rail-label copy correction, and narrow saved-run selector sizing fix).
+- Docs-only publication head before this dependency-installation correction: `0cf2f3e1f444d8199cd203d740ec87e9928c0f80`; the final worker message reports the new docs-only head.
 - Owned paths: `frontend/src/App.tsx`, `frontend/src/styles.css`, `frontend/src/Workflow.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/Schedule.tsx`, `frontend/src/CapacityReports.tsx`, and this handoff.
 - No backend, schema, API, fixture, lockfile, status, or acceptance-store changes.
 
@@ -28,6 +28,7 @@ ATLAS_UV_PARENT="$(mktemp -d /tmp/ipam-atlas-uv.XXXXXX)"
 export UV_PROJECT_ENVIRONMENT="$ATLAS_UV_PARENT/venv"
 uv sync --frozen --python 3.12
 cd "$ATLAS_ROOT/frontend"
+npm ci
 npx --yes node@24 node_modules/typescript/bin/tsc --noEmit
 npx --yes node@24 node_modules/vite/bin/vite.js build
 cd "$ATLAS_ROOT"
