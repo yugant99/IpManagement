@@ -13,7 +13,7 @@ Main Lead 3.0 owns review, merge, accounting and provider cleanup.
   One baseline build, zero rebuilds, no application or packaging source repair.
   Publication changes are documentation only; no unmerged runtime dependency.
 - The explicit user-authorized VM experiment superseded historical no-cloud/
-  no-Docker wording only for the sole existing DigitalOcean Droplet `602245599`.
+  no-Docker wording only for the sole authorized disposable host on DigitalOcean.
   No local Docker, additional VM, public app ingress, infrastructure creation,
   self-merge or worker deletion of provider resources occurred.
 - Evidence potentially relevant to RFP-090/020/023 is submitted for lead review.
@@ -237,13 +237,15 @@ firewall/key/tag immediately. **Lead cleanup subsequently completed:** the priva
 tag by00:54:01UTC. The worker read that record; no deletion was performed by
 this worker. The SSH tunnel exited after deletion. Evidence and the local
 private key were preserved; the lead removed the temporary cleanup heartbeat.
+No live VM remains. The lead confirmed that the native Atlas listener on
+local8000 was preserved outside this cleanup.
 
 ## Proposed lead follow-up
 
 Review this docs-only branch against deployed `eab1d337`, the exported manifests,
 actual refusal/preserved-marker proof and timing boundary. Reuse existing accepted
 application evidence; do not repeat a broad suite. Record bounded acceptance and
-RFP decisions, then merge only after review. Retain the verified deletion/absence of Droplet
-602245599 and its dedicated firewall/key/tag in the lead's cleanup record. Human
+RFP decisions, then merge only after review. Retain the verified absence of the sole authorized disposable host and its
+dedicated firewall/key/tag in the lead's private cleanup record. Human
 recipient acceptance and remaining clauses stay explicit. No new implementation
 stage or automatic VM extension is proposed.
