@@ -245,7 +245,8 @@ local8000 was preserved outside this cleanup.
 Review this docs-only branch against deployed `eab1d337`, the exported manifests,
 actual refusal/preserved-marker proof and timing boundary. Reuse existing accepted
 application evidence; do not repeat a broad suite. Record bounded acceptance and
-RFP decisions, then merge only after review. Retain the verified absence of the sole authorized disposable host and its
-dedicated firewall/key/tag in the lead's private cleanup record. Human
+RFP decisions, then merge only after review. Retain the verified absence of the
+sole authorized disposable host and its dedicated firewall/key/tag in the lead's
+private cleanup record. Human
 recipient acceptance and remaining clauses stay explicit. No new implementation
 stage or automatic VM extension is proposed.

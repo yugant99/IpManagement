@@ -161,9 +161,12 @@ setup-needed view instead of erroring out.
 
 To inspect the volume from the host: `docker volume inspect ipam_demo_data`.
 
-To provide a bind mount instead of the named volume (development only),
-override the `volumes:` entry in a local Compose override file and point
-`/data` at an existing local directory writable by uid `10001`.
+For an unverified development-only bind-mount variant, edit the service
+`volumes:` entry in a separate disposable source copy's `compose.yaml` and
+point `/data` at an existing local directory writable by uid `10001`. The
+wrappers do not automatically consume a Compose override file. Record the
+exact source-copy diff, rendered configuration, runtime UID and actual mount
+before using such a variant; this experiment used named volumes only.
 Missing/unwritable paths surface `DATA_PATH_UNAVAILABLE` or
 `DATA_PATH_UNWRITABLE` with the resolved path and runtime UID — the
 service never silently falls back to ephemeral storage.
