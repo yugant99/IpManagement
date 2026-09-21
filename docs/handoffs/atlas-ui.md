@@ -6,8 +6,9 @@ Status: ready for project-lead review; this is a frontend presentation and inter
 
 - Branch: `codex/atlas-ui`
 - Initial shell checkpoint: `57e55103029396ddf267ac8450aa041b64164518` (PR #60)
-- Final checkpoint: `2e81cc289ccfe7829afc19945d157b56d5397b46` (view-scroll reset, panel gutter, token cleanup, and rail-label copy correction).
-- Owned paths: `frontend/src/App.tsx`, `frontend/src/styles.css`, `frontend/src/Workflow.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/Schedule.tsx`, and this handoff.
+- Production/source checkpoint: `2e81cc289ccfe7829afc19945d157b56d5397b46` (view-scroll reset, panel gutter, token cleanup, and rail-label copy correction).
+- Docs-only publication head before this reproducibility correction: `7e1f1378b564fed5948132f2f75784eebe2415f2`; the final worker message reports the new docs-only head.
+- Owned paths: `frontend/src/App.tsx`, `frontend/src/styles.css`, `frontend/src/Workflow.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/Schedule.tsx`, `frontend/src/CapacityReports.tsx`, and this handoff.
 - No backend, schema, API, fixture, lockfile, status, or acceptance-store changes.
 
 ## What changed
@@ -18,31 +19,30 @@ Rail navigation now resets document scroll to the destination workspace top with
 
 ## Supported setup and start
 
-From the repository root, using a fresh disposable store:
+From the repository root, using a fresh disposable store and isolated Python environment:
 
 ```sh
-export ATLAS_ROOT="$PWD"
-export ATLAS_STORE=/tmp/ipam-atlas-f234-rich-20260921
-export UV_PROJECT_ENVIRONMENT=/tmp/ipam-atlas-f234-uv-rich
+ATLAS_ROOT="$PWD"
+ATLAS_STORE="$(mktemp -d /tmp/ipam-atlas-store.XXXXXX)"
+ATLAS_UV_PARENT="$(mktemp -d /tmp/ipam-atlas-uv.XXXXXX)"
+export UV_PROJECT_ENVIRONMENT="$ATLAS_UV_PARENT/venv"
 uv sync --frozen --python 3.12
+cd "$ATLAS_ROOT/frontend"
+npx --yes node@24 node_modules/typescript/bin/tsc --noEmit
+npx --yes node@24 node_modules/vite/bin/vite.js build
+cd "$ATLAS_ROOT"
+PYTHONPATH="$ATLAS_ROOT/backend:$ATLAS_ROOT/fixtures/evolving" \
+IPAM_DATA_DIR="$ATLAS_STORE" \
+"$UV_PROJECT_ENVIRONMENT/bin/python" -m ipam_demo seed --scenario rich \
+  --inventory "$ATLAS_ROOT/fixtures/v1/inventory.json"
 IPAM_DATA_DIR="$ATLAS_STORE" \
 IPAM_STATIC_DIR="$ATLAS_ROOT/frontend/dist" \
 IPAM_SYNTHETIC_FEED_DIR="$ATLAS_ROOT/fixtures/v1" \
 PYTHONPATH="$ATLAS_ROOT/backend:$ATLAS_ROOT/fixtures/evolving" \
-"$UV_PROJECT_ENVIRONMENT/bin/python" -m ipam_demo serve --host 127.0.0.1 --port 8000
+  "$UV_PROJECT_ENVIRONMENT/bin/python" -m ipam_demo serve --host 127.0.0.1 --port 8000
 ```
 
-For a new store, stop the service first, then seed rich synthetic data:
-
-```sh
-mkdir -p /tmp/ipam-atlas-f234-rich-new
-IPAM_DATA_DIR=/tmp/ipam-atlas-f234-rich-new \
-PYTHONPATH="$PWD/backend:$PWD/fixtures/evolving" \
-/tmp/ipam-atlas-f234-uv-rich/bin/python -m ipam_demo seed --scenario rich \
-  --inventory "$PWD/fixtures/v1/inventory.json"
-```
-
-The verified preview used Python 3.12.10 with frozen project dependencies: FastAPI 0.141.1 and Uvicorn 0.50.1. Final compiled UI/API preview: [http://127.0.0.1:8000/](http://127.0.0.1:8000/), disposable store `/tmp/ipam-atlas-f234-rich-20260921`, API PID 64292. Stop with Ctrl-C. Do not use retained acceptance stores.
+The verified preview used Python 3.12.10 with frozen project dependencies: FastAPI 0.141.1 and Uvicorn 0.50.1. The current preserved compiled UI/API preview is separate from the fresh-store sequence above: [http://127.0.0.1:8000/](http://127.0.0.1:8000/), disposable store `/tmp/ipam-atlas-f234-rich-20260921`, API PID 64292. Do not reseed that fixed review store; stop it with Ctrl-C only when the preview is no longer needed. Do not use retained acceptance stores.
 
 ## Verified focused flow
 
@@ -62,6 +62,7 @@ Lead independently observed desktop and 390px narrow layouts, no document overfl
 ## Checks and limits
 
 - Node 24.21.0 isolated runtime: TypeScript no-emit and Vite production build passed.
+- The compiled bundle contains the final `CapacityReports.tsx` guidance copy (`compute a run in Reconciliation`). The populated saved-run selector also has explicit `min-width: 0` and `width: 100%` sizing for narrow workspaces.
 - `git diff --check` passed.
 - No broad backend suite was run; checks were limited to the named UI workflows and the supported local runtime.
 - Synthetic/local only. No live discovery, external provisioning, production identity, portable recipient acceptance, or questionnaire status credit follows from this handoff.
