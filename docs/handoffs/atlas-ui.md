@@ -1,13 +1,13 @@
 # Atlas UI handoff
 
-Status: ready for project-lead review; this is a frontend presentation and interaction checkpoint, not global project acceptance.
+Status: accepted locally and merged through PR #60. See [lead acceptance](atlas-ui-lead-review.md) for the exact review, integration and remaining limits.
 
 ## Candidate
 
 - Branch: `codex/atlas-ui`
 - Initial shell checkpoint: `57e55103029396ddf267ac8450aa041b64164518` (PR #60)
 - Production/source checkpoint: `0cf2f3e1f444d8199cd203d740ec87e9928c0f80` (includes the earlier view-scroll reset, panel gutter, token cleanup, rail-label copy correction, and narrow saved-run selector sizing fix).
-- Docs-only publication head before this dependency-installation correction: `0cf2f3e1f444d8199cd203d740ec87e9928c0f80`; the final worker message reports the new docs-only head.
+- Final worker publication head: `04b4deecbee61be98fef247f4fc5a8252c885aff`; its changes after the production checkpoint are documentation only.
 - Owned paths: `frontend/src/App.tsx`, `frontend/src/styles.css`, `frontend/src/Workflow.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/Schedule.tsx`, `frontend/src/CapacityReports.tsx`, and this handoff.
 - No backend, schema, API, fixture, lockfile, status, or acceptance-store changes.
 
@@ -19,7 +19,7 @@ Rail navigation now resets document scroll to the destination workspace top with
 
 ## Supported setup and start
 
-From the repository root, using a fresh disposable store and isolated Python environment:
+From the repository root, using a fresh disposable store and isolated Python environment. Use an unused loopback port; the retained review preview already occupies 8000 while running. This setup recipe is separate from recipient-machine proof.
 
 ```sh
 ATLAS_ROOT="$PWD"
@@ -28,9 +28,7 @@ ATLAS_UV_PARENT="$(mktemp -d /tmp/ipam-atlas-uv.XXXXXX)"
 export UV_PROJECT_ENVIRONMENT="$ATLAS_UV_PARENT/venv"
 uv sync --frozen --python 3.12
 cd "$ATLAS_ROOT/frontend"
-npm ci
-npx --yes node@24 node_modules/typescript/bin/tsc --noEmit
-npx --yes node@24 node_modules/vite/bin/vite.js build
+npx --yes --package=node@24.21.0 --package=npm@10.9.2 -c 'npm ci && npm run build'
 cd "$ATLAS_ROOT"
 PYTHONPATH="$ATLAS_ROOT/backend:$ATLAS_ROOT/fixtures/evolving" \
 IPAM_DATA_DIR="$ATLAS_STORE" \
