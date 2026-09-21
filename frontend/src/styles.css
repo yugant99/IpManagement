@@ -199,7 +199,7 @@ tr[data-selected="true"] { background: #eff5f0; }
 .report-findings .section-heading p { margin-top: 6px; }
 .report-findings-scroll { max-height: 420px; overflow: auto; }
 .result-count { margin: 8px 0 16px; }
-.exception-detail { scroll-margin-top: 24px; }
+.exception-detail h3 { scroll-margin-top: 24px; }
 .exception-detail h3:focus { outline: 2px solid var(--accent); outline-offset: 4px; }
 .column-options { display: flex; flex-wrap: wrap; gap: 14px; }
 .column-options label { display: flex; align-items: center; gap: 6px; }
