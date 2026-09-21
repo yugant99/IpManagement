@@ -194,6 +194,13 @@ tr[data-selected="true"] { background: #eff5f0; }
 .capacity-history figcaption { color: var(--muted); }
 .report-run-select { display: grid; gap: 8px; max-width: 100%; min-width: 0; margin: 20px 0; }
 .report-run-select select { width: 100%; max-width: 100%; min-width: 0; }
+.report-findings { margin: 20px 0; }
+.report-findings .section-heading { padding-bottom: 12px; }
+.report-findings .section-heading p { margin-top: 6px; }
+.report-findings-scroll { max-height: 420px; overflow: auto; }
+.result-count { margin: 8px 0 16px; }
+.exception-detail { scroll-margin-top: 24px; }
+.exception-detail h3:focus { outline: 2px solid var(--accent); outline-offset: 4px; }
 .column-options { display: flex; flex-wrap: wrap; gap: 14px; }
 .column-options label { display: flex; align-items: center; gap: 6px; }
 .column-options input { width: auto; }
