@@ -1,5 +1,7 @@
 # Part 6: portable delivery — Spencer
 
+**Current runtime addendum, 2026-09-21:** [the lead acceptance](../handoffs/vm-portability-lead-review.md) now records bounded Linux amd64 startup, allocation/audit persistence, stopped recovery and agent reproduction; `PART6_READY=yes` for that tested target. The disposable host was destroyed after verified export. Human recipient acceptance and unexercised platform/operator cases remain explicit. Source-only statements below describe the earlier checkpoint.
+
 Owner: Spencer and his agent. Budget: approximately 6–8 hours. Core goals: G26–G28 and G30. Stretch: G29.
 
 Lane label: `codex/part-6-portability`. Feature branches follow `codex/part-6-<feature>`. Delivered so far: `codex/part-6-container-startup` (PR #49, packaging skeleton), superseded on packaging plumbing by `codex/part-6-build-compat-fix` (PR #50, Main Lead 2.0 compat repair with the rich feed producer and inventory packaging). The current branch `codex/part-6-operator-handoff` adds the rich-seed wrapper, state-command wrappers and the corrected runbook on top of PR #50.
