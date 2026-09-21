@@ -162,7 +162,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const mayHandle = selectedException?.owner_actor_id === actorId && actor?.permissions.includes("exception");
 
   return <section aria-labelledby="workflow-heading">
-    <div className="page-heading"><div><p className="eyebrow">Local decisions and recorded exceptions</p><h1 id="workflow-heading">Allocation and review</h1>
+    <div className="page-heading"><div><p className="eyebrow">Current workflow · saved evidence boundary</p><h1 id="workflow-heading">Allocation and review</h1>
       <p className="intro">Request an exact IPv4 address, review it as a second demo actor, and inspect the stored audit trail.</p></div>
       <button className="secondary" disabled={loading || busy} onClick={refresh}>Refresh workflow</button></div>
     <div className="evidence-banner"><strong>Synthetic workflow</strong><span>Local allocations are real database changes. External provisioning is simulated. Queue actions leave calculated findings unchanged.</span></div>

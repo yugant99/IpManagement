@@ -256,19 +256,27 @@ export default function App() {
     <>
       <a className="skip-link" href="#inventory-main">Skip to main content</a>
       <header className="app-header">
-        <div className="brand"><span className="brand-mark" aria-hidden="true">IP</span><span>IP inventory</span><span className="demo-label">Synthetic demo</span></div>
-        <span className="header-context">Scoped inventory · Evidence · Decisions</span>
+        <div className="brand"><span className="brand-mark" aria-hidden="true">IP</span><span>Pool Watch</span><span className="demo-label">Synthetic local workspace</span></div>
+        <span className="header-context">Scoped inventory · evidence · decisions</span>
       </header>
-      <main id="inventory-main">
-        <nav className="view-navigation" aria-label="Inventory views">
-          <button className="secondary" aria-current={view === "inventory" ? "page" : undefined} onClick={() => setView("inventory")}>Intended inventory</button>
-          <button className="secondary" aria-current={view === "first-path" ? "page" : undefined} onClick={() => setView("first-path")}>Source evidence</button>
-          <button className="secondary" aria-current={view === "planning" ? "page" : undefined} onClick={() => setView("planning")}>Prefix planning</button>
-          <button className="secondary" aria-current={view === "capacity" ? "page" : undefined} onClick={() => setView("capacity")}>Capacity and reports</button>
-          <button className="secondary" aria-current={view === "workflow" ? "page" : undefined} onClick={() => setView("workflow")}>Requests and exceptions</button>
-          <button className="secondary" aria-current={view === "corrections" ? "page" : undefined} onClick={() => setView("corrections")}>Inventory corrections</button>
-          <button className="secondary" aria-current={view === "schedule" ? "page" : undefined} onClick={() => setView("schedule")}>Synthetic acquisition</button>
+      <div className="atlas-body">
+        <nav className="view-navigation atlas-rail" aria-label="Inventory views">
+          <div className="rail-group"><p className="rail-label">Operate</p>
+            <button aria-current={view === "inventory" ? "page" : undefined} onClick={() => setView("inventory")}><span className="rail-marker" aria-hidden="true" />Inventory</button>
+            <button aria-current={view === "first-path" ? "page" : undefined} onClick={() => setView("first-path")}><span className="rail-marker" aria-hidden="true" />Reconciliation</button>
+            <button aria-current={view === "capacity" ? "page" : undefined} onClick={() => setView("capacity")}><span className="rail-marker" aria-hidden="true" />Capacity</button>
+          </div>
+          <div className="rail-group"><p className="rail-label">Decide</p>
+            <button aria-current={view === "workflow" ? "page" : undefined} onClick={() => setView("workflow")}><span className="rail-marker" aria-hidden="true" />Requests and exceptions</button>
+            <button aria-current={view === "corrections" ? "page" : undefined} onClick={() => setView("corrections")}><span className="rail-marker" aria-hidden="true" />Corrections</button>
+            <button aria-current={view === "planning" ? "page" : undefined} onClick={() => setView("planning")}><span className="rail-marker" aria-hidden="true" />Prefix planning</button>
+          </div>
+          <div className="rail-group"><p className="rail-label">Observe</p>
+            <button aria-current={view === "schedule" ? "page" : undefined} onClick={() => setView("schedule")}><span className="rail-marker" aria-hidden="true" />Synthetic acquisition</button>
+          </div>
+          <p className="rail-note">All records are synthetic and local. Saved evidence is separate from current intended state.</p>
         </nav>
+        <main id="inventory-main">
         <div hidden={view !== "inventory"}>
         <div className="page-heading">
           <div><p className="eyebrow">Intended network state</p><h1>Scoped inventory</h1><p className="intro">Browse IPv4 and IPv6 prefixes, their owners, and intended assignments.</p></div>
@@ -334,7 +342,8 @@ export default function App() {
         </>}
         {health && <Readiness health={health} />}
         <footer className="page-footer">Synthetic inventory and evidence · Saved calculations are pinned to their run · Data and readiness are reported by the API</footer>
-      </main>
+        </main>
+      </div>
     </>
   );
 }

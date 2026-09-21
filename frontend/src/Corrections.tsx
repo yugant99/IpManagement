@@ -243,7 +243,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
   const locked = busy || !!attempt || !!storageError;
 
   return <section aria-labelledby="corrections-heading">
-    <div className="page-heading"><div><p className="eyebrow">Reviewed intended inventory</p><h1 id="corrections-heading">Inventory corrections</h1>
+    <div className="page-heading"><div><p className="eyebrow">Current workflow · reviewed intended inventory</p><h1 id="corrections-heading">Inventory corrections</h1>
       <p className="intro">Propose missing registered space, obtain an independent decision, then reconcile and inspect the evidence.</p></div>
       <button type="button" className="secondary" disabled={busy || loading} onClick={() => { setError(""); setRevision(value => value + 1); }}>Refresh corrections</button></div>
     <div className="evidence-banner"><strong>Local synthetic workflow</strong><span>Approval registers a prefix in this application's inventory. It does not change DHCP, routers or any external system. Resolution requires a subsequent comparable finding.</span></div>

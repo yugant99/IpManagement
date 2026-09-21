@@ -238,3 +238,70 @@ tr[data-selected="true"] { background: #eff5f0; }
   .run-history > li { flex-wrap: wrap; }
   .run-history button { width: 100%; }
 }
+
+/* Atlas shell: a durable operational record surface around the existing views. */
+:root {
+  --navy: #102536;
+  --navy-muted: #9aadb7;
+  --paper: #f3efe7;
+  --paper-deep: #e9e5dc;
+  --line: #d5d4cc;
+  --accent: #286b67;
+  --muted: #5c686d;
+  --border: var(--line);
+}
+
+body { background: var(--paper); color: #23343b; }
+.app-header { min-height: 68px; padding: 16px 30px; background: #fff; border-bottom: 1px solid var(--line); color: #23343b; }
+.brand { color: #23343b; letter-spacing: 0.01em; }
+.brand-mark { background: #e6eee9; color: var(--accent); border-color: #c8dace; }
+.demo-label { color: #53675b; border-color: var(--line); }
+.header-context { color: var(--muted); text-transform: lowercase; }
+.atlas-body { display: grid; grid-template-columns: 224px minmax(0, 1fr); min-height: calc(100vh - 68px); }
+.atlas-rail { position: sticky; top: 0; height: calc(100vh - 68px); overflow-y: auto; display: flex; flex-direction: column; align-items: stretch; gap: 26px; padding: 28px 16px 20px; background: #fff; border: 0; border-right: 1px solid var(--line); margin: 0; color: #334d4c; }
+.rail-group { display: grid; gap: 3px; }
+.rail-label { margin: 0 10px 7px; color: #7a8784; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.atlas-rail button { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 8px 10px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #415b5a; font-size: 13px; font-weight: 550; text-align: left; }
+.atlas-rail button:hover { background: #edf3ef; color: #193b3b; }
+.atlas-rail button[aria-current="page"] { background: #e5eee8; color: #1d4c4a; border-color: #c8dbd0; }
+.rail-marker { width: 5px; height: 5px; flex: 0 0 5px; border: 1px solid currentColor; border-radius: 50%; opacity: 0.75; }
+.atlas-rail button[aria-current="page"] .rail-marker { background: var(--accent); border-color: var(--accent); }
+.rail-note { margin: auto 10px 0; padding-top: 16px; border-top: 1px solid var(--line); color: #76817f; font-size: 11px; line-height: 1.55; }
+.atlas-body > main { min-width: 0; max-width: none; margin: 0; padding: 34px clamp(22px, 4vw, 56px) 24px; background: var(--paper); }
+.view-navigation + .page-heading { border-top: 0; }
+.page-heading { margin-bottom: 22px; }
+.page-heading h1 { color: #142d3c; }
+.page-heading .intro { max-width: 620px; }
+.evidence-banner { background: #e4e9df; border-left-color: #7c9b7c; color: #40544b; }
+.filters { padding: 15px 0 4px; border-top: 1px solid var(--line); }
+.filters label { color: #344d53; }
+.filters select, .filters input { border-color: #b6bcb6; background: #fbfaf6; border-radius: 3px; }
+.scope-context { border-bottom-color: var(--line); color: #53656a; }
+.inventory-panel, .detail-panel { border-color: var(--line); border-radius: 3px; background: #fbfaf6; box-shadow: 0 7px 20px rgba(35, 52, 59, 0.04); }
+.section-heading { border-bottom: 1px solid var(--line); }
+th { background: var(--paper-deep); border-color: var(--line); color: #53656a; }
+td { border-bottom-color: #e1dfd7; }
+tr[data-selected="true"] { background: #e4eee7; }
+.tag { border-radius: 3px; background: #e8ece7; border-color: #d3ddd5; color: #4d625a; }
+.detail-section { border-top-color: var(--line); }
+.secondary { color: #294d50; background: #fbfaf6; border-color: #aab9b2; }
+.secondary:hover { background: #e5ede8; }
+.readiness, .page-footer { color: #687379; }
+.page-footer { border-top-color: var(--line); }
+
+@media (max-width: 900px) {
+  .atlas-body { grid-template-columns: 1fr; }
+  .atlas-rail { position: static; height: auto; flex-direction: row; align-items: flex-start; gap: 18px; overflow-x: auto; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .rail-group { min-width: max-content; }
+  .rail-label { margin-bottom: 4px; }
+  .rail-note { display: none; }
+  .atlas-rail button { min-height: 34px; white-space: nowrap; }
+  .atlas-body > main { padding-top: 26px; }
+}
+
+@media (max-width: 640px) {
+  .app-header { padding: 14px 16px; }
+  .header-context { display: none; }
+  .atlas-rail { gap: 12px; }
+  .atlas-body > main { padding: 24px 16px 18px; }
+}
