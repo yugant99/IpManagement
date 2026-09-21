@@ -6,7 +6,7 @@ Status: ready for project-lead review; this is a frontend presentation and inter
 
 - Branch: `codex/atlas-ui`
 - Initial shell checkpoint: `57e55103029396ddf267ac8450aa041b64164518` (PR #60)
-- Final checkpoint includes the view-scroll reset, panel gutter, and token cleanup; publish SHA in the worker report after commit.
+- Final checkpoint: `2e81cc289ccfe7829afc19945d157b56d5397b46` (view-scroll reset, panel gutter, token cleanup, and rail-label copy correction).
 - Owned paths: `frontend/src/App.tsx`, `frontend/src/styles.css`, `frontend/src/Workflow.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/Schedule.tsx`, and this handoff.
 - No backend, schema, API, fixture, lockfile, status, or acceptance-store changes.
 
