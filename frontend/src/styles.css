@@ -241,8 +241,6 @@ tr[data-selected="true"] { background: #eff5f0; }
 
 /* Atlas shell: a durable operational record surface around the existing views. */
 :root {
-  --navy: #102536;
-  --navy-muted: #9aadb7;
   --paper: #f3efe7;
   --paper-deep: #e9e5dc;
   --line: #d5d4cc;
@@ -288,6 +286,8 @@ tr[data-selected="true"] { background: #e4eee7; }
 .secondary:hover { background: #e5ede8; }
 .readiness, .page-footer { color: #687379; }
 .page-footer { border-top-color: var(--line); }
+section[aria-labelledby="workflow-heading"] .inventory-panel > :is(p, form, .notice),
+section[aria-labelledby="corrections-heading"] .inventory-panel > :is(h2, p, form, label, .notice) { margin-left: 20px; margin-right: 20px; }
 
 @media (max-width: 900px) {
   .atlas-body { grid-template-columns: 1fr; }

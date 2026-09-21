@@ -246,6 +246,11 @@ export default function App() {
     setOffset(next);
   }
 
+  function changeView(next: typeof view) {
+    setView(next);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+
   const activeScope = bootstrap.status === "ready" ? bootstrap.scopes.find((scope) => scope.id === filters.scope) : undefined;
   const hasFilters = Boolean(filters.scope || filters.domain || filters.region || filters.family || filters.query);
   const domains = bootstrap.status === "ready" ? [...new Set(bootstrap.scopes.map((scope) => scope.domain))].sort() : [];
@@ -262,17 +267,17 @@ export default function App() {
       <div className="atlas-body">
         <nav className="view-navigation atlas-rail" aria-label="Inventory views">
           <div className="rail-group"><p className="rail-label">Operate</p>
-            <button aria-current={view === "inventory" ? "page" : undefined} onClick={() => setView("inventory")}><span className="rail-marker" aria-hidden="true" />Inventory</button>
-            <button aria-current={view === "first-path" ? "page" : undefined} onClick={() => setView("first-path")}><span className="rail-marker" aria-hidden="true" />Reconciliation</button>
-            <button aria-current={view === "capacity" ? "page" : undefined} onClick={() => setView("capacity")}><span className="rail-marker" aria-hidden="true" />Capacity</button>
+            <button aria-current={view === "inventory" ? "page" : undefined} onClick={() => changeView("inventory")}><span className="rail-marker" aria-hidden="true" />Inventory</button>
+            <button aria-current={view === "first-path" ? "page" : undefined} onClick={() => changeView("first-path")}><span className="rail-marker" aria-hidden="true" />Reconciliation</button>
+            <button aria-current={view === "capacity" ? "page" : undefined} onClick={() => changeView("capacity")}><span className="rail-marker" aria-hidden="true" />Capacity</button>
           </div>
           <div className="rail-group"><p className="rail-label">Decide</p>
-            <button aria-current={view === "workflow" ? "page" : undefined} onClick={() => setView("workflow")}><span className="rail-marker" aria-hidden="true" />Requests and exceptions</button>
-            <button aria-current={view === "corrections" ? "page" : undefined} onClick={() => setView("corrections")}><span className="rail-marker" aria-hidden="true" />Corrections</button>
-            <button aria-current={view === "planning" ? "page" : undefined} onClick={() => setView("planning")}><span className="rail-marker" aria-hidden="true" />Prefix planning</button>
+            <button aria-current={view === "workflow" ? "page" : undefined} onClick={() => changeView("workflow")}><span className="rail-marker" aria-hidden="true" />Requests and exceptions</button>
+            <button aria-current={view === "corrections" ? "page" : undefined} onClick={() => changeView("corrections")}><span className="rail-marker" aria-hidden="true" />Corrections</button>
+            <button aria-current={view === "planning" ? "page" : undefined} onClick={() => changeView("planning")}><span className="rail-marker" aria-hidden="true" />Prefix planning</button>
           </div>
           <div className="rail-group"><p className="rail-label">Observe</p>
-            <button aria-current={view === "schedule" ? "page" : undefined} onClick={() => setView("schedule")}><span className="rail-marker" aria-hidden="true" />Synthetic acquisition</button>
+            <button aria-current={view === "schedule" ? "page" : undefined} onClick={() => changeView("schedule")}><span className="rail-marker" aria-hidden="true" />Synthetic acquisition</button>
           </div>
           <p className="rail-note">All records are synthetic and local. Saved evidence is separate from current intended state.</p>
         </nav>
