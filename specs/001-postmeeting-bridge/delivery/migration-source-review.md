@@ -37,3 +37,25 @@ their implementation or assembled behavior.
 No application tests, builds, imports, database, seed, migration, service, browser,
 VM or customer execution was performed. T025 runtime, portable/human gates and all
 three questionnaire ledgers remain unchanged. Tier B remains held.
+
+## T009 API review — corrections pending
+
+Luna task `01a0cb5e-f055-7751-b79c-a60c9662a0c5` published initial API candidate
+`5a0fcf82112e0c7ae3a161fa11f70921c16f4096` in draft
+[PR76](https://github.com/yugant99/IpManagement/pull/76), based on shared
+`36dbfb90f3178c07ed9c7d0a55b54370a563bf7f`. Only app.py and models.py changed.
+The lead's early uncommitted-diff finding about an unbound request in receipt
+projection was corrected before this candidate by passing the trusted principal.
+
+Independent Sol reviewed that exact published candidate against the frozen wire.
+Routing/order, strict mutation fields, current transaction authentication,
+selected-domain paging/detail/export, principal-scoped receipt lookup and mutation
+DTOs were coherent in source. One P2 correction remains: sign-off receipt shape and
+target validation must also reconcile its digest, signer, time and signed version
+with the authorized saved assessment. Valid-shaped corruption must fail with the
+generic integrity error rather than appear as a different historical sign-off.
+Current read-time staleness stays separate from the historical outcome. The original
+API author owns this two-file correction; T009 acceptance and T011 release remain held.
+
+T010 UI remains in implementation. No application execution, UI/build check or runtime
+acceptance occurred during either review.
