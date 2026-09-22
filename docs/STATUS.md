@@ -1,6 +1,6 @@
 # Current project status
 
-**Bridge first wave —2026-09-22:** source design `e8bc0ed08a8b3734d5278578828c8eb58b9f5d52` is adopted after one actual Fable design advisory and bounded source corrections. Terra T003 runs in Codex under the user's latest route approval; Grok4.6 T002 is committed and under Grok4.7 review through OpenCode Go. See [active transfer](handoffs/main-lead-4.0.md) and its dispatch manifest. No new application/runtime/recipient acceptance or ledger promotion follows.
+**Bridge migration source closure —2026-09-22:** T008 is source accepted at `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509` after GPT-6 Luna corrections and independent GPT-6 Sol closure of five findings; [review](../specs/001-postmeeting-bridge/delivery/migration-source-review.md), draft PR75. T009 API and T010 UI are the next released source assignments. Claude Code is updated to 2.1.280 and the single authorized Opus 5.5 lineage advisory completed. OpenCode remains paused. Runtime/T025, human/portable gates and all ledgers remain unchanged; no main merge.
 
 **Current authority — 2026-09-22:** Main Lead 4.0, task `01a0cade-506f-7442-97da-0cc09b4f9929`, host `local`, is the user-authorized persistent lead for the post-meeting bridge. This explicitly supersedes Main Lead 3.0 for new coordination, contracts, integration and acceptance. See [Main Lead 4.0 transfer](handoffs/main-lead-4.0.md). The earlier dated records below remain historical; their old ownership or no-new-phase wording does not override this grant.
 

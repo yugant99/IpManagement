@@ -2,7 +2,7 @@
 
 Input: locked spec, plan, data model, contracts and Q001–Q100 decisions.
 The original package was planning only. Checked tasks now refer to the dated source-only
-closures in delivery/foundation-source-review.md; no runtime acceptance is implied.
+closures in delivery/foundation-source-review.md and its linked T007 report; no runtime acceptance is implied.
 Implementation and validation each require later authority. No test code tasks added.
 Future independent observations are acceptance gates, never implied completed runs.
 
@@ -37,18 +37,20 @@ T001/T002 are documentary source checkpoints. T003 is source accepted at9c73fd8;
 
   Prerequisites: T003; owner: Terra in Codex; FR-005 FR-015. Completion: Default-deny trusted context, fail-closed invalid authority and stopped/reload revocation.
 
-- [ ] T005 Enforce all C-A routes/nested serializers before counts/export; project authorized saved runs without raw mutation; deny mixed raw/unmapped legacy data; scoped presets/audit/timer/docs/readiness, anonymous minimal liveness only. Global run/acquire/observation-callback mutations and receipts are coordinator-only; ordinary imports intended candidates only, callback disabled, mixed/observation/callback=true rejected before persistence. Ordinary refresh reads saved projections. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/inventory.py`, `backend/ipam_demo/reports.py`, `backend/ipam_demo/imports.py`, `backend/ipam_demo/source_catalog.py`, `backend/ipam_demo/scheduler.py`, `backend/ipam_demo/workflow.py`, `backend/ipam_demo/feed_adapter.py`, `backend/ipam_demo/inventory_commands.py`. Preserve Operator inventory_edit and independent Approver correction decisions without general direct-edit rights.
+- [x] T005 Enforce all C-A routes/nested serializers before counts/export; project authorized saved runs without raw mutation; deny mixed raw/unmapped legacy data; scoped presets/audit/timer/docs/readiness, anonymous minimal liveness only. Global run/acquire/observation-callback mutations and receipts are coordinator-only; ordinary imports intended candidates only, callback disabled, mixed/observation/callback=true rejected before persistence. Ordinary refresh reads saved projections. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/inventory.py`, `backend/ipam_demo/reports.py`, `backend/ipam_demo/imports.py`, `backend/ipam_demo/source_catalog.py`, `backend/ipam_demo/scheduler.py`, `backend/ipam_demo/workflow.py`, `backend/ipam_demo/feed_adapter.py`, `backend/ipam_demo/inventory_commands.py`. Preserve Operator inventory_edit and independent Approver correction decisions without general direct-edit rights.
 
   Prerequisites: T004; owner: Terra in Codex; FR-005 FR-009 FR-013 FR-015 FR-019. Completion: Every route has allow/deny/projection classification and no global data leak.
 
-- [ ] T006 [P] Wire memory-only token/domain through all clients and authenticated blob downloads; remove actor picker as identity; expose auth/stale/permission failures. Disable global run/acquisition/schedule/callback controls for ordinary domain sessions; saved-result refresh only. Files: `frontend/src/api.ts`, `frontend/src/firstPathApi.ts`, `frontend/src/workflowApi.ts`, `frontend/src/inventoryCommandsApi.ts`, `frontend/src/correctionApi.ts`, `frontend/src/scheduleApi.ts`, `frontend/src/App.tsx`, `frontend/src/FirstPath.tsx`, `frontend/src/Schedule.tsx`, `frontend/src/CapacityReports.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/InventoryEditor.tsx`, `frontend/src/Workflow.tsx`. Bind protected state/retries to authenticated principal/domain/config revision, reject late prior-context responses and require original-context readback for ambiguous operations before replacement.
+- [x] T006 [P] Wire memory-only token/domain through all clients and authenticated blob downloads; remove actor picker as identity; expose auth/stale/permission failures. Disable global run/acquisition/schedule/callback controls for ordinary domain sessions; saved-result refresh only. Files: `frontend/src/api.ts`, `frontend/src/firstPathApi.ts`, `frontend/src/workflowApi.ts`, `frontend/src/inventoryCommandsApi.ts`, `frontend/src/correctionApi.ts`, `frontend/src/scheduleApi.ts`, `frontend/src/App.tsx`, `frontend/src/FirstPath.tsx`, `frontend/src/Schedule.tsx`, `frontend/src/CapacityReports.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/InventoryEditor.tsx`, `frontend/src/Workflow.tsx`. Bind protected state/retries to authenticated principal/domain/config revision, reject late prior-context responses and require original-context readback for ambiguous operations before replacement.
 
   Prerequisites: T004; owner: DeepSeek UI under Terra; FR-005 FR-009 FR-015 FR-019. Completion: No token in URL/localStorage/logs; browser uses trusted context everywhere.
 
-- [ ] T007 Review all routes, clients, legacy data and errors against C-A before feature integration; record allowed/denied/projected/quarantined cases. Files: `specs/001-postmeeting-bridge/delivery/access-review.md`.
+- [x] T007 Review all routes, clients, legacy data and errors against C-A before feature integration; record allowed/denied/projected/quarantined cases. Files: `specs/001-postmeeting-bridge/delivery/access-review.md`.
 
   Prerequisites: T005 T006; owner: Luna independent verifier; FR-005 FR-015 FR-019. Completion: No unresolved source/design access findings; runtime still requires T025.
 
+
+T005/T006/T007 are source accepted at `aee0ade8bbeb6405aab4a6cf0c35079d76e6318e` after independent GPT-6 Sol review and owner corrections. Runtime remains unverified; T025 is open. Latest routes are in delivery/model-routes.md.
 
 ## Phase 3 — US1 migration assessment (P1)
 

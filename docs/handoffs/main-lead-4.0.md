@@ -48,3 +48,42 @@ fallback for limits/performance. Terra T003 is running on that exact base. Grok4
 completed through OpenCode Go at91e81506791214c186c10b0ab6ab0ed641655289; Grok4.7
 is reviewing it. No application tests/runtime or human result is established yet. See
 the current dispatch manifest for exact task sessions/leases and pending dependencies.
+
+
+## Current access integration checkpoint
+
+T002/T003/T004/T019 have source-only acceptance at the exact SHAs retained in the
+[foundation review](../../specs/001-postmeeting-bridge/delivery/foundation-source-review.md).
+The earlier first-execution state above is historical. T005 API and T006 UI are now
+separate visible Codex workers with disjoint leases. User-directed actual routes are
+GPT-6 Luna for the prior Terra role and GPT-6 Sol for review/escalation, with Astra
+remaining lead. Go limits are per model; the earlier shared-limit inference is withdrawn.
+Subsequent bounded preparation attempts also returned quota429 for OpenCode Luna and
+DeepSeek; no work was returned. Exact routes/outcomes are in model-routes.md. Other
+model allowances and the affected reset windows remain unmeasured.
+
+The [dispatch manifest](../../specs/001-postmeeting-bridge/delivery/dispatch-manifest.md)
+contains current branches/worktrees and wire-contract SHA. No runtime or portable/human
+acceptance, ledger promotion or merge to main is implied.
+
+
+## Codex-only continuation
+
+The user paused all OpenCode work and directed GPT-6 Luna/Sol development in Codex.
+The approved Muse privacy setting was never changed; no Muse review exists. No model
+retry or automatic reset check is running. The latest dispatch manifest and first-wave
+registry supersede prior route/state paragraphs above.
+
+T005/T006 now have draft PR73/PR72 and an unaccepted assembled source candidate
+`ea0f4d7d4c6cca81ffc41a610ebebf68accc5bd3`. Independent GPT-6 Sol review has returned
+concrete source findings to the original authors. Main, runtime evidence, human gates
+and all three questionnaire ledgers remain unchanged.
+
+Current closure: T005/T006/T007 source accepted at `aee0ade8bbeb6405aab4a6cf0c35079d76e6318e` after independent correction review; [report](https://github.com/yugant99/IpManagement/blob/833c2c8676b205c97476ab71f4e3b2cff0a2c608/specs/001-postmeeting-bridge/delivery/access-review.md). T008 is dispatched to GPT-6 Luna with one-file ownership and setup pending. Runtime/T025 and human gates remain open.
+
+Latest closure: T008 source accepted at `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509`,
+draft PR75, after five source findings and independent Sol closure. See the
+[migration review](../../specs/001-postmeeting-bridge/delivery/migration-source-review.md).
+T009/T010 follow on disjoint API/UI leases. The one authorized Opus 5.5 design
+advisory completed through updated Claude Code 2.1.280; no further call is queued.
+OpenCode remains paused. All runtime, human, portable and ledger limits are unchanged.
