@@ -19,6 +19,7 @@ VIEWER_INHERITING_ROLES = frozenset({"viewer", "requester", "operator", "approve
 EVIDENCE_OPERATIONS = frozenset({"read", "acquire", "run", "reconcile"})
 CONNECTOR_MODES = frozenset({"simulated", "disabled"})
 _DIGEST = re.compile(r"^[0-9a-f]{64}$")
+_BEARER_TOKEN = re.compile(r"^[0-9a-f]{64}$")
 
 
 @dataclass(frozen=True)
@@ -118,7 +119,7 @@ def _principal(value) -> Principal:
     if not _DIGEST.fullmatch(digest):
         raise ValueError("token digest")
     bits = item["token_bits"]
-    if type(bits) is not int or bits < 256:
+    if type(bits) is not int or bits != 256:
         raise ValueError("token bits")
     if type(item["enabled"]) is not bool:
         raise ValueError("enabled")
@@ -218,17 +219,18 @@ def load_reviewed_configuration(path: str | Path | None = None, *, now: datetime
 
 
 def _bearer(authorization: str | None) -> str:
+    """Enforce the offline-issued v1 shape; offline issuance, not shape, establishes entropy."""
     if not isinstance(authorization, str) or not authorization.startswith("Bearer "):
         raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
     token = authorization[7:]
-    if not token or token != token.strip() or any(character.isspace() for character in token):
+    if not _BEARER_TOKEN.fullmatch(token):
         raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
     return token
 
 
 def authenticate_bearer(authorization: str | None, configuration: ReviewedConfiguration, *, now: datetime | None = None) -> AccessContext:
     """Return only trusted identity claims. Call require_selected_domain for ordinary operations."""
-    token_digest = hashlib.sha256(_bearer(authorization).encode("utf-8")).hexdigest()
+    token_digest = hashlib.sha256(_bearer(authorization).encode("ascii")).hexdigest()
     principal = next((item for item in configuration.principals.values() if hmac.compare_digest(item.token_digest, token_digest)), None)
     current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     if principal is None or not principal.enabled or principal.expires_at <= current:
