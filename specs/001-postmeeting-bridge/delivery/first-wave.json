@@ -1,15 +1,15 @@
 {
-  "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+  "base_sha": "e8bc0ed08a8b3734d5278578828c8eb58b9f5d52",
   "packets": [
     {
       "task": "T003",
-      "status": "prepared_not_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "stage": "Stage 1 (post-meeting bridge)",
-      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "base_sha": "e8bc0ed08a8b3734d5278578828c8eb58b9f5d52",
       "branch": "codex/bridge-t003-schema",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-terra/Ip_inventory",
-      "owner": "Terra in OpenCode",
-      "route": "openai/gpt-5.6-terra",
+      "owner": "Terra in Codex",
+      "route": "gpt-5.6-terra",
       "prerequisites": [
         "T001"
       ],
@@ -19,19 +19,23 @@
         "backend/ipam_demo/store.py",
         "backend/ipam_demo/seed.py"
       ],
-      "assignment": "Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema.",
+      "assignment": "Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema. Retain ticket route assignment versions and pinned attempt scenario/route per FABLE-DESIGN amendments at this exact base.",
       "contracts": "data-model.md C-M C-L C-T",
       "acceptance": "Explicit recognized upgrade and fresh initialization; no destructive reseed or history loss.",
       "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
       "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
-      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "nonclaims": "Source accepted after corrections and independent review; no migration/seed/runtime tests or assembled Tier A acceptance.",
       "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
       "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
-      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements.",
+      "reasoning": "high",
+      "worker": "/root/terra_schema",
+      "result_sha": "9c73fd8e76c092b4d8297ec4475160b71574de7e",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/69"
     },
     {
       "task": "T002",
-      "status": "prepared_not_dispatched",
+      "status": "source_accepted",
       "stage": "Stage 1 (post-meeting bridge)",
       "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
       "branch": "codex/bridge-t002-sources",
@@ -49,10 +53,14 @@
       "acceptance": "Every gap has a requirement, owner role and evidence gate.",
       "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
       "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
-      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "nonclaims": "Documentary source accepted; no runtime/vendor/human/ledger promotion.",
       "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
       "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
-      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements.",
+      "result_sha": "ab005d8bf3b6c57e0a071707796d18514c278674",
+      "session": "ses_f350eb239ffeK1SvUzC4X8fQlY",
+      "correction_owner": "Codex gpt-5.6-sol replacing quota-blocked Grok4.6",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/68"
     },
     {
       "task": "T007",
@@ -82,9 +90,9 @@
     },
     {
       "task": "T020",
-      "status": "prepared_not_dispatched",
+      "status": "source_prerequisite_ready_human_not_started",
       "stage": "Stage 1 (post-meeting bridge)",
-      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "base_sha": "ab005d8bf3b6c57e0a071707796d18514c278674",
       "branch": "codex/bridge-t020-matrix",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-spencer/Ip_inventory",
       "owner": "Spencer under Luna coordination",
@@ -104,6 +112,47 @@
       "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
       "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
       "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+    }
+  ],
+  "route_decision": "Latest explicit user instruction: GPT-6 Luna replaces Terra implementation; GPT-6 Sol replaces Grok4.7 reviewer and handles difficult escalation; Astra remains lead. Go quota429 stops further Go calls pending reset. Prior completed runs retain actual model identities.",
+  "next_wave": [
+    {
+      "task": "T004",
+      "base_sha": "9c73fd8e76c092b4d8297ec4475160b71574de7e",
+      "branch": "codex/bridge-t004-access",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-access/Ip_inventory",
+      "route": "Codex gpt-5.6-terra high",
+      "status": "source_accepted_runtime_unverified",
+      "prerequisites": [
+        "T003 source acceptance"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/access.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "acceptance": "Default-deny trusted context, fail-closed invalid authority and stopped/reload revocation source contract; exact interface for T005/T006. No routes/runtime acceptance yet.",
+      "prohibited": "Unleased app/schema/UI/packaging/status files, real credentials, tests/runtime in this source slice, external spending/deployment, Fable/autodelegation.",
+      "result_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
+      "review_route": "Codex gpt-6-sol high",
+      "correction_route": "Codex gpt-6-luna high"
+    },
+    {
+      "task": "T019",
+      "base_sha": "ab005d8bf3b6c57e0a071707796d18514c278674",
+      "branch": "codex/bridge-t019-qualification",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-qualification/Ip_inventory",
+      "route": "Codex gpt-5.6-sol high",
+      "status": "source_accepted",
+      "prerequisites": [
+        "T002 source acceptance"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md"
+      ],
+      "acceptance": "Each exclusion has owner/evidence boundary/future gate; numeric cohorts remain assumptions. Source-only document.",
+      "prohibited": "Every other path, external research/credentials, tests/runtime, human or commercial claims, ledger changes.",
+      "result_sha": "4034c765fce8a68f8cd73195c73f9a3bdd185d24",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/70"
     }
   ]
 }

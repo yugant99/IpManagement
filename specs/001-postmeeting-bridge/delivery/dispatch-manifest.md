@@ -1,29 +1,31 @@
 # Locked first dispatch manifest — Main Lead 4.0
 
-**Exact amended specification / worker base: `6b66f943b7c7783285bfd1f70859ede42380bf60`.**
+**Current source-adopted specification: `e8bc0ed08a8b3734d5278578828c8eb58b9f5d52`.**
+Initial adopted base: `6b66f943b7c7783285bfd1f70859ede42380bf60`.
 Supplied original specification: `9df8393171af632b126a9801fe4cca73b1c575d1`.
-Remote main at lock: `04eba98cb8673406d1e5d38c5318fb963cc77ff7`, no drift.
-Lead branch `codex/main-lead-4-bridge`. The amended base is source-adopted after independent
-review; it is an explicit unmerged dependency, not main or a runtime-accepted candidate.
-All prepared worktrees below are created at this exact base. No worker has been invoked.
+Main at lock: `04eba98cb8673406d1e5d38c5318fb963cc77ff7`.
+Lead branch `codex/main-lead-4-bridge`; draft PR #67. These are explicit unmerged source
+checkpoints, not main or runtime-accepted candidates. Exact bases differ by lane below.
 
 ## Dispatch decision
 
-**Manifest locked; implementation wave HELD for Terra route resolution.** OpenCode active
-service has no Terra/OpenAI connection despite the user's expected availability. Fable's
-Claude Max route and Codex Sol route are separately identified. No silent substitution.
-After the route is resolved, lead records the route decision, dispatches T003 and T002,
-and releases later work only on the exact accepted prerequisite SHA. Do not rebuild these
-worktrees on another base or switch another worker's checkout. FABLE-DESIGN may review
-this locked specification/manifest now; final T027 still waits for T024/T025.
+**First wave released.** The user explicitly accepts Terra in native Codex after direct
+OpenCode CLI and official Go catalog showed Luna but no Terra. Astra remains the lead.
+A fallback to an equally or more capable OpenCode model is permitted for actual limits or
+subpar performance; record the reason, evaluation and exact route before replacement.
+No extra-spend permission follows. A briefly started OpenCode ChatGPT authorization was
+canceled without completion; the existing Go connection already served T002.
+FABLE-DESIGN completed once and its findings were resolved by bounded source amendments.
+Future substantial Fable review is a user-run prompt; advice is not an implementation
+or acceptance authority. Final T027 retains its exact-candidate evidence boundary.
 
-| Owner | Task / prerequisites | Branch | Worktree | Exclusive file lease / status |
+| Owner | Task / exact base | Branch | Worktree | Exclusive file lease / status |
 |---|---|---|---|---|
-| Terra / OpenCode intended openai/gpt-5.6-terra | T003; adopted T001, route must resolve | codex/bridge-t003-schema | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-terra/Ip_inventory | backend/ipam_demo/schema.sql; schema_v6.sql; store.py; seed.py. PREPARED, route held. |
-| Grok 4.7 / opencode-go/grok-4.7#high | Integration sublead; supervise T002 and review contract-sensitive changes | codex/bridge-contracts | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-grok/Ip_inventory | Source review only initially; later delivery/offline-api.md at T021. PREPARED. |
-| Grok 4.6 / opencode-go/grok-4.6#medium under Grok 4.7 | T002 after T001; T019 only after accepted T002 | codex/bridge-t002-sources | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-scout/Ip_inventory | specs/001-postmeeting-bridge/delivery/source-authority.md only for first assignment. PREPARED. |
-| Luna / opencode-go/gpt-5.6-luna#medium | T007 after exact T005 + T006 integration | codex/bridge-t007-access-review | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-luna/Ip_inventory | specs/001-postmeeting-bridge/delivery/access-review.md only. PREPARED, dependency held; no QA invocation yet. |
-| Spencer / human, coordinated by Luna | T020 after T002 | codex/bridge-t020-matrix | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-spencer/Ip_inventory | specs/001-postmeeting-bridge/delivery/integration-matrix.md only. PREPARED, no human acknowledgement inferred. |
+| Terra / Codex gpt-5.6-terra high | T003; e8bc0ed08a8b3734d5278578828c8eb58b9f5d52 | codex/bridge-t003-schema | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-terra/Ip_inventory | backend/ipam_demo/schema.sql; schema_v6.sql; store.py; seed.py. RUNNING source implementation as /root/terra_schema. |
+| Grok4.7 / opencode-go/grok-4.7#high | Review exact T002 result91e81506791214c186c10b0ab6ab0ed641655289 against6b66f94 | codex/bridge-contracts | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-grok/Ip_inventory | Read-only integration review; actual session ses_f3509d265ffeggMSkbiL7emfDV. No edit lease in this review. |
+| Grok4.6 / opencode-go/grok-4.6#medium | T002; base6b66f943b7c7783285bfd1f70859ede42380bf60 | codex/bridge-t002-sources | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-scout/Ip_inventory | specs/001-postmeeting-bridge/delivery/source-authority.md only. COMMITTED91e81506791214c186c10b0ab6ab0ed641655289; independent review pending. |
+| Luna / opencode-go/gpt-5.6-luna#medium | T007; prepared6b66f94, must receive exact T005+T006 before release | codex/bridge-t007-access-review | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-luna/Ip_inventory | specs/001-postmeeting-bridge/delivery/access-review.md only. PREPARED, dependency held; not invoked. |
+| Spencer / human under Luna coordination | T020; prepared6b66f94, accepted T002 required | codex/bridge-t020-matrix | /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-spencer/Ip_inventory | specs/001-postmeeting-bridge/delivery/integration-matrix.md only. PREPARED; no human acknowledgement inferred. |
 
 When later dependencies arrive, fast-forward/merge them only in the assigned lane with
 lead coordination; record the newly exact base in its dispatch. T004/T005 remain Terra's
@@ -84,3 +86,20 @@ A passed focused check is not full Tier A acceptance. Simulation is not live Ser
 or provisioning. Assessment never promotes inventory. Local allocation is separate from
 leased/routed/traffic state. A package is not recipient evidence; an agent is not a human
 acknowledgement. The accepted 39/18/10/44 ledger remains unchanged.
+
+## Foundation source closure — current update
+
+T002 source accepted at **ab005d8bf3b6c57e0a071707796d18514c278674**, after Grok4.7
+findings and Sol corrections when Grok4.6 hit its Go quota. T003 source accepted at
+**9c73fd8e76c092b4d8297ec4475160b71574de7e**, after review corrections. The first-wave
+table above retains dispatch history; these source results supersede its RUNNING/pending
+labels. PR68 and PR69 preserve their exact feature histories. No runtime acceptance.
+
+| Current owner | Task/base | Branch/worktree | Lease |
+|---|---|---|---|
+| Terra / native Codex | T004 /9c73fd8e76c092b4d8297ec4475160b71574de7e | codex/bridge-t004-access; /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-access/Ip_inventory | backend/ipam_demo/access.py; backend/ipam_demo/models.py only |
+| Sol / native Codex, replacing blocked scout | T019 /ab005d8bf3b6c57e0a071707796d18514c278674 | codex/bridge-t019-qualification; /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-qualification/Ip_inventory | specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md only |
+| Spencer / human, source ready | T020 /ab005d8bf3b6c57e0a071707796d18514c278674 | codex/bridge-t020-matrix; prepared worktree fast-forwarded to this exact base | specs/001-postmeeting-bridge/delivery/integration-matrix.md only; no human start/ack inferred |
+
+[Foundation review](foundation-source-review.md) retains findings, dispositions and exact
+models. [first-wave.json](first-wave.json) is updated with result SHAs and next-wave packets.

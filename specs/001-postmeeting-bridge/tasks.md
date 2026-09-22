@@ -1,7 +1,8 @@
 # Tasks: Post-meeting IPAM / Pool Watch bridge
 
 Input: locked spec, plan, data model, contracts and Q001–Q100 decisions.
-None of these implementation tasks has been performed. This package is planning only.
+The original package was planning only. Checked tasks now refer to the dated source-only
+closures in delivery/foundation-source-review.md; no runtime acceptance is implied.
 Implementation and validation each require later authority. No test code tasks added.
 Future independent observations are acceptance gates, never implied completed runs.
 
@@ -15,22 +16,24 @@ migration never authorizes a local change. US4 prepares alongside core implement
 
 ## Phase 1 — Setup and authority
 
-- [ ] T001 Adopt contracts; record actual implementation/validation authority, model/staff availability, base SHA, schema reservation and file ownership. Files: `specs/001-postmeeting-bridge/delivery/authorization-and-ownership.md`.
+- [x] T001 Adopt contracts; record actual implementation/validation authority, model/staff availability, base SHA, schema reservation and file ownership. Files: `specs/001-postmeeting-bridge/delivery/authorization-and-ownership.md`.
 
   Prerequisites: authority gate; owner: Astra / Main Lead 4.0; FR-001 FR-005 FR-015 FR-021. Completion: Explicit lead decision before dispatch; no inferred execution permission.
 
-- [ ] T002 [P] Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint. Files: `specs/001-postmeeting-bridge/delivery/source-authority.md`.
+- [x] T002 [P] Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint. Files: `specs/001-postmeeting-bridge/delivery/source-authority.md`.
 
   Prerequisites: T001; owner: Grok 4.6 under Grok 4.7; FR-009 FR-010 FR-012 FR-014 FR-018 FR-020. Completion: Every gap has a requirement, owner role and evidence gate.
 
 
+T001/T002 are documentary source checkpoints. T003 is source accepted at9c73fd8; its checked task marker records the schema source handoff only. SQL/migration/runtime observations and full Tier A acceptance remain T025 gates.
+
 ## Phase 2 — Shared foundation
 
-- [ ] T003 Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema. Files: `backend/ipam_demo/schema.sql`, `backend/ipam_demo/schema_v6.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/seed.py`. Retain versioned ticket route assignments; attempts pin assignment version and chosen synthetic scenario. Scoped presets quarantine legacy ownership.
+- [x] T003 Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema. Files: `backend/ipam_demo/schema.sql`, `backend/ipam_demo/schema_v6.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/seed.py`. Retain versioned ticket route assignments; attempts pin assignment version and chosen synthetic scenario. Scoped presets quarantine legacy ownership.
 
   Prerequisites: T001; owner: Terra in Codex; FR-002 FR-003 FR-004 FR-005 FR-016. Completion: Explicit recognized upgrade and fresh initialization; no destructive reseed or history loss.
 
-- [ ] T004 Implement bearer-digest principal and reviewed config: token at least 256 random bits, enabled/UTC expiry/roles/domains/revision; one domain, no actor fallback/admin bypass, no secret logging. Define the fixed internal evidence coordinator with explicit complete synthetic feed scope/source grants, global evidence operations only and no user delegation. Files: `backend/ipam_demo/access.py`, `backend/ipam_demo/models.py`.
+- [x] T004 Implement bearer-digest principal and reviewed config: token at least 256 random bits, enabled/UTC expiry/roles/domains/revision; one domain, no actor fallback/admin bypass, no secret logging. Define the fixed internal evidence coordinator with explicit complete synthetic feed scope/source grants, global evidence operations only and no user delegation. Files: `backend/ipam_demo/access.py`, `backend/ipam_demo/models.py`.
 
   Prerequisites: T003; owner: Terra in Codex; FR-005 FR-015. Completion: Default-deny trusted context, fail-closed invalid authority and stopped/reload revocation.
 
@@ -110,7 +113,7 @@ Goal/gate: exact current/saved metric identity and due conditions; arithmetic/ac
 
 Goal/gate: same-candidate package with actual target/recovery observations and separate human acknowledgement. Preparation runs from Day1 in parallel despite grouped display order.
 
-- [ ] T019 [P] [US4] Write evidence-based maturity/authority gaps and future HA/scale/encryption/virtual-network/EMS/DNS/IaC/fixed-workflow dispositions; human business-owner register, licensing continuity documentary only. Files: `specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md`.
+- [x] T019 [P] [US4] Write evidence-based maturity/authority gaps and future HA/scale/encryption/virtual-network/EMS/DNS/IaC/fixed-workflow dispositions; human business-owner register, licensing continuity documentary only. Files: `specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md`.
 
   Prerequisites: T002; owner: Grok 4.6 under Grok 4.7; FR-010 FR-012 FR-014 FR-016 FR-017 FR-018 FR-020 FR-022. Completion: Each exclusion has owner/evidence boundary/future gate; numeric cohorts are assumptions, not source requirement replacements.
 
