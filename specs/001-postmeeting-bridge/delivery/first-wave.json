@@ -291,5 +291,11 @@
     "authorization": "Latest user explicitly requested one bounded Opus5.5 task through existing Claude Code; Luna/Sol assignments remain intact.",
     "evidence_root": "/tmp/ipam-opus-t008-review",
     "report": "specs/001-postmeeting-bridge/delivery/opus-assessment-advisory.md"
+  },
+  "claude_current_policy": {
+    "status": "stopped_by_user_no_further_assignments",
+    "last_execution": "completed_before_stop_request",
+    "queued_calls": 0,
+    "instruction": "No Claude, Fable or Opus invocation without a new explicit user instruction; earlier optional advisory routing is superseded."
   }
 }
