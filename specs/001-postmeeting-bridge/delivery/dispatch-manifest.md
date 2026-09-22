@@ -184,3 +184,31 @@ T008 setup completed: task `01a0cb4a-4b2c-7451-b2dc-8ae0508a8448`, worktree
 `codex/bridge-t008-assessment`. Source work started. Its authority-revision/digest
 encoding question is under one user-authorized Opus5.5 read-only advisory; the worker
 continues independent source work and waits for the lead's encoding decision.
+
+## Migration API/UI wave — released
+
+T008 source accepted at `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509`, draft PR75.
+The [migration source review](migration-source-review.md) records all five findings
+and independent Sol closure. The one Opus 5.5 design advisory is complete.
+The appended T009/T010 interface in contracts/migration.md freezes request/response,
+pagination/baseline, identity projection, export and exact operation readback.
+Independent Sol reviewed this interface before dispatch; no runtime occurred.
+
+Prepare shared `codex/bridge-migration-integration` from exact T008 plus this lead
+publication. Record the actual resulting SHA and worker IDs after setup. Both
+workers use that exact shared source base; no main or current application deployment
+is advanced by this assembly.
+
+| Worker | Task / requirements | Requested branch | Exclusive edit lease |
+|---|---|---|---|
+| GPT-6 Luna high | T009 / FR-002, FR-005, FR-009 | codex/bridge-t009-migration-api | backend/ipam_demo/app.py; backend/ipam_demo/models.py |
+| GPT-6 Luna high | T010 / FR-002, FR-019 | codex/bridge-t010-migration-ui | frontend/src/MigrationCompare.tsx; frontend/src/FirstPath.tsx; frontend/src/firstPathApi.ts; frontend/src/App.tsx |
+
+Prior authors retain fixes only by renewed nonoverlapping lease. The new workers may
+read existing patterns but not modify access.py, migration_compare.py, workflow,
+schema, fixtures, CSS, packaging or other documentation. Escalate a required shared
+change to the lead. Use existing API clients/styles; no dependencies or nested model
+calls. Source-only implementation and source review, no tests/build/import/service/
+database/browser execution. Coherent commits and push at handoff; draft PRs target
+the shared migration integration base. Independent Sol review follows the exact
+assembly. T011 waits for T009 source closure; T025 and human gates remain distinct.

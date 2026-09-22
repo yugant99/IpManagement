@@ -96,3 +96,68 @@ it must distinguish that outcome from current assessment/sign-off currency. Curr
 readback reports subsequent staleness even when the original receipt records success.
 Changed payload under a reused key is a conflict. No assessment operation promotes
 candidate inventory or creates a cutover path.
+
+## Frozen T009/T010 HTTP interface — 2026-09-22
+
+This lead decision follows independent Sol source review. It concretizes the proposed
+interfaces above against accepted T008 `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509`.
+Reuse C-A authentication, configuration pins, AppError and immediate write transaction.
+No application execution is implied.
+
+- `POST /api/migration-assessments` accepts only source_batch_id,
+  expected_baseline_version, idempotency_key, reason, and optional supersedes_id plus
+  supersedes_reason. Reject unknown fields and invalid types. Actor/domain and
+  mapping/authority/policy revisions are derived from trusted current server context.
+- `GET /api/migration-assessments?limit=50&offset=0` returns the existing page fields
+  items/total/limit/offset plus current positive baseline_version. Filter by selected
+  domain before count and paging. Do not use the fixed workflow pool to obtain this
+  version. The shared version pin conveys no foreign inventory counts or identifiers.
+- `GET /api/migration-assessments/{id}` returns the T008 summary plus rows and
+  active_only. Preserve receipt/comparison count layers, immutable digest, governing
+  lineage, saved sign-off and independently computed current/staleness_reasons.
+- `POST /api/migration-assessments/{id}/signoff` accepts only expected_version,
+  expected_digest, active_only_acknowledged, idempotency_key and reason. Positive
+  versions are strict integers, acknowledgement a strict boolean, digest the exact
+  tagged SHA-256 shape. All business decisions remain in T008.
+- Both POST responses have `{assessment: summary, replayed: boolean,
+  original_signoff: object|null}`. Create uses null. Initial and replayed sign-off
+  expose the same allowlisted receipt fields: assessment_id, assessment_digest,
+  signer_id, signed_at, signed_version. Obtain them from the operation receipt in
+  the same transaction. A historical success never overrides current staleness.
+- `GET /api/migration-assessments/{id}/export` downloads the same sanitized detail
+  as JSON. Authentication and ownership checks precede content/filename creation;
+  use a fixed safe filename. No unauthenticated link or token in the URL.
+
+Summary is the T008 projection. At the HTTP boundary, expose created_by/signer_id
+only when equal to the current principal, otherwise null. Add
+created_by_current_principal and signed_by_current_principal booleans derived before
+redaction. Apply this projection to every list/detail/mutation/export/readback
+response, including receipt outcomes. Stored identities and the immutable digest
+remain unchanged; server-side independence checks use stored identities.
+
+### Exact operation readback
+
+Add only `GET /api/migration-assessments/operation-receipt?action=...&idempotency_key=...`
+before the dynamic `/{id}` route. Allow actions assessment.create and
+assessment.signoff only; key is a nonempty bounded string of at most 200 characters.
+Require current Viewer access and selected domain. Query the existing receipt by
+current authenticated principal, selected domain, exact action and key. Never accept
+principal/domain from query parameters. Validate target_kind=migration_assessment
+and target_id=result.assessment_id, then reauthorize/load the target through T008.
+Return only `{found: boolean, action, assessment: detail|null,
+original_outcome: object|null}`. The create outcome fields are assessment_id and
+assessment_digest; sign-off uses the five allowlisted fields above. No generic
+receipt JSON, request digest, foreign totals or other operation data is exposed.
+No receipt gives found=false with both nullable fields null; it does not prove that
+an earlier request cannot still commit. Corrupt receipts fail visibly and generically.
+
+UI mutations keep the exact payload/key in memory while retrying. Before submission,
+retain only a minimal sessionStorage recovery pointer: original principal/domain,
+configuration revision/digest, action/key and optional target ID. No token, reason,
+candidate JSON or protected response is persisted. Payload and protected views clear
+on context change. After reauthentication of the same principal/domain under current
+configuration, readback may resolve the pointer even when the revision changed.
+Another principal/domain cannot resolve or resend it. Preserve an earlier ambiguous
+outcome through a later definite retry refusal. A missing receipt or failed readback
+keeps replacement blocked; exact in-memory retry or a confirmed authorized outcome
+can resolve it. Storage failures block mutation rather than bypassing recovery.

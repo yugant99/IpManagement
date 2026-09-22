@@ -179,3 +179,11 @@ T007 source closure releases T008 only. No application tests, builds, server, br
 database/config/token operations or runtime validation were performed. T025 remains
 the independent runtime gate; portable/human gates, Tier B and all ledgers are unchanged.
 The latest user instruction pauses all OpenCode attempts and settings work.
+
+## T008 source closure
+
+Main Lead accepts `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509` after GPT-6 Luna
+corrections and independent GPT-6 Sol closure of all five reported findings.
+[Migration review](migration-source-review.md) retains exact history, findings and
+nonclaims. Draft PR75 remains unmerged. T009/T010 may proceed with a lead-frozen wire
+contract; runtime validation and all external gates remain open.

@@ -80,3 +80,10 @@ concrete source findings to the original authors. Main, runtime evidence, human 
 and all three questionnaire ledgers remain unchanged.
 
 Current closure: T005/T006/T007 source accepted at `aee0ade8bbeb6405aab4a6cf0c35079d76e6318e` after independent correction review; [report](https://github.com/yugant99/IpManagement/blob/833c2c8676b205c97476ab71f4e3b2cff0a2c608/specs/001-postmeeting-bridge/delivery/access-review.md). T008 is dispatched to GPT-6 Luna with one-file ownership and setup pending. Runtime/T025 and human gates remain open.
+
+Latest closure: T008 source accepted at `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509`,
+draft PR75, after five source findings and independent Sol closure. See the
+[migration review](../../specs/001-postmeeting-bridge/delivery/migration-source-review.md).
+T009/T010 follow on disjoint API/UI leases. The one authorized Opus 5.5 design
+advisory completed through updated Claude Code 2.1.280; no further call is queued.
+OpenCode remains paused. All runtime, human, portable and ledger limits are unchanged.
