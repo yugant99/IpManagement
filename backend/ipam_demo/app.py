@@ -6,7 +6,7 @@ import logging
 import os
 import sqlite3
 from threading import Lock
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
 from fastapi import Depends, FastAPI, Query, Request
@@ -16,11 +16,14 @@ from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import __version__, feed_adapter, inventory, inventory_commands, reconciliation, reports, source_catalog, workflow
+from . import __version__, feed_adapter, inventory, inventory_commands, migration_compare, reconciliation, reports, source_catalog, workflow
 from . import access
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
-from .models import Allocation, Page, Pool, Prefix, PrefixDetail, Scope
+from .models import (Allocation, MigrationAssessmentCreateRequest, MigrationAssessmentDetail,
+                     MigrationAssessmentMutation, MigrationAssessmentPage,
+                     MigrationAssessmentSignoffRequest, MigrationOperationReadback,
+                     Page, Pool, Prefix, PrefixDetail, Scope)
 from .scheduler import SyntheticScheduler
 from .store import (SCHEMA_VERSION, connect, data_directory,
                     exclusive_data_access, initialize_schema, require_initialized,
@@ -1093,6 +1096,147 @@ def create_app() -> FastAPI:
             if finding["id"] == str(finding_id):
                 return finding
         raise AppError("NOT_FOUND", "Finding does not belong to this saved run.", 404)
+
+    def project_migration_assessment(value, principal_id):
+        result = dict(value)
+        creator = result.get("created_by")
+        signer = result.get("signer_id")
+        result["created_by_current_principal"] = creator == principal_id
+        result["signed_by_current_principal"] = signer == principal_id
+        result["created_by"] = creator if creator == principal_id else None
+        result["signer_id"] = signer if signer == principal_id else None
+        return result
+
+    def migration_operation_receipt(connection, request, action, idempotency_key):
+        domain = ordinary_domain(request)
+        return connection.execute(
+            "SELECT target_kind,target_id,result_json FROM tier_a_operation_receipts "
+            "WHERE principal_id=? AND domain=? AND action=? AND idempotency_key=?",
+            (request.state.access_context.principal_id, domain, action, idempotency_key)).fetchone()
+
+    def migration_receipt_outcome(row, action, principal_id, expected_assessment_id=None):
+        try:
+            saved = json.loads(row["result_json"])
+        except (TypeError, ValueError, json.JSONDecodeError) as exc:
+            raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The saved migration operation receipt is invalid.", 409) from exc
+        required = ("assessment_id", "assessment_digest") if action == "assessment.create" else (
+            "assessment_id", "assessment_digest", "signer_id", "signed_at", "signed_version")
+        if (row["target_kind"] != "migration_assessment" or not isinstance(saved, dict)
+                or any(key not in saved for key in required)
+                or not isinstance(saved.get("assessment_id"), str)
+                or saved["assessment_id"] != row["target_id"]
+                or expected_assessment_id is not None and saved["assessment_id"] != expected_assessment_id):
+            raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The saved migration operation receipt is invalid.", 409)
+        outcome = {key: saved[key] for key in required}
+        digest = outcome.get("assessment_digest")
+        if (not isinstance(digest, str) or len(digest) != 71 or not digest.startswith("sha256:")
+                or any(char not in "0123456789abcdef" for char in digest[7:])):
+            raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The saved migration operation receipt is invalid.", 409)
+        if action == "assessment.signoff":
+            signer = outcome["signer_id"]
+            if (not isinstance(signer, str) or not isinstance(outcome["signed_at"], str)
+                    or type(outcome["signed_version"]) is not int or outcome["signed_version"] < 1):
+                raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The saved migration operation receipt is invalid.", 409)
+            outcome["signed_by_current_principal"] = signer == principal_id
+            outcome["signer_id"] = signer if signer == principal_id else None
+        return outcome
+
+    def required_migration_receipt(connection, request, action, idempotency_key, assessment_id):
+        row = migration_operation_receipt(connection, request, action, idempotency_key)
+        if row is None:
+            raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The committed migration operation has no readable receipt.", 409)
+        return migration_receipt_outcome(row, action, request.state.access_context.principal_id, assessment_id)
+
+    @app.post("/api/migration-assessments", response_model=MigrationAssessmentMutation, status_code=201)
+    def create_migration_assessment(request: Request, payload: MigrationAssessmentCreateRequest,
+                                    response: Response):
+        def create(connection):
+            context = request.state.access_context
+            configuration = request.state.access_configuration
+            value = migration_compare.create_assessment(
+                connection, **payload.model_dump(), context=context, configuration=configuration)
+            assessment_id = value["id"]
+            outcome = required_migration_receipt(
+                connection, request, "assessment.create", payload.idempotency_key, assessment_id)
+            assessment = {key: item for key, item in value.items() if key != "replayed"}
+            return {"assessment": project_migration_assessment(assessment, context.principal_id),
+                    "replayed": bool(value.get("replayed")), "original_signoff": None}
+        result = write_operation(request, create)
+        response.status_code = 200 if result["replayed"] else 201
+        return result
+
+    @app.get("/api/migration-assessments", response_model=MigrationAssessmentPage)
+    def list_migration_assessments(request: Request, limit: Limit = 50, offset: Offset = 0,
+                                   connection=Depends(database)):
+        context = request.state.access_context
+        baseline_row = connection.execute(
+            "SELECT baseline_version FROM app_meta WHERE singleton=1").fetchone()
+        baseline_version = baseline_row["baseline_version"] if baseline_row is not None else None
+        if type(baseline_version) is not int or baseline_version < 1:
+            raise AppError("INVENTORY_STATE_INVALID", "The active baseline version is unavailable.", 503)
+        items = migration_compare.list_assessments(
+            connection, context=context, configuration=request.state.access_configuration)
+        items = [project_migration_assessment(item, context.principal_id) for item in items]
+        return {"items": items[offset:offset + limit], "total": len(items), "limit": limit,
+                "offset": offset, "baseline_version": baseline_version}
+
+    @app.get("/api/migration-assessments/operation-receipt", response_model=MigrationOperationReadback)
+    def migration_operation_readback(
+            request: Request,
+            action: Literal["assessment.create", "assessment.signoff"],
+            idempotency_key: Annotated[str, Query(min_length=1, max_length=200)],
+            connection=Depends(database)):
+        access.require_role(request.state.access_context, "viewer")
+        ordinary_domain(request)
+        row = migration_operation_receipt(connection, request, action, idempotency_key)
+        if row is None:
+            return {"found": False, "action": action, "assessment": None, "original_outcome": None}
+        outcome = migration_receipt_outcome(row, action, request.state.access_context.principal_id)
+        detail = migration_compare.get_assessment(
+            connection, outcome["assessment_id"], context=request.state.access_context,
+            configuration=request.state.access_configuration)
+        return {"found": True, "action": action,
+                "assessment": project_migration_assessment(detail, request.state.access_context.principal_id),
+                "original_outcome": outcome}
+
+    @app.get("/api/migration-assessments/{assessment_id}/export", response_model=MigrationAssessmentDetail)
+    def export_migration_assessment(assessment_id: UUID, request: Request, response: Response,
+                                    connection=Depends(database)):
+        detail = migration_compare.assessment_export(
+            connection, str(assessment_id), context=request.state.access_context,
+            configuration=request.state.access_configuration)
+        result = project_migration_assessment(detail, request.state.access_context.principal_id)
+        response.headers["Content-Disposition"] = 'attachment; filename="ipam-migration-assessment.json"'
+        return result
+
+    @app.post("/api/migration-assessments/{assessment_id}/signoff", response_model=MigrationAssessmentMutation)
+    def signoff_migration_assessment(assessment_id: UUID, request: Request,
+                                     payload: MigrationAssessmentSignoffRequest, response: Response):
+        def signoff(connection):
+            context = request.state.access_context
+            result = migration_compare.signoff_assessment(
+                connection, str(assessment_id), **payload.model_dump(), context=context,
+                configuration=request.state.access_configuration)
+            if "assessment" in result:
+                value = result["assessment"]
+                replayed = bool(result.get("replayed"))
+            else:
+                value = result
+                replayed = False
+            outcome = required_migration_receipt(
+                connection, request, "assessment.signoff", payload.idempotency_key, str(assessment_id))
+            return {"assessment": project_migration_assessment(value, context.principal_id),
+                    "replayed": replayed, "original_signoff": outcome}
+        result = write_operation(request, signoff)
+        response.status_code = 200
+        return result
+
+    @app.get("/api/migration-assessments/{assessment_id}", response_model=MigrationAssessmentDetail)
+    def get_migration_assessment(assessment_id: UUID, request: Request, connection=Depends(database)):
+        detail = migration_compare.get_assessment(
+            connection, str(assessment_id), context=request.state.access_context,
+            configuration=request.state.access_configuration)
+        return project_migration_assessment(detail, request.state.access_context.principal_id)
 
     @app.api_route("/api/{unmatched:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"], include_in_schema=False)
     def missing_api(unmatched: str):

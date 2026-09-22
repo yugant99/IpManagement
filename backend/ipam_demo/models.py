@@ -1,7 +1,7 @@
 """HTTP response contract; all large address counts are decimal strings."""
 
-from typing import Generic, Literal, TypeVar
-from pydantic import BaseModel
+from typing import Any, Generic, Literal, TypeVar
+from pydantic import BaseModel, ConfigDict, StrictBool, StrictInt
 
 
 AccessRole = Literal["viewer", "requester", "operator", "approver", "platform_admin"]
@@ -110,3 +110,128 @@ class Page(BaseModel, Generic[Item]):
     total: int
     limit: int
     offset: int
+
+
+class StrictRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+
+class StrictResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+
+class MigrationAssessmentCreateRequest(StrictRequest):
+    source_batch_id: str
+    expected_baseline_version: StrictInt
+    idempotency_key: str
+    reason: str
+    supersedes_id: str | None = None
+    supersedes_reason: str | None = None
+
+
+class MigrationAssessmentSignoffRequest(StrictRequest):
+    expected_version: StrictInt
+    expected_digest: str
+    active_only_acknowledged: StrictBool
+    idempotency_key: str
+    reason: str
+
+
+class MigrationAssessmentSource(StrictResponse):
+    id: str
+    source_id: str
+    source_run_id: str
+    source_kind: str
+    envelope_hash: str
+    ingested_at: str
+
+
+class MigrationAssessmentSummary(StrictResponse):
+    id: str
+    source_batch_id: str
+    source: MigrationAssessmentSource | None
+    canonical_hash: str
+    domain: str
+    mapping_revision: str
+    authority_revision: str
+    policy_revision: str
+    baseline_version: int
+    input_count: int
+    accepted_count: int
+    rejected_count: int
+    duplicate_count: int
+    added_count: int
+    changed_count: int
+    unchanged_count: int
+    conflicting_count: int
+    active_only_acknowledged: bool
+    active_only_count: int
+    created_by: str | None
+    created_by_current_principal: bool
+    created_at: str
+    version: int
+    state: str
+    signer_id: str | None
+    signed_by_current_principal: bool
+    signed_at: str | None
+    signoff_reason: str | None
+    supersedes_id: str | None
+    supersedes_reason: str | None
+    digest: str
+    current: bool
+    staleness_reasons: list[str]
+
+
+class MigrationAssessmentRow(StrictResponse):
+    source_record_id: str
+    matching_key: str
+    candidate: dict[str, Any]
+    active: dict[str, Any] | None
+    disposition: str
+    reason: str
+
+
+class MigrationAssessmentActiveOnly(StrictResponse):
+    matching_key: str
+    active: dict[str, Any]
+    reason: str
+
+
+class MigrationAssessmentDetail(MigrationAssessmentSummary):
+    rows: list[MigrationAssessmentRow]
+    active_only: list[MigrationAssessmentActiveOnly]
+
+
+class MigrationAssessmentPage(StrictResponse):
+    items: list[MigrationAssessmentSummary]
+    total: int
+    limit: int
+    offset: int
+    baseline_version: int
+
+
+class MigrationAssessmentCreateOutcome(StrictResponse):
+    assessment_id: str
+    assessment_digest: str
+
+
+class MigrationAssessmentSignoffOutcome(StrictResponse):
+    assessment_id: str
+    assessment_digest: str
+    signer_id: str | None
+    signed_by_current_principal: bool
+    signed_at: str
+    signed_version: int
+
+
+class MigrationAssessmentMutation(StrictResponse):
+    assessment: MigrationAssessmentSummary
+    replayed: bool
+    original_signoff: MigrationAssessmentSignoffOutcome | None
+
+
+class MigrationOperationReadback(StrictResponse):
+    found: bool
+    action: Literal["assessment.create", "assessment.signoff"]
+    assessment: MigrationAssessmentDetail | None
+    original_outcome: MigrationAssessmentCreateOutcome | MigrationAssessmentSignoffOutcome | None
