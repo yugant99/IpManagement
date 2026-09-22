@@ -19,14 +19,16 @@ migration never authorizes a local change. US4 prepares alongside core implement
 
   Prerequisites: authority gate; owner: Astra / Main Lead 4.0; FR-001 FR-005 FR-015 FR-021. Completion: Explicit lead decision before dispatch; no inferred execution permission.
 
-- [ ] T002 [P] Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint. Files: `specs/001-postmeeting-bridge/delivery/source-authority.md`.
+- [x] T002 [P] Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint. Files: `specs/001-postmeeting-bridge/delivery/source-authority.md`.
 
   Prerequisites: T001; owner: Grok 4.6 under Grok 4.7; FR-009 FR-010 FR-012 FR-014 FR-018 FR-020. Completion: Every gap has a requirement, owner role and evidence gate.
 
 
+T001/T002 are documentary source checkpoints. T003 is source accepted at9c73fd8; its checked task marker records the schema source handoff only. SQL/migration/runtime observations and full Tier A acceptance remain T025 gates.
+
 ## Phase 2 — Shared foundation
 
-- [ ] T003 Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema. Files: `backend/ipam_demo/schema.sql`, `backend/ipam_demo/schema_v6.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/seed.py`. Retain versioned ticket route assignments; attempts pin assignment version and chosen synthetic scenario. Scoped presets quarantine legacy ownership.
+- [x] T003 Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema. Files: `backend/ipam_demo/schema.sql`, `backend/ipam_demo/schema_v6.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/seed.py`. Retain versioned ticket route assignments; attempts pin assignment version and chosen synthetic scenario. Scoped presets quarantine legacy ownership.
 
   Prerequisites: T001; owner: Terra in Codex; FR-002 FR-003 FR-004 FR-005 FR-016. Completion: Explicit recognized upgrade and fresh initialization; no destructive reseed or history loss.
 

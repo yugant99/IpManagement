@@ -86,3 +86,20 @@ A passed focused check is not full Tier A acceptance. Simulation is not live Ser
 or provisioning. Assessment never promotes inventory. Local allocation is separate from
 leased/routed/traffic state. A package is not recipient evidence; an agent is not a human
 acknowledgement. The accepted 39/18/10/44 ledger remains unchanged.
+
+## Foundation source closure — current update
+
+T002 source accepted at **ab005d8bf3b6c57e0a071707796d18514c278674**, after Grok4.7
+findings and Sol corrections when Grok4.6 hit its Go quota. T003 source accepted at
+**9c73fd8e76c092b4d8297ec4475160b71574de7e**, after review corrections. The first-wave
+table above retains dispatch history; these source results supersede its RUNNING/pending
+labels. PR68 and PR69 preserve their exact feature histories. No runtime acceptance.
+
+| Current owner | Task/base | Branch/worktree | Lease |
+|---|---|---|---|
+| Terra / native Codex | T004 /9c73fd8e76c092b4d8297ec4475160b71574de7e | codex/bridge-t004-access; /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-access/Ip_inventory | backend/ipam_demo/access.py; backend/ipam_demo/models.py only |
+| Sol / native Codex, replacing blocked scout | T019 /ab005d8bf3b6c57e0a071707796d18514c278674 | codex/bridge-t019-qualification; /Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-qualification/Ip_inventory | specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md only |
+| Spencer / human, source ready | T020 /ab005d8bf3b6c57e0a071707796d18514c278674 | codex/bridge-t020-matrix; prepared worktree fast-forwarded to this exact base | specs/001-postmeeting-bridge/delivery/integration-matrix.md only; no human start/ack inferred |
+
+[Foundation review](foundation-source-review.md) retains findings, dispositions and exact
+models. [first-wave.json](first-wave.json) is updated with result SHAs and next-wave packets.
