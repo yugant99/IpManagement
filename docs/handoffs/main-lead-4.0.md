@@ -30,3 +30,11 @@ Historical Atlas, easy-win, native and Linux acceptance remains tied to its reco
 The prior read-only oversight heartbeat is recorded historically as paused/expired on Main Lead 3.0. This task does not inspect, resume, retarget or duplicate that automation. Active coordination in this task is distinct from a scheduled monitor.
 
 Workers hand off `READY FOR PROJECT-LEAD REVIEW — Stage N` with assigned task IDs, exact base/final SHA/PR, owned files, evidence/mode/gaps, commands actually authorized/run and a bounded next prompt. Only the lead accepts and coordinates merges. No globally incomplete bridge is merged to satisfy a date.
+
+## Source-adopted dispatch checkpoint
+
+Corrected specification base `6b66f943b7c7783285bfd1f70859ede42380bf60` is accepted as source design after independent
+review of action permissions, UI context ownership and final Fable dependencies. It retains
+the supplied original specification as history. [Dispatch manifest](../../specs/001-postmeeting-bridge/delivery/dispatch-manifest.md)
+and isolated worker branches are prepared; implementation is held for the active Terra route
+conflict. No worker, runtime test, service or VM is claimed running.

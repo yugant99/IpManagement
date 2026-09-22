@@ -1,0 +1,109 @@
+{
+  "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+  "packets": [
+    {
+      "task": "T003",
+      "status": "prepared_not_dispatched",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "branch": "codex/bridge-t003-schema",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-terra/Ip_inventory",
+      "owner": "Terra in OpenCode",
+      "route": "openai/gpt-5.6-terra",
+      "prerequisites": [
+        "T001"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/schema.sql",
+        "backend/ipam_demo/schema_v6.sql",
+        "backend/ipam_demo/store.py",
+        "backend/ipam_demo/seed.py"
+      ],
+      "assignment": "Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema.",
+      "contracts": "data-model.md C-M C-L C-T",
+      "acceptance": "Explicit recognized upgrade and fresh initialization; no destructive reseed or history loss.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+    },
+    {
+      "task": "T002",
+      "status": "prepared_not_dispatched",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "branch": "codex/bridge-t002-sources",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-scout/Ip_inventory",
+      "owner": "Grok 4.6 under Grok 4.7",
+      "route": "opencode-go/grok-4.6#medium",
+      "prerequisites": [
+        "T001"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/source-authority.md"
+      ],
+      "assignment": "Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint.",
+      "contracts": "C-M C-T C-O",
+      "acceptance": "Every gap has a requirement, owner role and evidence gate.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+    },
+    {
+      "task": "T007",
+      "status": "prepared_not_dispatched",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "branch": "codex/bridge-t007-access-review",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-luna/Ip_inventory",
+      "owner": "Luna independent verifier",
+      "route": "opencode-go/gpt-5.6-luna#medium",
+      "prerequisites": [
+        "T005",
+        "T006"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/access-review.md"
+      ],
+      "assignment": "Review all routes, clients, legacy data and errors against C-A before feature integration; record allowed/denied/projected/quarantined cases.",
+      "contracts": "C-A",
+      "acceptance": "No unresolved source/design access findings; runtime still requires T025.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+    },
+    {
+      "task": "T020",
+      "status": "prepared_not_dispatched",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "branch": "codex/bridge-t020-matrix",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-spencer/Ip_inventory",
+      "owner": "Spencer under Luna coordination",
+      "route": "human",
+      "prerequisites": [
+        "T002"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/integration-matrix.md"
+      ],
+      "assignment": "Day1 two-hour finish: inventory every integration RFP row, detailed selected local API/assessment/ticket contracts, mode/authority/owner/evidence/unknown vendor fields.",
+      "contracts": "C-A C-M C-L C-T C-O",
+      "acceptance": "All integration clauses classified; no guessed endpoint or simulated-as-live entry.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+    }
+  ]
+}
