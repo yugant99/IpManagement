@@ -19,6 +19,14 @@ backup/restore protocol, failure refusals, evidence bundle, dependencies/license
 SQLite snapshot excludes installed code/UI/feed/config/tokens. Do not include live tokens in
 package or backup. Document secure separate provisioning and revocation. Missing assets,
 invalid schema or failed readiness remain blocking, not quietly re-seeded.
+Retain a separately provisioned sanitized configuration manifest/digest with the recovery
+evidence. A restore under a different governing configuration is changed-configuration
+recovery, not like-for-like recovery: record the difference and apply normal staleness
+and reauthorization. Historical assessment/policy/route revision mismatch alone does not
+fail readiness or rewrite retained results. Missing or incompatible information needed
+for a current operation blocks that operation visibly; history is not erased or silently
+reinterpreted. Schema/integrity/FK checks and all C-A readiness booleans are necessary
+but do not replace selected-domain business-state comparison and actual human evidence.
 Do not create new infrastructure. Keep loopback access; non-loopback TLS is a separate gate.
 The global Docker volume is not isolated merely by changing Compose project name.
 
@@ -30,5 +38,6 @@ Core defines the auth contract; Spencer changes wrappers only after that contrac
 
 No new licensing engine. Document future preserve-service expiry alarm intent and assign
 commercial terms, references, staffing, SLA/compliance/distribution rights to human roles.
-Owner unassigned remains visible; no invented person's commitment. Fable advice is pending
-until actual authorized invocation, and Main Lead retains final adjudication.
+Owner unassigned remains visible; no invented person's commitment. The actual FABLE-DESIGN
+advice is retained separately; final T027 advice remains pending exact T024/T025 evidence.
+Main Lead retains final adjudication.

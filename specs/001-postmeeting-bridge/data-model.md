@@ -55,6 +55,10 @@ address or consume another service's hold; eligibility rechecked under the same 
 Pool/baseline versions increment on hold-changing commits. Do not change
 capacity_history_version merely because occupancy changes; it describes denominator history.
 Atomic conversion links reservation to the existing new allocation ID; no allocation deletion.
+The pool authority is the existing workflow.STATIC_POOL_ID and _pool policy check
+(see C-L), not a new configurable pool set. baseline_version is the existing global
+app_meta singleton, so a hold change can stale an assessment in another domain without
+disclosing that domain's data. Do not introduce per-domain clocks or version counters.
 
 ## Reservation notice (narrow lifecycle identity, no fake findings)
 Reservation ID + episode number + policy revision; first due time; alert/alarm level;
@@ -67,12 +71,21 @@ keep their own saved-run evidence IDs and clearance rules.
 
 ## Ticket intent, attempt and simulator effect (new narrow tables)
 Intent: ID, domain, source request ID, action type, stable correlation, payload JSON/digest,
-route revision/team, contract version, immutable mode=simulated, state, created UTC.
+positive intent version, current route-assignment version, contract version,
+immutable mode=simulated, state, created UTC. Route assignments retain version,
+configuration/route revision, nullable team while blocked, assigning principal, reason
+and UTC as append-only lineage. These logical records need only the narrow existing
+SQLite/JSON representation; no generic routing framework.
 Unique domain+request+action and unique correlation. Persist with the request transaction.
 States: pending, routing_blocked, delivered, failed, unknown; recipient receipt is separate.
-Attempt: ID, intent ID, ordinal in 1..3, request digest, start/end UTC, result, reason,
+Attempt: ID, intent ID, ordinal in 1..3, pinned route-assignment version, chosen synthetic
+scenario, request digest, start/end UTC, result, reason,
 observed simulator ticket ID if any. Unknown requires readback before another attempt.
 Mode cannot be changed retrospectively. Changed digest with same logical key conflicts.
+Business payload digest excludes route/team and assignment metadata. Reassignment only
+from pending/routing_blocked with zero attempts preserves intent/correlation, records
+lineage and returns to pending after a unique reviewed route is selected. Every attempted
+route is thereafter frozen in Tier A; owner resolution cannot reset the three-attempt budget.
 Simulator effect: unique correlation, exact intent digest, synthetic ticket ID, committed UTC,
 simulated recipient state. Persist effect separately from delivery-observation update to
 demonstrate effect committed/response lost and subsequent correlation recovery.

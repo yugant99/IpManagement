@@ -1,7 +1,7 @@
 # T001 — Main Lead 4.0 authorization and ownership
 
 Date: 2026-09-22. Lead task `01a0cade-506f-7442-97da-0cc09b4f9929`, GPT-6 Astra.
-**State: bounded specification adopted with source-review corrections; Terra dispatch route gate open.**
+**State: bounded specification adopted with source-review corrections; first wave released. Terra uses native Codex and Grok uses OpenCode Go.**
 
 ## Exact source and lead decision
 
@@ -30,7 +30,7 @@ rules and the latest user instruction remain superior to the constitution.
 The user authorizes lead registration, specification review/adoption, resource loading,
 isolated worktrees, bounded Tier A coordination, source review and evidence collection.
 The later clarification routes Fable through the existing Claude Code CLI, Sol through
-Codex and the remaining requested workers through OpenCode. Use configured existing
+Codex and initially the remaining requested workers through OpenCode. The user then suggested the simpler Codex route; the lead explicitly selected native Codex gpt-5.6-terra without replacing Astra. Grok/DeepSeek/Luna retain OpenCode Go. Use configured existing
 accounts; no top-up, new subscription, overage activation or cloud purchase is authorized.
 Model-route inspection is not an inference smoke test. Do useful bounded work only after
 its declared route is verified; never silently substitute another model/provider.
@@ -81,3 +81,20 @@ assessment without promotion; no live ServiceNow/DHCP/DNS claim. Preserve all se
 ledgers: accounting workbook 36/21/8/46, accepted repository 39/18/10/44, meeting labels
 92/0/12/7. Production/customer, complete license disclosure and commercial commitments
 require their own evidence and authority.
+
+## FABLE-DESIGN and dispatch update
+
+The actual Claude Code Fable design review of dispatch5c061b2/sourcebase6b66f94 is
+retained in [fable-design-advisory.md](fable-design-advisory.md). Lead/source review
+settles route assignment lineage, existing pool authority, readiness/configuration drift
+and explicit lead supersession in the normative contracts. Original spec headers and
+constitution lead references remain historical, superseded by the latest user grant.
+The user requested no repeated autonomous Fable spend: provide an exact-candidate prompt
+before any substantial future review; Fable stays advisory, never an implementation
+dependency or acceptance authority. No second Fable call has run.
+
+Grok4.6 T002 ran via the already connected OpenCode Go account without auth/payment
+requirements. Its source-only commit91e81506791214c186c10b0ab6ab0ed641655289 awaits
+Grok4.7/lead review. Terra has completed native Codex T003 source preparation; the lead
+releases edits on the published amended contract base. The user-provided credential was
+not needed, installed or copied: the existing Go connection demonstrably served T002.

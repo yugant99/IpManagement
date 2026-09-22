@@ -10,11 +10,25 @@ Q047–Q070; FR-004/009/011. One durable local simulator, no ServiceNow endpoint
   no-effect-response-lost). Production/vendor effects are unavailable.
 - POST /api/handoffs/{id}/readback: operator, correlation and matching digest; recorded lookup.
 - POST /api/handoffs/{id}/acknowledge: explicitly simulated recipient acknowledgement.
+- POST /api/handoffs/{id}/reassign: operator, expected intent version, stable key and
+  reason; select the unique team from the current reviewed configuration, never a
+  caller-supplied destination. Permitted only while routing_blocked or pending with
+  zero attempts. Reassignment to a valid route returns the same intent to pending.
 Payload allowlist: domain/action, opaque service reference when required, source request ID,
 correlation, relevant revision, reason code and authorized evidence reference. No raw source
 envelope, profile, token, private worksheet or attachment upload.
 Fixed domain/action team map must have exactly one match; preserve route revision. A route
 change is a reviewed configuration revision and explicit reassignment, never silent retry.
+Keep an append-only route assignment version with configuration/route revision, team,
+assigning principal, reason and UTC. Initial routing may be blocked with no team.
+The immutable business payload digest excludes route/team and assignment metadata;
+reassignment changes neither logical identity, business payload nor correlation. Every
+attempt pins the selected assignment version and allowlisted synthetic scenario in its
+own request digest and retained record. After any attempt exists, route reassignment is
+unsupported in Tier A and requires visible owner resolution, not a replacement intent.
+Recheck current authority/configuration before retry/readback; a route revision change
+does not grant permission to change the attempted team. Valid readback/history remain
+available under their C-A rights even when new attempts are blocked.
 
 ## State and crash boundary
 One logical intent per domain/request/action; same identity changed payload is409. Persist

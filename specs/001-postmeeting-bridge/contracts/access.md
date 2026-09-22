@@ -15,7 +15,7 @@ fetch and a local blob, not an unauthenticated anchor or token in URL.
 |---|---|
 | Viewer | Scoped read, comparison display and permitted sanitized export |
 | Requester | Viewer plus propose allocation/correction requests; pending-request cancellation deferred |
-| Operator | Viewer plus existing bounded inventory_edit (safe child-prefix creation/edit), import/assess, reserve/extend, evaluate aging, permitted exception actions and manual ticket attempt/readback |
+| Operator | Viewer plus existing bounded inventory_edit (safe child-prefix creation/edit), import/assess, reserve/extend, evaluate aging, permitted exception actions, protected readiness and manual ticket attempt/readback/zero-attempt reassignment |
 | Approver | Viewer plus independently sign assessment or decide exact allocation/correction/release request; no general inventory_edit grant |
 | Platform admin | Reviewed stopped configuration/state custody procedures; no implicit domain data or approval authority |
 
@@ -77,6 +77,20 @@ show unavailable, managed by evidence operator. Awaiting evidence is visible if 
 Container healthcheck must use minimal liveness, while operator readiness inspects all
 protected booleans. Only the explicitly registered coordinator identity may run fixed global acquisition;
 timer remains default off. No new per-domain clocks, feeds or reconciliation algorithm.
+
+## Protected readiness
+
+Protected GET /api/readiness requires Operator rights and an explicitly selected permitted
+domain. Its required booleans are process_ready, schema_ready, data_ready, static_ready,
+configuration_ready and domain_state_compatible; HTTP200 requires all six true.
+Otherwise return a failure status and allowlisted generic reasons. Never forward raw
+startup_error details, paths, foreign objects/counts or historical revision lists.
+Configuration readiness validates loaded authority. Domain-state compatibility checks
+prerequisites required to interpret the selected domain's current state and enforce
+its permissions, not equality of every historical revision to current configuration.
+Unknown ownership remains quarantined. Readiness does not prove business-state recovery;
+the operator must separately compare the retained candidate/configuration and business
+state evidence. /healthz discloses only minimal process liveness.
 
 ## Required later observations
 Allowed/denied list/detail/export/direct-ID and nested errors; mixed raw/source/run payloads;

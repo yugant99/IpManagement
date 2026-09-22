@@ -1,40 +1,34 @@
-# CLI model routes — 2026-09-22
+# Active model routes —2026-09-22
 
-User-selected routing: Astra control plane in Codex; Terra, Grok 4.7/4.6, DeepSeek V4.1
-Flash and Luna in OpenCode; Sol escalation in Codex; Fable advisory in Claude Code CLI.
-The later user clarification supersedes any blanket inference that Fable/Sol need OpenCode.
+The user suggested the simpler native Codex route for Terra after interactive OpenCode
+inspection; the lead explicitly selected it. This does not change the Astra lead model.
 
-| Role | Exact selected route | Observed status |
+| Role | Selected exact route | Observed state |
 |---|---|---|
-| Main Lead 4.0 | Codex GPT-6 Astra, current task | Active control plane |
-| Terra implementation sublead | Intended OpenCode openai/gpt-5.6-terra | Catalog ID confirmed, active service lacks OpenAI connection; dispatch held |
-| Grok 4.7 contracts | opencode-go/grok-4.7#high | Active repo-scoped model list; inference not probed |
-| Grok 4.6 scout | opencode-go/grok-4.6#medium | Active repo-scoped model list; inference not probed |
-| DeepSeek backend/UI | opencode-go/deepseek-v4.1-flash#high | Active repo-scoped model list; inference not probed |
-| Luna independent QA | opencode-go/gpt-5.6-luna#medium | Active repo-scoped model list; inference not probed |
-| Sol escalation | Codex gpt-5.6-sol | Available in this task's native model-routing metadata; user explicitly selects Codex |
-| Fable advisory | Claude Code claude-fable-5-1[1m], high | CLI configured, authenticated through existing Claude Max; no inference probe |
+| Main Lead4 | Codex gpt-6-astra | Active lead |
+| Terra implementation | Codex gpt-5.6-terra, high | Actual native worker /root/terra_schema; T003 source preparation complete |
+| Grok4.7 integration | opencode-go/grok-4.7#high | Actual T002 source review invoked |
+| Grok4.6 scout | opencode-go/grok-4.6#medium | Actual T002 completed; session ses_f350eb239ffeK1SvUzC4X8fQlY |
+| DeepSeek backend/UI | opencode-go/deepseek-v4.1-flash#high | Listed by active service; not yet invoked |
+| Luna independent QA | opencode-go/gpt-5.6-luna#medium | Listed by active service; prerequisite held, not invoked |
+| Sol escalation | Codex gpt-5.6-sol | Native route available; user-approved escalation, not invoked |
+| Fable advisory | Claude Code claude-fable-5-1[1m], high | One actual FABLE-DESIGN response completed through existing Max |
 
-OpenCode executable `/opt/homebrew/bin/opencode`, version 2.0.14. Claude executable
-`/Users/yuganthareshsoni/.local/bin/claude`, version 2.1.278. Safe local reads: `opencode
-models`, CLI help, repo-scoped `/api/model`, `/api/provider`, `/api/integration`; Claude
-settings model only and `claude auth status --json` sanitized to login/auth/provider/plan.
-No credential values/account identifiers copied into evidence. Only metadata is retained.
+OpenCode /opt/homebrew/bin/opencode v2.0.14; Claude Code v2.1.278. Safe active-service
+metadata showed37 models, providers opencode/opencode-go, one Go connection and zero
+OpenAI connections. Interactive CLI /models was also inspected: terra gave no results;
+gpt showed GPT-5.6 Luna — OpenCode Go. No OpenCode Terra route was available. Cached
+OpenAI catalog entries did not establish a working connection. No ChatGPT auth was changed.
 
-The active OpenCode service reports 37 models, providers opencode and opencode-go, one Go
-credential connection and zero OpenAI connections. The OpenAI integration supports
-ChatGPT Pro/Plus methods chatgpt-browser and chatgpt-headless, but neither is connected.
-This is an active service observation beyond the cached catalog. The user expects Terra
-in OpenCode; retain that conflict rather than silently replacing it. Resolution is to use
-an existing authorized OpenCode ChatGPT connection once established, or obtain explicit
-approval to route the same Terra model through Codex. No model/account change was made.
+The existing Go connection served T002 successfully; no newly supplied key was needed,
+installed or copied to commands/logs/repository. Pin exact routes; do not use the service
+or UI default. No OpenRouter connection was configured or inferred from an OpenCode key.
 
-Explicitly pin provider/model and reasoning variant on every dispatch. Service default
-is opencode/mimo-v2.6-flash-free; recent UI selection is Grok 4.7. Neither is an acceptable
-implicit Terra substitute. Existing-account use is user-directed; no top-up, subscription
-purchase, extra-usage activation or cloud charge is allowed. Allowance/overage state is
-not established by catalog token-cost fields; stop on quota/payment requirements.
+Existing-account use is user-directed. No purchase, top-up, extra-usage activation, model
+fallback or cloud spend is permitted. Stop on quota/payment requirements. Catalog/list
+cost telemetry is not an actual billing receipt; remaining account allowance is unknown.
 
-Inference latency, runtime success and remaining allowance are unverified. No unnecessary
-paid probe ran. The supplementary Astra preflight advisers were local Codex source
-reviewers, not impersonated executions of the requested Grok/Luna/Fable workers.
+Fable is not repeatedly invoked autonomously. Provide the user an exact-candidate prompt
+before substantial further advice and continue independent work. Fable has no acceptance
+authority and is not an implementation dependency. Supplemental Astra preflight advisers
+are accurately labeled source advisers, not impersonated requested-model executions.

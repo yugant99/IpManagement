@@ -2,6 +2,14 @@
 
 Q033–Q046/071–Q077; FR-003/006/008. Designated local static IPv4 pool only.
 
+Authority reuses `workflow.STATIC_POOL_ID` = `8821c420-18ea-4caa-9d97-83a331c0c002`
+and existing `workflow._pool`: the stored pool must retain family=4,
+management_mode=static and allocation_authority=local, valid ranges and exclusions.
+Its scope must additionally map to the selected permitted domain under C-A. No new
+per-domain pool list or arbitrary local-static pool support is introduced. Missing,
+changed-policy, foreign, IPv6 and non-designated pools fail visibly. T025 observes
+non-designated-pool refusal as well as the supported path.
+
 ## Proposed interfaces
 - GET/POST /api/reservations: scoped list/create exact pool/address/owner/service/reason,
   positive duration <=168 hours (24 default), reviewed pool/baseline versions and idempotency.

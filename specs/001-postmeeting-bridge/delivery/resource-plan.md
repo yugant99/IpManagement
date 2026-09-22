@@ -47,10 +47,10 @@ Route recheck is in progress: the user identifies Terra through OpenCode, Fable 
 | T024 | Auth-aware operator wrappers/package/handoff | Spencer | H | 1.50 | 3.00 |
 | T025 | Independent Tier A observations and recovery evidence | Luna | M | 2.00 | 4.00 |
 | T026 | Guided human rehearsal and actual acknowledgement | Spencer | H | 0.50 | 1.00 |
-| T027 | Two bounded Fable advisory passes | Fable, direct to lead | M | 0.50 | 1.50 |
+| FABLE-DESIGN + T027 | Design advice and optional candidate advice | Fable, direct to lead | M | 0.50 | 1.50 |
 | T028 | Lead adjudication and canonical evidence/status | Main Lead 4.0 / Astra | M | 0.50 | 1.00 |
 
-T027 budgets both reviews: 0.25–0.75h after specification/dispatch lock and 0.25–0.75h against the exact candidate after T025. The final review must depend on T025 (and thus T024); T028 depends on that final review. If an allowed explicit waiver is chosen, record it instead of inventing either review. Do not silently waive a user-requested reviewer because the route is missing.
+The advisory allowance covers both potential reviews: 0.25–0.75h after specification/dispatch lock and 0.25–0.75h against the exact candidate after T025. The final review must depend on T025 (and thus T024); T028 depends on that final review. The user subsequently requested one completed Fable pass and user-run prompts for substantial further reviews. Record actual advice or the delivered prompt and lead adjudication; never invent a review or make Fable invocation an implementation dependency.
 
 ## Owner loads and required capacity
 
@@ -105,7 +105,7 @@ The Day 3 work is **two availability windows separated by independent validation
 ## Recommended checkpoint plan
 
 1. Close the route/billing and owner-availability gates needed for each implementation lane; record unresolved lanes as unavailable for dispatch. Route existence alone is insufficient. Continue preparation before the VM is identified. Select/pin an authorized target before target-specific execution/evidence; do not provision a VM by inference.
-2. On authorized dispatch, launch T003 and disjoint T002/T027-design work; do not fabricate a Terra substitution. Spencer T020 starts after T002. UI T006 starts after T004's frozen contract.
+2. On authorized dispatch, launch T003 and disjoint T002/FABLE-DESIGN work; do not fabricate a Terra substitution. Spencer T020 starts after T002. UI T006 starts after T004's frozen contract.
 3. Treat completion of T003–T007 as the first calibration gate. Their sequential path consumes 6.5–13 model hours, or 7.5–15 including T001. T006 must also finish for T007. Compare observed active time, provider queueing, defects and staffed windows to the estimate before promising the remaining calendar.
 4. Reforecast after the foundation gate using actual throughput and the next human slots. Preserve a candidate-freeze point before T024/T025. Review evidence only at its identified candidate.
 5. Keep all Tier B off the schedule. To fit a fixed three-day timebox, deliver the largest fully reviewed Tier A increment and report the remaining bridge incomplete. US1 can be the first useful partial release; it does not satisfy Q099. Do not remove access/egress, exact ownership/version checks, independent approval, durable unknown/readback, history, recovery or independent evidence to rename partial work complete.

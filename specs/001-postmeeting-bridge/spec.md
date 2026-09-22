@@ -1,5 +1,13 @@
 # Feature Specification: Post-meeting IPAM / Pool Watch bridge
 
+> Current authority, 2026-09-22: the user transferred oversight to Main Lead 4.0 and
+> authorized bounded Tier A implementation. The original header/input and assumption
+> below record the specification phase; they do not retain Main Lead 3.0 authority.
+> Source adoption started at `6b66f943b7c7783285bfd1f70859ede42380bf60`, with the
+> subsequent lead-adjudicated FABLE-DESIGN amendments in contracts/data-model and
+> [T001](delivery/authorization-and-ownership.md). The dispatch manifest pins each
+> worker's exact adopted base. Runtime acceptance remains pending.
+
 **Feature Branch**: `codex/postmeeting-specification`
 
 **Created**: 2026-09-22
