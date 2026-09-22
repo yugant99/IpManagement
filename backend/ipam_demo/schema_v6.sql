@@ -1,4 +1,4 @@
--- Explicit v5 -> v6. Tier A persistence only; allocations retain their existing identity and uniqueness.
+-- Explicit v5 -> v6. Tier A persistence only. Allocations retain their existing identity and uniqueness.
 CREATE TABLE migration_assessments (
     id TEXT PRIMARY KEY,
     source_batch_id TEXT NOT NULL REFERENCES source_batches(id),
@@ -202,7 +202,7 @@ CREATE TABLE ticket_simulator_effects (
 
 -- Preserve historical singleton content without assigning it to a domain. The retained
 -- report_preset table remains empty for legacy callers until T005 moves readers and writers
--- to report_presets; do not start a schema-6 service before that access transition.
+-- to report_presets. Do not start a schema-6 service before that access transition.
 CREATE TABLE report_preset_quarantine (
     singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
     name TEXT NOT NULL,
