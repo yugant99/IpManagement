@@ -195,6 +195,8 @@ export async function downloadProtected(path: string, filename: string, signal: 
   signal.addEventListener("abort", abort, { once: true });
   if (signal.aborted) abort();
   activeControllers.add(controller);
+  let timedOut = false;
+  const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, 12000);
   try {
     const response = await fetch(path, { signal: controller.signal, headers: {
       Accept: filename.endsWith(".csv") ? "text/csv" : "application/json",
@@ -207,7 +209,11 @@ export async function downloadProtected(path: string, filename: string, signal: 
     if (response.status === 409) {
       const body = await response.json().catch(() => null);
       ensureCurrent(captured, signal);
-      if ((body as { error?: { code?: string } } | null)?.error?.code === "ACCESS_CONTEXT_STALE") invalidate("stale", captured);
+      if ((body as { error?: { code?: string } } | null)?.error?.code === "ACCESS_CONTEXT_STALE") {
+        invalidate("stale", captured);
+        throw new ApiError("Access configuration changed. Revalidate your domain before viewing data.", "ACCESS_CONTEXT_STALE");
+      }
+      responseContext(response, captured);
       throw responseError(response, body);
     }
     responseContext(response, captured);
@@ -228,8 +234,12 @@ export async function downloadProtected(path: string, filename: string, signal: 
       link.download = filename;
       link.click();
     } finally { window.setTimeout(() => URL.revokeObjectURL(url), 1000); }
+  } catch (error) {
+    if (timedOut && session === captured) throw new ApiError("The export did not respond within 12 seconds. Retry the saved version.", "REQUEST_TIMEOUT");
+    throw error;
   } finally {
     activeControllers.delete(controller);
+    window.clearTimeout(timeout);
     signal.removeEventListener("abort", abort);
   }
 }
