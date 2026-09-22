@@ -38,3 +38,13 @@ review of action permissions, UI context ownership and final Fable dependencies.
 the supplied original specification as history. [Dispatch manifest](../../specs/001-postmeeting-bridge/delivery/dispatch-manifest.md)
 and isolated worker branches are prepared; implementation is held for the active Terra route
 conflict. No worker, runtime test, service or VM is claimed running.
+
+## First execution checkpoint
+
+Source design after real FABLE-DESIGN and bounded source adjudication is
+`e8bc0ed08a8b3734d5278578828c8eb58b9f5d52` (draft PR#67). The earlier route hold above
+is historical. Latest user instruction accepts Terra in Codex with an evaluated OpenCode
+fallback for limits/performance. Terra T003 is running on that exact base. Grok4.6 T002
+completed through OpenCode Go at91e81506791214c186c10b0ab6ab0ed641655289; Grok4.7
+is reviewing it. No application tests/runtime or human result is established yet. See
+the current dispatch manifest for exact task sessions/leases and pending dependencies.

@@ -98,3 +98,9 @@ requirements. Its source-only commit91e81506791214c186c10b0ab6ab0ed641655289 awa
 Grok4.7/lead review. Terra has completed native Codex T003 source preparation; the lead
 releases edits on the published amended contract base. The user-provided credential was
 not needed, installed or copied: the existing Go connection demonstrably served T002.
+
+Latest explicit routing confirmation: the user accepts native Codex Terra because Go
+lists Luna, and authorizes an equally or more capable OpenCode replacement if limits
+or subpar performance warrant it. Record actual evidence before any replacement;
+no silent model change or additional paid spend is granted. The temporary OpenCode
+ChatGPT login was canceled, and native Terra resumed on e8bc0ed08a8b3734d5278578828c8eb58b9f5d52.

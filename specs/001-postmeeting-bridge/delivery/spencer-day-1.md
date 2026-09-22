@@ -5,7 +5,8 @@ Owner: Spencer, coordinated by Luna; source prerequisite T002. This is an assign
 packet, not a claim Spencer has started or acknowledged it. No external message sent.
 
 Owned file: `specs/001-postmeeting-bridge/delivery/integration-matrix.md`.
-Use the exact base and branch in dispatch-manifest.md. Read C-A/C-M/C-T/C-O, T002's
+The prepared branch codex/bridge-t020-matrix now starts at accepted T002 source
+ab005d8bf3b6c57e0a071707796d18514c278674; use the worktree in dispatch-manifest.md. Read C-A/C-M/C-T/C-O, T002's
 source-authority register and all integration clauses in coverage.csv/current row map.
 
 Finish with every questionnaire integration row classified at status level: requirement,
