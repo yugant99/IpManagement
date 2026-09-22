@@ -8,6 +8,7 @@ promotes candidate rows or changes active inventory.
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
+import re
 from uuid import uuid4
 
 from . import access
@@ -19,6 +20,7 @@ from .workflow import audit_event
 _GROUPS = ("scopes", "prefixes", "pools", "allocations")
 _ACTION_CREATE = "assessment.create"
 _ACTION_SIGNOFF = "assessment.signoff"
+_ASSESSMENT_DIGEST = re.compile(r"sha256:[0-9a-f]{64}\Z")
 
 
 def _json(value):
@@ -200,6 +202,8 @@ def _comparison_record(group, record):
     # Staging provenance and mutable concurrency counters do not describe
     # intended content and therefore do not turn an otherwise equal row into a change.
     ignored = {"source_record_id", "version", "pool_version"}
+    if group == "pools":
+        ignored.add("family")
     if group == "allocations":
         ignored.add("id")
     return {key: _normalized(value, key) for key, value in record.items() if key not in ignored}
@@ -210,9 +214,18 @@ def _compare(connection, domain, candidate):
     by_key = {group: {_key(group, record): record for record in active[group]} for group in _GROUPS}
     accepted_rows = []
     seen = {group: set() for group in _GROUPS}
+    candidate_prefixes = {record["id"]: record for _, record in candidate["prefixes"]}
     for group in _GROUPS:
         for source_record_id, record in candidate[group]:
-            key = _key(group, record)
+            compared = record
+            if group == "pools":
+                prefix = candidate_prefixes.get(record.get("prefix_id"))
+                if prefix is None or prefix.get("scope_id") != record.get("scope_id"):
+                    raise AppError("MIGRATION_SOURCE_INVALID", "A staged pool does not reference a candidate prefix in its scope.", 409)
+                # Pool envelopes omit family; derive identity from the already
+                # validated candidate prefix without rewriting stored candidate JSON.
+                compared = {**record, "family": prefix["family"]}
+            key = _key(group, compared)
             current = by_key[group].get(key)
             seen[group].add(key)
             if current is None:
@@ -220,7 +233,7 @@ def _compare(connection, domain, candidate):
             elif (group == "allocations" and current.get("owner") != record.get("owner")
                   and current.get("id") in approved_allocations):
                 disposition, reason = "conflicting", "Owner change conflicts with a current approved allocation assignment."
-            elif _comparison_record(group, current) == _comparison_record(group, record):
+            elif _comparison_record(group, current) == _comparison_record(group, compared):
                 disposition, reason = "unchanged", "Normalized intended content matches the active object."
             else:
                 disposition, reason = "changed", "Normalized intended content differs from the active object."
@@ -514,7 +527,10 @@ def signoff_assessment(connection, assessment_id, *, expected_version, expected_
     _require_configuration_context(context, configuration)
     header = _authorized_assessment(connection, assessment_id, context)
     expected_version = _positive_version(expected_version, "expected_version")
-    expected_digest = _required_text(expected_digest, "expected_digest", 64)
+    expected_digest = _required_text(expected_digest, "expected_digest", 71)
+    if not _ASSESSMENT_DIGEST.fullmatch(expected_digest):
+        raise AppError("INVALID_INPUT", "expected_digest must be a tagged SHA-256 assessment digest.", 422,
+                       {"field": "expected_digest"})
     idempotency_key = _required_text(idempotency_key, "idempotency_key", 200)
     reason = _required_text(reason, "reason")
     if type(active_only_acknowledged) is not bool:
