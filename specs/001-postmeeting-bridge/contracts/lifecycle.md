@@ -56,3 +56,31 @@ Current static occupancy = active allocations + state=reserved holds over assign
 with separate components and as-of time. Converted/released reservations excluded. Saved
 DHCP evidence/runs remain immutable. Preserve current p95/forecast/720-sample semantics and
 supported IPv6 prefix units; no invented delegation/host-occupancy metric.
+
+## T011 conversion identity clarification — 2026-09-22
+
+The existing allocation request has owner and descriptive purpose. Purpose is not
+an opaque service identifier and must not be silently substituted for one. When an
+allocation request supplies reservation_id, also require service_reference and a
+strict positive reservation_version. Persist these in the existing payload_json
+and reservation_id column; no schema addition is needed. Reject the two companion
+fields without a reservation_id. Requests without any reservation fields retain
+their existing normalized payload and hash, including historical exact-key replay;
+do not inject nullable defaults into that preexisting payload.
+
+At both request creation and independent approval, authorize the selected domain
+before disclosing pool or hold details. Require the exact reservation scope, pool,
+IPv4 address, owner_reference=owner, service_reference and reservation_version;
+the saved allocation request is the authority for approval, not replacement fields
+in its decision body. The hold must still be state=reserved. An intervening extension
+makes the old request stale and requires a renewed review. Expiry alone does not
+free the hold. Existing purpose remains a descriptive field, retained unchanged.
+
+All availability/eligible-claim checks, allocation insertion, conditional hold
+conversion, converted_allocation_id linkage, history, audit and one pool/baseline
+bump occur in the same immediate transaction. The partial unique reservation
+index does not enforce cross-table allocation exclusion. Ordinary unreserved
+allocation must refuse a reserved address; a matching reserved allocation may
+consume only its explicitly identified current hold. T012/T015 expose these exact
+fields. This decision follows the lead's source inspection and independent Sol
+challenge; no application execution or T011 completion is implied.
