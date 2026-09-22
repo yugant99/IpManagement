@@ -57,3 +57,42 @@ reconciliation failure remains visible to that coordinator, never leaked in a do
 database restore is disaster recovery, not migration candidate undo.
 Future evidence: exact candidate/source hash, all count equations, conflict/partial/stale/
 denial cases and active-state invariance, plus actual human recipient acknowledgement where claimed.
+
+
+## T008 lineage encoding and immutable digest — lead decision 2026-09-22
+
+Schema6 is retained. `authority_revision` stores server-built canonical JSON with
+exactly `config_digest`, positive-integer `config_revision`, and
+`schema: "ipam.authority_revision.v1"`. Serialize sorted keys with compact separators
+and UTF-8. Values come from one current reviewed configuration snapshot; never accept
+an unverified client composite as authority. Pin policy_revision to that same snapshot.
+Mapping revision identifies the reviewed source/scope/domain mapping, not a client
+label. Where no separate reviewed mapping version exists, derive its tagged digest
+from the sorted source/scope/domain triples in that configuration and use the same
+algorithm for current-state comparisons.
+
+The assessment digest is SHA-256 of a version-tagged canonical object containing its
+immutable header (identity, source batch/canonical hash, domain, mapping/authority/
+policy/baseline revisions, all receipt/classification counts, creator/time and
+supersedes lineage), comparison rows sorted by source_record_id, and active-only rows
+sorted by matching_key. Include their immutable matching keys, classifications,
+reasons and stored candidate/active JSON text verbatim. Exclude mutable state/version,
+signer/time/reason, acknowledgement, read-time staleness and row surrogate IDs.
+The canonical object tag is `ipam.assessment_digest.v1`; expose `sha256:` plus lowercase
+hex. Reject noncanonical/unsupported authority encodings rather than guessing.
+
+Compute the digest after inserting immutable rows within the creation transaction and
+anchor it in the existing assessment.create receipt result_json. Recompute on later
+reads and compare to that anchor; missing or mismatched anchors fail visibly, without
+silent repair. Sign-off must match both expected version and immutable digest, preserve
+creator/signer independence, and require all governing revisions and the in-transaction
+baseline to remain current. Acknowledgement binds to the exact active-only list through
+that digest. Use the existing immediate transaction, conditional update and same-
+transaction operation receipt. GET computes staleness without rewriting history.
+
+Reauthorize the current principal, domain and target before any retry disclosure.
+Matching-key replay returns the historical operation outcome without signing again;
+it must distinguish that outcome from current assessment/sign-off currency. Current
+readback reports subsequent staleness even when the original receipt records success.
+Changed payload under a reused key is a conflict. No assessment operation promotes
+candidate inventory or creates a cutover path.

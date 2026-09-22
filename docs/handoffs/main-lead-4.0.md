@@ -65,3 +65,18 @@ model allowances and the affected reset windows remain unmeasured.
 The [dispatch manifest](../../specs/001-postmeeting-bridge/delivery/dispatch-manifest.md)
 contains current branches/worktrees and wire-contract SHA. No runtime or portable/human
 acceptance, ledger promotion or merge to main is implied.
+
+
+## Codex-only continuation
+
+The user paused all OpenCode work and directed GPT-6 Luna/Sol development in Codex.
+The approved Muse privacy setting was never changed; no Muse review exists. No model
+retry or automatic reset check is running. The latest dispatch manifest and first-wave
+registry supersede prior route/state paragraphs above.
+
+T005/T006 now have draft PR73/PR72 and an unaccepted assembled source candidate
+`ea0f4d7d4c6cca81ffc41a610ebebf68accc5bd3`. Independent GPT-6 Sol review has returned
+concrete source findings to the original authors. Main, runtime evidence, human gates
+and all three questionnaire ledgers remain unchanged.
+
+Current closure: T005/T006/T007 source accepted at `aee0ade8bbeb6405aab4a6cf0c35079d76e6318e` after independent correction review; [report](https://github.com/yugant99/IpManagement/blob/833c2c8676b205c97476ab71f4e3b2cff0a2c608/specs/001-postmeeting-bridge/delivery/access-review.md). T008 is dispatched to GPT-6 Luna with one-file ownership and setup pending. Runtime/T025 and human gates remain open.

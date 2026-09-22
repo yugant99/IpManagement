@@ -158,3 +158,24 @@ authenticate/revoke before comparing configuration pins, with no config headers 
 unauthenticated responses; and match correction recovery to original actor and exact
 proposal/approve/reject outcome, never another principal's decision.
 T005/T006 and all runtime/independent QA gates remain open.
+
+
+## T005/T006/T007 source closure
+
+Main Lead4.0 accepts the bounded access source checkpoint after actual GPT-6 Sol
+independent review and owner corrections. API author: GPT-6 Luna, `c4b367b3e51028ea70327ce9c62b9fb4598491e7`.
+UI author: a separate GPT-6 Sol worker, `671dae8d2c74f1a426c9f29c3c1d8997d3096ad8`. Reviewed application assembly:
+`aee0ade8bbeb6405aab4a6cf0c35079d76e6318e`. [Independent report](https://github.com/yugant99/IpManagement/blob/833c2c8676b205c97476ab71f4e3b2cff0a2c608/specs/001-postmeeting-bridge/delivery/access-review.md) publication: `833c2c8676b205c97476ab71f4e3b2cff0a2c608`,
+with route allow/deny/projection/quarantine matrix and the initial findings/resolutions.
+Draft PR73/API, PR72/UI and PR74/assembly preserve histories; main is unchanged.
+
+The lead read both correction diffs and the report. Eight backend findings and the
+ambiguous-retry/projection-UI findings are source-closed. Direct authenticated OpenAPI
+JSON is the current reference path; interactive Swagger usability remains explicitly
+with T021. Schedule configuration remains a stopped-service procedure, with T023 and
+Spencer's artifacts retaining that responsibility. No anonymous documentation exception.
+
+T007 source closure releases T008 only. No application tests, builds, server, browser,
+database/config/token operations or runtime validation were performed. T025 remains
+the independent runtime gate; portable/human gates, Tier B and all ledgers are unchanged.
+The latest user instruction pauses all OpenCode attempts and settings work.

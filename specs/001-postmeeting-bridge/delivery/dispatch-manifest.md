@@ -137,3 +137,50 @@ section; do not independently invent a different interface. T007 starts only on 
 assembled exact source candidate. No application test/build/server/seed/migration has
 run; T025 remains the distinct bounded validation gate. Human T020/T022/T024/T026 and
 new-candidate Linux recipient evidence remain open.
+
+
+## Current Codex-only access review
+
+The latest user instruction pauses OpenCode work while limits reset. No retries,
+privacy-setting changes or automatic reset monitor are dispatched. Continue Codex
+GPT-6 Luna implementation and GPT-6 Sol review/escalation; Astra remains lead.
+
+T005 initial API source `e66a810ad094f957565925855caaef204d35980d` and T006 initial
+UI source `97360e4db3a0ce4bbb0010c430e90735e24b7b73` were assembled without conflicts
+at `ea0f4d7d4c6cca81ffc41a610ebebf68accc5bd3` in the existing T007 review worktree.
+This unaccepted integration branch is `codex/bridge-t007-access-review`; main is
+unchanged. GPT-6 Sol independent reviewer `/root/sol6_access_review` owns the bounded
+source review; original Luna/Sol authors retain their disjoint correction leases.
+
+Draft API [PR73](https://github.com/yugant99/IpManagement/pull/73) and UI
+[PR72](https://github.com/yugant99/IpManagement/pull/72) target the shared T004/wire
+base `codex/bridge-access-integration` at `a5817e63efbf74998de0e29d30734e55a775e5de`.
+They are review artifacts, not accepted or merged features. UI follow-up
+`9e348e7c04becfe396bc4efe0d4cb94014ce5246` retains prior ambiguous-write recovery
+through a later retry refusal. Backend projection/access/error corrections are in
+progress; T007 remains open until the exact corrected assembly is reviewed.
+
+Corrected source heads: API `c4b367b3e51028ea70327ce9c62b9fb4598491e7` and UI `671dae8d2c74f1a426c9f29c3c1d8997d3096ad8`; current assembly
+`aee0ade8bbeb6405aab4a6cf0c35079d76e6318e`. Independent correction review is in progress; source and runtime
+acceptance remain separate.
+
+
+### Source gate closed; T008 released
+
+Independent correction review of `aee0ade8bbeb6405aab4a6cf0c35079d76e6318e` returned no remaining blocker
+in the affected paths; lead source acceptance is recorded in foundation-source-review.md.
+Review publication `833c2c8676b205c97476ab71f4e3b2cff0a2c608` and draft PR74 retain the source evidence.
+T025 runtime and all human/portable gates remain open; no main merge.
+
+T008 is dispatched to a separate GPT-6 Luna high task from the T007 branch, with
+worktree setup pending. Its sole edit lease is backend/ipam_demo/migration_compare.py;
+requested branch codex/bridge-t008-assessment. It may inspect existing parser/schema/
+access helpers but cannot edit them, execute application code or call other models.
+The next T009/T010 assignments wait for its independently reviewed source handoff.
+
+
+T008 setup completed: task `01a0cb4a-4b2c-7451-b2dc-8ae0508a8448`, worktree
+`/Users/yuganthareshsoni/.codex/worktrees/cf7c/Ip_inventory`, branch
+`codex/bridge-t008-assessment`. Source work started. Its authority-revision/digest
+encoding question is under one user-authorized Opus5.5 read-only advisory; the worker
+continues independent source work and waits for the lead's encoding decision.

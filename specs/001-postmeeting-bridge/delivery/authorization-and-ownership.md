@@ -1,7 +1,7 @@
 # T001 — Main Lead 4.0 authorization and ownership
 
 Date: 2026-09-22. Lead task `01a0cade-506f-7442-97da-0cc09b4f9929`, GPT-6 Astra.
-**State: bounded specification adopted with source-review corrections; first wave released. Terra uses native Codex and Grok uses OpenCode Go.**
+**Current state: bounded specification adopted; T005/T006 source candidates are in independent T007 review. Latest user instruction pauses all OpenCode work and selects Codex GPT-6 Luna implementation and GPT-6 Sol review/escalation, with Astra lead. Earlier route decisions below are history.**
 
 ## Exact source and lead decision
 

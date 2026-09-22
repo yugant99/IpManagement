@@ -64,13 +64,13 @@
     },
     {
       "task": "T007",
-      "status": "prepared_not_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "stage": "Stage 1 (post-meeting bridge)",
-      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "base_sha": "aee0ade8bbeb6405aab4a6cf0c35079d76e6318e",
       "branch": "codex/bridge-t007-access-review",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-luna/Ip_inventory",
-      "owner": "Luna independent verifier",
-      "route": "opencode-go/gpt-5.6-luna#medium",
+      "owner": "GPT-6 Sol independent reviewer",
+      "route": "Codex gpt-6-sol high",
       "prerequisites": [
         "T005",
         "T006"
@@ -83,10 +83,13 @@
       "acceptance": "No unresolved source/design access findings; runtime still requires T025.",
       "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
       "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
-      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "nonclaims": "Bounded independent source review closed after owner corrections. No runtime validation or main merge; T025 remains open.",
       "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
       "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
-      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements.",
+      "worker": "/root/sol6_access_review",
+      "result_sha": "833c2c8676b205c97476ab71f4e3b2cff0a2c608",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/74"
     },
     {
       "task": "T020",
@@ -114,7 +117,7 @@
       "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
     }
   ],
-  "route_decision": "User directs GPT-6 Luna implementation and GPT-6 Sol review/escalation; Astra lead. Go limits are per model. Grok4.6/4.7 quota failures were followed by separate Luna and DeepSeek preparation attempts also returning429 without work. This does not establish shared limits. Keep active T005/T006 workers; no extra usage or fallback purchase.",
+  "route_decision": "Latest user instruction pauses all OpenCode work. Continue Codex GPT-6 Luna implementation and GPT-6 Sol independent review/escalation; Astra lead. No privacy settings change, model retry or extra spend. Historical runs retain their actual routes.",
   "next_wave": [
     {
       "task": "T004",
@@ -157,7 +160,7 @@
     },
     {
       "task": "T005",
-      "status": "running_source_implementation",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
       "wire_contract_sha": "fcd11a1bd9b78be2779e4b6896d8af1c3dc8cf04",
       "route": "Codex gpt-6-luna high",
@@ -179,11 +182,14 @@
         "backend/ipam_demo/inventory_commands.py"
       ],
       "acceptance": "Every route has allow/deny/projection classification and no global data leak.",
-      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge."
+      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge.",
+      "result_sha": "c4b367b3e51028ea70327ce9c62b9fb4598491e7",
+      "review_route": "Codex gpt-6-sol high",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/73"
     },
     {
       "task": "T006",
-      "status": "running_source_implementation",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
       "wire_contract_sha": "fcd11a1bd9b78be2779e4b6896d8af1c3dc8cf04",
       "route": "Codex gpt-6-sol high",
@@ -209,7 +215,49 @@
         "frontend/src/Workflow.tsx"
       ],
       "acceptance": "No token in URL/localStorage/logs; browser uses trusted context everywhere. No prior-context data/retry disclosure or blind resubmission on identity/domain change.",
-      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge."
+      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge.",
+      "result_sha": "671dae8d2c74f1a426c9f29c3c1d8997d3096ad8",
+      "supplemental_review_route": "opencode-go/muse-spark-1.3-contributor#xhigh",
+      "supplemental_review_status": "provider_privacy_refusal_then_user_paused_opencode",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/72"
+    },
+    {
+      "task": "T008",
+      "status": "running_source_implementation",
+      "base_sha": "833c2c8676b205c97476ab71f4e3b2cff0a2c608",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t008-assessment",
+      "client_thread_id": "client-new-thread:e08f5d45-2795-4b8f-9972-1fbf34ae1b81",
+      "prerequisites": [
+        "T007 source acceptance"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/migration_compare.py"
+      ],
+      "acceptance": "Immutable scoped comparison with reconciled counts, conflict precedence and independent exact-current sign-off; no active-state promotion.",
+      "prohibited": "Unleased paths, tests/build/runtime/application imports/DB/config, OpenCode/other model calls, autonomous delegation, main merge or self-acceptance.",
+      "thread_id": "01a0cb4a-4b2c-7451-b2dc-8ae0508a8448",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/cf7c/Ip_inventory"
     }
-  ]
+  ],
+  "muse_route": {
+    "authorization": "Previously authorized Muse1.3 xhigh and workspace privacy option; latest user instruction pauses all OpenCode work.",
+    "exact_route": "opencode-go/muse-spark-1.3-contributor#xhigh",
+    "variant_verified": true,
+    "status": "paused_by_user_privacy_setting_unchanged_no_review",
+    "last_attempt_http_status": 400,
+    "result": "No review produced; workspace training-endpoint option was not changed."
+  },
+  "opus_t008_advisory": {
+    "route": "claude-opus-5-5",
+    "effort": "high",
+    "session_id": "d999c245-03ec-4915-8675-6018dfc09185",
+    "candidate": "833c2c8676b205c97476ab71f4e3b2cff0a2c608",
+    "scope": "One tool-less read-only assessment authority/digest/signoff design response.",
+    "status": "completed_adjudicated_one_turn",
+    "authorization": "Latest user explicitly requested one bounded Opus5.5 task through existing Claude Code; Luna/Sol assignments remain intact.",
+    "evidence_root": "/tmp/ipam-opus-t008-review",
+    "report": "specs/001-postmeeting-bridge/delivery/opus-assessment-advisory.md"
+  }
 }
