@@ -109,17 +109,24 @@ def _load_candidate(connection, batch_id, context, configuration):
         raise AppError("NOT_FOUND", "Source import was not found in the selected domain.", 404)
     try:
         envelope = json.loads(batch["envelope_json"])
-        receipt = json.loads(batch["receipt_json"])
     except (TypeError, ValueError, json.JSONDecodeError) as exc:
-        raise AppError("MIGRATION_SOURCE_INVALID", "The staged source receipt is not usable as a migration candidate.", 409) from exc
+        raise AppError("NOT_FOUND", "Source import was not found in the selected domain.", 404) from exc
     scope_rows = envelope.get("scopes") if isinstance(envelope, dict) else None
     if (not isinstance(scope_rows, list) or not scope_rows
-            or any(not isinstance(item, dict) or item.get("domain") != domain for item in scope_rows)):
+            or any(not isinstance(item, dict) or item.get("domain") != domain for item in scope_rows)
+            or envelope.get("source_id") != batch["source_id"]
+            or envelope.get("source_run_id") != batch["source_run_id"]):
         raise AppError("NOT_FOUND", "Source import was not found in the selected domain.", 404)
     scope_ids = {item.get("id") for item in scope_rows}
     if any(not isinstance(scope_id, str) for scope_id in scope_ids):
-        raise AppError("MIGRATION_SOURCE_INVALID", "The staged source receipt is not usable as a migration candidate.", 409)
+        raise AppError("NOT_FOUND", "Source import was not found in the selected domain.", 404)
     mapping_revision = _mapping_lineage(configuration, batch["source_id"], domain, scope_ids)
+    try:
+        receipt = json.loads(batch["receipt_json"])
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise AppError("MIGRATION_SOURCE_INVALID", "The staged source receipt is not usable as a migration candidate.", 409) from exc
+    if not isinstance(receipt, dict):
+        raise AppError("MIGRATION_SOURCE_INVALID", "The staged source receipt is not usable as a migration candidate.", 409)
     rows = list(connection.execute(
         "SELECT id,status,reason,typed_json FROM source_records WHERE batch_id=? ORDER BY row_number,id", (batch_id,)))
     counts = {status: sum(1 for row in rows if row["status"] == status)
@@ -170,7 +177,7 @@ def _active_object(connection, group, row):
     return {key: item[key] for key in ("id", "scope_id", "prefix_id", "pool_id", "family", "address", "owner", "purpose")}
 
 
-def _active_snapshot(connection, domain):
+def _active_snapshot(connection, domain, configuration):
     snapshot = {group: [] for group in _GROUPS}
     queries = {
         "scopes": "SELECT s.* FROM scopes s WHERE s.domain=? ORDER BY s.id",
@@ -178,8 +185,20 @@ def _active_snapshot(connection, domain):
         "pools": "SELECT p.* FROM pools p JOIN scopes s ON s.id=p.scope_id WHERE s.domain=? ORDER BY p.id",
         "allocations": "SELECT a.* FROM allocations a JOIN scopes s ON s.id=a.scope_id WHERE s.domain=? ORDER BY a.scope_id,a.family,a.address_hex,a.id",
     }
+    local_sources = {"local-inventory", "local-inventory-correction", "local-demo-workflow"}
     for group, query in queries.items():
-        snapshot[group] = [_active_object(connection, group, row) for row in connection.execute(query, (domain,))]
+        for row in connection.execute(query, (domain,)):
+            if group != "scopes":
+                try:
+                    origin = json.loads(row["origin"])
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    origin = None
+                source_id = origin.get("source_id") if isinstance(origin, dict) else None
+                if not (isinstance(source_id, str) and (source_id in local_sources
+                        or configuration.source_domains.get((source_id, row["scope_id"])) == domain)):
+                    raise AppError("MIGRATION_INVENTORY_INCOMPATIBLE",
+                                   "Active inventory provenance cannot be established for this domain assessment.", 409)
+            snapshot[group].append(_active_object(connection, group, row))
     approved = {row["allocation_id"] for row in connection.execute(
         "SELECT r.allocation_id FROM allocation_requests r JOIN scopes s ON s.id=r.scope_id "
         "WHERE s.domain=? AND r.state='approved' AND r.allocation_id IS NOT NULL", (domain,))}
@@ -209,8 +228,8 @@ def _comparison_record(group, record):
     return {key: _normalized(value, key) for key, value in record.items() if key not in ignored}
 
 
-def _compare(connection, domain, candidate):
-    active, approved_allocations = _active_snapshot(connection, domain)
+def _compare(connection, domain, candidate, configuration):
+    active, approved_allocations = _active_snapshot(connection, domain, configuration)
     by_key = {group: {_key(group, record): record for record in active[group]} for group in _GROUPS}
     accepted_rows = []
     seen = {group: set() for group in _GROUPS}
@@ -415,9 +434,7 @@ def create_assessment(connection, *, source_batch_id, expected_baseline_version,
                        {"field": "supersedes_reason"})
     request_digest = _digest({"source_batch_id": source_batch_id,
                               "expected_baseline_version": expected_baseline_version, "reason": reason,
-                              "supersedes_id": supersedes_id, "supersedes_reason": supersedes_reason,
-                              "authority_revision": _config_lineage(configuration),
-                              "policy_revision": configuration.policy_revision})
+                              "supersedes_id": supersedes_id, "supersedes_reason": supersedes_reason})
     replay = _receipt(connection, context, domain, _ACTION_CREATE, idempotency_key, request_digest)
     if replay is not None:
         header = connection.execute("SELECT * FROM migration_assessments WHERE id=? AND domain=?",
@@ -435,7 +452,7 @@ def create_assessment(connection, *, source_batch_id, expected_baseline_version,
     if meta is None or meta["baseline_version"] != expected_baseline_version:
         raise AppError("STALE_INVENTORY", "Active inventory changed after review. Reload and assess again.", 409,
                        {"baseline_version": meta["baseline_version"] if meta else None})
-    accepted_rows, active_only, compare_counts = _compare(connection, domain, candidate)
+    accepted_rows, active_only, compare_counts = _compare(connection, domain, candidate, configuration)
     input_count = receipt_counts["accepted"] + receipt_counts["rejected"] + receipt_counts["duplicate"]
     if (input_count != receipt_counts["accepted"] + receipt_counts["rejected"] + receipt_counts["duplicate"]
             or receipt_counts["accepted"] != sum(compare_counts.values())):
