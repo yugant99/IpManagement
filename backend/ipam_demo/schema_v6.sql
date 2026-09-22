@@ -132,6 +132,23 @@ CREATE TABLE reservation_notices (
     UNIQUE(reservation_id, episode_number)
 );
 
+CREATE TABLE tier_a_operation_receipts (
+    id TEXT PRIMARY KEY,
+    principal_id TEXT NOT NULL,
+    domain TEXT NOT NULL,
+    action TEXT NOT NULL CHECK (action IN ('assessment.create', 'assessment.signoff', 'reservation.create',
+        'reservation.extend', 'reservation.release.decision', 'ticket.reassign', 'ticket.attempt',
+        'ticket.readback', 'ticket.acknowledge')),
+    idempotency_key TEXT NOT NULL,
+    request_digest TEXT NOT NULL,
+    target_kind TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    result_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE(principal_id, domain, action, idempotency_key)
+);
+CREATE INDEX tier_a_operation_receipts_target ON tier_a_operation_receipts(target_kind, target_id, created_at DESC, id DESC);
+
 ALTER TABLE allocation_requests ADD COLUMN reservation_id TEXT REFERENCES reservations(id);
 
 CREATE TABLE ticket_intents (
@@ -197,8 +214,47 @@ CREATE TABLE ticket_simulator_effects (
     FOREIGN KEY(intent_id, route_assignment_version) REFERENCES ticket_route_assignments(intent_id, assignment_version),
     FOREIGN KEY(intent_id, correlation, business_payload_digest) REFERENCES ticket_intents(id, correlation, business_payload_digest),
     FOREIGN KEY(attempt_id, intent_id, route_assignment_version, synthetic_scenario)
-        REFERENCES ticket_attempts(id, intent_id, route_assignment_version, synthetic_scenario)
+        REFERENCES ticket_attempts(id, intent_id, route_assignment_version, synthetic_scenario),
+    UNIQUE(id, intent_id, correlation, business_payload_digest),
+    UNIQUE(id, intent_id, correlation, business_payload_digest, synthetic_ticket_id)
 );
+
+CREATE TABLE ticket_handoff_events (
+    id TEXT PRIMARY KEY,
+    operation_receipt_id TEXT NOT NULL UNIQUE REFERENCES tier_a_operation_receipts(id),
+    intent_id TEXT NOT NULL REFERENCES ticket_intents(id),
+    correlation TEXT NOT NULL,
+    business_payload_digest TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    event_type TEXT NOT NULL CHECK (event_type IN ('readback', 'recipient_acknowledgement')),
+    outcome TEXT NOT NULL CHECK (outcome IN ('found', 'definitive_absence', 'error', 'acknowledged')),
+    attempt_id TEXT,
+    route_assignment_version INTEGER,
+    synthetic_scenario TEXT,
+    effect_id TEXT,
+    returned_ticket_id TEXT,
+    sanitized_error_json TEXT,
+    acknowledgement_mode TEXT CHECK (acknowledgement_mode IS NULL OR acknowledgement_mode = 'simulated'),
+    occurred_at TEXT NOT NULL,
+    FOREIGN KEY(intent_id, correlation, business_payload_digest) REFERENCES ticket_intents(id, correlation, business_payload_digest),
+    FOREIGN KEY(attempt_id, intent_id, route_assignment_version, synthetic_scenario)
+        REFERENCES ticket_attempts(id, intent_id, route_assignment_version, synthetic_scenario),
+    FOREIGN KEY(effect_id, intent_id, correlation, business_payload_digest)
+        REFERENCES ticket_simulator_effects(id, intent_id, correlation, business_payload_digest),
+    FOREIGN KEY(effect_id, intent_id, correlation, business_payload_digest, returned_ticket_id)
+        REFERENCES ticket_simulator_effects(id, intent_id, correlation, business_payload_digest, synthetic_ticket_id),
+    CHECK ((attempt_id IS NULL AND route_assignment_version IS NULL AND synthetic_scenario IS NULL)
+        OR (attempt_id IS NOT NULL AND route_assignment_version IS NOT NULL AND synthetic_scenario IS NOT NULL)),
+    CHECK ((event_type = 'readback' AND outcome IN ('found', 'definitive_absence', 'error')
+            AND acknowledgement_mode IS NULL)
+        OR (event_type = 'recipient_acknowledgement' AND outcome = 'acknowledged'
+            AND acknowledgement_mode = 'simulated' AND effect_id IS NOT NULL)),
+    CHECK ((outcome = 'found' AND effect_id IS NOT NULL AND returned_ticket_id IS NOT NULL AND sanitized_error_json IS NULL)
+        OR (outcome = 'definitive_absence' AND returned_ticket_id IS NULL AND sanitized_error_json IS NULL)
+        OR (outcome = 'error' AND returned_ticket_id IS NULL AND sanitized_error_json IS NOT NULL)
+        OR (outcome = 'acknowledged' AND sanitized_error_json IS NULL))
+);
+CREATE INDEX ticket_handoff_events_intent_time ON ticket_handoff_events(intent_id, occurred_at, id);
 
 -- Preserve historical singleton content without assigning it to a domain. The retained
 -- report_preset table remains empty for legacy callers until T005 moves readers and writers

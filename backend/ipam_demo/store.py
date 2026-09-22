@@ -82,7 +82,7 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
         expected.update({"migration_assessments", "migration_assessment_rows", "migration_assessment_active_only",
                          "reservations", "reservation_history", "reservation_release_requests", "reservation_notices",
                          "ticket_intents", "ticket_route_assignments", "ticket_attempts", "ticket_simulator_effects",
-                         "report_preset_quarantine", "report_presets"})
+                         "ticket_handoff_events", "tier_a_operation_receipts", "report_preset_quarantine", "report_presets"})
     tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     if not expected.issubset(tables) or connection.execute("SELECT singleton FROM app_meta WHERE singleton=1").fetchone() is None:
         raise AppError("INVALID_SCHEMA", "Required inventory tables or metadata are missing. Existing data was preserved.")
@@ -114,6 +114,8 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
                              "service_reference", "version", "policy_revision", "state"},
             "reservation_release_requests": {"reservation_id", "reservation_version", "payload_digest", "state"},
             "reservation_notices": {"reservation_id", "episode_number", "policy_revision", "state"},
+            "tier_a_operation_receipts": {"principal_id", "domain", "action", "idempotency_key", "request_digest",
+                                          "target_kind", "target_id", "result_json"},
             "ticket_intents": {"domain", "source_request_id", "action", "correlation", "business_payload_digest",
                                "version", "current_route_assignment_version", "mode", "state"},
             "ticket_route_assignments": {"intent_id", "assignment_version", "configuration_revision", "route_revision",
@@ -121,6 +123,8 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
             "ticket_attempts": {"intent_id", "ordinal", "route_assignment_version", "synthetic_scenario", "request_digest"},
             "ticket_simulator_effects": {"intent_id", "attempt_id", "correlation", "business_payload_digest",
                                          "route_assignment_version", "synthetic_scenario"},
+            "ticket_handoff_events": {"operation_receipt_id", "intent_id", "correlation", "business_payload_digest",
+                                      "actor_id", "event_type", "outcome", "attempt_id", "effect_id", "occurred_at"},
             "report_presets": {"domain", "name", "run_id", "version", "actor_id"},
             "report_preset_quarantine": {"quarantined_at", "quarantine_reason"},
         }
