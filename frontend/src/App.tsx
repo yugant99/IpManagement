@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { ApiError, loadScopes, request } from "./api";
-import type { Health, Origin, Page, Prefix, PrefixDetail, Scope } from "./api";
+import { accessContext, ApiError, clearSession, installSession, loadScopes, onSessionInvalidated, request } from "./api";
+import type { AccessContext, Origin, Page, Prefix, PrefixDetail, ReadinessStatus, Scope } from "./api";
 import FirstPath from "./FirstPath";
 import CapacityReports from "./CapacityReports";
 import InventoryEditor from "./InventoryEditor";
@@ -12,12 +12,11 @@ import Corrections from "./Corrections";
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 type Bootstrap =
   | { status: "loading" }
-  | { status: "ready"; health: Health; scopes: Scope[] }
-  | { status: "not-ready"; health: Health }
+  | { status: "ready"; scopes: Scope[] }
   | { status: "error"; error: ApiError };
 
 const PAGE_SIZE = 25;
-const emptyFilters = { scope: "", domain: "", region: "", family: "", query: "" };
+const emptyFilters = { scope: "", region: "", family: "", query: "" };
 const displayCount = (value: string) => value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 const asError = (error: unknown) => error instanceof ApiError ? error : new ApiError("The inventory response could not be read. Retry to request it again.", "INVALID_RESPONSE");
 
@@ -32,18 +31,23 @@ function ErrorState({ error, onRetry }: { error: ApiError; onRetry: () => void }
   );
 }
 
-function Readiness({ health }: { health: Health }) {
+function Readiness() {
+  const [state, setState] = useState<Resource<ReadinessStatus>>({ status: "loading" });
+  useEffect(() => {
+    const controller = new AbortController();
+    request<ReadinessStatus>("/api/readiness", controller.signal, true).then(data => {
+      if (!controller.signal.aborted) setState({ status: "ready", data });
+    }).catch((error: unknown) => { if (!controller.signal.aborted) setState({ status: "error", error: asError(error) }); });
+    return () => controller.abort();
+  }, []);
   return (
     <details className="readiness">
-      <summary>Readiness details</summary>
-      <dl className="facts compact">
-        <dt>API process</dt><dd>{health.process_ready ? "Ready" : "Unavailable"}</dd>
-        <dt>Database schema</dt><dd>{health.schema_ready ? "Ready" : "Not ready"}</dd>
-        <dt>Initialized inventory</dt><dd>{health.data_ready ? "Ready" : "Not ready"}</dd>
-        <dt>Compiled UI assets</dt><dd>{health.static_ready ? "Available" : "Not available to API"}</dd>
-        <dt>Schema version</dt><dd>{health.schema_version ?? "Not initialized"}</dd>
-        <dt>Contract</dt><dd><code>{health.contract_revision}</code></dd>
-      </dl>
+      <summary>Operator readiness</summary>
+      {state.status === "loading" && <p>Loading protected readiness…</p>}
+      {state.status === "error" && <p role="alert">{state.error.message}</p>}
+      {state.status === "ready" && <><dl className="facts compact">
+        {(["process_ready", "schema_ready", "data_ready", "static_ready", "configuration_ready", "domain_state_compatible"] as const).map(key => <div className="fact-pair" key={key}><dt>{key.replaceAll("_", " ")}</dt><dd>{state.data[key] ? "Ready" : "Not ready"}</dd></div>)}
+      </dl>{state.data.reasons.map((reason, index) => <p key={index}>{reason}</p>)}</>}
     </details>
   );
 }
@@ -162,7 +166,7 @@ function PrefixContents({ prefix, onSelect }: { prefix: PrefixDetail; onSelect: 
   );
 }
 
-export default function App() {
+function ProtectedApp({ context }: { context: AccessContext }) {
   const [view, setView] = useState<"inventory" | "first-path" | "planning" | "capacity" | "workflow" | "corrections" | "schedule">("inventory");
   const [bootstrap, setBootstrap] = useState<Bootstrap>({ status: "loading" });
   const [evidenceScopes, setEvidenceScopes] = useState<Scope[] | null>(null);
@@ -180,16 +184,10 @@ export default function App() {
     setBootstrap({ status: "loading" });
     async function load() {
       try {
-        const health = await request<Health>("/healthz", controller.signal, true);
-        if (controller.signal.aborted) return;
-        if (health.status !== "ready") {
-          setBootstrap({ status: "not-ready", health });
-          return;
-        }
         const scopes = await loadScopes(controller.signal);
         if (!controller.signal.aborted) {
           setEvidenceScopes(scopes);
-          setBootstrap({ status: "ready", health, scopes });
+          setBootstrap({ status: "ready", scopes });
         }
       } catch (error) {
         if (!controller.signal.aborted) setBootstrap({ status: "error", error: asError(error) });
@@ -204,7 +202,6 @@ export default function App() {
     const controller = new AbortController();
     const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) });
     if (filters.scope) params.set("scope_id", filters.scope);
-    if (filters.domain) params.set("domain", filters.domain);
     if (filters.region) params.set("region", filters.region);
     if (filters.family) params.set("family", filters.family);
     if (filters.query) params.set("q", filters.query);
@@ -252,17 +249,15 @@ export default function App() {
   }
 
   const activeScope = bootstrap.status === "ready" ? bootstrap.scopes.find((scope) => scope.id === filters.scope) : undefined;
-  const hasFilters = Boolean(filters.scope || filters.domain || filters.region || filters.family || filters.query);
-  const domains = bootstrap.status === "ready" ? [...new Set(bootstrap.scopes.map((scope) => scope.domain))].sort() : [];
+  const hasFilters = Boolean(filters.scope || filters.region || filters.family || filters.query);
   const regions = bootstrap.status === "ready" ? [...new Set(bootstrap.scopes.map((scope) => scope.region))].sort() : [];
-  const health = bootstrap.status === "ready" || bootstrap.status === "not-ready" ? bootstrap.health : null;
 
   return (
     <>
       <a className="skip-link" href="#inventory-main">Skip to main content</a>
       <header className="app-header">
         <div className="brand"><span className="brand-mark" aria-hidden="true">IP</span><span>Pool Watch</span><span className="demo-label">Synthetic local workspace</span></div>
-        <span className="header-context">Scoped inventory · evidence · decisions</span>
+        <span className="header-context">{context.principal_id} · {context.selected_domain} · scoped evidence</span>
       </header>
       <div className="atlas-body">
         <nav className="view-navigation atlas-rail" aria-label="Inventory views">
@@ -290,24 +285,14 @@ export default function App() {
         <div className="evidence-banner"><strong>Synthetic intended inventory</strong><span>Data comes from the local inventory API. No live discovery, traffic measurements, or current-use evidence is included.</span></div>
         </div>
 
-        {bootstrap.status === "loading" && <div className="notice loading-line" role="status">Checking API readiness and loading network scopes…</div>}
+        {bootstrap.status === "loading" && <div className="notice loading-line" role="status">Loading permitted network scopes…</div>}
         {bootstrap.status === "error" && <ErrorState error={bootstrap.error} onRetry={refresh} />}
-        {bootstrap.status === "not-ready" && (
-          <section className="notice setup" role="status">
-            <p className="eyebrow">{bootstrap.health.status === "setup_needed" ? "Setup required" : "Inventory unavailable"}</p>
-            <h2>{bootstrap.health.status === "setup_needed" ? "Initialize the synthetic inventory" : "The inventory store is not ready"}</h2>
-            <p>{bootstrap.health.reason ?? "The API has not reported initialized inventory."}</p>
-            {bootstrap.health.status === "setup_needed" && <><p>From the installed backend environment, use the same data directory as the server and run:</p><pre><code>python -m ipam_demo seed --scenario baseline</code></pre><p className="quiet">Setup is explicit. This page does not create or overwrite records.</p></>}
-            {bootstrap.health.code && <p className="diagnostic"><code>{bootstrap.health.code}</code></p>}
-            <button onClick={refresh}>Check readiness again</button>
-          </section>
-        )}
 
         {bootstrap.status === "ready" && (
           <div hidden={view !== "inventory"}>
             <form className="filters" onSubmit={search} aria-label="Filter intended prefixes">
               <label>Network scope<select value={filters.scope} onChange={(event) => updateFilters({ ...filters, scope: event.target.value })}><option value="">All network scopes</option>{bootstrap.scopes.map((scope) => <option value={scope.id} key={scope.id}>{scope.name} · {scope.namespace}</option>)}</select></label>
-              <label>Domain<select value={filters.domain} onChange={(event) => updateFilters({ ...filters, domain: event.target.value })}><option value="">All domains</option>{domains.map((domain) => <option value={domain} key={domain}>{domain}</option>)}</select></label>
+              <span className="filter-help">Selected domain: {context.selected_domain}</span>
               <label>Region<select value={filters.region} onChange={(event) => updateFilters({ ...filters, region: event.target.value })}><option value="">All regions</option>{regions.map((region) => <option value={region} key={region}>{region}</option>)}</select></label>
               <label>Address family<select value={filters.family} onChange={(event) => updateFilters({ ...filters, family: event.target.value })}><option value="">IPv4 and IPv6</option><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
               <label className="search-field">Prefix, IP, owner, purpose or tag<input type="search" placeholder="Search inventory" value={queryInput} onChange={(event) => setQueryInput(event.target.value)} aria-describedby="search-help" /></label>
@@ -345,10 +330,91 @@ export default function App() {
           <div hidden={view !== "planning"}><InventoryEditor scopes={bootstrap.scopes} onChanged={() => { setListRevision((value) => value + 1); setSelectedId(null); }} /></div>
           <div hidden={view !== "capacity"}><CapacityReports scopes={bootstrap.scopes} /></div>
         </>}
-        {health && <Readiness health={health} />}
-        <footer className="page-footer">Synthetic inventory and evidence · Saved calculations are pinned to their run · Data and readiness are reported by the API</footer>
+        {context.roles.includes("operator") && <Readiness />}
+        <footer className="page-footer">Synthetic inventory and evidence · Saved calculations are pinned to their run · Domain {context.selected_domain}</footer>
         </main>
       </div>
     </>
   );
+}
+
+type AuthState = { status: "signed-out"; error: string } | { status: "select-domain"; context: AccessContext; error: string }
+  | { status: "active"; context: AccessContext; epoch: number };
+
+export default function App() {
+  const token = useRef("");
+  const authAttempt = useRef(0);
+  const [entry, setEntry] = useState("");
+  const [auth, setAuth] = useState<AuthState>({ status: "signed-out", error: "" });
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => onSessionInvalidated(reason => {
+    authAttempt.current += 1;
+    token.current = "";
+    if (reason === "revoked") {
+      setAuth({ status: "signed-out", error: "Access expired or was revoked. Enter a current token." });
+    } else {
+      setAuth({ status: "signed-out", error: "Access configuration changed. Revalidate your token and select a domain." });
+    }
+  }), []);
+
+  async function signIn(event: FormEvent) {
+    event.preventDefault();
+    const attempt = ++authAttempt.current;
+    clearSession();
+    const candidate = entry.trim();
+    token.current = candidate;
+    setEntry(""); setBusy(true);
+    try {
+      const context = await accessContext(candidate, new AbortController().signal);
+      if (attempt !== authAttempt.current || token.current !== candidate) return;
+      setAuth({ status: "select-domain", context, error: "" });
+    } catch (error) {
+      if (attempt !== authAttempt.current) return;
+      token.current = "";
+      setAuth({ status: "signed-out", error: asError(error).message });
+    } finally { if (attempt === authAttempt.current) setBusy(false); }
+  }
+
+  async function selectDomain(domain: string) {
+    if (!token.current || auth.status !== "select-domain" || !auth.context.domains.includes(domain)) return;
+    const attempt = ++authAttempt.current;
+    const candidate = token.current;
+    clearSession(); setBusy(true);
+    try {
+      const context = await accessContext(candidate, new AbortController().signal, domain);
+      if (attempt !== authAttempt.current || token.current !== candidate) return;
+      const epoch = installSession(candidate, context);
+      setAuth({ status: "active", context, epoch });
+    } catch (error) {
+      if (attempt !== authAttempt.current) return;
+      const failure = asError(error);
+      if (failure.code === "AUTH_REQUIRED") {
+        token.current = "";
+        setAuth({ status: "signed-out", error: failure.message });
+      } else setAuth({ status: "select-domain", context: auth.context, error: failure.message });
+    } finally { if (attempt === authAttempt.current) setBusy(false); }
+  }
+
+  function signOut() {
+    authAttempt.current += 1;
+    clearSession(); token.current = ""; setEntry("");
+    setAuth({ status: "signed-out", error: "" });
+  }
+
+  if (auth.status === "active") return <><div className="auth-bar"><span>{auth.context.principal_id} · {auth.context.selected_domain}</span>
+    <button type="button" className="secondary" onClick={() => { authAttempt.current += 1; clearSession(); setAuth({ status: "select-domain", context: auth.context, error: "" }); }}>Change domain</button>
+    <button type="button" className="secondary" onClick={signOut}>Sign out</button></div>
+    <ProtectedApp key={auth.epoch} context={auth.context} /></>;
+
+  return <main id="inventory-main" className="inventory-panel"><h1>Pool Watch access</h1>
+    {auth.status === "signed-out" ? <form onSubmit={event => void signIn(event)}><label>Access token
+      <input type="password" autoComplete="off" value={entry} onChange={event => setEntry(event.target.value)} required /></label>
+      <button disabled={busy}>Continue</button>{auth.error && <p className="notice error" role="alert">{auth.error}</p>}</form>
+      : <section><h2>Select a permitted domain</h2><p>Principal: {auth.context.principal_id}</p>
+        {auth.context.domains.map(domain => <button type="button" className="secondary" key={domain} disabled={busy} onClick={() => void selectDomain(domain)}>{domain}</button>)}
+        {!auth.context.domains.length && <p>No ordinary domain is granted to this principal.</p>}
+        {auth.error && <p className="notice error" role="alert">{auth.error}</p>}
+        <button type="button" className="text-button" onClick={signOut}>Use another token</button></section>}
+  </main>;
 }
