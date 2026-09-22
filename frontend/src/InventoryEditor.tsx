@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { ApiError, request } from "./api";
+import { ApiError, currentContext, hasRole } from "./api";
 import type { Prefix, Scope } from "./api";
 import { createChildPrefix, loadChildPreview, loadEditContext, loadScopedPrefixes, updatePrefix } from "./inventoryCommandsApi";
-import type { ChildPreview, EditContext, EditablePrefix, InventoryActor, PrefixMutation } from "./inventoryCommandsApi";
+import type { ChildPreview, EditContext, EditablePrefix, PrefixMutation } from "./inventoryCommandsApi";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 const asError = (error: unknown) => error instanceof ApiError ? error : new ApiError("The inventory response could not be read. Reload saved inventory before retrying.", "INVALID_RESPONSE");
@@ -13,10 +13,10 @@ function ErrorNotice({ error }: { error: ApiError }) {
   return <div className="notice error" role="alert"><p>{error.message}</p><p className="diagnostic"><code>{error.code}</code>{error.requestId && <> · Request <code>{error.requestId}</code></>}</p></div>;
 }
 
-function PrefixCommandForm({ context, actors, onSaved }: { context: EditContext; actors: InventoryActor[]; onSaved: (result: PrefixMutation) => void }) {
+function PrefixCommandForm({ context, onSaved }: { context: EditContext; onSaved: (result: PrefixMutation) => void }) {
   const { prefix, scope } = context;
   const [mode, setMode] = useState<"child" | "edit">("child");
-  const [actorId, setActorId] = useState(actors.find((actor) => actor.permissions.includes("inventory_edit"))?.id ?? "");
+  const actorId = currentContext().principal_id;
   const [cidr, setCidr] = useState("");
   const [owner, setOwner] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -34,7 +34,6 @@ function PrefixCommandForm({ context, actors, onSaved }: { context: EditContext;
   const operation = useRef<AbortController | null>(null);
   const previewOperation = useRef<AbortController | null>(null);
   const populated = Boolean(context.children_count || prefix.pools.length || prefix.allocations.length);
-  const actor = actors.find((item) => item.id === actorId);
   const structuralChange = mode === "child" || cidr.trim() !== prefix.cidr;
   const affectedPools = context.history_impact?.structural;
 
@@ -118,8 +117,7 @@ function PrefixCommandForm({ context, actors, onSaved }: { context: EditContext;
     </section>}
     <form onSubmit={(event) => { void save(event); }}>
       <fieldset disabled={busy} className="inventory-form"><legend>{mode === "child" ? "New intended child" : "Edit intended prefix"}</legend>
-        <label className="field-label">Demo actor<select required value={actorId} onChange={(event) => setActorId(event.target.value)}><option value="">Select actor</option>{actors.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.role} · {item.team}</option>)}</select></label>
-        <p className="quiet">The API derives permissions from this named demo actor. {actor?.permissions.includes("inventory_edit") ? "This actor can edit inventory." : "Select an actor with inventory editing permission to save."}</p>
+        <p className="quiet">Authenticated principal: {actorId}. Inventory editing requires the Operator role.</p>
         <label className="field-label">{mode === "child" ? "Child CIDR" : "Prefix CIDR"}<input required maxLength={80} value={cidr} disabled={mode === "edit" && populated} placeholder={prefix.family === 6 ? "2001:db8:100:1::/64" : "10.40.0.0/26"} onChange={(event) => { setCidr(event.target.value); setSelectedPreview(null); }} /></label>
         {mode === "edit" && populated && <p className="quiet">Bounds are locked because this prefix has children, allocations or an attached pool. Metadata can still be edited.</p>}
         {mode === "child" && <p className="quiet">Parent: {prefix.cidr} in {scope.name}. The API requires strict containment and rejects unrelated overlaps.</p>}
@@ -143,7 +141,7 @@ function PrefixCommandForm({ context, actors, onSaved }: { context: EditContext;
               <p>Current occupancy may remain available, and positive lease evidence can still show activity. Previously saved runs remain unchanged.</p>
             </> : <p>The server lists no affected pools for {mode === "child" ? "this child creation" : "a bounds change to this prefix"} at the reviewed inventory version. Previously saved runs remain unchanged.</p>}
         </div>
-        <button type="submit" disabled={!actor?.permissions.includes("inventory_edit") || !cidr.trim() || (structuralChange && !affectedPools)}>{busy ? "Saving intended inventory…" : mode === "child" ? "Save child prefix" : "Save prefix changes"}</button>
+        <button type="submit" disabled={!hasRole("Operator") || !cidr.trim() || (structuralChange && !affectedPools)}>{busy ? "Saving intended inventory…" : mode === "child" ? "Save child prefix" : "Save prefix changes"}</button>
       </fieldset>
     </form>
     {error && <><ErrorNotice error={error} /><p className="run-warning">No write is confirmed by this response. Reload saved inventory before retrying; a timed-out request may have committed. Stale changes require a new review.</p></>}
@@ -155,24 +153,13 @@ export default function InventoryEditor({ scopes, onChanged }: { scopes: Scope[]
   const [scopeId, setScopeId] = useState(scopes[0]?.id ?? "");
   const [prefixId, setPrefixId] = useState("");
   const [prefixes, setPrefixes] = useState<Resource<Prefix[]>>({ status: "loading" });
-  const [actors, setActors] = useState<Resource<InventoryActor[]>>({ status: "loading" });
   const [context, setContext] = useState<Resource<EditContext>>({ status: "loading" });
   const [revision, setRevision] = useState(0);
   const [saved, setSaved] = useState<PrefixMutation | null>(null);
   const selectedScope = scopes.find((scope) => scope.id === scopeId);
   const domain = selectedScope?.domain ?? "";
   const region = selectedScope?.region ?? "";
-  const domains = [...new Set(scopes.map((scope) => scope.domain))];
   const regions = [...new Set(scopes.filter((scope) => scope.domain === domain).map((scope) => scope.region))];
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setActors({ status: "loading" });
-    request<InventoryActor[]>("/api/actors", controller.signal)
-      .then((data) => { if (!controller.signal.aborted) setActors({ status: "ready", data }); })
-      .catch((error: unknown) => { if (!controller.signal.aborted) setActors({ status: "error", error: asError(error) }); });
-    return () => controller.abort();
-  }, [revision]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -198,17 +185,17 @@ export default function InventoryEditor({ scopes, onChanged }: { scopes: Scope[]
   return <section className="panel" aria-labelledby="inventory-editor-heading">
     <div className="section-heading"><div><p className="eyebrow">Local intended inventory</p><h2 id="inventory-editor-heading">Prefix editing and IPv6 planning</h2><p className="quiet">Real local writes with server validation and audit. Domain and region labels organize scoped synthetic inventory; they do not provide tenant isolation or network provisioning.</p></div><button className="secondary" onClick={() => setRevision((value) => value + 1)}>Reload saved inventory</button></div>
     <div className="filters">
-      <label className="field-label">Network domain<select value={domain} onChange={(event) => changeScope(scopes.find((scope) => scope.domain === event.target.value)?.id ?? "")}>{domains.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+      <span className="filter-help">Selected domain: {currentContext().selected_domain}</span>
       <label className="field-label">Region<select value={region} onChange={(event) => changeScope(scopes.find((scope) => scope.domain === domain && scope.region === event.target.value)?.id ?? "")}>{regions.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
       <label className="field-label">Network scope<select value={scopeId} onChange={(event) => changeScope(event.target.value)}>{scopes.filter((scope) => scope.domain === domain && scope.region === region).map((scope) => <option key={scope.id} value={scope.id}>{scope.name} · {scope.namespace}</option>)}</select></label>
     </div>
     {saved && <div className="notice" role="status"><h3>Intended prefix saved</h3><p><code>{saved.prefix.cidr}</code> · Prefix version {saved.prefix.version} · Ledger version {saved.baseline_version}</p><p>Audit record <code>{saved.audit_id}</code>. Saved calculations retain their original ledger version until a new run is computed.</p></div>}
     {prefixes.status === "loading" && <p role="status" className="loading-line">Loading this scope's intended prefixes…</p>}
     {prefixes.status === "error" && <ErrorNotice error={prefixes.error} />}
-    {actors.status === "error" && <ErrorNotice error={actors.error} />}
+    {!hasRole("Operator") && <p className="notice">Prefix editing is available to domain Operators.</p>}
     {prefixes.status === "ready" && <>{!prefixes.data.length ? <p>No intended prefixes exist in this scope. Child creation requires an existing parent.</p> : <label className="field-label">Selected prefix / child parent<select value={prefixId} onChange={(event) => { setPrefixId(event.target.value); setSaved(null); }}>{prefixes.data.map((prefix) => <option key={prefix.id} value={prefix.id}>{prefix.cidr} · {prefix.owner || "Owner unspecified"}</option>)}</select></label>}</>}
     {prefixId && context.status === "loading" && <p role="status">Loading the prefix and current intended-ledger revision…</p>}
     {prefixId && context.status === "error" && <ErrorNotice error={context.error} />}
-    {prefixId && context.status === "ready" && context.data.prefix.id === prefixId && context.data.scope.id === scopeId && actors.status === "ready" && <PrefixCommandForm key={`${prefixId}:${revision}:${context.data.baseline_version}`} context={context.data} actors={actors.data} onSaved={(result) => { setSaved(result); setPrefixId(result.prefix.id); setRevision((value) => value + 1); onChanged?.(); }} />}
+    {prefixId && context.status === "ready" && context.data.prefix.id === prefixId && context.data.scope.id === scopeId && hasRole("Operator") && <PrefixCommandForm key={`${prefixId}:${revision}:${context.data.baseline_version}`} context={context.data} onSaved={(result) => { setSaved(result); setPrefixId(result.prefix.id); setRevision((value) => value + 1); onChanged?.(); }} />}
   </section>;
 }

@@ -130,16 +130,3 @@ export async function uploadSource(body: string, signal: AbortSignal) {
   });
   return { receipt, replay };
 }
-
-export async function uploadSourceWithReconciliation(body: string, signal: AbortSignal, reconcileAfterImport: boolean) {
-  let replay = false;
-  const receipt = await request<Receipt>(`/api/imports${reconcileAfterImport ? "?reconcile_after_import=true" : ""}`, signal, false, {
-    method: "POST", body,
-    onResponse: (response) => { replay = response.headers.get("X-Import-Replay") === "true"; },
-  });
-  return { receipt, replay };
-}
-
-export function computeRun(signal: AbortSignal) {
-  return request<SavedRun>("/api/runs", signal, false, { method: "POST" });
-}

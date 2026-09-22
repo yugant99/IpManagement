@@ -5,7 +5,7 @@ import type { EvidenceState } from "./firstPathApi";
 export interface DemoActor {
   id: string;
   name: string;
-  role: "requester" | "approver";
+  role: string;
   team: string;
   permissions: string[];
 }
