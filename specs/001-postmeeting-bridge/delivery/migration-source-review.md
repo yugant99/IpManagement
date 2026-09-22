@@ -59,3 +59,19 @@ API author owns this two-file correction; T009 acceptance and T011 release remai
 
 T010 UI remains in implementation. No application execution, UI/build check or runtime
 acceptance occurred during either review.
+
+### T009 source closure
+
+Luna correction `daede1905304c5d5bd363ff230b5f6371763eb49` keeps raw receipt
+identities until the target is reauthorized and its saved assessment is loaded.
+It compares target ID and anchored digest, and for sign-off also signed state,
+raw signer, signed_at and signed version. Initial/replay responses and key-only
+readback all use that reconciliation before identity projection. Well-shaped but
+inconsistent receipts return the generic integrity error; current staleness remains
+separate from historical success. Sol independently closed the bounded delta at
+that exact SHA, and the lead read it as well.
+
+Main Lead accepts T009 as source-only. Draft PR76 remains unmerged, application
+execution unverified. This releases T011 against T009 plus the lead's explicit
+reservation service/version clarification in contracts/lifecycle.md. T010 and
+the final assembled migration UI/API review are still pending.

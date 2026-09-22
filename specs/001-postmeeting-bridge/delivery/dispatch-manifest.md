@@ -223,3 +223,17 @@ T010 task `01a0cb5f-6dcf-7080-90ea-fffcc1743645` uses
 `/Users/yuganthareshsoni/.codex/worktrees/e121/Ip_inventory`.
 Each reported its dedicated branch at the exact shared base. The machine registry
 contains the current leases; no parent or historical author may edit them concurrently.
+
+### T009 source closure and T011 release
+
+T009 is source accepted at `daede1905304c5d5bd363ff230b5f6371763eb49`, draft PR76,
+after independent Sol closure of the receipt-integrity correction. T010 remains
+in progress. Prepare `codex/bridge-lifecycle-integration` from exact T009 plus this
+lead publication. Do not advance the frozen migration PR base or main.
+T011 receives only backend/ipam_demo/lifecycle.py and backend/ipam_demo/workflow.py,
+in its own GPT-6 Luna task/branch/worktree. The final C-L clarification requires
+explicit service_reference and reservation_version when reservation_id is supplied,
+preserving old unreserved normalization/replay. Cross-table holds, atomic conversion,
+independent unused release, history and version bumps are its bounded deliverable.
+No API/UI/schema edits or execution; T012/T013 remain dependency-held until source
+review. Sol remains independent reviewer; Claude/OpenCode remain stopped/paused.

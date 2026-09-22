@@ -1,5 +1,11 @@
 # Current project status
 
+**Latest bridge update —2026-09-22:** T009 API is source accepted at
+`daede1905304c5d5bd363ff230b5f6371763eb49` after independent Sol review and receipt
+integrity correction. T010 UI continues; T011 reservation core is released on a
+separate Luna lease. Further Claude use is stopped; OpenCode stays paused. The
+runtime, human/portable, main-merge and ledger limits below remain unchanged.
+
 **Bridge migration source closure —2026-09-22:** T008 is source accepted at `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509` after GPT-6 Luna corrections and independent GPT-6 Sol closure of five findings; [review](../specs/001-postmeeting-bridge/delivery/migration-source-review.md), draft PR75. T009 API and T010 UI are the next released source assignments. Claude Code is updated to 2.1.280 and the single authorized Opus 5.5 lineage advisory completed. OpenCode remains paused. Runtime/T025, human/portable gates and all ledgers remain unchanged; no main merge.
 
 **Current authority — 2026-09-22:** Main Lead 4.0, task `01a0cade-506f-7442-97da-0cc09b4f9929`, host `local`, is the user-authorized persistent lead for the post-meeting bridge. This explicitly supersedes Main Lead 3.0 for new coordination, contracts, integration and acceptance. See [Main Lead 4.0 transfer](handoffs/main-lead-4.0.md). The earlier dated records below remain historical; their old ownership or no-new-phase wording does not override this grant.
