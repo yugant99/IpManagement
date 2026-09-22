@@ -48,3 +48,17 @@ fallback for limits/performance. Terra T003 is running on that exact base. Grok4
 completed through OpenCode Go at91e81506791214c186c10b0ab6ab0ed641655289; Grok4.7
 is reviewing it. No application tests/runtime or human result is established yet. See
 the current dispatch manifest for exact task sessions/leases and pending dependencies.
+
+
+## Current access integration checkpoint
+
+T002/T003/T004/T019 have source-only acceptance at the exact SHAs retained in the
+[foundation review](../../specs/001-postmeeting-bridge/delivery/foundation-source-review.md).
+The earlier first-execution state above is historical. T005 API and T006 UI are now
+separate visible Codex workers with disjoint leases. User-directed actual routes are
+GPT-6 Luna for the prior Terra role and GPT-6 Sol for review/escalation, with Astra
+remaining lead. OpenCode Go is stopped on observed quota429.
+
+The [dispatch manifest](../../specs/001-postmeeting-bridge/delivery/dispatch-manifest.md)
+contains current branches/worktrees and wire-contract SHA. No runtime or portable/human
+acceptance, ledger promotion or merge to main is implied.

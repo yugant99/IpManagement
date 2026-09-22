@@ -134,7 +134,8 @@
       "prohibited": "Unleased app/schema/UI/packaging/status files, real credentials, tests/runtime in this source slice, external spending/deployment, Fable/autodelegation.",
       "result_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
       "review_route": "Codex gpt-6-sol high",
-      "correction_route": "Codex gpt-6-luna high"
+      "correction_route": "Codex gpt-6-luna high",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/71"
     },
     {
       "task": "T019",
@@ -153,6 +154,62 @@
       "prohibited": "Every other path, external research/credentials, tests/runtime, human or commercial claims, ledger changes.",
       "result_sha": "4034c765fce8a68f8cd73195c73f9a3bdd185d24",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/70"
+    },
+    {
+      "task": "T005",
+      "status": "running_source_implementation",
+      "base_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
+      "wire_contract_sha": "fcd11a1bd9b78be2779e4b6896d8af1c3dc8cf04",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t005-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/faf2/Ip_inventory",
+      "thread_id": "01a0cb1e-a711-70a3-a74d-5651989a0355",
+      "prerequisites": [
+        "T004 source acceptance"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/inventory.py",
+        "backend/ipam_demo/reports.py",
+        "backend/ipam_demo/imports.py",
+        "backend/ipam_demo/source_catalog.py",
+        "backend/ipam_demo/scheduler.py",
+        "backend/ipam_demo/workflow.py",
+        "backend/ipam_demo/feed_adapter.py",
+        "backend/ipam_demo/inventory_commands.py"
+      ],
+      "acceptance": "Every route has allow/deny/projection classification and no global data leak.",
+      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge."
+    },
+    {
+      "task": "T006",
+      "status": "running_source_implementation",
+      "base_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
+      "wire_contract_sha": "fcd11a1bd9b78be2779e4b6896d8af1c3dc8cf04",
+      "route": "Codex gpt-6-sol high",
+      "branch": "codex/bridge-t006-ui",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/1632/Ip_inventory",
+      "thread_id": "01a0cb1f-4086-7e40-a613-3fe2255ff4ec",
+      "prerequisites": [
+        "T004 source acceptance"
+      ],
+      "owned_paths": [
+        "frontend/src/api.ts",
+        "frontend/src/firstPathApi.ts",
+        "frontend/src/workflowApi.ts",
+        "frontend/src/inventoryCommandsApi.ts",
+        "frontend/src/correctionApi.ts",
+        "frontend/src/scheduleApi.ts",
+        "frontend/src/App.tsx",
+        "frontend/src/FirstPath.tsx",
+        "frontend/src/Schedule.tsx",
+        "frontend/src/CapacityReports.tsx",
+        "frontend/src/Corrections.tsx",
+        "frontend/src/InventoryEditor.tsx",
+        "frontend/src/Workflow.tsx"
+      ],
+      "acceptance": "No token in URL/localStorage/logs; browser uses trusted context everywhere. No prior-context data/retry disclosure or blind resubmission on identity/domain change.",
+      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge."
     }
   ]
 }

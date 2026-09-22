@@ -103,3 +103,32 @@ labels. PR68 and PR69 preserve their exact feature histories. No runtime accepta
 
 [Foundation review](foundation-source-review.md) retains findings, dispositions and exact
 models. [first-wave.json](first-wave.json) is updated with result SHAs and next-wave packets.
+
+
+## Access integration wave — current dispatch
+
+T004 is source accepted at `c7a3bed6dfec31bd07abc613f52b64f1304a1349` (PR71); T019 is
+source accepted at `4034c765fce8a68f8cd73195c73f9a3bdd185d24` (PR70).
+The reviewed API/UI wire interface is frozen in `contracts/access.md` at
+`fcd11a1bd9b78be2779e4b6896d8af1c3dc8cf04`. Both next workers integrate these
+explicit unmerged dependencies in their own isolated worktrees, preserving history.
+
+The user replaced Terra implementation with GPT-6 Luna, and Grok4.7 review plus
+difficult escalation with GPT-6 Sol. Earlier completed runs retain their actual models.
+OpenCode Go returned quota429 on the T004 review attempt; no further Go call or paid
+route is enabled. The UI leaf uses the authorized Sol escalation.
+
+Per the user's visible-task preference, T005 and T006 now use separate user-visible
+Codex tasks. No duplicate implementation is running in the earlier internal agents.
+
+| Task | Actual model | Isolated branch / worktree | Scope |
+|---|---|---|---|
+| T005 | GPT-6 Luna high | codex/bridge-t005-api; /Users/yuganthareshsoni/.codex/worktrees/faf2/Ip_inventory; task 01a0cb1e-a711-70a3-a74d-5651989a0355 | The nine backend files enumerated by task-graph.csv; all C-A routes, projections and source ownership |
+| T006 | GPT-6 Sol high, Go quota escalation | codex/bridge-t006-ui; /Users/yuganthareshsoni/.codex/worktrees/1632/Ip_inventory; task 01a0cb1f-4086-7e40-a613-3fe2255ff4ec | The thirteen frontend files enumerated by task-graph.csv; authenticated context, every client/download, actor removal and safe ambiguous recovery |
+
+T005 and T006 have disjoint exclusive leases. Bootstrap, configuration pins, protected
+readiness, compatibility actors and recovery pointer semantics are fixed by the wire
+section; do not independently invent a different interface. T007 starts only on their
+assembled exact source candidate. No application test/build/server/seed/migration has
+run; T025 remains the distinct bounded validation gate. Human T020/T022/T024/T026 and
+new-candidate Linux recipient evidence remain open.
