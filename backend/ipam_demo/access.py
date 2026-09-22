@@ -15,7 +15,9 @@ from .models import AccessContext
 
 
 ROLE_BUNDLES = frozenset({"viewer", "requester", "operator", "approver", "platform_admin"})
+VIEWER_INHERITING_ROLES = frozenset({"viewer", "requester", "operator", "approver"})
 EVIDENCE_OPERATIONS = frozenset({"read", "acquire", "run", "reconcile"})
+CONNECTOR_MODES = frozenset({"simulated", "disabled"})
 _DIGEST = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -94,6 +96,21 @@ def _object(value, keys: set[str]) -> dict:
     return value
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate configuration key")
+        result[key] = value
+    return result
+
+
+def effective_roles(roles: Iterable[str]) -> frozenset[str]:
+    """Return C-A's Viewer inheritance without treating platform admin as a data role."""
+    declared = frozenset(roles)
+    return declared | {"viewer"} if declared & VIEWER_INHERITING_ROLES else declared
+
+
 def _principal(value) -> Principal:
     item = _object(value, {"id", "token_digest", "token_bits", "enabled", "expires_at", "roles", "domains"})
     principal_id = _text(item["id"], "principal id")
@@ -121,6 +138,8 @@ def _load_configuration(value) -> ReviewedConfiguration:
     effective_at = _utc(root["effective_at"], "effective time")
     policy_revision = _text(root["policy_revision"], "policy revision")
     connector_mode = _text(root["connector_mode"], "connector mode")
+    if connector_mode not in CONNECTOR_MODES:
+        raise ValueError("connector mode")
     _unique_texts(root["reviewer_references"], "reviewer references")
     if not isinstance(root["principals"], list) or not root["principals"]:
         raise ValueError("principals")
@@ -133,12 +152,18 @@ def _load_configuration(value) -> ReviewedConfiguration:
     if not isinstance(mappings, list) or not mappings:
         raise ValueError("source mappings")
     source_domains: dict[tuple[str, str], str] = {}
+    scope_domains: dict[str, str] = {}
     for item in mappings:
         item = _object(item, {"source_id", "scope_id", "domain"})
-        key = (_text(item["source_id"], "source id"), _text(item["scope_id"], "scope id"))
+        scope_id = _text(item["scope_id"], "scope id")
+        domain = _text(item["domain"], "domain")
+        key = (_text(item["source_id"], "source id"), scope_id)
         if key in source_domains:
             raise ValueError("source mapping")
-        source_domains[key] = _text(item["domain"], "domain")
+        if scope_id in scope_domains and scope_domains[scope_id] != domain:
+            raise ValueError("scope domain")
+        source_domains[key] = domain
+        scope_domains[scope_id] = domain
 
     coordinator = _object(root["evidence_coordinator"], {"principal_id", "grants"})
     coordinator_id = _text(coordinator["principal_id"], "coordinator id")
@@ -182,7 +207,7 @@ def load_reviewed_configuration(path: str | Path | None = None, *, now: datetime
         if config_path.is_symlink() or not config_path.is_file() or config_path.stat().st_size > 1024 * 1024:
             raise ValueError("configuration file")
         with config_path.open("rb") as source:
-            value = json.loads(source.read())
+            value = json.loads(source.read(), object_pairs_hook=_reject_duplicate_keys)
         configuration = _load_configuration(value)
     except (OSError, TypeError, UnicodeDecodeError, ValueError, json.JSONDecodeError) as exc:
         raise _config_error() from exc
@@ -208,7 +233,7 @@ def authenticate_bearer(authorization: str | None, configuration: ReviewedConfig
     current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     if principal is None or not principal.enabled or principal.expires_at <= current:
         raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
-    return AccessContext(principal_id=principal.id, roles=sorted(principal.roles), domains=sorted(principal.domains),
+    return AccessContext(principal_id=principal.id, roles=sorted(effective_roles(principal.roles)), domains=sorted(principal.domains),
                          selected_domain=None, configuration_revision=configuration.revision,
                          configuration_digest=configuration.digest, policy_revision=configuration.policy_revision,
                          is_evidence_coordinator=principal.id == configuration.coordinator_id)
@@ -225,7 +250,7 @@ def require_selected_domain(context: AccessContext, selected_domain: str | None)
 
 
 def require_role(context: AccessContext, role: str) -> None:
-    if role not in ROLE_BUNDLES or role not in context.roles:
+    if role not in ROLE_BUNDLES or role not in effective_roles(context.roles):
         raise AppError("FORBIDDEN", "The current principal is not permitted to perform this operation.", 403)
 
 

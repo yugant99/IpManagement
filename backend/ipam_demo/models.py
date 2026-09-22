@@ -8,7 +8,7 @@ AccessRole = Literal["viewer", "requester", "operator", "approver", "platform_ad
 
 
 class AccessContext(BaseModel):
-    """Trusted identity context returned to protected clients without credential material."""
+    """Trusted identity context with C-A Viewer inheritance and no credential material."""
 
     principal_id: str
     roles: list[AccessRole]
