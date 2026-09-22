@@ -15,7 +15,7 @@ migration never authorizes a local change. US4 prepares alongside core implement
 
 ## Phase 1 — Setup and authority
 
-- [ ] T001 Adopt contracts; record actual implementation/validation authority, model/staff availability, base SHA, schema reservation and file ownership. Files: `specs/001-postmeeting-bridge/delivery/authorization-and-ownership.md`.
+- [x] T001 Adopt contracts; record actual implementation/validation authority, model/staff availability, base SHA, schema reservation and file ownership. Files: `specs/001-postmeeting-bridge/delivery/authorization-and-ownership.md`.
 
   Prerequisites: authority gate; owner: Astra / Main Lead 4.0; FR-001 FR-005 FR-015 FR-021. Completion: Explicit lead decision before dispatch; no inferred execution permission.
 
