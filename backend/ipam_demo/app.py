@@ -32,6 +32,12 @@ Offset = Annotated[int, Query(ge=0)]
 TextFilter = Annotated[str | None, Query(max_length=200)]
 
 
+def _require_complete_feed_authority(config):
+    grants = {(item.source_id, item.scope_id) for item in config.coordinator_grants}
+    if grants != set(feed_adapter.REGISTERED_SOURCE_SCOPE_GRANTS):
+        raise AppError("ACCESS_CONFIGURATION_INVALID", "Reviewed access configuration does not cover the registered synthetic feed.", 503)
+
+
 def create_app() -> FastAPI:
     directory = data_directory()
     static = static_directory()
@@ -51,6 +57,11 @@ def create_app() -> FastAPI:
                     initialized = bool(connection.execute("SELECT initialized FROM app_meta WHERE singleton=1").fetchone()[0])
                     if initialized:
                         require_initialized(connection)
+                configuration = access.load_reviewed_configuration()
+                _require_complete_feed_authority(configuration)
+                if initialized:
+                    with connect(path) as connection:
+                        _validate_access_mappings(connection, configuration)
                 if initialized:
                     app.state.scheduler = SyntheticScheduler(path, run_lock)
                     app.state.scheduler.start()
@@ -87,6 +98,7 @@ def create_app() -> FastAPI:
                 )
                 request.state.access_configuration = config
                 request.state.access_context = context
+                _require_complete_feed_authority(config)
                 bootstrap = path == "/api/access-context"
                 docs = path in {"/api/docs", "/api/openapi.json"}
                 if not bootstrap and not docs and not context.is_evidence_coordinator:
@@ -174,6 +186,7 @@ def create_app() -> FastAPI:
         context = request.state.access_context
         if context.is_evidence_coordinator:
             raise AppError("FORBIDDEN", "The evidence coordinator cannot use domain-local operations.", 403)
+        access.require_role(context, "viewer")
         row = connection.execute("SELECT domain FROM scopes WHERE id=?", (str(scope_id),)).fetchone()
         access.require_domain_access(context, row["domain"] if row else None)
         request.state.audit_scope_id = str(scope_id)
@@ -200,14 +213,13 @@ def create_app() -> FastAPI:
         return config, context
 
     def require_full_feed_authority(config):
-        grants = {(item.source_id, item.scope_id) for item in config.coordinator_grants}
-        if grants != set(feed_adapter.REGISTERED_SOURCE_SCOPE_GRANTS):
-            raise AppError("FORBIDDEN", "The configured coordinator lacks complete registered feed grants.", 403)
+        _require_complete_feed_authority(config)
 
     def ordinary_domain(request):
         context = request.state.access_context
         if context.is_evidence_coordinator or context.selected_domain is None:
             raise AppError("FORBIDDEN", "This operation requires a selected permitted domain.", 403)
+        access.require_role(context, "viewer")
         return context.selected_domain
 
     def require_local_role(request, role):
@@ -260,7 +272,7 @@ def create_app() -> FastAPI:
         if not isinstance(origin, dict):
             return False
         source_id = origin.get("source_id")
-        return (source_id in {"local-inventory-correction", "local-demo-workflow"}
+        return (source_id in {"local-inventory", "local-inventory-correction", "local-demo-workflow"}
                 or request.state.access_configuration.source_domains.get((source_id, scope_id)) is not None)
 
     def safe_inventory_rows(items, request):
@@ -321,10 +333,14 @@ def create_app() -> FastAPI:
                     schema_ready = True
                     data_ready = bool(connection.execute("SELECT initialized FROM app_meta WHERE singleton=1").fetchone()[0])
                     _validate_access_mappings(connection, request.state.access_configuration)
+                    _require_complete_feed_authority(request.state.access_configuration)
                     configuration_ready = True
                     compatible = connection.execute("SELECT 1 FROM scopes WHERE domain=? LIMIT 1",
                                                     (context.selected_domain,)).fetchone() is not None
-        except (AppError, sqlite3.Error):
+        except AppError as exc:
+            reasons.append("configuration_unavailable" if exc.code == "ACCESS_CONFIGURATION_INVALID"
+                           else "domain_state_incompatible")
+        except sqlite3.Error:
             reasons.append("domain_state_incompatible")
         static_ready = bool(static and (static / "index.html").is_file())
         if not configuration_ready:
@@ -684,12 +700,8 @@ def create_app() -> FastAPI:
 
     @app.get("/api/run-comparison")
     def compare_runs(before_run_id: UUID, after_run_id: UUID, request: Request, connection=Depends(database)):
-        domain = projection_domain(request)
-        scopes = allowed_scope_ids(connection, request)
-        before = reports.project_run(reconciliation.get_run(connection, str(before_run_id)), scopes, domain=domain,
-                                     source_pairs=request.state.access_configuration.source_domains.keys())
-        after = reports.project_run(reconciliation.get_run(connection, str(after_run_id)), scopes, domain=domain,
-                                    source_pairs=request.state.access_configuration.source_domains.keys())
+        before = scoped_run(connection, request, str(before_run_id))
+        after = scoped_run(connection, request, str(after_run_id))
         return reports.compare_runs_from_results(before, after)
 
     @app.get("/api/report-preset")
@@ -721,8 +733,6 @@ def create_app() -> FastAPI:
         domain = ordinary_domain(request)
         preset, body = reports.preset_csv(connection, revision, domain, allowed_scope_ids(connection, request),
                                           request.state.access_configuration.source_domains.keys())
-        if not preset.get("projection") and not reports.get_preset(connection, domain):
-            raise AppError("NOT_FOUND", "Saved report preset was not found.", 404)
         return Response(body, media_type="text/csv", headers={"Content-Disposition": 'attachment; filename="ipam-findings.csv"',
                         "X-Run-ID": preset["run_id"], "X-Preset-Revision": preset["revision"],
                         "X-Report-Filters": json.dumps(preset["filters"], ensure_ascii=True)})

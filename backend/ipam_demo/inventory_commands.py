@@ -147,8 +147,7 @@ def _validate_position(connection, scope_id, network, parent, *, editing_id=None
             continue
         if row["id"] in ancestors and network != other and network.subnet_of(other):
             continue
-        raise AppError("PREFIX_OVERLAP", "This prefix overlaps inventory outside its declared ancestry.", 409,
-                       {"conflicting_prefix_id": row["id"], "conflicting_cidr": row["cidr"]})
+        raise AppError("PREFIX_OVERLAP", "This prefix overlaps inventory outside its declared ancestry.", 409)
 
 
 def _bump_ledger(connection, affected_prefix_ids, *, structural=False):

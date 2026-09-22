@@ -45,8 +45,8 @@ _RICH_SCOPES = {
     _CENTRAL: ("vrf-central", ["10.80.0.0/16", "2001:db8:80::/48"]),
 }
 
-# Frozen source/scope grants from fixtures/v1. Runtime access configuration may
-# narrow this registry but cannot invent a source or attach it to another scope.
+# Frozen source/scope grants from fixtures/v1. Reviewed access configuration must
+# cover every registered pair and cannot invent a source or attach it elsewhere.
 REGISTERED_SOURCE_SCOPE_GRANTS = frozenset(
     [("synthetic-inventory-rich", scope_id) for scope_id in _RICH_SCOPES]
     + [("synthetic-inventory-policy", scope_id) for scope_id in _RICH_SCOPES]
