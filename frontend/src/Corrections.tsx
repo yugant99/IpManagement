@@ -309,7 +309,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
       </select></label>
       {runs && <PageButtons page={runs} change={setRunOffset} disabled={locked || loading} label="Saved run pages" />}
       {runs?.total === 0 && <p>Awaiting domain evidence. The evidence operator manages global reconciliation.</p>}
-      {run && <><p className="quiet">Pinned scenario time {run.demo_clock_at}; saved ledger version {run.ledger_version}.</p>
+      {run && <><p className="quiet">Pinned scenario time {run.demo_clock_at}{run.ledger_version !== undefined && `; saved ledger version ${run.ledger_version}`}.</p>
         <label className="field-label">Anomalous inventory omission<select value={findingId} disabled={locked} onChange={event => { setFindingId(event.target.value); setContext(null); }}>
           <option value="">Select a ghost or unregistered-route finding</option>{availableFindings.map(finding => <option key={finding.id} value={finding.id}>{finding.subject.scope_name} · {finding.subject.cidr} · {finding.rule_id}</option>)}
         </select></label>{!availableFindings.length && <p>This saved run has no anomalous ghost-scope or unregistered-route finding eligible for this workflow.</p>}</>}
