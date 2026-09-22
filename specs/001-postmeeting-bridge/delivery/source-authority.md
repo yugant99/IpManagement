@@ -18,14 +18,14 @@ These four occupancy-like nouns and the intended/observed pair are independent a
 
 | Noun | What it is in this repository | What it is not |
 |---|---|---|
-| **Allocated** | Intended local ledger row in `allocations` (`backend/ipam_demo/schema.sql` 55–69). Workflow authority is only the designated North static IPv4 pool with `management_mode=static` and `allocation_authority=local` (`workflow.py` `_pool` / `_eligibility`). Pending `allocation_requests` do not reserve or allocate. | Not a DHCP lease, not a route, not traffic, not a CMTS/subscriber assignment, not a ticket. |
+| **Allocated** | Intended local ledger row in `allocations` (`backend/ipam_demo/schema.sql` 55–69). Workflow authority is locked to `workflow.STATIC_POOL_ID` (`workflow.py` 19); `_pool` rejects every other ID (110–112), then requires that selected pool to remain IPv4, static and locally authoritative (119–120). There is no configurable designated-pool list. Pending `allocation_requests` do not reserve or allocate. | Not a DHCP lease, not a route, not traffic, not a CMTS/subscriber assignment, not a ticket. |
 | **Leased** | Observed DHCP interval: `address`, `client_id`, `lease_start_at`, `lease_end_at`, `observed_at` under `source.authority=observed` and `required_for=["dhcp_history"]` (`imports.py` 143–145, 411–415). Current claim: `lease_start_at <= clock < lease_end_at`. Positive claims can block allocation; silence never proves availability (`evidence.py` `active_dhcp_claims`). | Not intended inventory. Not occupancy-as-traffic. DHCP-managed pool occupancy uses distinct assignable addresses; renewals do not inflate counts (`calculations.py` 73–74). |
 | **Routed** | Observed routing interval: `cidr`, `router_id`, `valid_from_at`, `valid_until_at`, `observed_at` under `source.authority=observed` and `required_for=["routing_view"]` (`imports.py` 140–142). Compared with **intended** `route_policy` (`source.authority=intended_policy`, `required_for=["route_policy"]`). Match policy `exact` or `covering`. | Not traffic. Not BMP add/withdraw. Not CMTS RF/MAC state. Missing expected route requires a complete declared view (`IMPLEMENTATION_DECISIONS.md` zombie/routing rules). |
 | **Traffic** | **No field, source, or metric exists.** Occupancy and route findings explicitly refuse traffic inference (`calculations.py` 73; `reconciliation.py` 56–57; FR-008/FR-013 non-claims). | Do not treat lease counts, route presence, Docker packaging, or utilization percentages as traffic. |
 | **Intended** | Active seeded/edited inventory (`scopes`, `prefixes`, `pools`, `allocations`) plus intended route policy. Staged candidate inventory (`source_kind=inventory_staged`) is **not** active and does not declare coverage (`imports.py` `_stage_inventory`; `evidence.py` “staged data never active”; `source_catalog.py` staged `authority=not_applicable`). | Staging or C-M assessment is not promotion/cutover (C-M: no activate endpoint). |
 | **Observed** | Imported `dhcp` and `routing` batches. Catalog `authority_status` is `declared` only (`source_catalog.py` 54; `app.py` `/api/source-catalog` limitations). Competing `source_id` families are refused by the synthetic feed adapter (`feed_adapter.py` 305–306). | Declared observed authority is not unique live-system authority and not discovery (`app.py` 498–499). |
 
-Failure cases already encoded in source (not re-run here): unmapped `scope_id`; `SOURCE_KIND_CONFLICT`; `IMPORT_IDENTITY_CONFLICT` on same `(source_id, source_run_id)` with changed canonical JSON; multiple DHCP/policy sources per scope → unresolved authority; stale/incomplete coverage; whole-envelope intended refusal vs coordinator partial observation receipts (C-M).
+Failure cases already encoded in source (not re-run here): unmapped `scope_id`; `SOURCE_KIND_CONFLICT`; `IMPORT_IDENTITY_CONFLICT` on same `(source_id, source_run_id)` with changed canonical JSON; multiple DHCP/policy sources per scope → unresolved authority; stale/incomplete coverage; whole-envelope intended refusal with no receipt or audit; and partial observation receipts through the existing importer, whose current route has no coordinator gate. Coordinator-only observation submission is planned in C-M/C-A.
 
 ---
 
@@ -39,10 +39,11 @@ Inspected at base `6b66f94`. These are **existing** fields. Planned C-M/C-T/C-O 
 |---|---|---|---|
 | `scopes.id,name,namespace,domain,region,managed_cidrs` | `schema.sql` 13–20; `imports.py` 261, 285–296 | Intended isolation. `managed_cidrs` is independently declared perimeter; detection must not derive it from checked inventory (`IMPLEMENTATION_DECISIONS.md` 16). | Unmapped scope rejected. Namespace unique. Domain/region labels are not tenant isolation (RFP-008 remaining gap). |
 | `prefixes.*` including `owner,purpose,tags,custom_fields,version,origin` | `schema.sql` 21–38; `imports.py` 262 | Intended prefix identity and string metadata. | String key/value only; no typed schema designer (RFP-027 remaining). |
-| `pools.management_mode` `dhcp\|static` | `schema.sql` 46; `imports.py` 306–307 | Intended management class. Occupancy/forecast apply only to DHCP-managed IPv4 (`calculations.py` 76–80). | Relabeling a static pool as DHCP is forbidden (C-T / planned T034). |
-| `pools.allocation_authority` `local\|external` | `schema.sql` 47; `seed.py` 94–95; `workflow.py` 119–120 | Local write authority only for static IPv4 designated pool. | External authority is declared, not a live DHCP/DNS/CMTS writer. |
+| `pools.management_mode` `dhcp\|static` | `schema.sql` 46; `imports.py` 306–307 | Intended management class. Occupancy/forecast apply only to DHCP-managed IPv4 (`calculations.py` 76–80). | No current `management_mode` edit path was found. Planned T037 requires no static-pool relabeling; T034 separately freezes a provider fixture distinct from local-static authority. |
+| `pools.allocation_authority` `local\|external` | `schema.sql` 47; `workflow.py` 19, 110–120 | `STATIC_POOL_ID` plus `_pool` 110–112 is the one-pool lock; 119–120 rechecks that selected pool's IPv4/static/local attributes. | No configurable designated-pool list exists. `seed.py` 94–95 validates local-authority attributes; it does not select the designated pool. External authority is declared, not a live DHCP/DNS/CMTS writer. |
 | `allocations` unique `(scope_id,family,address)` | `schema.sql` 55–69 | Intended allocated address. | Cross-scope private reuse is legitimate (RFP-029). Same-scope overlap is conflict. |
 | Seed/edit `origin` | `schema.sql` prefixes/pools/allocations `origin` | Provenance of the active row, not an observation batch. | |
+| `app_meta.singleton=1` `baseline_version,demo_clock_at` | `schema.sql` 2–11; importer/catalog/workflow/reconciliation reads | Sole global baseline and evaluation-clock authority. | No per-scope baseline or clock list exists. Expected baseline is a planned C-M assessment field, not an implemented object. |
 
 ### 2.2 Source batches, coverage, records
 
@@ -52,7 +53,7 @@ Inspected at base `6b66f94`. These are **existing** fields. Planned C-M/C-T/C-O 
 | `(source_id, source_run_id)` + SHA256 canonical JSON | `imports.py` 242–250, 387–397; C-M planned reuse | Replay identity. | Same identity/hash returns original receipt; changed content 409. Raw-byte checksums are provenance only (C-M). |
 | Envelope `source.{name,owner,authority,required_for}` | `imports.py` 407–415; `fixtures/SCHEMA.md` 47 | Declared sender metadata. | Must match kind table below or import is invalid. |
 | `source_coverage` window + `declared_complete` / `effective_complete` | `schema_v2.sql` 15–22; `imports.py` `_coverage` | Sender completeness vs post-reject effective completeness. | Rejected required observations force effective completeness false. |
-| `source_records.status` `accepted\|rejected\|duplicate` | `schema_v2.sql` 24–33 | Exclusive receipt classes; counts sum to input. | Intended staging: all-or-nothing; success `rejected=duplicate=0` (C-M / `_stage_inventory`). Partial row receipts are coordinator observation path only. |
+| `source_records.status` `accepted\|rejected\|duplicate` | `schema_v2.sql` 24–33 | Exclusive receipt classes; counts sum to input. | Existing observation imports may persist partial receipts (`imports.py` 444–520); `/api/imports` is not coordinator gated at this base. Coordinator-only submission is planned in C-M/C-A. Intended staging is all-or-nothing: invalid/duplicate input leaves no receipt or audit, while a new successful staging receipt writes `source.import` (`app.py` 460–477). |
 | `ingested_at` vs `demo_clock_at` vs `observed_at` | batches + typed records | Wall-clock ingest vs evaluation clock vs observation time. | Future `observed_at`/start rejected; future lease/route end allowed. |
 | Catalog `authority_status=declared` | `source_catalog.py` 44–64; `app.py` 491–499 | Receipt projection. | Explicitly not discovery or live uniqueness. Staged rows: `authority=not_applicable`. |
 
@@ -215,7 +216,7 @@ Do not treat as present in schema v5.
 
 | Contract | Planned objects | Authority effect |
 |---|---|---|
-| C-M | `migration-assessments` with source batch ID, canonical hash, mapping/policy revisions, comparison classes, sign-off digest | Assessment is not intended promotion; abandon review changes no persisted state; restore is not undo. |
+| C-M | `migration-assessments` with source batch ID, expected baseline, canonical hash, mapping/policy revisions, comparison classes, sign-off digest | Assessment is not intended promotion; abandon review changes no persisted state; restore is not undo. |
 | C-T | ticket intent/attempt/simulator effect; correlation; route revision; mode=`simulated` | Local allocation independent of ticket. External ticket approval never authorizes IPAM mutation. Provisioning unsupported/not requested. Optional DHCP simulation uses a **separate** fixture (T034), not this ticket. |
 | C-O | operator matrix, recipient pack, authenticated readiness wrapper, separate coordinator vs domain credentials | Wrappers must not log tokens. SQLite snapshot excludes code/UI/feed/config/tokens. Global Docker volume is not isolated by Compose project name. |
 
@@ -228,8 +229,8 @@ Do not treat as present in schema v5.
 | Missing/stale DHCP or routing | `evidence.py`, rules/reconciliation unknown paths | Unknown, not zero use / not safe reclaim |
 | Multiple sources same kind+scope | `evidence.py` 71–72; `reconciliation.py` 61–62 | Authority unresolved |
 | Competing feed `source_id` | `feed_adapter.py` 305–326 | Scheduling 409 `SYNTHETIC_FEED_INCOMPATIBLE` |
-| Intended invalid/duplicate rows | `_stage_inventory` | Whole envelope refused |
-| Observation partial receipts | C-M; coordinator path | Not a migration candidate |
+| Intended invalid/duplicate rows | `_stage_inventory`; `app.py` 460–477 | Whole envelope refused before persistence; no receipt or failure audit. Only a new successful staging import writes `source.import`. |
+| Observation partial receipts | `imports.py` 444–520; `app.py` 460–477 | Existing importer can persist them and its route is not coordinator gated; they are not migration candidates. Coordinator-only submission is planned in C-M/C-A. |
 | DHCP claim on static pool | `calculations.py` `static_dhcp_observations` | Policy discrepancy, not occupancy |
 | Zombie candidate | `IMPLEMENTATION_DECISIONS.md` 47 | Investigation only; not reclaim |
 | Catalog declared authority | `app.py` 498–499 | Not live uniqueness |
