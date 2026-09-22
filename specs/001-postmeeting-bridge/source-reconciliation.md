@@ -82,7 +82,8 @@ substantive documents answer the requirement; it does not prove operational adop
 
 `coverage.csv` contains all 111 sanitized generic topics, all three row classifications,
 exact worksheet locators, candidate capability ID and evidence/task gates. It contains no
-raw private questionnaire wording. No tasks have been approved or decomposed yet.
+raw private questionnaire wording. At the Spec v0 checkpoint, tasks had not yet been
+decomposed; the final package now carries the proposed 40-task graph for lead review.
 
 ## Material conflicts
 

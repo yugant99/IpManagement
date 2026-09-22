@@ -46,5 +46,13 @@ and human/business evidence remain explicit gates. Agent agreement is not runtim
 Owned paths: .specify/, generated .agents/skills/, specs/001-postmeeting-bridge/.
 Branch: codex/postmeeting-specification; original base
 04eba98cb8673406d1e5d38c5318fb963cc77ff7. No global-status/application files changed.
-Fresh checkout: select specs/001-postmeeting-bridge through the local ignored
-.specify/feature.json pointer before invoking toolkit scripts; do not create a second feature.
+Fresh checkout: select the existing feature before invoking toolkit scripts; do not create a
+second feature. From the repository root, run:
+
+```sh
+export SPECIFY_FEATURE=001-postmeeting-bridge
+export SPECIFY_FEATURE_DIRECTORY="$PWD/specs/001-postmeeting-bridge"
+bash .specify/scripts/bash/check-prerequisites.sh --json --require-spec --require-tasks --include-tasks
+```
+
+The first toolkit script call recreates the local ignored `.specify/feature.json` pointer.
