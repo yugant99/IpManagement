@@ -1,0 +1,86 @@
+# Future validation and handoff guide — not executed
+
+This is a runnable-path design guide for the future integrated implementation. It is not
+permission to build, test, start/stop a service, change state or contact a recipient now.
+The planning task ran no application commands. New auth/routes below do not exist yet.
+
+## Prerequisites and candidate
+Main Lead records implementation/validation authorization, exact candidate SHA and selected
+Linux amd64 target. Pin image/UI/feed assets plus schema/config revision, fixture hash and
+isolated data volume. Docker Engine>=24 with the Compose plugin (record exact version; accepted experiment used 5.5.1), Bash/curl/Python3.11+ host tooling;
+application Python3.12 from its image/native dependency lock. No dependency upgrades.
+Use an explicitly isolated disposable synthetic store; changing Compose project alone is
+insufficient because the current volume name is global. Never point recovery exercises at
+the user's live store. Provision separate requester/operator and independent approver tokens
+via the reviewed offline procedure; no token content in evidence or command history.
+
+## Existing operator command sequence (later, on the declared synthetic target)
+From the pinned repository, after reading scripts/ops/README.md and docs/STATE_OPERATIONS.md:
+
+```sh
+scripts/ops/build.sh
+scripts/ops/seed.sh --scenario rich
+scripts/ops/start.sh
+scripts/ops/health.sh
+scripts/ops/acquire.sh bridge-initial-acquisition
+```
+
+These wrappers require the future C-A/C-O auth and readiness updates. The evidence operator supplies the
+separate coordinator token through the approved protected input mechanism; do not paste it into arguments.
+If state already exists, seed must refuse; do not reset it. Acquire retries retain the same key.
+Check all protected readiness booleans and compiled UI, not HTTP200 alone. The timer stays off.
+
+## Independent acceptance observations
+1. Enter scoped operator credentials in browser memory. Compare allowed domain list/detail/
+   export with foreign IDs, mixed raw envelopes, scoped saved-run projections and errors.
+   Repeat after revocation/config reload. Confirm domain callers cannot create global runs,
+   acquire/schedule or request import callbacks; domain refresh only reloads saved projections. No hidden counts/links or token artifacts.
+2. Import wholly selected-domain canonical intended-inventory JSON with reconciliation disabled within 10MiB/10k bound; retain receipt and candidate hash.
+   Produce C-M comparison, check both count equations and active-only set. Inspect whole-envelope invalid/duplicate-row refusal, canonical whole-batch replay,
+   comparison conflict and stale examples; valid intended staging has accepted=input and
+   rejected=duplicate=0. Partial observation receipts are coordinator-only and not part of
+   the migration assessment. Independent sign-off only when valid.
+   Retain active-state revision before/after assessment: unchanged.
+3. Create exact local IPv4 reservation with 24h default; available capacity decreases by one.
+   Request allocation against its exact version and matching owner/service; another permitted
+   principal approves. Reservation converts atomically, no double count. Concurrent/stale/
+   wrong-domain/self-approval actions must fail visibly with preserved state.
+4. Separately reserve another unused local address, request release and independently decide.
+   Release checks no allocation/external effect; refused release leaves hold. Historical due
+   fixture shows alert/alarm timing and acknowledgement without automatic free/clear.
+5. Observe local request plus ticket intent, then manual simulated attempt/readback. Cover
+   success, definitive failure, effect-committed/response-lost, no-effect-response-lost and
+   disabled connector. Use same correlation/digest; unknown never shown successful and
+   attempts never exceed three. Ticket failure does not erase local allocation.
+6. Compare current static hold occupancy to its ledger and saved DHCP metrics to saved source;
+   show exact units/time/completeness. Unknown evidence cannot clear finding-backed alarm.
+7. Export same-candidate sanitized evidence/offline API pack. Every simulated ID/receipt says
+   simulated, provisioning unsupported; no 92-completed or live integration claim.
+
+Luna retains exact requests/redacted responses, candidate/schema/config revisions, prior
+and resulting IDs/versions, failures, evidence hashes and limitations. The author cannot
+self-accept. A correctly represented/recoverable unknown outcome is an expected case.
+
+## Stopped recovery sequence (later, disposable target only)
+Use a new snapshot filename; both backup and restore require stopped service:
+```sh
+scripts/ops/stop.sh
+scripts/ops/backup.sh bridge-review.sqlite3
+scripts/ops/snapshots.sh list
+scripts/ops/restore.sh bridge-review.sqlite3 --confirm
+scripts/ops/start.sh
+scripts/ops/health.sh
+```
+Stop/start operations here are future instructions, not executed. Snapshot restores state,
+not code/UI/config/credentials; pin/provision those separately. Restore never implicitly
+migrates: invoke scripts/ops/migrate.sh only for an explicitly recognized old schema under
+the adopted upgrade protocol, still stopped. Retain rejected corrupt/nonstandalone/unsupported/
+busy cases without damaging the prior store. Compare allocation/reservation/request/intent/
+attempt/assessment/audit lineage and readiness plus representative business read afterward.
+Measure full declared incident boundary; historical 4.427 seconds is not this changed candidate.
+
+## Human and business gate
+One guided human rehearsal must have an actual participant/acknowledgement to claim handoff.
+Agent reproduction supplies technical evidence only. Missing human/Fable/commercial inputs
+remain separately named gates. Main Lead accepts the evidence or returns bounded findings;
+workers report exact SHA/PR, evidence, gaps and draft next prompt, never global completion.

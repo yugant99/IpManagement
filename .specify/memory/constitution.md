@@ -59,11 +59,12 @@ Scoped identity, immutable receipts/runs, staged inventory authority and indepen
 approval remain binding until an explicit decision and lead-approved amendment replace them.
 
 ## Decision and Review Workflow
-Create Spec v0 before interviewing. Ask exactly Q001–Q100 in dependency-aware frontier
-rounds, with recommendations. Record real user answers, rationale, affected requirements,
-downstream dependencies and conflicts. Recommendations are not answers. No final spec lock,
-technical plan or task decomposition until all 100 decisions are answered and conflicts
-resolved. Fable advises after lock and has no acceptance authority.
+Create Spec v0 before agent grilling. Run exactly Q001–Q100 between architecture agents in dependency-aware frontier
+rounds. Record actual proposer answers, adversarial challenges, resolutions, rationale,
+affected requirements and downstream dependencies. Do not interview the user for routine
+architecture decisions. Explicit planning assumptions are not discovered facts. No final
+spec lock, technical plan or task decomposition until all 100 decisions are answered and
+material conflicts resolved. Fable advises after lock and has no acceptance authority.
 
 ## Governance
 This is proposed adoption of the task constraints, not a takeover of repository governance.
@@ -71,7 +72,9 @@ Latest user instructions and project authority control conflicts. Main Lead 3.0 
 repository-wide adoption and amendments. Record reasons, affected decisions/contracts and
 compatibility impact. Semantic versions: major for incompatible governance, minor for
 added principles, patch for clarifications. Every checkpoint records compliance/open gates.
-Initial version 1.0.0 replaces only the toolkit scaffold; no templates changed. Adoption
+Initial version 1.0.0 replaced only the toolkit scaffold; no templates changed.
+Version 1.1.0 records the user's correction to agent-to-agent architectural grilling.
+Agent agreement locks a candidate for lead review; it does not confer lead acceptance. Adoption
 is pending lead review. Ratification date remains unset until that review.
 
-**Version**: 1.0.0 | **Ratified**: Pending lead review | **Last Amended**: 2026-09-22
+**Version**: 1.1.0 | **Ratified**: Pending lead review | **Last Amended**: 2026-09-22

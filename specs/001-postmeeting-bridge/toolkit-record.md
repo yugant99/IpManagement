@@ -35,11 +35,26 @@ Constitution scaffold → 1.0.0 introduces eight principles, scope, review workf
 governance. Main Lead 3.0 adoption remains pending. Temporary sync-impact content is
 summarized here and not embedded in the committed governance text. No template edits.
 
-Task-specific overrides: the user explicitly requires Spec v0 before questions and
-exactly 100 questions in frontier rounds, superseding the toolkit's default maximum of
-three clarifications. Unanswered decisions remain in the register; the toolkit's usual
-“ready for planning” completion is withheld. Grilling supplies the interview; Spec Kit
-planning/tasks run only after all 100 genuine answers and conflict resolution.
+Task-specific overrides: Spec v0 precedes exactly 100 real architecture decisions. The
+latest user correction makes this agent-to-agent grilling, not a user interview. Actual
+responses and challenges, including refused lock and amendments, are in agent-grilling.md.
+Constitution 1.1.0 records that correction; Main Lead adoption remains pending.
 
-No application tests, smoke tests, builds, services, deployment or paid model calls.
-Toolkit initialization and document inspection are not application verification.
+After actual initial Q100 lock, ran the real workflows:
+
+```sh
+bash .specify/scripts/bash/setup-plan.sh --json
+bash .specify/scripts/bash/setup-tasks.sh --json
+bash .specify/scripts/bash/check-prerequisites.sh --json --require-spec --require-tasks --include-tasks
+```
+
+Plan template filled with researched existing architecture; research/data-model/contracts/
+quickstart authored. Tasks generated from settled stories/contracts, then read-only analyze
+performed across spec/plan/tasks/constitution. No extension hooks file is installed, before
+or after these workflows. Script logical BRANCH output is 001-postmeeting-bridge from the
+feature pointer; real Git branch is codex/postmeeting-specification.
+Independent source review found six material corrections; agents resolved them, artifacts
+were updated as part of the authorized specification work, and Q100 was reconfirmed.
+The retained analysis report is a separate requested deliverable after read-only analysis;
+no analyze hook changed application files. No application tests, smokes, builds, services,
+deployments, infrastructure, paid model calls, external messages or customer submissions.

@@ -1,3 +1,5 @@
+> Historical record: superseded by the user-directed agent-to-agent review. See agent-grilling.md.
+
 # Round 1 — product boundary and delivery intent
 
 Status: awaiting real user answers. Recommendations are not decisions.

@@ -1,6 +1,6 @@
 # Ambiguity and decision register
 
-Spec v0. Recommendations are proposals, not answers. User answers belong in questions.csv.
+Historical ambiguity origins and current agent resolutions. Actual agent answers/challenges are in questions.csv.
 Discoverable facts are researched from documents/source, not sent back as decision questions.
 
 ## Eight previously identified clarification-pending requirements
@@ -27,12 +27,10 @@ cover them without treating every comment as a new implementation mandate.
   remains unverified. Exact reassignment, reservation/static-mode, prefix proposal/removal
   and LDAP/domain wording remain ambiguous. License alarm-without-shutdown is legible
   meeting intent, still subject to product policy decision. No source inspection blocker remains.
-- A-SRC-02: No named EMS product/version/operation contract is supplied. The product boundary
-  is a user decision; once chosen, research official documentation and actual available schema.
+- A-SRC-02: No named EMS product/version/operation contract is supplied. Q063–Q064 resolve this as future read-only contract discovery; no implementation platform is invented.
 - A-SRC-03: No live instance, credentials or operational authorization follows from a suggested
   ServiceNow account. Design can specify sandbox gates without connecting now.
-- A-SRC-04: Three-day elapsed schedule, staffing hours and tradeoffs require user decisions.
-  Earlier 20-hour and Spencer 6–8-hour budgets are historical, not confirmed new capacity.
+- A-SRC-04: Q007/Q089–Q099 set relative days, 20% reserve and Spencer 2 hours/day plus at most 2 contingency hours as planning assumptions, not confirmed capacity.
 
 ## Contract conflicts to resolve before lock
 
@@ -47,17 +45,28 @@ cover them without treating every comment as a new implementation mandate.
 | DNS automation request versus explicit exclusion | FR-007, FR-010, FR-012 | Read/validate/export only; any future write must be separately specified |
 | 92 label versus 39 accepted observations | FR-001 | Separate target ledger; lead-only evidence promotion |
 
-Resolve user-answer conflicts explicitly. Clarify within the same numbered decision until
-answered consistently; do not invent an additional Q101 or silently average positions.
-If further independent decisions are discovered, replace an unasked slot and retain the
-change history. If 100 cannot close all branches, report that conflict before claiming lock.
+## Agent resolutions
+
+- 008: internal domain authorization, not customer tenancy (Q003/Q009–Q020).
+- 024: managed-network inventory contract; packaging receives no duplicate credit (Q004).
+- 025/093/094: future workload cohorts and qualification, no three-day scale claim (Q081–Q088).
+- 040: evidence-backed gap/owner report without invented maturity score (Q005/Q079).
+- 044: future read-only EMS inventory/status contract; no guessed product endpoint (Q064).
+- 096: manage existing service interfaces, no DNS/DHCP server operation (Q006/Q059/Q065).
+- Migration: assessment only; no promotion/cutover (Q021–Q032).
+- Identity: token-backed principals plus default-deny egress; labels are insufficient (Q009–Q020).
+- Lifecycle: explicit reservations distinct from pending requests; allocated release/reuse is Tier B behind history-preserving schema changes (Q033–Q046).
+- Subscriber/ticket: synthetic service reference only, one durable ticket simulator, no real provisioning or inbound approvals (Q047–Q058).
+- Events: closed local event set, manual attempts, stable correlation and unknown readback gates (Q066–Q070).
+- DNS: existing IPAM context export only; no new parser/live read/write (Q065).
+- Evidence: all 111 rows keep baseline and meeting labels separate (Q080).
 
 ## Gates
 
-G0: Complete source inspection or explicit approved source omission.
-G1: Publish Spec v0 before interview.
-G2: Exactly 100 real user answers, no unanswered/conflicting decisions.
-G3: User confirms shared understanding (Q100), required conflicts resolved.
-G4: Locked specification → Spec Kit plan → tasks → consistency analysis.
-G5: Fable advisory after lock, independent evidence review, Main Lead 3.0 acceptance.
-No gate is an authorization to implement or execute tests.
+G0 source inspection completed, with retained-image byte identity limit.
+G1 Spec v0 published before actual review.
+G2 Q001–Q100 actual agent answers/challenges recorded.
+G3 Q100 initially refused three wording conflicts, then confirmed the corrected candidate before lock.
+G4 Agent-locked specification → real Spec Kit plan → tasks → consistency analysis.
+G5 Independent document review for this package; later Fable advice and Main Lead adoption/acceptance remain explicit gates.
+No gate authorizes application implementation or runtime tests.
