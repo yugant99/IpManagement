@@ -114,7 +114,7 @@
       "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
     }
   ],
-  "route_decision": "User explicitly accepts native Codex Terra; equally or more capable OpenCode fallback permitted for limits/subpar performance, with recorded evaluation and exact route. Astra remains lead.",
+  "route_decision": "Latest explicit user instruction: GPT-6 Luna replaces Terra implementation; GPT-6 Sol replaces Grok4.7 reviewer and handles difficult escalation; Astra remains lead. Go quota429 stops further Go calls pending reset. Prior completed runs retain actual model identities.",
   "next_wave": [
     {
       "task": "T004",
@@ -122,7 +122,7 @@
       "branch": "codex/bridge-t004-access",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-access/Ip_inventory",
       "route": "Codex gpt-5.6-terra high",
-      "status": "running",
+      "status": "source_accepted_runtime_unverified",
       "prerequisites": [
         "T003 source acceptance"
       ],
@@ -131,7 +131,10 @@
         "backend/ipam_demo/models.py"
       ],
       "acceptance": "Default-deny trusted context, fail-closed invalid authority and stopped/reload revocation source contract; exact interface for T005/T006. No routes/runtime acceptance yet.",
-      "prohibited": "Unleased app/schema/UI/packaging/status files, real credentials, tests/runtime in this source slice, external spending/deployment, Fable/autodelegation."
+      "prohibited": "Unleased app/schema/UI/packaging/status files, real credentials, tests/runtime in this source slice, external spending/deployment, Fable/autodelegation.",
+      "result_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
+      "review_route": "Codex gpt-6-sol high",
+      "correction_route": "Codex gpt-6-luna high"
     },
     {
       "task": "T019",
@@ -139,7 +142,7 @@
       "branch": "codex/bridge-t019-qualification",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-qualification/Ip_inventory",
       "route": "Codex gpt-5.6-sol high",
-      "status": "running",
+      "status": "source_accepted",
       "prerequisites": [
         "T002 source acceptance"
       ],
@@ -147,7 +150,9 @@
         "specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md"
       ],
       "acceptance": "Each exclusion has owner/evidence boundary/future gate; numeric cohorts remain assumptions. Source-only document.",
-      "prohibited": "Every other path, external research/credentials, tests/runtime, human or commercial claims, ledger changes."
+      "prohibited": "Every other path, external research/credentials, tests/runtime, human or commercial claims, ledger changes.",
+      "result_sha": "4034c765fce8a68f8cd73195c73f9a3bdd185d24",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/70"
     }
   ]
 }

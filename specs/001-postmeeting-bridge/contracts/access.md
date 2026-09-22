@@ -116,3 +116,61 @@ original-context recovery pointer, require authorized readback before replacemen
 never silently generate a new key or resend it as another principal. Server history remains
 authoritative. Within the same authorized context, exact-key retry semantics remain intact.
 No token enters browser persistent storage, URLs, logs or recovery pointers.
+
+
+## Lead 4.0 implementation interface — T004/T005/T006
+
+This freezes the wire boundary for parallel implementation; it is not runtime evidence.
+
+- V1 offline issuance uses `secrets.token_hex(32)`: exactly 32 cryptographically random
+  bytes, encoded as 64 lowercase hexadecimal characters. The authority stores SHA-256
+  of that exact ASCII token and `token_bits=256`. The bearer parser rejects any other
+  shape. Shape validation does not prove randomness; authorized offline issuance and
+  custody remain required. Never generate or retain real tokens in repository artifacts.
+- `GET /api/access-context` authenticates the bearer and returns only `AccessContext`
+  from T004, without inventory. Omitted domain is allowed for this bootstrap; a supplied
+  `X-IPAM-Domain` must be permitted. Roles contain effective Viewer inheritance.
+- All ordinary data calls send `Authorization: Bearer ...` and `X-IPAM-Domain`. Clients
+  also pin `X-IPAM-Configuration-Revision` and `X-IPAM-Configuration-Digest` from bootstrap;
+  a mismatch returns `409 ACCESS_CONTEXT_STALE` before protected output or mutation.
+  Authenticate the bearer, enabled state and expiry before comparing pins: a revoked
+  or invalid token returns generic 401 even with stale pins. Unauthenticated responses
+  carry no configuration headers.
+  Bootstrap and authenticated API docs do not require these pins. Coordinator calls
+  use freshly authenticated explicit grants rather than an ordinary selected domain.
+- Authenticated responses include the current `X-IPAM-Configuration-Revision` and
+  `X-IPAM-Configuration-Digest`. The browser rejects responses from an earlier local
+  session epoch or a different configuration. Refresh bootstrap before restoring any
+  protected view. No credential or digest-of-token is returned.
+- `GET /api/actors` is a compatibility shape containing only the current trusted
+  principal, with permissions derived from its effective roles. Existing nested actor
+  arrays follow the same rule; no fabricated teammate names or selectable identities.
+  `request` requires Requester, `approve` Approver, `inventory_edit` and `exception`
+  Operator. Combined roles combine these grants; platform admin and coordinator add none.
+- `GET /api/readiness` returns T004 `ReadinessStatus` (six booleans and sanitized reasons),
+  Operator-only with selected domain. `/healthz` returns only `{"process_ready": true}`.
+  Ordinary viewing must not depend on permission to inspect readiness.
+- Existing resource response shapes remain where safe. Saved-run projections identify
+  selected domain and projection provenance, recompute counts, and never replace the
+  immutable saved global result. The UI labels the projection and never displays global
+  totals or raw envelopes obtained under a different context.
+- `GET /api/correction-requests` may accept an optional `idempotency_key` filter for
+  recovery, additionally restricted to the current principal and selected domain before
+  count/pagination. Ordinary list behavior remains scoped. A request ID readback also
+  rechecks current authority. This uses existing persisted request identity.
+- Retain a minimal correction recovery pointer containing original principal, domain,
+  configuration revision/digest, operation kind (`proposal`, `approve` or `reject`), and request ID or idempotency key.
+  No token, payload, source finding, form values or actor metadata enters that pointer.
+  Purge legacy unscoped saved payloads. Within one active authorized context the exact
+  retry payload can remain in memory. After reload or a context change, reauthenticate
+  the original principal/domain before any readback; a new configuration requires fresh
+  authorization. Confirm a readback only when saved key/request ID, original principal
+  (actor_id for proposals, decision_actor_id for decisions), and intended outcome match.
+  A decision made by another principal does not confirm this original ambiguous call.
+  Missing/denied/failed readback does not prove the old write absent or
+  authorize silent replacement. Keep ambiguous work visibly unresolved.
+
+T005 validates configuration ownership against stored scope domains and registered feed
+scope/source grants. T006 resets the mounted protected application on logout, revocation
+and principal/domain/configuration change, and checks its captured session epoch after
+all response-body reads including downloads. Tokens stay only in memory.

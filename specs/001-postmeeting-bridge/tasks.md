@@ -1,7 +1,8 @@
 # Tasks: Post-meeting IPAM / Pool Watch bridge
 
 Input: locked spec, plan, data model, contracts and Q001–Q100 decisions.
-None of these implementation tasks has been performed. This package is planning only.
+The original package was planning only. Checked tasks now refer to the dated source-only
+closures in delivery/foundation-source-review.md; no runtime acceptance is implied.
 Implementation and validation each require later authority. No test code tasks added.
 Future independent observations are acceptance gates, never implied completed runs.
 
@@ -32,7 +33,7 @@ T001/T002 are documentary source checkpoints. T003 is source accepted at9c73fd8;
 
   Prerequisites: T001; owner: Terra in Codex; FR-002 FR-003 FR-004 FR-005 FR-016. Completion: Explicit recognized upgrade and fresh initialization; no destructive reseed or history loss.
 
-- [ ] T004 Implement bearer-digest principal and reviewed config: token at least 256 random bits, enabled/UTC expiry/roles/domains/revision; one domain, no actor fallback/admin bypass, no secret logging. Define the fixed internal evidence coordinator with explicit complete synthetic feed scope/source grants, global evidence operations only and no user delegation. Files: `backend/ipam_demo/access.py`, `backend/ipam_demo/models.py`.
+- [x] T004 Implement bearer-digest principal and reviewed config: token at least 256 random bits, enabled/UTC expiry/roles/domains/revision; one domain, no actor fallback/admin bypass, no secret logging. Define the fixed internal evidence coordinator with explicit complete synthetic feed scope/source grants, global evidence operations only and no user delegation. Files: `backend/ipam_demo/access.py`, `backend/ipam_demo/models.py`.
 
   Prerequisites: T003; owner: Terra in Codex; FR-005 FR-015. Completion: Default-deny trusted context, fail-closed invalid authority and stopped/reload revocation.
 
@@ -112,7 +113,7 @@ Goal/gate: exact current/saved metric identity and due conditions; arithmetic/ac
 
 Goal/gate: same-candidate package with actual target/recovery observations and separate human acknowledgement. Preparation runs from Day1 in parallel despite grouped display order.
 
-- [ ] T019 [P] [US4] Write evidence-based maturity/authority gaps and future HA/scale/encryption/virtual-network/EMS/DNS/IaC/fixed-workflow dispositions; human business-owner register, licensing continuity documentary only. Files: `specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md`.
+- [x] T019 [P] [US4] Write evidence-based maturity/authority gaps and future HA/scale/encryption/virtual-network/EMS/DNS/IaC/fixed-workflow dispositions; human business-owner register, licensing continuity documentary only. Files: `specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md`.
 
   Prerequisites: T002; owner: Grok 4.6 under Grok 4.7; FR-010 FR-012 FR-014 FR-016 FR-017 FR-018 FR-020 FR-022. Completion: Each exclusion has owner/evidence boundary/future gate; numeric cohorts are assumptions, not source requirement replacements.
 

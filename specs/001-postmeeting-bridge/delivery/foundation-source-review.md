@@ -115,3 +115,46 @@ access.py/models.py leased. T019 is released to Sol replacing the quota-blocked 
 in codex/bridge-t019-qualification from exactab005d8, with only delivery/gaps-and-qualification.md
 leased. Spencer's prepared codex/bridge-t020-matrix was fast-forwarded to exactab005d8;
 T020's source prerequisite is available, but no human execution or acknowledgement is claimed.
+
+
+## T019 documentary closure
+
+Sol authored `af2f74a53668b52c31a200c50f2186b22a71cc88`. Independent Astra
+source review found the missing RFP-019 recovery-point disposition. Correction
+`4034c765fce8a68f8cd73195c73f9a3bdd185d24` retains its Missing class, requires an
+approved backup policy and measured loss window, assigns the platform operator role,
+and keeps the 24-hour snapshot-age planning assumption separate from that requirement.
+Main Lead accepts this corrected document as source-only. No human owner acknowledgement,
+runtime measurement, customer requirement fulfilment or ledger change follows.
+
+## T004 access review in progress
+
+Initial Terra implementation `735df304060971e24a9156d1a73d0e951048ce73` needed
+four source corrections: Viewer inheritance for Requester/Operator/Approver without
+admin inheritance; a simulated/disabled connector-mode allowlist; duplicate JSON-key
+refusal; and unambiguous domain ownership of a scope across source mappings.
+The lead read the corrected diff at actual Git SHA
+`aa5a387d063a73a00fc17a2374037bc8bf314871`. The worker's first full-SHA handoff
+had an incorrect suffix; this verified Git identity supersedes it.
+
+The Grok4.7 review attempt hit Go quota429 before returning findings. The latest user
+explicitly replaced that review role with GPT-6 Sol and Terra implementation with
+GPT-6 Luna. Independent Sol source review is now assigned to the corrected exact SHA.
+Route/startup enforcement, configuration-versus-persisted-scope checks and client
+integration remain T005/T006; no application execution has occurred.
+
+
+### T004 final source closure
+
+GPT-6 Sol found one remaining gap: token_bits was self-declared while arbitrarily short
+matching bearer strings were accepted. GPT-6 Luna corrected it at
+`c7a3bed6dfec31bd07abc613f52b64f1304a1349`: fixed 32-byte random offline issuance,
+64 lowercase hexadecimal bearer format, token_bits=256 and SHA-256 over exact ASCII.
+No actual token/configuration was created. Lead read the exact correction and accepts
+T004 source only; the format does not itself prove random issuance.
+
+Sol also reviewed the T005/T006 wire freeze. Lead adopted its two clarifications:
+authenticate/revoke before comparing configuration pins, with no config headers on
+unauthenticated responses; and match correction recovery to original actor and exact
+proposal/approve/reject outcome, never another principal's decision.
+T005/T006 and all runtime/independent QA gates remain open.

@@ -1,5 +1,23 @@
 # Active model routes —2026-09-22
 
+## Latest user-directed replacements
+
+The user now explicitly assigns **GPT-6 Luna** to all work previously assigned to Terra,
+and **GPT-6 Sol** to the Grok4.7 review role and difficult implementation escalations.
+Native routes are `gpt-6-luna` and `gpt-6-sol`; Astra remains lead. Completed runs below
+retain their actual original model identities. These changes do not turn prior source
+review into runtime evidence. Independent QA remains a separate worker and gate from
+the Luna implementation lane.
+
+The attempted T004 review on `opencode-go/grok-4.7#high` stopped with
+`provider.quota`, HTTP429, `Go usage limit exceeded`, before returning source findings
+(session `ses_f34ea7951ffeaWltEiAHeydGdI`). No more Go calls are dispatched while that
+account limit is unresolved; no purchase, extra-usage activation or new credential is
+used. GPT-6 Sol replaces this review and any blocked leaf that needs escalation.
+
+## Earlier route history
+
+
 After interactive inspection and a routing correction, the user explicitly accepts native
 Codex Terra. An equally or more capable OpenCode fallback is authorized for actual limits
 or subpar performance; the lead records the evidence and exact route before replacement. This does not change the Astra lead model.
