@@ -36,7 +36,7 @@ def project_run(run, scope_ids, *, domain, source_pairs=()):
     """Return a separately identified selected-domain projection of one immutable run."""
     allowed = set(scope_ids)
     pairs = set(source_pairs)
-    local_sources = {"local-inventory-correction", "local-demo-workflow"}
+    local_sources = {"local-inventory", "local-inventory-correction", "local-demo-workflow"}
     def safe_source(source_id, scope_id):
         return (source_id, scope_id) in pairs or source_id in local_sources
     findings = []
@@ -83,11 +83,19 @@ def project_run(run, scope_ids, *, domain, source_pairs=()):
                 for state in ("anomalous", "healthy", "unknown", "not_applicable")}
     overview["total"] = len(findings)
     projection = {key: value for key, value in run.items() if key != "ledger_version"}
+    candidate_space = run.get("candidate_space", {})
+    if not isinstance(candidate_space, dict):
+        candidate_space = {}
+    by_scope = candidate_space.get("by_scope", [])
+    if not isinstance(by_scope, list):
+        by_scope = []
+    scoped_candidate_space = {**candidate_space,
+                              "by_scope": [item for item in by_scope
+                                           if isinstance(item, dict) and item.get("scope_id") in allowed]}
     return {**projection, "findings": findings, "calculations": calculations,
             "selected_batches": selected_batches, "overview": overview,
             "rule_ids": sorted({item.get("rule_id") for item in findings if item.get("rule_id")}),
-            "candidate_space": {**candidate_space,
-                                 "by_scope": {key: value for key, value in by_scope.items() if key in allowed}},
+            "candidate_space": scoped_candidate_space,
             "projection": {"kind": "selected_domain", "domain": domain, "scope_ids": sorted(allowed),
                            "source_run_id": run.get("id")}}
 
@@ -201,6 +209,9 @@ def preset_csv(connection, expected_revision, domain, scope_ids, source_pairs=()
         raise AppError("NOT_FOUND", "Save the report preset before exporting it.", 404)
     if preset["revision"] != expected_revision:
         raise AppError("STALE_REPORT_PRESET", "The saved preset changed. Reload the saved preset, review its run, filters and columns, then export again.", 409)
+    scope_filter = preset.get("filters", {}).get("scope_id")
+    if scope_filter and scope_filter not in set(scope_ids):
+        raise AppError("NOT_FOUND", "Saved report preset was not found.", 404)
     run = project_run(get_run(connection, preset["run_id"]), scope_ids, domain=domain, source_pairs=source_pairs)
     if not run["selected_batches"] and not run["findings"] and not run["calculations"]:
         raise AppError("NOT_FOUND", "Saved report preset was not found.", 404)

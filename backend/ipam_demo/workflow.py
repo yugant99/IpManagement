@@ -167,7 +167,7 @@ def _eligibility(connection, pool, ranges, exclusions, candidate, clock):
     evidence = active_dhcp_claims(connection, pool["scope_id"], 4, candidate, clock)
     if evidence["claims"]:
         raise AppError("CANDIDATE_OBSERVED", "Current eligible DHCP evidence contradicts allocation of this candidate.",
-                       409, {"claims": evidence["claims"]})
+                       409, {"evidence": "eligible_dhcp_observation"})
     return evidence.get("unknown_reasons", [])
 
 
