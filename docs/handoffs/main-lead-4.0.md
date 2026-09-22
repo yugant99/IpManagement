@@ -15,7 +15,7 @@ Registered 2026-09-22 by explicit user handoff. Task `01a0cade-506f-7442-97da-0c
 
 Authorized: establish lead records; inspect/adopt or return the specification; load actual capacity; prepare isolated branches; coordinate bounded Tier A implementation; review source and collect evidence. This grant supersedes old statements forbidding a new phase, without changing historical evidence.
 
-Not authorized: additional paid-model/cloud spend, new infrastructure/deployment/public exposure, customer credentials/systems, or invented runtime/human/commercial outcomes. Application tests, builds, smokes and state operations are not launched by this registration; the prepared candidate-specific validation scope remains pending explicit authorization.
+Not authorized: additional paid-model/cloud spend, new infrastructure/deployment/public exposure, customer credentials/systems, or invented runtime/human/commercial outcomes. No tests/builds/state operations run for this documentation-only registration. The active handoff explicitly assigns Luna to test the assembled candidate; the authority record bounds that grant to named local Tier A cases on disposable synthetic data, after dependencies pass. Infrastructure/customer/user-store execution remains excluded.
 
 OpenCode route and capacity preflight is recorded in the delivery package. Do not silently substitute models or start metered inference to discover whether billing is included. T001 stays incomplete until its dispatch gates are closed. Prepare work while that gate is unresolved; mark held assignments as prepared, never running.
 

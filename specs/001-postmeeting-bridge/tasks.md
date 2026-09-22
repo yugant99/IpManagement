@@ -17,7 +17,7 @@ migration never authorizes a local change. US4 prepares alongside core implement
 
 - [ ] T001 Adopt contracts; record actual implementation/validation authority, model/staff availability, base SHA, schema reservation and file ownership. Files: `specs/001-postmeeting-bridge/delivery/authorization-and-ownership.md`.
 
-  Prerequisites: authority gate; owner: Astra / Main Lead 3.0; FR-001 FR-005 FR-015 FR-021. Completion: Explicit lead decision before dispatch; no inferred execution permission.
+  Prerequisites: authority gate; owner: Astra / Main Lead 4.0; FR-001 FR-005 FR-015 FR-021. Completion: Explicit lead decision before dispatch; no inferred execution permission.
 
 - [ ] T002 [P] Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint. Files: `specs/001-postmeeting-bridge/delivery/source-authority.md`.
 
@@ -34,11 +34,11 @@ migration never authorizes a local change. US4 prepares alongside core implement
 
   Prerequisites: T003; owner: Terra in OpenCode; FR-005 FR-015. Completion: Default-deny trusted context, fail-closed invalid authority and stopped/reload revocation.
 
-- [ ] T005 Enforce all C-A routes/nested serializers before counts/export; project authorized saved runs without raw mutation; deny mixed raw/unmapped legacy data; scoped presets/audit/timer/docs/readiness, anonymous minimal liveness only. Global run/acquire/observation-callback mutations and receipts are coordinator-only; ordinary imports intended candidates only, callback disabled, mixed/observation/callback=true rejected before persistence. Ordinary refresh reads saved projections. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/inventory.py`, `backend/ipam_demo/reports.py`, `backend/ipam_demo/imports.py`, `backend/ipam_demo/source_catalog.py`, `backend/ipam_demo/scheduler.py`, `backend/ipam_demo/workflow.py`, `backend/ipam_demo/feed_adapter.py`.
+- [ ] T005 Enforce all C-A routes/nested serializers before counts/export; project authorized saved runs without raw mutation; deny mixed raw/unmapped legacy data; scoped presets/audit/timer/docs/readiness, anonymous minimal liveness only. Global run/acquire/observation-callback mutations and receipts are coordinator-only; ordinary imports intended candidates only, callback disabled, mixed/observation/callback=true rejected before persistence. Ordinary refresh reads saved projections. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/inventory.py`, `backend/ipam_demo/reports.py`, `backend/ipam_demo/imports.py`, `backend/ipam_demo/source_catalog.py`, `backend/ipam_demo/scheduler.py`, `backend/ipam_demo/workflow.py`, `backend/ipam_demo/feed_adapter.py`, `backend/ipam_demo/inventory_commands.py`. Preserve Operator inventory_edit and independent Approver correction decisions without general direct-edit rights.
 
   Prerequisites: T004; owner: Terra in OpenCode; FR-005 FR-009 FR-013 FR-015 FR-019. Completion: Every route has allow/deny/projection classification and no global data leak.
 
-- [ ] T006 [P] Wire memory-only token/domain through all clients and authenticated blob downloads; remove actor picker as identity; expose auth/stale/permission failures. Disable global run/acquisition/schedule/callback controls for ordinary domain sessions; saved-result refresh only. Files: `frontend/src/api.ts`, `frontend/src/firstPathApi.ts`, `frontend/src/workflowApi.ts`, `frontend/src/inventoryCommandsApi.ts`, `frontend/src/correctionApi.ts`, `frontend/src/scheduleApi.ts`, `frontend/src/App.tsx`, `frontend/src/FirstPath.tsx`, `frontend/src/Schedule.tsx`, `frontend/src/CapacityReports.tsx`.
+- [ ] T006 [P] Wire memory-only token/domain through all clients and authenticated blob downloads; remove actor picker as identity; expose auth/stale/permission failures. Disable global run/acquisition/schedule/callback controls for ordinary domain sessions; saved-result refresh only. Files: `frontend/src/api.ts`, `frontend/src/firstPathApi.ts`, `frontend/src/workflowApi.ts`, `frontend/src/inventoryCommandsApi.ts`, `frontend/src/correctionApi.ts`, `frontend/src/scheduleApi.ts`, `frontend/src/App.tsx`, `frontend/src/FirstPath.tsx`, `frontend/src/Schedule.tsx`, `frontend/src/CapacityReports.tsx`, `frontend/src/Corrections.tsx`, `frontend/src/InventoryEditor.tsx`, `frontend/src/Workflow.tsx`. Bind protected state/retries to authenticated principal/domain/config revision, reject late prior-context responses and require original-context readback for ambiguous operations before replacement.
 
   Prerequisites: T004; owner: DeepSeek UI under Terra; FR-005 FR-009 FR-015 FR-019. Completion: No token in URL/localStorage/logs; browser uses trusted context everywhere.
 
@@ -145,13 +145,13 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
   Prerequisites: T025; owner: Spencer under Luna coordination; FR-020 FR-021. Completion: Human-handoff claim only with actual acknowledgement; agent reproduction not substitute.
 
-- [ ] T027 [P] After later authorized Fable invocation, review exact locked design and candidate for contradictions/history/authority/failures/false claims/critical-path feasibility; retain findings or explicit pending/lead waiver. Files: `specs/001-postmeeting-bridge/delivery/fable-advisory.md`.
+- [ ] T027 Final pre-acceptance Fable advisory on the exact implementation candidate and retained T025 evidence for contradictions/history/authority/recovery/false claims and critical-path feasibility. Files: `specs/001-postmeeting-bridge/delivery/fable-advisory.md`.
 
-  Prerequisites: T001; owner: Fable direct advisory to Main Lead; FR-001 FR-002 FR-003 FR-004 FR-005 FR-009 FR-016 FR-021. Completion: Actual advice or explicit lead waiver before acceptance; Fable has no acceptance authority.
+  Prerequisites: T024 T025; owner: Fable via Claude Code CLI, direct advisory to Main Lead; FR-001 FR-002 FR-003 FR-004 FR-005 FR-009 FR-016 FR-021. Completion: Actual exact-candidate advice or explicit lead waiver before acceptance; Fable has no acceptance authority. The separate post-spec/dispatch-lock design advisory (FABLE-DESIGN after T001) does not complete T027.
 
 - [ ] T028 Adjudicate evidence/Fable/human/business gates, accept only proved clauses, coordinate PR merges and authorized next stage prompt; incomplete Tier A remains partial. Files: `specs/001-postmeeting-bridge/delivery/lead-adjudication.md`, `docs/STATUS.md`, `docs/QUESTIONNAIRE_ROW_MAP.md`.
 
-  Prerequisites: T025 T026 T027; owner: Astra / Main Lead 3.0; FR-001 FR-020 FR-021. Completion: Lead alone changes canonical ledger/status; no hidden external gate or92-completed claim.
+  Prerequisites: T025 T026 T027; owner: Astra / Main Lead 4.0; FR-001 FR-020 FR-021. Completion: Lead alone changes canonical ledger/status; no hidden external gate or92-completed claim.
 
 
 ## Optional Tier B — off the three-day critical path
@@ -213,7 +213,7 @@ Core path: T001 → T003 → T004 → T005/T006 → T007 → T008 → T009 → T
 T012/T013 → T014 → T015/T016 → T017/T018 → T023/T024 → T025 → T028.
 Full CSV includes operator/API/gap prerequisites. T019/T020 run alongside core. T022
 needs usable assessment/change contracts; final recipient values refresh at exact candidate.
-T027 can review the locked design early and candidate later, only with call authorization.
+FABLE-DESIGN reviews the locked design/dispatch after T001. T027 waits for T024 and T025 on the exact candidate; both calls use authorized Claude Code Fable.
 
 Parallel examples: T005 with T006; T009 API with T010 UI on frozen C-M; T012 routes with
 T013 ticket leaf; T016 aging with T015 UI; T019/T020 documents with core. Terra serializes

@@ -14,9 +14,9 @@ fetch and a local blob, not an unauthenticated anchor or token in URL.
 | Bundle | Allowed operations inside selected domain |
 |---|---|
 | Viewer | Scoped read, comparison display and permitted sanitized export |
-| Requester | Viewer plus propose; pending-request cancellation deferred |
-| Operator | Import/assess, reserve/extend, evaluate aging, permitted exception actions and manual ticket attempt/readback |
-| Approver | Independently sign assessment or decide exact local request/release |
+| Requester | Viewer plus propose allocation/correction requests; pending-request cancellation deferred |
+| Operator | Viewer plus existing bounded inventory_edit (safe child-prefix creation/edit), import/assess, reserve/extend, evaluate aging, permitted exception actions and manual ticket attempt/readback |
+| Approver | Viewer plus independently sign assessment or decide exact allocation/correction/release request; no general inventory_edit grant |
 | Platform admin | Reviewed stopped configuration/state custody procedures; no implicit domain data or approval authority |
 
 Bundles may combine; independent decision requires different principal IDs regardless of role.
@@ -83,3 +83,22 @@ Allowed/denied list/detail/export/direct-ID and nested errors; mixed raw/source/
 revocation on read and stale approval; self-approval; principal mismatch; unknown legacy data;
 presets/search/count leak attempts; CLI/readiness compatibility; no token in URL/log/artifact.
 These are future acceptance cases, not tests executed by this specification task.
+
+## Lead 4.0 source-review amendments — 2026-09-22
+
+Preserve existing safe prefix editing through the Operator bundle. Correction approval
+authorizes only the exact independently reviewed correction mutation; adapt the existing
+inventory_commands approval helper so an Approver does not need a general inventory_edit
+grant. Direct inventory-edit routes still require Operator rights and existing validation.
+
+T006 covers every component that owns an actor picker, including Corrections, InventoryEditor
+and Workflow. Derive displayed actor and permitted actions from authenticated context.
+Bind requests, protected component state and retries to principal/domain/configuration
+revision; discard late responses after a context switch. Clear protected views on logout,
+revocation and identity/domain change. Never render a persisted retry before authenticating
+its original context; quarantine/purge the old unscoped correction payload format.
+An ambiguous request remains unknown when its UI payload is cleared: retain only a minimal
+original-context recovery pointer, require authorized readback before replacement, and
+never silently generate a new key or resend it as another principal. Server history remains
+authoritative. Within the same authorized context, exact-key retry semantics remain intact.
+No token enters browser persistent storage, URLs, logs or recovery pointers.

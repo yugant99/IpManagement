@@ -1,5 +1,7 @@
 # Shared engineering contracts
 
+**Post-meeting bridge, 2026-09-22:** Main Lead 4.0 coordinates adoption of the bounded contracts under [the delivery authority record](../specs/001-postmeeting-bridge/delivery/authorization-and-ownership.md). Those contracts supersede historical exclusions only for expressly assigned Tier A behavior. Existing accepted source/evidence remains tied to its original candidate; a specification amendment is not new runtime proof.
+
 The user-authorized [bounded easy-win contract](EASY_WINS_CONTRACT.md) supersedes prior deferrals only for its report/domain filters, imported-source catalog, saved-run summary, optional import callback and request logging/evidence scope. It preserves the shared guard, immutable receipts, source provenance and existing evidence limits.
 
 The user-authorized [F1–F7 follow-up](handoffs/audit-response-authorization.md) supersedes earlier exclusions only for its bounded local correction, metadata/history and exception-lifecycle scope. Its [approved implementation contract](AUDIT_RESPONSE_CONTRACT.md) pins schema/API and evidence semantics; older evidence is preserved.

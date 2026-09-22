@@ -1,5 +1,7 @@
 # Post-meeting specification package
 
+**Main Lead 4.0 update, 2026-09-22:** the user authorized the post-meeting bridge implementation phase and lead transfer. Current decisions, source-review amendments and dispatch gates are in [delivery/authorization-and-ownership.md](delivery/authorization-and-ownership.md). The original specification/history below is retained; its Lead 3.0 identity and specification-task-only authority describe that prior task. No runtime acceptance follows from this update.
+
 **State: 100/100 actual agent decisions resolved; agent-locked candidate for Main Lead 3.0 review.**
 No application implementation, tests, smoke runs, builds, infrastructure changes or paid model calls.
 
