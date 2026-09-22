@@ -1114,7 +1114,7 @@ def create_app() -> FastAPI:
             "WHERE principal_id=? AND domain=? AND action=? AND idempotency_key=?",
             (request.state.access_context.principal_id, domain, action, idempotency_key)).fetchone()
 
-    def migration_receipt_outcome(row, action, principal_id, expected_assessment_id=None):
+    def migration_receipt_outcome(row, action, expected_assessment_id=None):
         try:
             saved = json.loads(row["result_json"])
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
@@ -1137,15 +1137,34 @@ def create_app() -> FastAPI:
             if (not isinstance(signer, str) or not isinstance(outcome["signed_at"], str)
                     or type(outcome["signed_version"]) is not int or outcome["signed_version"] < 1):
                 raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The saved migration operation receipt is invalid.", 409)
-            outcome["signed_by_current_principal"] = signer == principal_id
-            outcome["signer_id"] = signer if signer == principal_id else None
         return outcome
 
-    def required_migration_receipt(connection, request, action, idempotency_key, assessment_id):
+    def project_migration_receipt_outcome(outcome, action, assessment, principal_id):
+        if (outcome["assessment_id"] != assessment["id"]
+                or outcome["assessment_digest"] != assessment["digest"]):
+            raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The saved migration operation receipt is invalid.", 409)
+        projected = dict(outcome)
+        if action == "assessment.signoff":
+            signer = outcome["signer_id"]
+            if (assessment["state"] != "signed" or signer != assessment["signer_id"]
+                    or outcome["signed_at"] != assessment["signed_at"]
+                    or outcome["signed_version"] != assessment["version"]):
+                raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The saved migration operation receipt is invalid.", 409)
+            projected["signed_by_current_principal"] = signer == principal_id
+            projected["signer_id"] = signer if signer == principal_id else None
+        return projected
+
+    def authorized_migration_receipt(connection, request, action, idempotency_key, assessment_id):
         row = migration_operation_receipt(connection, request, action, idempotency_key)
         if row is None:
             raise AppError("MIGRATION_ASSESSMENT_INTEGRITY", "The committed migration operation has no readable receipt.", 409)
-        return migration_receipt_outcome(row, action, request.state.access_context.principal_id, assessment_id)
+        outcome = migration_receipt_outcome(row, action, assessment_id)
+        detail = migration_compare.get_assessment(
+            connection, assessment_id, context=request.state.access_context,
+            configuration=request.state.access_configuration)
+        projected = project_migration_receipt_outcome(
+            outcome, action, detail, request.state.access_context.principal_id)
+        return detail, projected
 
     @app.post("/api/migration-assessments", response_model=MigrationAssessmentMutation, status_code=201)
     def create_migration_assessment(request: Request, payload: MigrationAssessmentCreateRequest,
@@ -1156,7 +1175,7 @@ def create_app() -> FastAPI:
             value = migration_compare.create_assessment(
                 connection, **payload.model_dump(), context=context, configuration=configuration)
             assessment_id = value["id"]
-            outcome = required_migration_receipt(
+            _, outcome = authorized_migration_receipt(
                 connection, request, "assessment.create", payload.idempotency_key, assessment_id)
             assessment = {key: item for key, item in value.items() if key != "replayed"}
             return {"assessment": project_migration_assessment(assessment, context.principal_id),
@@ -1191,10 +1210,12 @@ def create_app() -> FastAPI:
         row = migration_operation_receipt(connection, request, action, idempotency_key)
         if row is None:
             return {"found": False, "action": action, "assessment": None, "original_outcome": None}
-        outcome = migration_receipt_outcome(row, action, request.state.access_context.principal_id)
+        outcome = migration_receipt_outcome(row, action)
         detail = migration_compare.get_assessment(
             connection, outcome["assessment_id"], context=request.state.access_context,
             configuration=request.state.access_configuration)
+        outcome = project_migration_receipt_outcome(
+            outcome, action, detail, request.state.access_context.principal_id)
         return {"found": True, "action": action,
                 "assessment": project_migration_assessment(detail, request.state.access_context.principal_id),
                 "original_outcome": outcome}
@@ -1223,7 +1244,7 @@ def create_app() -> FastAPI:
             else:
                 value = result
                 replayed = False
-            outcome = required_migration_receipt(
+            _, outcome = authorized_migration_receipt(
                 connection, request, "assessment.signoff", payload.idempotency_key, str(assessment_id))
             return {"assessment": project_migration_assessment(value, context.principal_id),
                     "replayed": replayed, "original_signoff": outcome}
