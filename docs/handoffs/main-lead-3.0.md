@@ -1,5 +1,7 @@
 # Main Lead 3.0 transfer and readiness
 
+**Historical transfer, superseded for current leadership on 2026-09-22:** the user appointed [Main Lead 4.0](main-lead-4.0.md). The original checkpoints, observations and limits below remain unchanged.
+
 **Current checkpoint, 2026-09-21:** [portable demonstration acceptance](vm-portability-lead-review.md) supersedes the earlier no-execution and pending technical-gate wording below. All nine wins and Atlas are accepted; bounded Linux startup/persistence/recovery and transfer passed. The authorized disposable host was destroyed. `PART6_READY=yes` within that tested scope; human/customer outcomes remain separate and oversight stays PAUSED.
 
 Registered 2026-09-20 under the user's explicit transfer authorization. Current lead: **Main Lead 3.0**, task `01a0c0c1-3952-7720-93c8-ff49192b8e13`, host `local`. The active task ID was read from `CODEX_THREAD_ID` and confirmed in the app task registry. Main Lead 2.0 (`01a0bb80-cf0d-7f60-8e46-1e825f42d276`) and the original lead (`01a0b845-6c8d-7021-a5c9-15e673db07c9`) are reference-only. The current lead owns coordination, acceptance, integration, all 111 questionnaire rows and demo readiness.

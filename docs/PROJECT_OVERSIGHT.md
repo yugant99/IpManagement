@@ -1,5 +1,11 @@
 # Persistent project oversight
 
+**Current authority — 2026-09-22:** Main Lead 4.0, task `01a0cade-506f-7442-97da-0cc09b4f9929`, host `local`, is the user-authorized persistent lead for the post-meeting bridge. This explicitly supersedes Main Lead 3.0 for new coordination, contracts, integration and acceptance. See [Main Lead 4.0 transfer](handoffs/main-lead-4.0.md). The earlier dated records below remain historical; their old ownership or no-new-phase wording does not override this grant.
+
+Bounded Tier A implementation coordination is authorized, subject to the specification, route and capacity gates in the transfer. Runtime tests/builds/state operations require their explicit scoped authorization; no new paid-model/cloud spend, customer access, deployment or public exposure is granted. Tier B remains locked until T025 passes and reserve survives. No new application behavior or evidence class is accepted by this transition. The accepted ledger stays **39/18/10/44**; earlier one-target portability evidence keeps its exact candidate. The historical oversight monitor is not resumed, duplicated or retargeted by this change.
+
+---
+
 **Leadership transfer authorized on 2026-09-20: Main Lead 3.0 is the persistent project lead.** Registered task: `01a0c0c1-3952-7720-93c8-ff49192b8e13`, host `local`; identity confirmed from the active task and app registry. Follow [the current transfer record](handoffs/main-lead-3.0.md). Main Lead 2.0 (`01a0bb80-cf0d-7f60-8e46-1e825f42d276`) and the original lead (`01a0b845-6c8d-7021-a5c9-15e673db07c9`) are reference-only. Coordination, acceptance, integration, questionnaire accounting and demo readiness transfer together; accepted evidence and worker ownership remain intact.
 
 The existing `ipam-project-oversight` heartbeat remains **PAUSED**, reattached to Main Lead 3.0; saved target/status and schedule were read back on 2026-09-20. Preserve its 30-minute cadence, read-only/quiet behavior and September 21, 2026, 17:00 UTC expiry. Do not resume or duplicate it without a user request. Titles alone never reassign ownership: "Overseer" (`01a0b8b9-82fb-7a11-bc50-ec3a5b234729`) remains the synthetic-data worker. Ordinary stage tasks remain workers and do not replace the lead.
