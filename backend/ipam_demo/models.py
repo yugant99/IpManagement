@@ -4,6 +4,32 @@ from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel
 
 
+AccessRole = Literal["viewer", "requester", "operator", "approver", "platform_admin"]
+
+
+class AccessContext(BaseModel):
+    """Trusted identity context returned to protected clients without credential material."""
+
+    principal_id: str
+    roles: list[AccessRole]
+    domains: list[str]
+    selected_domain: str | None
+    configuration_revision: int
+    configuration_digest: str
+    policy_revision: str
+    is_evidence_coordinator: bool
+
+
+class ReadinessStatus(BaseModel):
+    process_ready: bool
+    schema_ready: bool
+    data_ready: bool
+    static_ready: bool
+    configuration_ready: bool
+    domain_state_compatible: bool
+    reasons: list[str]
+
+
 class Origin(BaseModel):
     source_id: str
     source_run_id: str

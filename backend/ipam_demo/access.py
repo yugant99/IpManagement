@@ -1,0 +1,295 @@
+"""Fail-closed reviewed access configuration for the post-meeting bridge."""
+
+from dataclasses import dataclass
+from datetime import datetime, timezone
+import hashlib
+import hmac
+import json
+import os
+from pathlib import Path
+import re
+from typing import Iterable
+
+from .errors import AppError
+from .models import AccessContext
+
+
+ROLE_BUNDLES = frozenset({"viewer", "requester", "operator", "approver", "platform_admin"})
+EVIDENCE_OPERATIONS = frozenset({"read", "acquire", "run", "reconcile"})
+_DIGEST = re.compile(r"^[0-9a-f]{64}$")
+
+
+@dataclass(frozen=True)
+class Principal:
+    id: str
+    token_digest: str
+    token_bits: int
+    enabled: bool
+    expires_at: datetime
+    roles: frozenset[str]
+    domains: frozenset[str]
+
+
+@dataclass(frozen=True)
+class CoordinatorGrant:
+    source_id: str
+    scope_id: str
+
+
+@dataclass(frozen=True)
+class TicketRoute:
+    domain: str
+    action: str
+    revision: str
+    team: str
+
+
+@dataclass(frozen=True)
+class ReviewedConfiguration:
+    revision: int
+    digest: str
+    effective_at: datetime
+    policy_revision: str
+    connector_mode: str
+    principals: dict[str, Principal]
+    coordinator_id: str
+    coordinator_grants: frozenset[CoordinatorGrant]
+    source_domains: dict[tuple[str, str], str]
+    routes: dict[tuple[str, str], TicketRoute]
+
+
+def _config_error() -> AppError:
+    return AppError("ACCESS_CONFIGURATION_INVALID", "Reviewed access configuration is unavailable or invalid.")
+
+
+def _text(value, field: str, maximum: int = 200) -> str:
+    if not isinstance(value, str) or not value or value == "*" or value != value.strip() or len(value) > maximum:
+        raise ValueError(field)
+    return value
+
+
+def _utc(value, field: str) -> datetime:
+    text = _text(value, field, 64)
+    try:
+        instant = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(field) from exc
+    if instant.utcoffset() != timezone.utc.utcoffset(instant):
+        raise ValueError(field)
+    return instant.astimezone(timezone.utc)
+
+
+def _unique_texts(value, field: str, *, allow_empty: bool = False) -> frozenset[str]:
+    if not isinstance(value, list) or (not value and not allow_empty):
+        raise ValueError(field)
+    items = frozenset(_text(item, field) for item in value)
+    if len(items) != len(value):
+        raise ValueError(field)
+    return items
+
+
+def _object(value, keys: set[str]) -> dict:
+    if not isinstance(value, dict) or set(value) != keys:
+        raise ValueError("configuration object")
+    return value
+
+
+def _principal(value) -> Principal:
+    item = _object(value, {"id", "token_digest", "token_bits", "enabled", "expires_at", "roles", "domains"})
+    principal_id = _text(item["id"], "principal id")
+    digest = _text(item["token_digest"], "token digest", 64)
+    if not _DIGEST.fullmatch(digest):
+        raise ValueError("token digest")
+    bits = item["token_bits"]
+    if type(bits) is not int or bits < 256:
+        raise ValueError("token bits")
+    if type(item["enabled"]) is not bool:
+        raise ValueError("enabled")
+    roles = _unique_texts(item["roles"], "roles", allow_empty=True)
+    if not roles.issubset(ROLE_BUNDLES):
+        raise ValueError("roles")
+    return Principal(principal_id, digest, bits, item["enabled"], _utc(item["expires_at"], "expiry"), roles,
+                     _unique_texts(item["domains"], "domains", allow_empty=True))
+
+
+def _load_configuration(value) -> ReviewedConfiguration:
+    root = _object(value, {"revision", "effective_at", "policy_revision", "connector_mode", "reviewer_references",
+                           "principals", "evidence_coordinator", "source_mappings", "routes"})
+    revision = root["revision"]
+    if type(revision) is not int or revision < 1:
+        raise ValueError("revision")
+    effective_at = _utc(root["effective_at"], "effective time")
+    policy_revision = _text(root["policy_revision"], "policy revision")
+    connector_mode = _text(root["connector_mode"], "connector mode")
+    _unique_texts(root["reviewer_references"], "reviewer references")
+    if not isinstance(root["principals"], list) or not root["principals"]:
+        raise ValueError("principals")
+    principals = [_principal(item) for item in root["principals"]]
+    by_id = {item.id: item for item in principals}
+    if len(by_id) != len(principals) or len({item.token_digest for item in principals}) != len(principals):
+        raise ValueError("principal identity")
+
+    mappings = root["source_mappings"]
+    if not isinstance(mappings, list) or not mappings:
+        raise ValueError("source mappings")
+    source_domains: dict[tuple[str, str], str] = {}
+    for item in mappings:
+        item = _object(item, {"source_id", "scope_id", "domain"})
+        key = (_text(item["source_id"], "source id"), _text(item["scope_id"], "scope id"))
+        if key in source_domains:
+            raise ValueError("source mapping")
+        source_domains[key] = _text(item["domain"], "domain")
+
+    coordinator = _object(root["evidence_coordinator"], {"principal_id", "grants"})
+    coordinator_id = _text(coordinator["principal_id"], "coordinator id")
+    coordinator_principal = by_id.get(coordinator_id)
+    if coordinator_principal is None or coordinator_principal.roles or coordinator_principal.domains:
+        raise ValueError("coordinator")
+    if not isinstance(coordinator["grants"], list):
+        raise ValueError("coordinator grants")
+    grants = set()
+    for item in coordinator["grants"]:
+        item = _object(item, {"source_id", "scope_id"})
+        grants.add(CoordinatorGrant(_text(item["source_id"], "source id"), _text(item["scope_id"], "scope id")))
+    if len(grants) != len(coordinator["grants"]) or {(item.source_id, item.scope_id) for item in grants} != set(source_domains):
+        raise ValueError("coordinator grants")
+
+    routes = root["routes"]
+    if not isinstance(routes, list):
+        raise ValueError("routes")
+    by_route: dict[tuple[str, str], TicketRoute] = {}
+    for item in routes:
+        item = _object(item, {"domain", "action", "revision", "team"})
+        route = TicketRoute(_text(item["domain"], "domain"), _text(item["action"], "action"),
+                            _text(item["revision"], "route revision"), _text(item["team"], "route team"))
+        key = (route.domain, route.action)
+        if key in by_route:
+            raise ValueError("route")
+        by_route[key] = route
+
+    digest = hashlib.sha256(json.dumps(root, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")).hexdigest()
+    return ReviewedConfiguration(revision, digest, effective_at, policy_revision, connector_mode, by_id, coordinator_id,
+                                 frozenset(grants), source_domains, by_route)
+
+
+def load_reviewed_configuration(path: str | Path | None = None, *, now: datetime | None = None) -> ReviewedConfiguration:
+    """Load the separately provisioned configuration without disclosing its path or contents."""
+    candidate = path if path is not None else os.environ.get("IPAM_ACCESS_CONFIG")
+    if not isinstance(candidate, (str, Path)) or not str(candidate):
+        raise AppError("ACCESS_CONFIGURATION_UNAVAILABLE", "Reviewed access configuration is unavailable.")
+    try:
+        config_path = Path(candidate).expanduser()
+        if config_path.is_symlink() or not config_path.is_file() or config_path.stat().st_size > 1024 * 1024:
+            raise ValueError("configuration file")
+        with config_path.open("rb") as source:
+            value = json.loads(source.read())
+        configuration = _load_configuration(value)
+    except (OSError, TypeError, UnicodeDecodeError, ValueError, json.JSONDecodeError) as exc:
+        raise _config_error() from exc
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    if configuration.effective_at > current:
+        raise _config_error()
+    return configuration
+
+
+def _bearer(authorization: str | None) -> str:
+    if not isinstance(authorization, str) or not authorization.startswith("Bearer "):
+        raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
+    token = authorization[7:]
+    if not token or token != token.strip() or any(character.isspace() for character in token):
+        raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
+    return token
+
+
+def authenticate_bearer(authorization: str | None, configuration: ReviewedConfiguration, *, now: datetime | None = None) -> AccessContext:
+    """Return only trusted identity claims. Call require_selected_domain for ordinary operations."""
+    token_digest = hashlib.sha256(_bearer(authorization).encode("utf-8")).hexdigest()
+    principal = next((item for item in configuration.principals.values() if hmac.compare_digest(item.token_digest, token_digest)), None)
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    if principal is None or not principal.enabled or principal.expires_at <= current:
+        raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
+    return AccessContext(principal_id=principal.id, roles=sorted(principal.roles), domains=sorted(principal.domains),
+                         selected_domain=None, configuration_revision=configuration.revision,
+                         configuration_digest=configuration.digest, policy_revision=configuration.policy_revision,
+                         is_evidence_coordinator=principal.id == configuration.coordinator_id)
+
+
+def require_selected_domain(context: AccessContext, selected_domain: str | None) -> AccessContext:
+    try:
+        domain = _text(selected_domain, "selected domain") if selected_domain is not None else None
+    except ValueError as exc:
+        raise AppError("FORBIDDEN", "Select a permitted domain before accessing domain data.", 403) from exc
+    if not domain or context.is_evidence_coordinator or domain not in context.domains:
+        raise AppError("FORBIDDEN", "Select a permitted domain before accessing domain data.", 403)
+    return context.model_copy(update={"selected_domain": domain})
+
+
+def require_role(context: AccessContext, role: str) -> None:
+    if role not in ROLE_BUNDLES or role not in context.roles:
+        raise AppError("FORBIDDEN", "The current principal is not permitted to perform this operation.", 403)
+
+
+def require_actor_match(context: AccessContext, actor_id: str | None) -> None:
+    if actor_id is not None and actor_id != context.principal_id:
+        raise AppError("ACTOR_MISMATCH", "Request actor does not match the authenticated principal.", 403)
+
+
+def require_independent_principal(context: AccessContext, other_principal_id: str) -> None:
+    if context.principal_id == other_principal_id:
+        raise AppError("SELF_APPROVAL_FORBIDDEN", "A different authenticated principal must make this decision.", 403)
+
+
+def require_domain_access(context: AccessContext, resource_domain: str | None) -> None:
+    if context.selected_domain is None:
+        raise AppError("FORBIDDEN", "Select a permitted domain before accessing domain data.", 403)
+    if resource_domain is None or resource_domain != context.selected_domain:
+        raise AppError("NOT_FOUND", "Requested resource was not found.", 404)
+
+
+def require_source_domain(configuration: ReviewedConfiguration, context: AccessContext, *, source_id: str,
+                          scope_ids: Iterable[str]) -> None:
+    """Require every supplied source scope to be mapped to the selected ordinary domain."""
+    if context.selected_domain is None or context.is_evidence_coordinator or isinstance(scope_ids, str):
+        raise AppError("FORBIDDEN", "The current principal is not permitted to use these source scopes.", 403)
+    try:
+        source = _text(source_id, "source id")
+        scopes = {_text(scope_id, "scope id") for scope_id in scope_ids}
+    except ValueError as exc:
+        raise AppError("FORBIDDEN", "The current principal is not permitted to use these source scopes.", 403) from exc
+    if not scopes or any(configuration.source_domains.get((source, scope_id)) != context.selected_domain for scope_id in scopes):
+        raise AppError("FORBIDDEN", "The current principal is not permitted to use these source scopes.", 403)
+
+
+def require_coordinator(configuration: ReviewedConfiguration, context: AccessContext, *, operation: str,
+                        source_id: str, scope_ids: Iterable[str]) -> None:
+    if not context.is_evidence_coordinator or operation not in EVIDENCE_OPERATIONS:
+        raise AppError("FORBIDDEN", "The current principal is not permitted to run this evidence operation.", 403)
+    if isinstance(scope_ids, str):
+        raise AppError("FORBIDDEN", "The configured coordinator lacks the required source and scope grant.", 403)
+    try:
+        source = _text(source_id, "source id")
+        requested = {_text(scope_id, "scope id") for scope_id in scope_ids}
+    except ValueError as exc:
+        raise AppError("FORBIDDEN", "The configured coordinator lacks the required source and scope grant.", 403) from exc
+    if not requested or any(CoordinatorGrant(source, scope_id) not in configuration.coordinator_grants for scope_id in requested):
+        raise AppError("FORBIDDEN", "The configured coordinator lacks the required source and scope grant.", 403)
+
+
+def resolve_ticket_route(configuration: ReviewedConfiguration, context: AccessContext, action: str) -> TicketRoute:
+    if context.selected_domain is None:
+        raise AppError("FORBIDDEN", "Select a permitted domain before routing a handoff.", 403)
+    try:
+        route = configuration.routes.get((context.selected_domain, _text(action, "action")))
+    except ValueError as exc:
+        raise AppError("ROUTE_UNAVAILABLE", "No reviewed route is available for this handoff.", 409) from exc
+    if route is None:
+        raise AppError("ROUTE_UNAVAILABLE", "No reviewed route is available for this handoff.", 409)
+    return route
+
+
+def authenticate_request(authorization: str | None, selected_domain: str | None = None, *,
+                         path: str | Path | None = None, now: datetime | None = None) -> tuple[ReviewedConfiguration, AccessContext]:
+    """Reload reviewed authority for each request and optionally bind one ordinary domain."""
+    configuration = load_reviewed_configuration(path, now=now)
+    context = authenticate_bearer(authorization, configuration, now=now)
+    return configuration, require_selected_domain(context, selected_domain) if selected_domain is not None else context
