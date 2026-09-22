@@ -248,9 +248,9 @@ CREATE TABLE ticket_handoff_events (
     CHECK ((event_type = 'readback' AND outcome IN ('found', 'definitive_absence', 'error')
             AND acknowledgement_mode IS NULL)
         OR (event_type = 'recipient_acknowledgement' AND outcome = 'acknowledged'
-            AND acknowledgement_mode = 'simulated' AND effect_id IS NOT NULL)),
+            AND acknowledgement_mode IS NOT NULL AND acknowledgement_mode = 'simulated' AND effect_id IS NOT NULL)),
     CHECK ((outcome = 'found' AND effect_id IS NOT NULL AND returned_ticket_id IS NOT NULL AND sanitized_error_json IS NULL)
-        OR (outcome = 'definitive_absence' AND returned_ticket_id IS NULL AND sanitized_error_json IS NULL)
+        OR (outcome = 'definitive_absence' AND effect_id IS NULL AND returned_ticket_id IS NULL AND sanitized_error_json IS NULL)
         OR (outcome = 'error' AND returned_ticket_id IS NULL AND sanitized_error_json IS NOT NULL)
         OR (outcome = 'acknowledged' AND sanitized_error_json IS NULL))
 );
