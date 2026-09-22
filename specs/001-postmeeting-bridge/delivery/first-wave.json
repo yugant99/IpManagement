@@ -114,7 +114,7 @@
       "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements."
     }
   ],
-  "route_decision": "Latest explicit user instruction: GPT-6 Luna replaces Terra implementation; GPT-6 Sol replaces Grok4.7 reviewer and handles difficult escalation; Astra remains lead. Go quota429 stops further Go calls pending reset. Prior completed runs retain actual model identities.",
+  "route_decision": "User directs GPT-6 Luna implementation and GPT-6 Sol review/escalation; Astra lead. Go limits are per model. Grok4.6/4.7 quota failures were followed by separate Luna and DeepSeek preparation attempts also returning429 without work. This does not establish shared limits. Keep active T005/T006 workers; no extra usage or fallback purchase.",
   "next_wave": [
     {
       "task": "T004",

@@ -115,8 +115,13 @@ explicit unmerged dependencies in their own isolated worktrees, preserving histo
 
 The user replaced Terra implementation with GPT-6 Luna, and Grok4.7 review plus
 difficult escalation with GPT-6 Sol. Earlier completed runs retain their actual models.
-OpenCode Go returned quota429 on the T004 review attempt; no further Go call or paid
-route is enabled. The UI leaf uses the authorized Sol escalation.
+Grok4.7 on OpenCode Go returned quota429 on the T004 review attempt. The lead initially
+inferred an account-wide block and placed the UI leaf with Sol. That inference is
+corrected: Go publishes per-model allowances. Keep the active UI worker; later eligible
+DeepSeek work and independent OpenCode Luna QA remain available to try within their own
+allowances. The follow-up Luna and DeepSeek preparation attempts also returned429
+without work; these are separate observed model failures. No paid overage is enabled.
+See model-routes.md for the correction and exact sessions.
 
 Per the user's visible-task preference, T005 and T006 now use separate user-visible
 Codex tasks. No duplicate implementation is running in the earlier internal agents.

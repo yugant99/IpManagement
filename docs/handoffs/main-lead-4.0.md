@@ -57,7 +57,10 @@ T002/T003/T004/T019 have source-only acceptance at the exact SHAs retained in th
 The earlier first-execution state above is historical. T005 API and T006 UI are now
 separate visible Codex workers with disjoint leases. User-directed actual routes are
 GPT-6 Luna for the prior Terra role and GPT-6 Sol for review/escalation, with Astra
-remaining lead. OpenCode Go is stopped on observed quota429.
+remaining lead. Go limits are per model; the earlier shared-limit inference is withdrawn.
+Subsequent bounded preparation attempts also returned quota429 for OpenCode Luna and
+DeepSeek; no work was returned. Exact routes/outcomes are in model-routes.md. Other
+model allowances and the affected reset windows remain unmeasured.
 
 The [dispatch manifest](../../specs/001-postmeeting-bridge/delivery/dispatch-manifest.md)
 contains current branches/worktrees and wire-contract SHA. No runtime or portable/human

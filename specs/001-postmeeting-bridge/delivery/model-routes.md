@@ -11,9 +11,18 @@ the Luna implementation lane.
 
 The attempted T004 review on `opencode-go/grok-4.7#high` stopped with
 `provider.quota`, HTTP429, `Go usage limit exceeded`, before returning source findings
-(session `ses_f34ea7951ffeaWltEiAHeydGdI`). No more Go calls are dispatched while that
-account limit is unresolved; no purchase, extra-usage activation or new credential is
-used. GPT-6 Sol replaces this review and any blocked leaf that needs escalation.
+(session `ses_f34ea7951ffeaWltEiAHeydGdI`). The initial inference that this blocked
+all Go models was incorrect. The user challenged it; the current official
+[Go usage limits](https://opencode.ai/docs/go/#usage-limits), read 2026-09-22,
+define separate 5-hour, weekly and monthly limits for each model. Initially only
+Grok4.6 and Grok4.7 had returned quota errors; that did not establish a shared limit. No purchase, extra-usage activation or new credential is used.
+
+Keep the already-active T005/T006 Codex workers to avoid overlapping edits. DeepSeek
+remains the intended model for the next eligible bounded leaf; independent OpenCode
+GPT5.6 Luna is dispatched for source-checklist preparation while T007 still waits for
+the assembled API/UI. A quota response stops only that selected model's call; report
+its exact error and do not infer another model's allowance. The user-directed GPT6
+Luna implementation and GPT6 Sol review/escalation replacements remain unchanged.
 
 ## Earlier route history
 
@@ -55,3 +64,20 @@ are accurately labeled source advisers, not impersonated requested-model executi
 Official Go list inspected2026-09-22: https://opencode.ai/docs/go/ includes GPT5.6 Luna, Grok4.7/4.6 and DeepSeekV4.1 Flash, but no Terra. This corroborates the active CLI menu, not a model-quality comparison.
 
 First quota event: Grok4.6 correction run returned provider.quota /429 /Go usage limit exceeded. It was stopped; Sol takes the exact bounded correction lease. No new Go credential or balance fallback was installed or activated.
+
+
+### Per-model follow-up observations
+
+After the user corrected the quota assumption, the lead attempted one useful, bounded
+source-preparation task on each remaining planned Go route:
+
+| Route | Task attempt | Actual outcome |
+|---|---|---|
+| opencode-go/gpt-5.6-luna#medium | T007 source-checklist preparation only | HTTP429 provider.quota, Go usage limit exceeded; session ses_f34db77c4ffeAZLDM7k2ZcfV8W; exit1 |
+| opencode-go/deepseek-v4.1-flash#high | Future leaf access-prerequisite preparation only | HTTP429 provider.quota, Go usage limit exceeded; session ses_f34da1fcfffeZb7mNMbyN7LbHK; exit1 |
+
+Neither returned work, edited source or ran tests. Each attempt stopped immediately.
+This establishes failures on those selected models, not a shared quota design or the
+remaining allowance of every Go model. The generic error identifies no reset window.
+T007 still waits for assembled T005/T006; T008 and later leaves retain their dependency
+gates. Active Codex workers continue without restarting or duplicating their edits.
