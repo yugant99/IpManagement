@@ -120,6 +120,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const operation = useRef<AbortController | null>(null);
+  const priorAmbiguity = useRef(false);
   useEffect(() => () => operation.current?.abort(), []);
 
   useEffect(() => {
@@ -193,6 +194,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
       try {
         sessionStorage.removeItem(RECOVERY_KEY);
         if (sessionStorage.getItem(RECOVERY_KEY) !== null) throw new Error("Recovery pointer could not be cleared.");
+        priorAmbiguity.current = false;
         setPointer(null); setSelectedId(saved!.id); setSelected(saved!);
         setRecoveryStatus("Original correction outcome confirmed by authorized readback.");
       } catch (failure) { setStorageError(`Readback confirmed the outcome, but recovery storage could not be cleared. ${readableError(failure)}`); }
@@ -218,6 +220,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
     try {
       sessionStorage.removeItem(RECOVERY_KEY);
       if (sessionStorage.getItem(RECOVERY_KEY) !== null) throw new Error("The previous recovery pointer remains saved.");
+      priorAmbiguity.current = false;
       setPointer(null);
       setAttempt(null);
     } catch (failure) {
@@ -227,6 +230,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
 
   async function submit(value: Attempt) {
     if (operation.current || storageError || (pointer && !attempt)) return;
+    if (!attempt && !pointer) priorAmbiguity.current = false;
     try { retain(value); }
     catch (failure) {
       setStorageError(`No request was sent. A minimal recovery pointer must be saved first. ${readableError(failure)}`); return;
@@ -243,8 +247,19 @@ export default function Corrections({ active = true }: { active?: boolean }) {
       else setDecisionReason("");
     } catch (failure) {
       if (!controller.signal.aborted) {
-        setError(`${readableError(failure)} ${ambiguous(failure) ? "The response is uncertain. Retry preserves the exact operation." : "The server rejected this operation; review its reason and refresh before submitting again."}`);
-        if (!ambiguous(failure)) clearAttempt();
+        if (ambiguous(failure)) {
+          priorAmbiguity.current = true;
+          setError(`${readableError(failure)} The response is uncertain. Retry preserves the exact operation.`);
+        } else if (priorAmbiguity.current) {
+          setError(`${readableError(failure)} This refusal applies to the latest retry only. The earlier submission remains unresolved; read it back under the original principal before another write.`);
+          if (!(failure instanceof ApiError && ["AUTH_REQUIRED", "ACCESS_CONTEXT_STALE"].includes(failure.code))) {
+            setAttempt(null);
+            setRecoveryStatus("Checking the earlier uncertain submission by its original recovery pointer…");
+          }
+        } else {
+          setError(`${readableError(failure)} The server rejected this first submission; review its reason and refresh before submitting again.`);
+          clearAttempt();
+        }
       }
     } finally {
       operation.current = null;
@@ -294,7 +309,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
       </select></label>
       {runs && <PageButtons page={runs} change={setRunOffset} disabled={locked || loading} label="Saved run pages" />}
       {runs?.total === 0 && <p>Awaiting domain evidence. The evidence operator manages global reconciliation.</p>}
-      {run && <><p className="quiet">Pinned scenario time {run.demo_clock_at}; saved ledger version {run.ledger_version}.</p>
+      {run && <><p className="quiet">Pinned scenario time {run.demo_clock_at}{run.ledger_version !== undefined && `; saved ledger version ${run.ledger_version}`}.</p>
         <label className="field-label">Anomalous inventory omission<select value={findingId} disabled={locked} onChange={event => { setFindingId(event.target.value); setContext(null); }}>
           <option value="">Select a ghost or unregistered-route finding</option>{availableFindings.map(finding => <option key={finding.id} value={finding.id}>{finding.subject.scope_name} · {finding.subject.cidr} · {finding.rule_id}</option>)}
         </select></label>{!availableFindings.length && <p>This saved run has no anomalous ghost-scope or unregistered-route finding eligible for this workflow.</p>}</>}

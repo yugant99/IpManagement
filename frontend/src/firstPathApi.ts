@@ -34,6 +34,8 @@ export interface Receipt {
   reconciliation?: { batch_id: string; status: "succeeded" | "busy" | "failed" | "skipped"; run_id?: string; replay: boolean; audit_recorded?: boolean; error?: { code: string; message: string } };
 }
 
+export type SelectedBatch = Pick<Receipt, "id" | "source_id" | "source_run_id" | "source_kind" | "coverage">;
+
 export interface SourceCatalogEntry {
   source_id: string;
   source_name: string | null;
@@ -112,11 +114,11 @@ export interface RunSummary {
   id: string;
   created_at: string;
   demo_clock_at: string;
-  ledger_version: number;
+  ledger_version?: number;
   rule_id: string;
   rule_version: number;
   synthetic: true;
-  selected_batches: Receipt[];
+  selected_batches: SelectedBatch[];
   overview: { total: number; anomalous: number; healthy: number; unknown: number; not_applicable: number };
 }
 
