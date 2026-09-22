@@ -224,7 +224,7 @@
     },
     {
       "task": "T008",
-      "status": "running_source_implementation",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "833c2c8676b205c97476ab71f4e3b2cff0a2c608",
       "route": "Codex gpt-6-luna high",
       "branch": "codex/bridge-t008-assessment",
@@ -238,7 +238,39 @@
       "acceptance": "Immutable scoped comparison with reconciled counts, conflict precedence and independent exact-current sign-off; no active-state promotion.",
       "prohibited": "Unleased paths, tests/build/runtime/application imports/DB/config, OpenCode/other model calls, autonomous delegation, main merge or self-acceptance.",
       "thread_id": "01a0cb4a-4b2c-7451-b2dc-8ae0508a8448",
-      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/cf7c/Ip_inventory"
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/cf7c/Ip_inventory",
+      "result_sha": "776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/75",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "review_report": "specs/001-postmeeting-bridge/delivery/migration-source-review.md"
+    },
+    {
+      "task": "T009",
+      "status": "running_source_implementation",
+      "base_sha": "36dbfb90f3178c07ed9c7d0a55b54370a563bf7f",
+      "wire_contract_sha": "37c3706d33a7416f0ef88cc6addfc3ffd9d160d8",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t009-migration-api",
+      "thread_id": "01a0cb5e-f055-7751-b79c-a60c9662a0c5",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/eb8d/Ip_inventory",
+      "prerequisites": ["T008 source acceptance"],
+      "owned_paths": ["backend/ipam_demo/app.py", "backend/ipam_demo/models.py"],
+      "acceptance": "Frozen scoped migration create/list/detail/signoff/export and exact receipt readback, current authority and transaction guards, no cutover.",
+      "prohibited": "Unleased paths; application tests/build/import/runtime/DB/config; OpenCode or other model calls; autonomous delegation; main merge or self-acceptance."
+    },
+    {
+      "task": "T010",
+      "status": "running_source_implementation",
+      "base_sha": "36dbfb90f3178c07ed9c7d0a55b54370a563bf7f",
+      "wire_contract_sha": "37c3706d33a7416f0ef88cc6addfc3ffd9d160d8",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t010-migration-ui",
+      "thread_id": "01a0cb5f-6dcf-7080-90ea-fffcc1743645",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/e121/Ip_inventory",
+      "prerequisites": ["T008 source acceptance", "T006 source acceptance"],
+      "owned_paths": ["frontend/src/MigrationCompare.tsx", "frontend/src/FirstPath.tsx", "frontend/src/firstPathApi.ts", "frontend/src/App.tsx"],
+      "acceptance": "Receipt and comparison accounting, active-only/conflict/refusal/stale/sign-off views, exact recovery and protected export using the frozen API, no activation.",
+      "prohibited": "Unleased paths; tests/build/typecheck/lint/import/runtime/DB/config; OpenCode or other model calls; autonomous delegation; main merge or self-acceptance."
     }
   ],
   "muse_route": {

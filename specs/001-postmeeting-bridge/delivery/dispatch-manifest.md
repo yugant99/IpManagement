@@ -212,3 +212,14 @@ calls. Source-only implementation and source review, no tests/build/import/servi
 database/browser execution. Coherent commits and push at handoff; draft PRs target
 the shared migration integration base. Independent Sol review follows the exact
 assembly. T011 waits for T009 source closure; T025 and human gates remain distinct.
+
+Both setups are complete and running source implementation. The actual shared base is
+`36dbfb90f3178c07ed9c7d0a55b54370a563bf7f`, including frozen interface publication
+`37c3706d33a7416f0ef88cc6addfc3ffd9d160d8`. Shared worktree:
+`/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-migration/Ip_inventory`.
+T009 task `01a0cb5e-f055-7751-b79c-a60c9662a0c5` uses
+`/Users/yuganthareshsoni/.codex/worktrees/eb8d/Ip_inventory`.
+T010 task `01a0cb5f-6dcf-7080-90ea-fffcc1743645` uses
+`/Users/yuganthareshsoni/.codex/worktrees/e121/Ip_inventory`.
+Each reported its dedicated branch at the exact shared base. The machine registry
+contains the current leases; no parent or historical author may edit them concurrently.
