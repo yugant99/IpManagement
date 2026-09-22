@@ -5,25 +5,26 @@ the API records failed attempts in a fresh transaction after rollback.
 """
 
 from datetime import datetime, timezone
+from contextvars import ContextVar
 from hashlib import sha256
 from ipaddress import ip_address, ip_network
 import json
 from uuid import UUID, uuid4
 
 from .errors import AppError
+from . import access
 from .evidence import active_dhcp_claims
 from .inventory import pool_payload
 from .rules import comparable_findings, discrepancy_keys
 from .seed import _ranges
 
 STATIC_POOL_ID = "8821c420-18ea-4caa-9d97-83a331c0c002"
-DEMO_ACTORS = {
-    "demo-requester": {"id": "demo-requester", "name": "Mira", "role": "requester",
-                       "team": "Access Planning", "permissions": ["request", "exception"]},
-    "demo-approver": {"id": "demo-approver", "name": "Rowan", "role": "approver",
-                      "team": "Network Operations",
-                      "permissions": ["request", "approve", "inventory_edit", "exception"]},
-}
+_access_context = ContextVar("ipam_access_context", default=None)
+
+
+def bind_access_context(context):
+    """Bind this request's freshly authenticated principal for existing domain helpers."""
+    return _access_context.set(context)
 
 
 def _now():
@@ -39,17 +40,36 @@ def _hash(value):
 
 
 def actors():
-    return [dict(actor) for actor in DEMO_ACTORS.values()]
+    context = _access_context.get()
+    if context is None:
+        return []
+    permissions = []
+    if "requester" in context.roles:
+        permissions.append("request")
+    if "approver" in context.roles:
+        permissions.append("approve")
+    if "operator" in context.roles:
+        permissions.extend(("inventory_edit", "exception"))
+    role = "coordinator" if context.is_evidence_coordinator else ",".join(
+        role for role in context.roles if role != "viewer") or "viewer"
+    return [{"id": context.principal_id, "name": context.principal_id,
+             "role": role,
+             "team": None, "permissions": permissions}]
 
 
 def require_actor(actor_id, permission=None):
-    actor = DEMO_ACTORS.get(actor_id) if isinstance(actor_id, str) else None
-    if actor is None:
-        raise AppError("FORBIDDEN", "Select a recognized demo actor identity.", 403)
-    if permission and permission not in actor["permissions"]:
-        raise AppError("FORBIDDEN", "This demo actor is not permitted to perform that action.", 403,
-                       {"actor_id": actor_id, "permission": permission})
-    return dict(actor)
+    context = _access_context.get()
+    if context is None:
+        raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
+    access.require_actor_match(context, actor_id)
+    roles = {"request": "requester", "approve": "approver",
+             "inventory_edit": "operator", "exception": "operator"}
+    if permission:
+        role = roles.get(permission)
+        if role is None:
+            raise AppError("FORBIDDEN", "The current principal is not permitted to perform this operation.", 403)
+        access.require_role(context, role)
+    return actors()[0]
 
 
 def _text(value, field, maximum=500):
@@ -73,14 +93,14 @@ def _payload(payload, allowed):
 def audit_event(connection, *, actor_id, action, outcome, reason, request_id=None,
                 subject_id=None, scope_id=None, pool_id=None, address=None, details=None):
     """Shared inventory/workflow audit, atomic with a successful local mutation."""
-    # Unknown supplied identities may be recorded for rejected attempts, never trusted.
-    actor = DEMO_ACTORS.get(actor_id) if isinstance(actor_id, str) else None
-    if actor_id == "system" and outcome != "failed":
+    context = _access_context.get()
+    actor = actors()[0] if context is not None and actor_id == context.principal_id else None
+    if actor_id == "system" and outcome != "failed" and context is not None and context.is_evidence_coordinator:
         actor = {"role": "system"}
     if actor is None and outcome != "failed":
-        raise AppError("FORBIDDEN", "A successful mutation needs a recognized demo actor.", 403)
+        raise AppError("FORBIDDEN", "A successful mutation needs the authenticated principal.", 403)
     item = {"id": str(uuid4()), "created_at": _now(),
-            "actor_id": actor_id if isinstance(actor_id, str) else "unknown",
+            "actor_id": (actor_id if actor is not None else "unknown"),
             "actor_role": actor["role"] if actor else "unknown", "action": action,
             "outcome": outcome, "reason": _text(reason, "reason", 2000), "request_id": request_id,
             "subject_id": subject_id, "scope_id": scope_id, "pool_id": pool_id,
@@ -158,7 +178,7 @@ def workflow_status(connection):
             "demo_clock_at": meta["demo_clock_at"], "synthetic": True,
             "limitations": ["The local static ledger is authoritative only inside this demo.",
                             "Pending requests do not reserve addresses. Approval rechecks the exact candidate and versions.",
-                            "Demo actor switching is not enterprise authentication. External provisioning is simulated."]}
+                            "External provisioning is simulated."]}
 
 
 def _request_payload(row):
@@ -365,13 +385,13 @@ def sync_exceptions(connection, run):
         connection.execute(
             "INSERT INTO exceptions(id,subject_key,run_id,finding_id,owner_actor_id,state,version,created_at,updated_at,"
             "latest_run_id,latest_finding_id,material_keys_json) VALUES (?,?,?,?,?,'open',1,?,?,?,?,?)",
-            (object_id, key, run["id"], finding["id"], "demo-requester", now, now, run["id"], finding["id"],
+            (object_id, key, run["id"], finding["id"], "unassigned", now, now, run["id"], finding["id"],
              _json(discrepancy_keys(finding))))
         audit_event(connection, actor_id="system", action="exception.detected", outcome="succeeded",
                     reason="New calculated anomaly added to the in-app exception queue.", subject_id=object_id,
                     scope_id=subject["scope_id"], details={"run_id": run["id"], "finding_id": finding["id"],
                         "notification_version": 1, "episode_count": 1,
-                        "after": {"state": "open", "owner_actor_id": "demo-requester"}})
+                        "after": {"state": "open", "owner_actor_id": "unassigned"}})
         created += 1
     return created
 
@@ -409,7 +429,11 @@ def _exception_payload(connection, row):
     item["latest_evidence_reason"] = latest_reason
     item["evidence_resolution"] = "resolved" if latest_state == "healthy" else "active" if latest_state == "anomalous" else "unknown"
     item["lifecycle_state"] = "closed" if item["closed_at"] else "open"
-    item["owner"] = require_actor(item["owner_actor_id"])
+    context = _access_context.get()
+    item["owner"] = actors()[0] if context is not None and item["owner_actor_id"] == context.principal_id else None
+    for field in ("owner_actor_id", "handoff_from_actor_id"):
+        if item.get(field) != (context.principal_id if context is not None else None):
+            item[field] = None
     item["notification_pending"] = item["acknowledged_at"] is None and item["closed_at"] is None and latest_state != "healthy"
     item["synthetic"] = True
     return item
@@ -439,11 +463,13 @@ def update_exception(connection, object_id, payload):
         return {**_exception_payload(connection, row), "replay": True}
     if row["version"] != version:
         raise AppError("STALE_EXCEPTION", "Exception ownership or state changed. Refresh before deciding.", 409)
-    if row["owner_actor_id"] != actor["id"]:
+    if row["owner_actor_id"] not in (actor["id"], "unassigned"):
         raise AppError("FORBIDDEN", "Only the assigned exception owner can change its workflow state.", 403)
     if row["closed_at"] and action != "reopen":
         raise AppError("EXCEPTION_CLOSED", "Reopen the closed exception before another owner action.", 409)
     now = _now()
+    if row["owner_actor_id"] == "unassigned" and action != "handoff":
+        connection.execute("UPDATE exceptions SET owner_actor_id=? WHERE id=?", (actor["id"], object_id))
     if action == "handoff":
         if recipient["team"] == actor["team"]:
             raise AppError("INVALID_HANDOFF", "Choose the named recipient on the other fictional team.", 422)

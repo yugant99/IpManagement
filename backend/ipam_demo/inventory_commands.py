@@ -427,7 +427,6 @@ def decide_correction(connection, object_id, payload):
     prefix_id, baseline, registered = None, None, None
     now = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     if action == "approve":
-        require_actor(actor["id"], "inventory_edit")
         network = _correction_position(connection, proposed)
         prefix_id = str(uuid4())
         clock = connection.execute("SELECT demo_clock_at FROM app_meta WHERE singleton=1").fetchone()[0]
