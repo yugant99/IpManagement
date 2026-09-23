@@ -77,7 +77,7 @@ def _notice_payload(row):
         "acknowledged_at": row["acknowledged_at"],
         "acknowledged_by": row["acknowledged_by"] if row["acknowledged_by"] == context.principal_id else None,
         "acknowledgement_reason": row["acknowledgement_reason"] if row["acknowledged_by"] == context.principal_id else None,
-        "acknowledgement_current": (row["acknowledged_at"] is not None
+        "acknowledgement_current": (row["state"] == "acknowledged" and row["acknowledged_at"] is not None
                                     and row["acknowledgement_version"] == row["notification_version"]),
         "acknowledgement_kind": "operator_acknowledgement",
         "owner_signoff": False,
@@ -176,6 +176,9 @@ def acknowledge_reservation_notice(connection, notice_id, payload):
     if actor_id is None:
         actor_id = context.principal_id
     actor = workflow.require_actor(actor_id, "inventory_edit")
+    _, pool, _, _ = workflow._selected_static_pool(connection)
+    if pool["id"] != current["pool_id"] or pool["scope_id"] != current["scope_id"]:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
     workflow._payload(payload, {"actor_id", "expected_notification_version", "reason"})
     expected = _version(payload.get("expected_notification_version"), "expected_notification_version")
     reason = _text(payload.get("reason"), "reason", 2000)
