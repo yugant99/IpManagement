@@ -1,9 +1,10 @@
-# Future validation and handoff guide — not executed
+# Validation and handoff criteria — observations recorded separately
 
-This is a runnable-path design guide for the future integrated implementation. It is not
-permission to build, test, start/stop a service, change state or contact a recipient now.
-Source implementation/review is progressing separately. None of the observations below
-has been executed for this bridge; T025 prerequisites and exact-candidate pin still govern.
+This guide defines the required observations; its example commands are not evidence or
+permission to execute them. T025 is in progress under the user's scoped native disposable
+synthetic authorization. Actual candidate-bound results belong in
+`delivery/independent-evidence.md`, not in this checklist. T025 has not yet passed.
+Package/recipient execution and human contact retain their separate authorization gates.
 
 ## Prerequisites and candidate
 Main Lead records implementation/validation authorization, exact candidate SHA and the declared
@@ -90,7 +91,7 @@ scripts/ops/restore.sh bridge-review.sqlite3 --confirm
 scripts/ops/start.sh
 scripts/ops/health.sh --readiness --token-file /protected/operator.token --domain demo-core
 ```
-Stop/start operations here are future instructions, not executed. Snapshot restores state,
+This package stop/start sequence is an instruction, not an execution claim. Snapshot restores state,
 not code/UI/config/credentials; pin/provision those separately. Restore never implicitly
 migrates: invoke scripts/ops/migrate.sh only for an explicitly recognized old schema under
 the adopted upgrade protocol, still stopped. Retain rejected corrupt/nonstandalone/unsupported/
