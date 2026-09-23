@@ -134,6 +134,26 @@ def _save_receipt(connection, context, action, key, digest, target_kind, target_
          target_kind, target_id, workflow._json(result), workflow._now()))
 
 
+def _reservation_create_replay(connection, context, key, digest, pool_id):
+    # Reauthorize both the submitted pool and the original receipt target before
+    # disclosing either the saved result or a key conflict.
+    workflow._require_pool_domain(connection, pool_id)
+    row = connection.execute(
+        "SELECT * FROM tier_a_operation_receipts WHERE principal_id=? AND domain=? "
+        "AND action='reservation.create' AND idempotency_key=?",
+        (context.principal_id, context.selected_domain, key)).fetchone()
+    if row is None:
+        return None
+    if row["target_kind"] != "reservation":
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    original = _resource(connection, row["target_id"])
+    if original["pool_id"] != pool_id:
+        raise AppError("IDEMPOTENCY_CONFLICT", "This operation key already identifies a different payload.", 409)
+    if row["request_digest"] != digest:
+        raise AppError("IDEMPOTENCY_CONFLICT", "This operation key already identifies a different payload.", 409)
+    return json.loads(row["result_json"])
+
+
 def _operation_result(reservation, *, state=None):
     result = _reservation(reservation)
     if state is not None:
@@ -166,7 +186,7 @@ def create_reservation(connection, payload):
     except ValueError as exc:
         raise AppError("INVALID_INPUT", "candidate must be an IPv4 address.", 422, {"field": "candidate"}) from exc
     digest = workflow._hash(normalized)
-    replay = _receipt(connection, context, "reservation.create", key, digest)
+    replay = _reservation_create_replay(connection, context, key, digest, normalized["pool_id"])
     if replay is not None:
         return replay, True
     pool, ranges, exclusions = _pool_for(connection, normalized["pool_id"])
@@ -290,12 +310,10 @@ def create_release_request(connection, reservation_id, payload):
                   "expected_baseline_version": _version(payload.get("expected_baseline_version"), "expected_baseline_version"),
                   "reason": _text(payload.get("reason"), "reason", 2000)}
     digest = workflow._hash(normalized)
-    replay = _receipt(connection, context, "reservation.release.decision", key, digest)
-    if replay is not None:
-        return replay, True
     old = connection.execute("SELECT * FROM reservation_release_requests WHERE requester_id=? AND idempotency_key=?",
                              (actor["id"], key)).fetchone()
     if old:
+        _resource(connection, old["reservation_id"])
         if old["payload_digest"] != digest:
             raise AppError("IDEMPOTENCY_CONFLICT", "This operation key already identifies a different payload.", 409)
         return _release_request_payload(old), True
@@ -322,8 +340,6 @@ def create_release_request(connection, reservation_id, payload):
                                   "reservation_state": "reserved"})
     result = _release_request_payload(connection.execute(
         "SELECT * FROM reservation_release_requests WHERE id=?", (request_id,)).fetchone())
-    _save_receipt(connection, context, "reservation.release.decision", key, digest, "reservation_release_request",
-                  request_id, result)
     return result, False
 
 
