@@ -223,6 +223,15 @@ def create_app() -> FastAPI:
         request.state.access_context = context
         return config, context
 
+    def coordinator_preflight(request, operation):
+        """Validate coordinator authority on a short read transaction before a separate writer."""
+        if request.app.state.startup_error:
+            raise AppError("SERVICE_UNAVAILABLE", "The inventory service is not ready.", 503)
+        with connect(request.app.state.database) as connection:
+            connection.execute("BEGIN")
+            require_initialized(connection)
+            return require_coordinator(request, operation, connection)
+
     def require_full_feed_authority(config):
         _require_complete_feed_authority(config)
 
@@ -519,8 +528,8 @@ def create_app() -> FastAPI:
         raise AppError("FORBIDDEN", "Schedule configuration requires the reviewed stopped-service procedure.", 403)
 
     @app.post("/api/schedule/run", status_code=201)
-    def acquire_now(request: Request, payload: dict, connection=Depends(database)):
-        require_coordinator(request, "acquire", connection)
+    def acquire_now(request: Request, payload: dict):
+        coordinator_preflight(request, "acquire")
         result = schedule_service(request).run_now(
             payload, authority_check=lambda current_connection=None:
                 require_coordinator(request, "acquire", current_connection))
@@ -1736,8 +1745,8 @@ def create_app() -> FastAPI:
         return record_payload(row)
 
     @app.post("/api/runs", status_code=201)
-    def compute_run(request: Request, connection=Depends(database)):
-        require_coordinator(request, "run", connection)
+    def compute_run(request: Request):
+        coordinator_preflight(request, "run")
         if not run_lock.acquire(blocking=False):
             raise AppError("RUN_IN_PROGRESS", "Another reconciliation run is in progress. Retry after it completes.", 409)
         try:
