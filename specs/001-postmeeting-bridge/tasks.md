@@ -137,7 +137,7 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
   Prerequisites: T002; owner: Grok 4.6 under Grok 4.7; FR-010 FR-012 FR-014 FR-016 FR-017 FR-018 FR-020 FR-022. Completion: Each exclusion has owner/evidence boundary/future gate; numeric cohorts are assumptions, not source requirement replacements.
 
-- [ ] T020 [P] [US4] Day1 two-hour finish: inventory every integration RFP row, detailed selected local API/assessment/ticket contracts, mode/authority/owner/evidence/unknown vendor fields. Files: `specs/001-postmeeting-bridge/delivery/integration-matrix.md`.
+- [x] T020 [P] [US4] Day1 two-hour finish: inventory every integration RFP row, detailed selected local API/assessment/ticket contracts, mode/authority/owner/evidence/unknown vendor fields. Files: `specs/001-postmeeting-bridge/delivery/integration-matrix.md`.
 
   Prerequisites: T002; owner: Muse 1.3 high in OpenCode; FR-004 FR-007 FR-009 FR-010 FR-011 FR-012 FR-021. Completion: All integration clauses classified; no guessed endpoint or simulated-as-live entry.
 
