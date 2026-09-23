@@ -284,7 +284,12 @@ def create_request(connection, payload):
             raise AppError("IDEMPOTENCY_CONFLICT", "This creation key already identifies a different payload.", 409)
         return _request_payload(old), True
     if normalized["supersedes_request_id"]:
-        previous = get_request(connection, normalized["supersedes_request_id"])
+        previous_row = connection.execute("SELECT * FROM allocation_requests WHERE id=?",
+                                          (normalized["supersedes_request_id"],)).fetchone()
+        if previous_row is None:
+            get_request(connection, normalized["supersedes_request_id"])
+        _require_scope_domain(connection, previous_row["scope_id"])
+        previous = _request_payload(previous_row)
         if previous["actor_id"] != actor["id"]:
             raise AppError("FORBIDDEN", "A renewed review may supersede only your own request.", 403)
     _require_pool_domain(connection, normalized["pool_id"])
