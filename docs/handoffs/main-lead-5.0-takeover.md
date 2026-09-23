@@ -88,3 +88,13 @@ and integrated at `c5121d4d85c6972fe5ae39315a5a413a96a07599`. T014 PR86 remains
 under correction at `0e5d1046f9ddb2fec95b3a8647dbcd26ffd11799`: canonical allocation
 key matching is closed; exact reassignment recovery requires the shared T013 audit
 anchor validator in both POST replay and GET recovery. No runtime gate has run.
+
+## T014 source closure and next common base
+
+Sol independently closed T013a5ce063 exact reassign audit-anchor recovery in both
+core POST replay and shared helper, then T0141b00a66 GET helper adoption and the
+earlier allocation key correction. T014/T016 and revised T013 are assembled at
+`ede6cb6511c71011e6295fd46bf9d7c400a7db39`. Source acceptance only; no application
+checks. The next publication pins the common T015/T017 base and registers separate
+Muse UI / Opus API worktrees and exact provider sessions. T012/T013 original base
+b557137 remains immutable. Main and PR79 remain unchanged.

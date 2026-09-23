@@ -362,14 +362,14 @@
         "Exact route and usage preflight"
       ],
       "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes.",
-      "result_sha": "57dd77362f612f2a6a4f65b0e7a6dde80eddf12f",
+      "result_sha": "a5ce063f2e350fe854c9e10a0d35cd439dd042e2",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/83",
       "review_report": "specs/001-postmeeting-bridge/delivery/reservation-ticket-source-review.md",
-      "integration_sha": "6599ae493edcb897a407d90570b68efd5affcea2"
+      "integration_sha": "ede6cb6511c71011e6295fd46bf9d7c400a7db39"
     },
     {
       "task": "T014",
-      "status": "source_review_correction_pending",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "fb3723a5de9f20179adfc869a61558585c200865",
       "branch": "codex/bridge-t014-ticket-api",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t014-api/Ip_inventory",
@@ -386,9 +386,10 @@
       "wire_contract": "specs/001-postmeeting-bridge/contracts/ticket-api-wire.md",
       "review_route": "Codex gpt-6-sol high independent worker",
       "prohibited": "No tests/builds/typechecks/lint/imports/runtime/DB/private data/untracked outputs/external model calls/delegation; no unleased edits, self-acceptance or main merge.",
-      "result_sha": "0e5d1046f9ddb2fec95b3a8647dbcd26ffd11799",
+      "result_sha": "1b00a66ee1fc9fe9340ad27ec2b3a41b29156ac8",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/86",
-      "remaining": "Exact reassign receipt recovery waits for shared reviewed T013 helper; allocation canonical-key finding closed."
+      "integration_sha": "ede6cb6511c71011e6295fd46bf9d7c400a7db39",
+      "review_report": "specs/001-postmeeting-bridge/delivery/ticket-api-source-review.md"
     },
     {
       "task": "T016",
@@ -438,11 +439,11 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T014_T016_source_dispatched",
-    "action": "Use docs/handoffs/main-lead-5.0.md; receiver registers its actual task ID when started by user",
-    "hold": "T014 and T016 source implementation released after independent closure; T025 remains prerequisite-gated.",
+    "status": "T014_T016_source_accepted_next_T015_T017",
+    "action": "Main Lead5 continues critical path with full Muse T015 and Opus T017 after exact common base pin",
+    "hold": "T025 remains prerequisite-gated; FR006 owner mapping and Spencer prerequisites open",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "6599ae493edcb897a407d90570b68efd5affcea2",
+    "application_source_sha": "ede6cb6511c71011e6295fd46bf9d7c400a7db39",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7"

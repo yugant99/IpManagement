@@ -89,9 +89,9 @@ T011 has source-only acceptance at `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; s
 
   Prerequisites: T011; owner: Opus 5.5 high in Claude Code; FR-004 FR-009 FR-011. Completion: Effect-committed/response-lost recovers via same correlation; no duplicate or budget reset.
 
-T012/T013 are independently source-reviewed at `0e8fb4b`/`57dd7736`, integrated at `6599ae4`; see delivery/reservation-ticket-source-review.md. These checkmarks do not claim runtime acceptance.
+T012/T013 are independently source-reviewed at `0e8fb4b`/`a5ce063`, with T014/T016 assembled at `ede6cb6`; see delivery/reservation-ticket-source-review.md. These checkmarks do not claim runtime acceptance.
 
-- [ ] T014 [US2] Expose C-T handoff list/detail/attempt/readback/simulated acknowledgement; local approval independent of routing/delivery; disable new attempts without losing history, legacy downstream status historical only. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`. Include operator zero-attempt reassignment, exact-version/key refusal and immutable attempted route history.
+- [x] T014 [US2] Expose C-T handoff list/detail/attempt/readback/simulated acknowledgement; local approval independent of routing/delivery; disable new attempts without losing history, legacy downstream status historical only. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`. Include operator zero-attempt reassignment, exact-version/key refusal and immutable attempted route history.
 
   Prerequisites: T012 T013; owner: GPT-6 Luna high in Codex; FR-004 FR-005 FR-009 FR-011. Completion: Unknown never success; no ticket approval grants local authority; old requests not tracked.
 

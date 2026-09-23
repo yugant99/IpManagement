@@ -84,3 +84,16 @@ This reuses C-A's correction recovery pattern for a lost allocation create respo
 no new write or legacy backfill. Direct-ID immutable decision recovery can confirm
 its saved terminal outcome and current principal as decision actor. Missing own key
 or unmatched decision remains ambiguous and never silently authorizes replacement.
+
+## Reviewed reassignment recovery amendment
+
+T013 `a5ce063f2e350fe854c9e10a0d35cd439dd042e2` provides
+recover_reassignment(connection, receipt, *, context, configuration), returning
+the sanitized immutable original assignment. Use this shared helper for GET
+recovery; core POST replay uses the same validation. It requires exactly one
+succeeded audit linked by operation_receipt_id to the receipt, matching canonical
+intent/actor/scope/reason, before/after assignment and versions, exact assigned_at
+and recomputed original request digest. Missing/duplicate/malformed/mismatched
+records fail generic409 after current target authorization; foreign identity is404.
+Earlier unanchored source receipts fail closed; no chronology guessing or backfill.
+Current handoff projection remains separate from this original assignment.

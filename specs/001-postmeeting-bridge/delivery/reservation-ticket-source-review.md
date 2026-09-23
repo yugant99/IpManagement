@@ -25,3 +25,16 @@ Source review otherwise found compatible T012 configuration forwarding, atomic r
 ## Evidence boundary
 
 Only Git/source inspection and model-route/usage/tool-permission preflight ran. No application tests, builds, typechecks, imports, database operations, services or browser application checks. T025 runtime remains gated on all prerequisites and fresh disposable synthetic data. Portable/human evidence remains pending, no questionnaire promotion, Tier B locked.
+
+## T014-discovered reassignment receipt correction
+
+Two same-principal reassignment operations could be confused if saved assignment
+version pointed to a later own assignment. Opus retained the original T013 lease
+and added an atomic exact receipt-to-audit anchor at c878cf5, then the shared
+recover_reassignment validator used by core POST replay at
+`a5ce063f2e350fe854c9e10a0d35cd439dd042e2`. Sol independently closed this correction: 
+current authorization before saved data, strict types/positive versions, unique
+anchor, canonical actor/scope/route/time/before-after identity and original digest.
+This supersedes57dd7736 as the final T013 source candidate. T014 GET must use the
+same helper before its source acceptance. No runtime or older-receipt migration
+was inferred; unanchored old source receipts fail visibly instead of guessing.
