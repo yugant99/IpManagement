@@ -1,0 +1,35 @@
+{
+  "schema": "ipam.t025-independent-evidence.v1",
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "status": "in_progress",
+  "scope": "disposable synthetic stores; loopback only",
+  "observations": {
+    "reservation_race": {"status": "pass", "responses": [201, 409], "persisted_reservations": 1},
+    "browser_access": {"status": "pass", "selected_domain": "demo-core", "prefix_detail_loaded": true, "saved_domain_export_bytes": 2359059},
+    "browser_token_storage": {"status": "pass", "local_storage_keys": 0, "session_storage_keys": 0, "token_value_present": false, "reload_signed_out": true, "revocation_signed_out": true, "password_field_blank": true},
+    "populated_recovery": {"status": "pass", "tables_compared": 32, "all_equal": true, "integrity": "ok", "readiness_booleans_true": 6},
+    "migration_assessment": {"status": "pass", "accepted": 55, "added": 0, "changed": 0, "unchanged": 55, "conflicting": 0, "active_only": 1, "active_inventory_writes": 0},
+    "unknown_evidence": {"status": "pass", "incomplete_dhcp": true, "unknown_findings": 12, "prior_anomalies_that_remained_unknown": 4, "prior_anomalies_marked_healthy": 0},
+    "malformed_v6_ack_migration": {"status": "pass", "migration_refused": true, "schema_after": 6, "history_table_created": false, "database_bytes_unchanged": true},
+    "recovery_refusals": {"status": "partial", "unsupported_schema": "refused_target_unchanged", "non_standalone": "refused_target_unchanged", "busy_lock": "DATA_IN_USE_no_snapshot", "integrity_corrupt_input": "not_yet_recorded"},
+    "foreign_export": {"status": "not_run"},
+    "migration_malformed_and_bounds": {"status": "partial", "duplicate_envelope": "refused", "stale_assessment": "refused", "malformed_row_and_bounds": "not_yet_recorded"},
+    "saved_dhcp_unit_labels": {"status": "not_yet_recorded"}
+  },
+  "private_evidence": [
+    "reservation-race-timed.json",
+    "browser-ui-evidence.json",
+    "authenticated-detail-evidence.json",
+    "unknown-evidence-and-units.json",
+    "populated-before-restore.json",
+    "populated-after-restore.json",
+    "injected-failure-results.json",
+    "refusal-probes.json",
+    "migration-assessment.jsonl",
+    "wrapper-negative-matrix.json"
+  ],
+  "limitations": [
+    "No human portability acknowledgement or production/customer evidence is claimed.",
+    "Private tokens, raw configuration files, databases, and full API exports are excluded."
+  ]
+}
