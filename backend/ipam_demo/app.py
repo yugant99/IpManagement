@@ -24,7 +24,7 @@ from .models import (Allocation, MigrationAssessmentCreateRequest, MigrationAsse
                      MigrationAssessmentMutation, MigrationAssessmentPage,
                      MigrationAssessmentSignoffRequest, MigrationOperationReadback,
                      Page, Pool, Prefix, PrefixDetail, ReservationDetail, ReservationHistoryEntry,
-                     ReservationReleaseRequest, ReservationSummary, Scope)
+                     ReservationOperationReadback, ReservationReleaseRequest, ReservationSummary, Scope)
 from .scheduler import SyntheticScheduler
 from .store import (SCHEMA_VERSION, connect, data_directory,
                     exclusive_data_access, initialize_schema, require_initialized,
@@ -702,62 +702,70 @@ def create_app() -> FastAPI:
         row = connection.execute("SELECT scope_id FROM reservations WHERE id=?", (reservation_id,)).fetchone()
         return row["scope_id"] if row else None
 
+    RESERVATION_IMMUTABLE_KEYS = ("id", "scope_id", "prefix_id", "pool_id", "family", "address",
+                                   "owner_reference", "service_reference", "created_by", "reason",
+                                   "created_at", "policy_revision")
+    RELEASE_RESULT_KEYS = ("id", "reservation_id", "reservation_version", "requester_id", "reason",
+                           "expected_pool_version", "expected_baseline_version", "state",
+                           "created_at", "decided_at", "approver_id", "decision_reason")
+
+    def reservation_integrity_error():
+        return AppError("RESERVATION_OPERATION_INTEGRITY",
+                        "The saved reservation operation receipt is invalid.", 409)
+
     def reservation_receipt_saved(row):
         try:
             saved = json.loads(row["result_json"])
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409) from exc
+            raise reservation_integrity_error() from exc
         if not isinstance(saved, dict) or saved.get("id") != row["target_id"]:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
+            raise reservation_integrity_error()
         return saved
 
-    def reconciled_reservation_readback(connection, request, reservation_id, saved):
-        current = connection.execute("SELECT * FROM reservations WHERE id=?", (reservation_id,)).fetchone()
-        if current is None:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
-        require_domain(request, connection, current["scope_id"])
-        for key in ("scope_id", "prefix_id", "pool_id", "address"):
+    def reconciled_reservation_readback(connection, request, action, current, saved, principal_id):
+        version = saved.get("version")
+        if type(version) is not int or version < 1:
+            raise reservation_integrity_error()
+        if saved.get("state") != "reserved":
+            raise reservation_integrity_error()
+        if saved.get("converted_allocation_id") is not None or saved.get("released_at") is not None:
+            raise reservation_integrity_error()
+        for key in RESERVATION_IMMUTABLE_KEYS:
             if saved.get(key) != current[key]:
-                raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                               "The saved reservation operation receipt is invalid.", 409)
+                raise reservation_integrity_error()
         history = connection.execute(
-            "SELECT after_json FROM reservation_history WHERE reservation_id=? AND version=?",
-            (reservation_id, saved.get("version"))).fetchone()
+            "SELECT action,actor_id,after_json FROM reservation_history WHERE reservation_id=? AND version=?",
+            (current["id"], version)).fetchone()
         if history is None:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
+            raise reservation_integrity_error()
+        expected_action = "created" if action == "reservation.create" else "extended"
+        if history["action"] != expected_action or history["actor_id"] != principal_id:
+            raise reservation_integrity_error()
+        if action == "reservation.create" and version != 1:
+            raise reservation_integrity_error()
         try:
             after = json.loads(history["after_json"])
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409) from exc
-        if not isinstance(after, dict) or after.get("state") != saved.get("state"):
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
+            raise reservation_integrity_error() from exc
+        if (not isinstance(after, dict) or after.get("version") != version
+                or after.get("state") != saved.get("state")
+                or after.get("expires_at") != saved.get("expires_at")):
+            raise reservation_integrity_error()
+        if action == "reservation.create" and (
+                after.get("owner_reference") != saved.get("owner_reference")
+                or after.get("service_reference") != saved.get("service_reference")):
+            raise reservation_integrity_error()
         return current
 
-    def reconciled_release_readback(connection, request, release_id, saved):
-        row = connection.execute(
-            "SELECT * FROM reservation_release_requests WHERE id=?", (release_id,)).fetchone()
-        if row is None:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
-        require_domain(request, connection, reservation_scope_id(connection, row["reservation_id"]))
-        if (saved.get("reservation_id") != row["reservation_id"]
-                or saved.get("reservation_version") != row["reservation_version"]
-                or saved.get("state") != row["state"]):
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
-        current = connection.execute(
-            "SELECT * FROM reservations WHERE id=?", (row["reservation_id"],)).fetchone()
-        if current is None:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
-        require_domain(request, connection, current["scope_id"])
-        return row, current
+    def reconciled_release_readback(release, saved, principal_id):
+        for key in RELEASE_RESULT_KEYS:
+            if saved.get(key) != release[key]:
+                raise reservation_integrity_error()
+        if release["state"] not in ("approved", "rejected"):
+            raise reservation_integrity_error()
+        if release["approver_id"] != principal_id:
+            raise reservation_integrity_error()
+        return release
 
     @app.get("/api/reservations")
     def list_reservations(request: Request, limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
@@ -862,8 +870,9 @@ def create_app() -> FastAPI:
                 "WHERE requester_id=? AND reservation_id=? AND idempotency_key=?",
                 (principal_id, supplied, idempotency_key)).fetchone()
             if row is None:
-                return {"found": False, "action": action, "original_outcome": None,
-                        "current_reservation": None, "current_release_request": None}
+                return ReservationOperationReadback.model_validate(
+                    {"found": False, "action": action, "original_outcome": None,
+                     "current_reservation": None, "current_release_request": None}).model_dump()
             require_domain(request, connection, reservation_scope_id(connection, row["reservation_id"]))
             if row["reservation_id"] != supplied:
                 raise AppError("RESERVATION_OPERATION_INTEGRITY",
@@ -880,35 +889,57 @@ def create_app() -> FastAPI:
                 raise AppError("RESERVATION_OPERATION_INTEGRITY",
                                "The saved release proposal is invalid.", 409)
             require_domain(request, connection, current["scope_id"])
-            outcome = project_release_request(dict(row), principal_id)
-            return {"found": True, "action": action, "original_outcome": outcome,
-                    "current_reservation": project_reservation(dict(current), principal_id),
-                    "current_release_request": outcome}
-        target_kind = ("reservation" if action in ("reservation.create", "reservation.extend")
-                       else "reservation_release_request")
+            snapshot = dict(row)
+            snapshot["state"] = "pending"
+            snapshot["decided_at"] = None
+            snapshot["approver_id"] = None
+            snapshot["decision_reason"] = None
+            return ReservationOperationReadback.model_validate({
+                "found": True, "action": action,
+                "original_outcome": project_release_request(snapshot, principal_id),
+                "current_reservation": project_reservation(dict(current), principal_id),
+                "current_release_request": project_release_request(dict(row), principal_id)}).model_dump()
         row = connection.execute(
             "SELECT target_kind,target_id,result_json FROM tier_a_operation_receipts "
             "WHERE principal_id=? AND domain=? AND action=? AND idempotency_key=?",
             (principal_id, domain, action, idempotency_key)).fetchone()
         if row is None:
-            return {"found": False, "action": action, "original_outcome": None,
-                    "current_reservation": None, "current_release_request": None}
-        if row["target_kind"] != target_kind:
-            raise AppError("RESERVATION_OPERATION_INTEGRITY",
-                           "The saved reservation operation receipt is invalid.", 409)
-        saved = reservation_receipt_saved(row)
-        if target_kind == "reservation":
-            current = reconciled_reservation_readback(connection, request, row["target_id"], saved)
-            return {"found": True, "action": action,
-                    "original_outcome": project_reservation(saved, principal_id),
-                    "current_reservation": project_reservation(dict(current), principal_id),
-                    "current_release_request": None}
-        release, current = reconciled_release_readback(connection, request, row["target_id"], saved)
-        outcome = project_release_request(dict(release), principal_id)
-        return {"found": True, "action": action,
-                "original_outcome": project_release_request(saved, principal_id),
+            return ReservationOperationReadback.model_validate(
+                {"found": False, "action": action, "original_outcome": None,
+                 "current_reservation": None, "current_release_request": None}).model_dump()
+        if action in ("reservation.create", "reservation.extend"):
+            current = connection.execute(
+                "SELECT * FROM reservations WHERE id=?", (row["target_id"],)).fetchone()
+            if current is None:
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+            require_domain(request, connection, current["scope_id"])
+            if row["target_kind"] != "reservation":
+                raise reservation_integrity_error()
+            saved = reservation_receipt_saved(row)
+            reconciled_reservation_readback(connection, request, action, current, saved, principal_id)
+            return ReservationOperationReadback.model_validate({
+                "found": True, "action": action,
+                "original_outcome": project_reservation(saved, principal_id),
                 "current_reservation": project_reservation(dict(current), principal_id),
-                "current_release_request": outcome}
+                "current_release_request": None}).model_dump()
+        release = connection.execute(
+            "SELECT * FROM reservation_release_requests WHERE id=?", (row["target_id"],)).fetchone()
+        if release is None:
+            raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+        current = connection.execute(
+            "SELECT * FROM reservations WHERE id=?", (release["reservation_id"],)).fetchone()
+        if current is None:
+            raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+        require_domain(request, connection, current["scope_id"])
+        if row["target_kind"] != "reservation_release_request":
+            raise reservation_integrity_error()
+        saved = reservation_receipt_saved(row)
+        reconciled_release_readback(dict(release), saved, principal_id)
+        return ReservationOperationReadback.model_validate({
+            "found": True, "action": action,
+            "original_outcome": project_release_request(saved, principal_id),
+            "current_reservation": project_reservation(dict(current), principal_id),
+            "current_release_request": project_release_request(dict(release), principal_id)}).model_dump()
 
     @app.get("/api/audit")
     def audit(request: Request, request_id: UUID | None = None, subject_id: TextFilter = None, limit: Limit = 50,
