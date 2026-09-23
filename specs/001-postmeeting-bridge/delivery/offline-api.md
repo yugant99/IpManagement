@@ -55,7 +55,7 @@ source-reviewed and not observed at runtime. *Simulated* means it runs only insi
 | `backend/ipam_demo/app.py`, `models.py`, `access.py`, `errors.py` | Decisive for routes, DTOs, headers, status codes and authorization order |
 | `lifecycle.py`, `workflow.py`, `ticket_handoff.py`, `migration_compare.py`, `scheduler.py`, `reports.py`, `inventory.py` | Decisive for leaf validation, allowed fields, replay semantics and error codes |
 | `frontend/src/api.ts`, `workflowApi.ts`, `firstPathApi.ts` | Reference client behaviour: pinning, stale/revoked clearing, recovery pointers |
-| `contracts/access.md` (C-A), `migration.md` (C-M), `lifecycle.md` (C-L), `ticketing.md` (C-T), `operator.md` (C-O), `reservation-ticket-wire.md`, `ticket-api-wire.md`, `notice-api-wire.md`, `notice-recipient-wire.md`, `state-recovery-wire.md` | Frozen intent. Code implements them. Any conflict is noted in §15 |
+| `contracts/access.md` (C-A), `migration.md` (C-M), `lifecycle.md` (C-L), `ticketing.md` (C-T), `operator.md` (C-O), `reservation-ticket-wire.md`, `ticket-api-wire.md`, `notice-api-wire.md`, `notice-recipient-wire.md`, `state-recovery-wire.md` | Frozen intent. Code implements them. Any contract-to-code difference is noted in §14 |
 | `delivery/integration-matrix.md` §4 | Navigation aid only |
 
 **Historical (pre-bridge) documents.** These describe an earlier baseline that used
@@ -113,9 +113,33 @@ it from bootstrap and must never compute or invent it.
 7. For non-bootstrap, non-docs calls with a pin mismatch, the response is `409 ACCESS_CONTEXT_STALE`. This happens before any protected output or mutation.
 8. The route runs. Data routes open a transaction that validates the reviewed source-to-scope mappings
    against stored scopes (`503 ACCESS_CONFIGURATION_INVALID` on mismatch). Then the route checks
-   role, resource ownership and payload. Every mutation **re-authenticates the bearer, domain and pins
-   inside its `BEGIN IMMEDIATE` transaction** (`write_operation`, `app.py:422-444`). A token
-   revoked during a request cannot complete a write.
+   role, resource ownership and payload. Every mutating route runs a **fresh authority check at a named
+   point inside its write transaction**. It reloads the reviewed configuration file and re-authenticates
+   against it. The mechanism depends on the route:
+   - Domain mutations, `POST /api/imports`, `POST /api/runs` and import reconciliation use
+     `write_operation` (`app.py:422-444`). Immediately after `BEGIN IMMEDIATE`, and before the operation
+     runs, it re-authenticates the bearer, selected domain and pins, and re-validates the mappings.
+   - `POST /api/schedule/run` does **not** use `write_operation`. The route first runs a fresh
+     `require_coordinator` check (`app.py:521-528`). The scheduler then opens its own transactions in
+     `SyntheticScheduler._acquire` (`scheduler.py:210-255`): first a read transaction, then its own
+     `BEGIN IMMEDIATE` commit transaction. At the start of each one, before its replay lookup or state
+     check, it calls the route's `authority_check`, which is `require_coordinator(request, "acquire", connection)`.
+     That check freshly re-authenticates the bearer and pins, re-checks the coordinator identity and
+     `acquire` grant, and re-validates the mappings and full feed authority.
+
+   **The exact guarantee is narrow.** A revocation, disablement, expiry or configuration change that is
+   already in effect when a transaction's authority check runs refuses that write. The refusal is
+   401, 403, 409 `ACCESS_CONTEXT_STALE` or 503, depending on what changed. A replay or cycle is therefore
+   disclosed or committed only under the authority that was valid at that check.
+
+   The guarantee has limits:
+   - **It is not atomic configuration fencing.** The reviewed configuration is a separate file. SQLite
+     `BEGIN IMMEDIATE` locks only the database and does not lock or version that file.
+   - A configuration replacement or revocation that takes effect **after** the final authority check can
+     race the commit, and that write may still commit. Expiry that passes after the check is not re-evaluated either.
+   - Later requests are evaluated against the new configuration. For a clean authority change, rely on the
+     reviewed **stopped-service** configuration replacement procedure (C-A, C-O).
+   - The source adds no fencing beyond the check itself.
 
 FastAPI validates declared body and query types before the handler body runs. A malformed
 body can therefore receive `422 INVALID_INPUT` (with `details.issues`) before a role or
@@ -285,7 +309,7 @@ the same authorized context. Otherwise:
 | Ticket attempt/readback/ack/reassign | `/api/handoff-operations?action=ticket.attempt\|ticket.readback\|ticket.acknowledge\|ticket.reassign&idempotency_key=…` |
 | Notice acknowledgement | `/api/reservation-notices/{notice_id}/notifications/{version}` (exact original version) |
 | Evaluate | `/api/reservation-notices` (canonical list; evaluate is repeat-safe) |
-| Coordinator acquisition | Re-POST the same key (replay), then `GET /api/schedule` |
+| Coordinator acquisition | After an explicit, operator-confirmed decision, re-POST the **same original** key and reason (replay under current coordinator authority), then `GET /api/schedule`. Never generate a new key or auto-retry |
 
 Retry budgets are bounded by the server: three manual ticket attempts in total, no automatic retry,
 queue or background drain. Busy responses (`RUN_IN_PROGRESS`, `STORE_BUSY`) may be retried with the
@@ -783,9 +807,27 @@ The fresh response is 201 with `X-Request-Replay: false`: `{"handoff": {…, "st
 
 A replay with the same key returns 200 with `operation.phase: "reserve"`, and **does not run phases 2 or 3**.
 
-If phase 2 or phase 3 fails after phase 1 committed, the error carries `details.handoff_id`, `attempt_id`,
-`readback_required: true` and `recovery_action: "POST /api/handoffs/<id>/readback"`. The ordinal stays
-consumed, and any committed effect stays committed. There is no automatic retry and no reset of the budget.
+If phase 2 or phase 3 fails after phase 1 committed, the recovery pointers depend on the error
+(`app.py:748-753`):
+- For an `AppError` whose status is **not** 401, 403 or 404, the route adds `details.handoff_id`,
+  `details.attempt_id`, `details.readback_required: true` and
+  `details.recovery_action: "POST /api/handoffs/<id>/readback"`. This covers, for example, 409 block or state errors
+  and 503 `STORE_BUSY`/`STORE_ERROR`, because `audited_write` converts store errors to `AppError`.
+- A **401, 403 or 404** from phase 2 or 3 carries **no** recovery pointers and no handoff or attempt
+  identifiers. That covers a token already revoked or expired when phase 2 or 3 re-authenticates, a role or domain denial, or a target no longer in scope, and the
+  body is the ordinary generic error. Any other unexpected failure is a generic `500 INTERNAL_ERROR`, which also has no pointers.
+
+In every case phase 1 may already have committed. The ordinal stays consumed, and any committed effect stays
+committed. There is no automatic retry and no reset of the budget. If the response had no pointers, or was
+lost, the caller must still treat the attempt as possibly reserved. Keep the original-context recovery
+information: principal, domain, configuration pins, the handoff `id`, the action `ticket.attempt` and the
+original `idempotency_key`. Then, after re-establishing that same authorized context:
+1. Call `GET /api/handoff-operations?action=ticket.attempt&idempotency_key=<original-key>` to find the
+   reserved attempt.
+2. Call `GET /api/handoffs/{id}` for current state.
+3. Send an explicit readback. Do not send a new attempt key.
+
+A denied or failed recovery keeps the attempt unresolved. It is not proof of absence.
 
 **Readback** (`POST /api/handoffs/{id}/readback`, Operator). The strict body is **exactly**
 `{expected_version, idempotency_key, correlation, business_payload_digest, actor_id?}`
@@ -866,7 +908,18 @@ condition or a hold. Resolution, delivery and acknowledgement are distinct state
   `legacy_unbound` (`access.py:340-380`, `lifecycle.py:74-116`).
 - **Versions.** `episode_number` identifies the due episode. `notification_version` increments on a
   new binding: the alarm upgrade at due+24 h, a changed recipient or eligibility, or renewal of a legacy or missing binding. One
-  evaluate increments it at most once per notice. `acknowledgement_version` is the parent's last acknowledged version.
+  evaluate increments it at most once per notice.
+- `acknowledgement_version` is **not** acknowledgement evidence. A new notice is inserted unacknowledged with
+  `acknowledgement_version = 1` (`lifecycle.py:247-252`), and the schema-6 column defaults to 1. The value is
+  set to the acknowledged version only when a recipient receipt is recorded (`lifecycle.py:350-354`), so on its own it
+  proves nothing, whether it is `1` or the value of a legacy or migrated row.
+  - **Receipt evidence** is the exact notification version's binding, from `current_notification`,
+    `notification_history[]` or `GET …/notifications/{version}`. It requires `in_app_receipt: true`,
+    `acknowledgement_kind: "recipient_in_app"`, `delivery_status: "acknowledged"` and a non-null
+    `acknowledged_at`. The recipient can confirm its own receipt when `acknowledged_by` equals its principal ID; for
+    every other caller `acknowledged_by` is redacted to `null`.
+  - The parent `state` and `acknowledged_*` fields and a `legacy_operator` acknowledgement are **not** recipient
+    receipts.
 
 **Evaluate** (`POST /api/reservations/evaluate`, Operator). The body must be `{}` or `{"actor_id": "<own-id>"}`.
 Caller time, configuration or finding IDs are refused. It uses server UTC only. For each `reserved` hold in the
@@ -907,9 +960,13 @@ The caller must be the recipient **bound to that version** and must also be the 
 ```json
 {"notice_id": "<notice-uuid>", "expected_notification_version": 2, "reason": "Seen; extension under review."}
 ```
-The fresh response is 200 with `X-Request-Replay: false`, and the notice now shows `state: "acknowledged"`, `acknowledgement_version: 2`,
-`current_notification.delivery_status: "acknowledged"`, `acknowledgement_kind: "recipient_in_app"`,
-`in_app_receipt: true` and `acknowledgement_current: true`.
+The fresh response is 200 with `X-Request-Replay: false`. What evidences the receipt is the version-2 binding in
+`current_notification`: `notification_version: 2`, `acknowledged_by: "<own-principal-id>"`,
+`acknowledged_at: "<utc-timestamp>"`, `delivery_status: "acknowledged"`,
+`acknowledgement_kind: "recipient_in_app"` and `in_app_receipt: true`. The route refuses to return success
+unless exactly this own receipt is present (`app.py:1200-1205`). The parent also shows `state: "acknowledged"`,
+`acknowledgement_version: 2` and `acknowledgement_current: true`, but these are summaries and not receipt evidence
+on their own.
 
 A replay by the same principal with the same reason, while that version is still current and unresolved, returns 200 with
 `X-Request-Replay: true` and the original receipt. Refusals:
@@ -977,7 +1034,7 @@ host-occupancy metric.
 | `simulate_failure: true` on an intent-backed allocation decision | `422 SIMULATION_UNSUPPORTED` |
 | Ordinary import with observation records, mixed or unmapped scopes, or `reconcile_after_import=true` | `403` before persistence |
 | Non-JSON import, or import over 10 MiB | `422` or `413` |
-| `POST /api/schedule` (any body) | `403` |
+| `POST /api/schedule` | After authentication, domain and pin checks pass (§2.3), a well-formed JSON-object body reaches the handler and always gets `403 FORBIDDEN`, including for the coordinator (§8.2). A malformed, missing or non-object body can get `422 INVALID_INPUT` from request validation before the handler runs. No body ever configures the schedule |
 | Ticket route change after any attempt | `409 REASSIGNMENT_NOT_ALLOWED` (Tier A unsupported) |
 | Allocated reclaim or reuse, provisioning, external ticket delivery, DNS/DHCP writes | No route exists (Tier B locked or absent) |
 
@@ -999,24 +1056,65 @@ host-occupancy metric.
 
 ## 13. Handoff to T024 (operator package, Muse)
 
-What T024 can rely on, from source only:
-- **Liveness.** The container health check uses anonymous `GET /healthz`, which returns only `{"process_ready": true}`.
-- **Readiness wrapper** (`scripts/ops/health.sh`). It uses a **domain Operator** credential and
-  `X-IPAM-Domain`. It first bootstraps `GET /api/access-context` to obtain the pins. Then it calls
-  `GET /api/readiness` with the pins, requires HTTP 200 **and** all six booleans `true`, and reports the
-  allowlisted `reasons` otherwise.
-- **Acquire wrapper** (`scripts/ops/acquire.sh`). It uses the **separately provisioned coordinator**
-  credential, never a browser or Operator token, and **does not send `X-IPAM-Domain`**. It bootstraps to obtain
-  pins and then sends `POST /api/schedule/run {idempotency_key, reason}` with a stable key per intended
-  acquisition. It must reuse the same key after an ambiguous outcome and interpret
-  `X-Acquisition-Replay`. It must not assume `POST /api/schedule` can configure anything. There is no actor argument
-  unless the value equals the coordinator principal ID.
-- **Both wrappers.** They take the token from protected storage, never from command arguments, environment dumps or logs. They
-  handle 401 (stop, credential revoked or expired) and 409 `ACCESS_CONTEXT_STALE` (bootstrap again once)
-  distinctly, and log `X-Request-ID` rather than bodies.
+**Status: T024 has not started.** The user has explicitly paused T024 until they resume it tomorrow. Nothing
+in this section is implemented. It records the API contract that a **future** T024 implementation must
+meet. Everything here is derived from the pinned API source, and none of it was executed.
 
-T024 must pin the actual assets and record the actual Compose version. Those are not specified
-here. T025 supplies the first observed evidence for everything in this document.
+**Current wrappers at the pinned source, which predate the bridge.** Neither meets the bridge
+authentication contract:
+- `scripts/ops/health.sh` sends only anonymous `GET /healthz` (default `http://127.0.0.1:8000/healthz`). It maps
+  200 to exit 0 and a 503 body containing `SETUP_NEEDED` to exit 1. Under the bridge, `/healthz` returns only
+  `{"process_ready": true}`, so this script proves liveness only. Its `SETUP_NEEDED` branch is never
+  produced by the current `/healthz`. It does not call `/api/readiness`.
+- `scripts/ops/acquire.sh` sends `POST /api/schedule/run` with **no** `Authorization` header and no configuration
+  pins. Its default body is `{"actor_id": "demo-approver", …}`, and it takes `--actor`, `--reason` and the idempotency key on the command line and logs
+  them. Against the bridge API it would receive `401 AUTHENTICATION_REQUIRED` (§2.3). No
+  `demo-approver` identity or actor selection exists in the bridge.
+- `scripts/ops/start.sh` still tells operators to check `/healthz` for `SETUP_NEEDED`, and names the Docker volume
+  `ipam_demo_data`. Those are historical or unverified statements. They are not readiness or volume evidence.
+
+**Required future T024 behaviour** (C-A, C-O and this reference):
+- **Container liveness.** The container health check targets anonymous `GET /healthz` and treats it as process liveness only.
+- **Readiness wrapper** (future `scripts/ops/health.sh`):
+  - It must use a separately provisioned **domain Operator** credential and send `X-IPAM-Domain` for one selected domain.
+  - It must bootstrap `GET /api/access-context` to obtain the configuration revision and digest.
+  - It must call `GET /api/readiness` with those pins.
+  - It must report ready only on HTTP 200 **and** all six booleans `true`. Otherwise it reports the allowlisted `reasons`.
+  - It must state that readiness is not a business-state comparison or human acceptance.
+- **Acquire wrapper** (future `scripts/ops/acquire.sh`):
+  - It must use the separately provisioned **coordinator** credential, never a browser, Operator or approver token. It must
+    **not** send `X-IPAM-Domain`.
+  - It must bootstrap for pins and then send `POST /api/schedule/run` with `{idempotency_key, reason}`.
+  - It must interpret `X-Acquisition-Replay`, the 201 or 200 status, and the body `replay`.
+  - It must have no `demo-approver` default and no actor selection. If `actor_id` is sent at all, it must equal the
+    coordinator principal ID.
+  - It must never assume that `POST /api/schedule` can configure anything, because that route always returns 403.
+- **Both wrappers:**
+  - Take the token from protected storage, never from command arguments, URLs, environment dumps, shell history or logs.
+    Log `X-Request-ID`, not tokens or protected bodies.
+  - Treat a `401` as a hard stop, because the credential is revoked or expired. Do not retry.
+  - On `409 ACCESS_CONTEXT_STALE`, refresh the access context explicitly with one bootstrap to obtain the current pins.
+    This is a **context refresh only**. It must **never** automatically re-send a mutation.
+  - After a stale, ambiguous or failed acquisition, any retry must be an explicit, operator-confirmed action. It
+    must reuse the **same original** `idempotency_key` and `reason`, so the server either replays the committed result
+    or refuses. It must never generate a new key.
+  - For recovery of an uncertain outcome, re-send the same key and reason, which replays under current coordinator
+    authority, and then read `GET /api/schedule`, as described in §5.
+
+**Scope boundaries for the future T024 lease:**
+- T024 owns the six task-graph package and ops paths (`task-graph.csv` T024 row).
+- The lead has approved a narrow expansion, recorded in the lead's ownership and pickup records. It covers only the
+  authentication, readiness and configuration text in `docs/RUNNING.md`, and the readiness and actual-volume text in the
+  start and backup scripts.
+- This T021 document does not edit those files and does not claim to implement them.
+- A target platform that is absent from source today does not prevent later authorized T024 source or documentation work.
+  Target observations remain separate.
+
+**Pinning and evidence split:**
+- T024 pins the **declared** package references: assets, dependency and licence declarations, and the presenter path.
+- **Observed** Compose plugin versions, target behaviour and all runtime evidence for this API belong to the later,
+  separately authorized **T025**. They are not T021 or T024 source claims.
+- T025 supplies the first observed evidence for everything in this document.
 
 ---
 
@@ -1036,6 +1134,29 @@ Inspected read-only at `cc4e281…`, with no execution:
 - Frontend code: `frontend/src/api.ts` (session, pins, clearing, downloads), and the `/api/` call sites in
   `workflowApi.ts`, `firstPathApi.ts`, `correctionApi.ts`, `inventoryCommandsApi.ts` and `scheduleApi.ts`.
 - Historical documents: a grep of `docs/STAGE4_API.md` and `docs/RUNNING.md` for markers of historical API use.
+- Current operator wrappers, read as part of the correction pass: `scripts/ops/health.sh` and `scripts/ops/acquire.sh` in full, and a grep of
+  `scripts/ops/start.sh`, `backup.sh` and `common.sh` for readiness and volume text. None was run or edited.
+
+Correction pass after the independent Sol review of initial candidate
+`b57d9283b7ffdb24347afabf5706b4bd48c0e0ed`. Each item was re-checked against the pinned source:
+1. §13 now presents the protected health and acquire wrappers as **required future T024** behaviour. It records
+   the current pre-bridge wrappers (anonymous `/healthz`, and an unauthenticated `demo-approver` acquire). It states that T024 is on hold, that stale context
+   is handled by explicit context refresh only with no automatic mutation retry, and that T024 pins declared references while observations belong to T025.
+2. §2.3 narrows the fresh-authentication claim. `write_operation` covers domain, import and run mutations.
+   `POST /api/schedule/run` re-authenticates through `authority_check` inside `SyntheticScheduler._acquire`'s
+   own transactions.
+3. §10.4 now states that recovery pointers are added only to caught `AppError`s other than 401, 403 and 404, and
+   keeps the original-context recovery steps.
+4. §10.5 no longer treats `acknowledgement_version` as acknowledgement evidence. Receipt evidence is the exact
+   version's `in_app_receipt`, the recipient's own `acknowledged_by` and `acknowledged_at`.
+5. The dangling reference to §15 in §1 now points to §14.
+
+Final precision pass, after Sol's complete-source review, keeping items 1–5 above:
+6. The §11 quick-reference row for `POST /api/schedule` now matches §2.3 and §8.2. A well-formed JSON object gets 403, while a
+   malformed or non-object body can get 422 before the handler.
+7. §2.3 now states the exact guarantee: fresh authority at a named check inside the write transaction. Revocation
+   that is already effective at that check refuses the write. A change to the separate configuration file after the final
+   check can race the commit, because `BEGIN IMMEDIATE` does not fence the file. §10.4's 401 wording is aligned with this. No code changed.
 
 Consistency with the T020 matrix §4:
 - All routes and field names there match the source.
