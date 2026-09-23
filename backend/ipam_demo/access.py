@@ -1,6 +1,6 @@
 """Fail-closed reviewed access configuration for the post-meeting bridge."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hashlib
 import hmac
@@ -59,6 +59,7 @@ class ReviewedConfiguration:
     coordinator_grants: frozenset[CoordinatorGrant]
     source_domains: dict[tuple[str, str], str]
     routes: dict[tuple[str, str], TicketRoute]
+    notice_recipients: dict[tuple[str, str], str] = field(default_factory=dict)
 
 
 def _config_error() -> AppError:
@@ -131,8 +132,17 @@ def _principal(value) -> Principal:
 
 
 def _load_configuration(value) -> ReviewedConfiguration:
-    root = _object(value, {"revision", "effective_at", "policy_revision", "connector_mode", "reviewer_references",
-                           "principals", "evidence_coordinator", "source_mappings", "routes"})
+    base_keys = {"revision", "effective_at", "policy_revision", "connector_mode", "reviewer_references",
+                           "principals", "evidence_coordinator", "source_mappings", "routes"}
+    if not isinstance(value, dict):
+        raise ValueError("configuration object")
+    keys = set(value)
+    if "notice_recipients" in value:
+        if keys != base_keys | {"notice_recipients"}:
+            raise ValueError("configuration object")
+    elif keys != base_keys:
+        raise ValueError("configuration object")
+    root = value
     revision = root["revision"]
     if type(revision) is not int or revision < 1:
         raise ValueError("revision")
@@ -193,9 +203,22 @@ def _load_configuration(value) -> ReviewedConfiguration:
             raise ValueError("route")
         by_route[key] = route
 
+    notice_recipients: dict[tuple[str, str], str] = {}
+    if "notice_recipients" in root:
+        raw_recipients = root["notice_recipients"]
+        if not isinstance(raw_recipients, list):
+            raise ValueError("notice recipients")
+        for item in raw_recipients:
+            item = _object(item, {"domain", "scope_id", "principal_id"})
+            recipient_key = (_text(item["domain"], "domain"), _text(item["scope_id"], "scope id"))
+            recipient_id = _text(item["principal_id"], "principal id")
+            if recipient_key in notice_recipients:
+                raise ValueError("notice recipient")
+            notice_recipients[recipient_key] = recipient_id
+
     digest = hashlib.sha256(json.dumps(root, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")).hexdigest()
     return ReviewedConfiguration(revision, digest, effective_at, policy_revision, connector_mode, by_id, coordinator_id,
-                                 frozenset(grants), source_domains, by_route)
+                                 frozenset(grants), source_domains, by_route, notice_recipients)
 
 
 def load_reviewed_configuration(path: str | Path | None = None, *, now: datetime | None = None) -> ReviewedConfiguration:
@@ -312,6 +335,49 @@ def resolve_ticket_route(configuration: ReviewedConfiguration, context: AccessCo
     if route is None:
         raise AppError("ROUTE_UNAVAILABLE", "No reviewed route is available for this handoff.", 409)
     return route
+
+
+def resolve_notice_recipient(configuration: ReviewedConfiguration, domain: str, scope_id: str, *,
+                             now: datetime | None = None) -> dict:
+    """Return the internal reviewed recipient binding for one domain and scope.
+
+    Missing mapping returns unassigned with reason missing_mapping. A configured
+    but currently unavailable principal stays internally identified with an
+    allowlisted unroutable reason. Only a currently enabled, unexpired,
+    selected-domain Operator is assigned. Never invalidates the whole
+    configuration merely because one recipient is unavailable.
+    """
+    try:
+        lookup = (_text(domain, "domain"), _text(scope_id, "scope id"))
+    except ValueError:
+        return {"recipient_id": None, "routing_status": "unassigned", "routing_reason": "missing_mapping",
+                "configuration_revision": configuration.revision, "configuration_digest": configuration.digest}
+    recipient_id = configuration.notice_recipients.get(lookup)
+    if recipient_id is None:
+        return {"recipient_id": None, "routing_status": "unassigned", "routing_reason": "missing_mapping",
+                "configuration_revision": configuration.revision, "configuration_digest": configuration.digest}
+    principal = configuration.principals.get(recipient_id)
+    if now is None:
+        current = datetime.now(timezone.utc).astimezone(timezone.utc)
+    else:
+        if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
+            raise ValueError("now must be an aware datetime")
+        current = now.astimezone(timezone.utc)
+    if principal is None:
+        reason = "unknown_principal"
+    elif not principal.enabled:
+        reason = "disabled"
+    elif principal.expires_at <= current:
+        reason = "expired"
+    elif "operator" not in effective_roles(principal.roles):
+        reason = "not_operator"
+    elif lookup[0] not in principal.domains:
+        reason = "wrong_domain"
+    else:
+        return {"recipient_id": recipient_id, "routing_status": "assigned", "routing_reason": None,
+                "configuration_revision": configuration.revision, "configuration_digest": configuration.digest}
+    return {"recipient_id": recipient_id, "routing_status": "unroutable", "routing_reason": reason,
+            "configuration_revision": configuration.revision, "configuration_digest": configuration.digest}
 
 
 def authenticate_request(authorization: str | None, selected_domain: str | None = None, *,
