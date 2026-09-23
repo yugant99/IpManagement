@@ -5,13 +5,23 @@
 #   - Persistent SQLite lives under IPAM_DATA_DIR (mounted at /data).
 #   - Published port binds to loopback only; no public exposure.
 #   - Explicit seed. The service never seeds/resets on its own.
-#   - Restart policy fires only on actual process exit, never on the
-#     503 SETUP_NEEDED readiness reply Docker reports as "unhealthy".
+#   - Restart policy fires only on actual process exit. Docker health
+#     observes anonymous /healthz liveness only, so a protected-readiness
+#     503 on /api/readiness never marks the container unhealthy and never
+#     drives a restart.
+#   - No token ever appears in Compose environment, images or logs. The
+#     reviewed access configuration is mounted read-only from a separately
+#     provisioned host file; the data volume name is explicit per candidate.
 #
 # Runtime prerequisites (before `docker compose up`):
 #   1. Build the image: `docker compose build ipam` (Linux amd64).
-#   2. Ensure the data volume exists (Compose creates it on first up).
-#   3. Seed once: `scripts/ops/seed.sh` (see docs/RUNNING.md).
+#   2. Record a NEW disposable volume name for this candidate in
+#      IPAM_DATA_VOLUME. Reusing a prior volume is deliberate and recorded;
+#      a different Compose project name alone does NOT isolate a globally
+#      named volume.
+#   3. Provision the reviewed access configuration separately and export
+#      IPAM_ACCESS_CONFIG pointing at it (mounted read-only; never committed).
+#   4. Seed once: `scripts/ops/seed.sh` (see docs/RUNNING.md).
 
 name: ipam-demo
 
@@ -31,8 +41,15 @@ services:
       IPAM_DATA_DIR: /data
       IPAM_STATIC_DIR: /app/static
       IPAM_SYNTHETIC_FEED_DIR: /app/fixtures/v1
+      # Container-side path of the reviewed access configuration. This is a
+      # path, not a credential: the file itself is mounted read-only below
+      # from the separately provisioned IPAM_ACCESS_CONFIG host file.
+      IPAM_ACCESS_CONFIG: /run/ipam/access-config.json
     volumes:
       - ipam_data:/data
+      # Separately provisioned reviewed configuration, read-only. Compose
+      # refuses to start when IPAM_ACCESS_CONFIG is unset or empty.
+      - "${IPAM_ACCESS_CONFIG:?Set IPAM_ACCESS_CONFIG to the separately provisioned reviewed configuration file}:/run/ipam/access-config.json:ro"
     restart: unless-stopped
     stop_grace_period: 15s
     read_only: true
@@ -48,6 +65,11 @@ services:
 
 volumes:
   # Named volume — do NOT bind-mount a network filesystem here. Local
-  # filesystem or a local Docker volume only (docs/CONTRACTS.md).
+  # filesystem or a local Docker volume only (docs/CONTRACTS.md). The name
+  # is explicit per candidate: Compose refuses to start when
+  # IPAM_DATA_VOLUME is unset or empty. A new candidate records a NEW
+  # disposable volume name; reuse is deliberate and recorded. The name is
+  # global to the engine, so a different Compose project name alone does
+  # not isolate data.
   ipam_data:
-    name: ipam_demo_data
+    name: "${IPAM_DATA_VOLUME:?Set IPAM_DATA_VOLUME to a new recorded disposable volume name for this candidate}"

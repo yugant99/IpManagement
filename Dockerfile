@@ -77,8 +77,19 @@ EXPOSE 8000
 
 USER ipam:ipam
 
-# HEALTHCHECK reports readiness only; it does not drive restarts. An unseeded
-# service returns 503 SETUP_NEEDED — reported as "unhealthy" by design.
+# HEALTHCHECK is minimal anonymous process liveness only: /healthz answers
+# {"process_ready": true} while the process serves HTTP. It proves nothing
+# about schema, data, configuration or domain readiness — operator readiness
+# is the protected GET /api/readiness with all six booleans true
+# (scripts/ops/health.sh --readiness). Docker health therefore never
+# observes a readiness 503: readiness shortfalls surface only on
+# /api/readiness with allowlisted reasons, and Compose restarts only on
+# real process exit, never on a health state.
+LABEL ipam.healthcheck.scope="liveness-only" \
+      ipam.healthcheck.endpoint="/healthz" \
+      ipam.healthcheck.never-observes="api-readiness-503" \
+      ipam.readiness.endpoint="/api/readiness (protected: Operator token file + domain + pins, six booleans)" \
+      ipam.restart.policy="process-exit-only"
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD curl --fail --silent --show-error --max-time 3 \
       http://127.0.0.1:8000/healthz > /dev/null || exit 1
