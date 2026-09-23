@@ -57,3 +57,13 @@ are registered in first-wave.json. T014 owns app/models; T016 owns lifecycle/wor
 No old worker checkout was changed. The integration is draft PR84. T015 waits for
 T014 source acceptance; T017 waits for both T014/T016. Spencer T020 remains a separate
 human prerequisite, not an agent-completed matrix.
+
+## Open notice authority disposition
+
+T016 source/schema inspection and independent Sol challenge found that FR-006's
+owner/recipient acknowledgement criterion has no trusted principal mapping in
+schema6. The bounded Operator action can be implemented honestly, but owner
+routing/recipient permission/delivery remains an acceptance gap; no T025 passing
+bar or main-merge policy is waived. See C-L's explicit clarification. Spencer's
+T020 worktree remains clean at ab005d8 and integration-matrix.md is not yet present.
+These are retained gaps, not inferred completed work.

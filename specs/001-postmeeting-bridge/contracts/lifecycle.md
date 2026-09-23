@@ -84,3 +84,21 @@ allocation must refuse a reserved address; a matching reserved allocation may
 consume only its explicitly identified current hold. T012/T015 expose these exact
 fields. This decision follows the lead's source inspection and independent Sol
 challenge; no application execution or T011 completion is implied.
+
+## T016 acknowledgement authority boundary — source implementation clarification
+
+The schema stores descriptive owner_reference and trusted acknowledged_by, but no
+principal-to-owner mapping, assigned recipient or delivery receipt. Free-text owner
+reference cannot authorize a caller. T016 therefore implements only selected-domain
+Operator acknowledgement, attributed to the authenticated principal, with exact
+notice-version checks and explicit operator-acknowledgement wording. This never
+clears the due condition or establishes recipient delivery, owner acknowledgement
+or human signoff. Alarm escalation and recurrence remain visible and versioned.
+
+Sol independently challenged this interpretation: FR-006's explicit permitted
+owner/recipient acknowledgement and owner-routing criterion remains an OPEN
+acceptance gap. This bounded implementation does not waive that requirement or
+lower T025/T028's passing bar. Satisfying it needs an explicitly settled trusted
+owner/recipient mapping and its scoped authorization contract, or a separately
+accepted requirement disposition. T016 must not invent an identity from a label
+or add unreviewed schema/configuration. Source completion alone promotes no row.
