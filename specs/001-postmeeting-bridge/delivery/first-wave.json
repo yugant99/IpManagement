@@ -319,7 +319,7 @@
     },
     {
       "task": "T012",
-      "status": "source_implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
       "branch": "codex/bridge-t012-reservation-api",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t012-muse/Ip_inventory",
@@ -336,11 +336,15 @@
         "Shared wire freeze and source-base pin",
         "Exact route and usage preflight"
       ],
-      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes."
+      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes.",
+      "result_sha": "0e8fb4b3168261328d7832781453dfb14f40e8d3",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/82",
+      "review_report": "specs/001-postmeeting-bridge/delivery/reservation-ticket-source-review.md",
+      "integration_sha": "6599ae493edcb897a407d90570b68efd5affcea2"
     },
     {
       "task": "T013",
-      "status": "source_implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
       "branch": "codex/bridge-t013-ticket-core",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t013-opus/Ip_inventory",
@@ -357,7 +361,11 @@
         "Shared wire freeze and source-base pin",
         "Exact route and usage preflight"
       ],
-      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes."
+      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes.",
+      "result_sha": "57dd77362f612f2a6a4f65b0e7a6dde80eddf12f",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/83",
+      "review_report": "specs/001-postmeeting-bridge/delivery/reservation-ticket-source-review.md",
+      "integration_sha": "6599ae493edcb897a407d90570b68efd5affcea2"
     }
   ],
   "muse_route": {
@@ -383,12 +391,12 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "takeover_complete_T012_T013_dispatched",
+    "status": "T012_T013_source_integrated",
     "action": "Use docs/handoffs/main-lead-5.0.md; receiver registers its actual task ID when started by user",
-    "hold": "T014 waits for both complete exact-SHA source reviews and integration; T025 prerequisite gate unchanged.",
+    "hold": "T014 and T016 source implementation released after independent closure; T025 remains prerequisite-gated.",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "ab370a4273784bd750bf5f59289594a31d097739",
-    "publication_branch": "codex/bridge-t011-handover",
+    "application_source_sha": "6599ae493edcb897a407d90570b68efd5affcea2",
+    "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7"
   },

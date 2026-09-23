@@ -32,3 +32,21 @@ Workers receive isolated tracked-source worktrees only. No private attachments, 
 Shared frozen source base `b557137279f09abb6979618d6eea7ca24fc27ef7`; accepted feature lineage was confirmed as ancestors by Git. T012 and T013 are dispatched in their isolated worktrees on that base. Sol independently reviewed the freeze and closed the two compatibility decisions; attempt phases must share ticket.attempt identity rather than invent schema receipt actions. Exact provider session IDs and leases are in first-wave.json.
 
 The initial Muse session was blocked by a lead-authored permission pattern using absolute internal paths. It made no edits. The corrected session allowlists exact tracked relative paths for read and the two leased relative paths for edit, following OpenCode V2 permission semantics; shell/external directories remain denied. This was a tool-permission correction, not a provider/privacy failure or model substitution. Claude init metadata confirms claude-opus-5-5, dontAsk mode and only Read/Glob/Grep/Edit/Write tools. Logs remain outside the repository and are not model inputs. Runtime remains unverified.
+
+## T012/T013 source completion
+
+Independent Sol closed T012 `0e8fb4b` (PR82) and T013 `57dd7736` (PR83), then their
+combined invariants. Source assembly `6599ae493edcb897a407d90570b68efd5affcea2` is in
+the lead-owned ipam-bridge-ticket-integration worktree/branch; frozen base b557137
+and prior worker refs are unchanged. T014/T016 use native GPT-6 Luna high as the
+user-authorized later-slice route, keeping external T012/T013 authors available for
+fixes and preserving Spencer's tasks. Codex ordinary usage remains allowed at13%
+weekly consumed on dispatch preflight. No capacity was bought or reset.
+
+Provider receipts confirm the exact requested author routes. Muse's completed calls
+report step-token totals input212103/output13076/reasoning20058/cache-read2926767;
+its cost field is provider metadata, not an incremental invoice. Opus's final retained
+session snapshot is cumulative: input68/output91514 (includes thinking51701),
+cache-read4456040/cache-created211647, list-cost metadata4.414936 USD, existing Max
+subscription. Do not sum cumulative Claude resume snapshots or treat list cost as
+actual billed spend. Raw provider logs remain outside the public repository.

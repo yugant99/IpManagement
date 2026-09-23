@@ -73,3 +73,14 @@ Astra will freeze the exact implementation SHA for T015. Sol independently revie
 whole T014 routes, three commit boundaries, partial failure, replay, nested isolation
 and recovery before source acceptance. Application and portable/human evidence stay
 pending. Tier B and bridge-to-main merge gates remain unchanged.
+
+## Allocation create recovery dependency for T015
+
+The existing allocation-request list also accepts optional idempotency_key query
+filter, normalized by the original key rule. In this filtered mode restrict results
+to current principal and selected scope before pagination, matching the saved
+normalized request payload key. Preserve ordinary list behavior and mutation hashes.
+This reuses C-A's correction recovery pattern for a lost allocation create response;
+no new write or legacy backfill. Direct-ID immutable decision recovery can confirm
+its saved terminal outcome and current principal as decision actor. Missing own key
+or unmatched decision remains ambiguous and never silently authorizes replacement.

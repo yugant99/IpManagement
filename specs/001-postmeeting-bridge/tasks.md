@@ -79,19 +79,21 @@ Goal/gate: exact local approved transition with independent honest ticket outcom
 
   Prerequisites: T009; owner: DeepSeek backend under Terra; FR-003 FR-014. Completion: No double hold, substitution, self-approval or free-on-expiry; local cancellation distinct from reclaim.
 
-T011 has source-only acceptance at `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; see delivery/lifecycle-source-review.md. The user requested handover here. T012/T013 remain undispatched until the user starts the new lead; T025 remains open.
+T011 has source-only acceptance at `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; see delivery/lifecycle-source-review.md. Main Lead 5.0 is registered and continues this checkpoint; T025 remains open.
 
-- [ ] T012 [US2] Expose C-L reservation/create/extend/release-request/decision and optional reservation_id allocation API; derive principal/domain and audit in existing write boundary. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
+- [x] T012 [US2] Expose C-L reservation/create/extend/release-request/decision and optional reservation_id allocation API; derive principal/domain and audit in existing write boundary. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
 
-  Prerequisites: T011; owner: Terra in Codex; FR-003 FR-005 FR-009. Completion: Exact versions and supported authority checked; unsupported pool/family/action refused.
+  Prerequisites: T011; owner: Muse 1.3 high in OpenCode; FR-003 FR-005 FR-009. Completion: Exact versions and supported authority checked; unsupported pool/family/action refused.
 
-- [ ] T013 [US2] Persist request+intent atomically and independent durable simulator effect/attempt/readback. Fixed route revision, unique correlation/digest, three total manual attempts with ordinal reserved before effect, five-second observation budget; no provisioning simulator. Files: `backend/ipam_demo/ticket_handoff.py`, `backend/ipam_demo/workflow.py`. Zero-attempt route reassignment preserves logical intent/digest/correlation and returns to pending after valid reviewed routing; attempted routes cannot change in Tier A.
+- [x] T013 [US2] Persist request+intent atomically and independent durable simulator effect/attempt/readback. Fixed route revision, unique correlation/digest, three total manual attempts with ordinal reserved before effect, five-second observation budget; no provisioning simulator. Files: `backend/ipam_demo/ticket_handoff.py`, `backend/ipam_demo/workflow.py`. Zero-attempt route reassignment preserves logical intent/digest/correlation and returns to pending after valid reviewed routing; attempted routes cannot change in Tier A.
 
-  Prerequisites: T011; owner: DeepSeek backend under Terra; FR-004 FR-009 FR-011. Completion: Effect-committed/response-lost recovers via same correlation; no duplicate or budget reset.
+  Prerequisites: T011; owner: Opus 5.5 high in Claude Code; FR-004 FR-009 FR-011. Completion: Effect-committed/response-lost recovers via same correlation; no duplicate or budget reset.
+
+T012/T013 are independently source-reviewed at `0e8fb4b`/`57dd7736`, integrated at `6599ae4`; see delivery/reservation-ticket-source-review.md. These checkmarks do not claim runtime acceptance.
 
 - [ ] T014 [US2] Expose C-T handoff list/detail/attempt/readback/simulated acknowledgement; local approval independent of routing/delivery; disable new attempts without losing history, legacy downstream status historical only. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`. Include operator zero-attempt reassignment, exact-version/key refusal and immutable attempted route history.
 
-  Prerequisites: T012 T013; owner: Terra in Codex; FR-004 FR-005 FR-009 FR-011. Completion: Unknown never success; no ticket approval grants local authority; old requests not tracked.
+  Prerequisites: T012 T013; owner: GPT-6 Luna high in Codex; FR-004 FR-005 FR-009 FR-011. Completion: Unknown never success; no ticket approval grants local authority; old requests not tracked.
 
 - [ ] T015 [P] [US2] Show reservation/decisions and independent local/ticket states, correlation/attempt cap/unknown lookup/simulated receipt; provisioning unsupported/not requested. Files: `frontend/src/Workflow.tsx`, `frontend/src/workflowApi.ts`.
 
@@ -104,7 +106,7 @@ Goal/gate: exact current/saved metric identity and due conditions; arithmetic/ac
 
 - [ ] T016 [US3] Implement UTC reservation episodes/evaluate/ack: due alert, due+24h alarm, no auto-free; resolve on extension/conversion/release; preserve finding clearance and historical metrics, expose current active-hold occupancy separately. Files: `backend/ipam_demo/lifecycle.py`, `backend/ipam_demo/workflow.py`.
 
-  Prerequisites: T013; owner: DeepSeek backend under Terra; FR-003 FR-006 FR-008. Completion: One due episode, ack not clearance, no forged finding IDs or saved-run rewriting.
+  Prerequisites: T013; owner: GPT-6 Luna high in Codex; FR-003 FR-006 FR-008. Completion: One due episode, ack not clearance, no forged finding IDs or saved-run rewriting.
 
 - [ ] T017 [US3] Integrate bounded evaluate/notice/current static occupancy endpoints with protected UTC/config context; timer default off, no new monitor/retry service. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
 

@@ -1,5 +1,7 @@
 # Current project status
 
+**T012/T013 source integration — 2026-09-22:** Main Lead 5.0 integrated Muse T012 `0e8fb4b3168261328d7832781453dfb14f40e8d3` and Opus T013 `57dd77362f612f2a6a4f65b0e7a6dde80eddf12f` at `6599ae493edcb897a407d90570b68efd5affcea2` on `codex/bridge-ticket-integration`. Independent GPT-6 Sol high closed both full source reviews and their combined invariants. T014 ticket HTTP and T016 lifecycle notices/occupancy are the next separate native GPT-6 Luna high slices. Source acceptance only: no application checks ran, T025 remains prerequisite-gated, main/PR79 unchanged, Spencer ownership and Tier B lock preserved.
+
 **Main Lead 5.0 takeover — 2026-09-22:** GPT-6 Astra task `01a0ccc7-6219-73c1-bd3b-1521bb71a837` is the user-authorized persistent lead from the accepted T011 source checkpoint. Main Lead 4.0 and earlier leads are reference-only for new coordination; retained workers keep their correction ownership. The controlling pickup includes PR #80 at `352f5a7ba891b4c13c9670beb9eee7d0b60bc764`, on published T011 handover `aaec3b625ff84554e93e3116d8102a3eb5c347e7`. [Takeover and merge-readiness record](handoffs/main-lead-5.0-takeover.md). T012 is assigned to OpenCode Muse 1.3 high and T013 to Claude Code Opus 5.5 high after shared-wire/base freeze; GPT-6 Sol high independently reviews both. This latest user grant supersedes the older provider pause and undispatched handover hold. Source acceptance does not establish runtime acceptance. T025 remains gated; T028 is the next bridge-to-main merge. Spencer and Tier B boundaries remain unchanged.
 
 **Explicit main merge gate —2026-09-22:** [Main merge rule](MAIN_MERGE_POLICY.md).
@@ -9,7 +11,7 @@ T026/T027/business dispositions. Pending human rehearsal alone does not block a
 validated technical-package merge; it limits human-handoff claims. Lead merges at
 that checkpoint. This documentary clarification runs no checks or implementation.
 
-**Latest bridge update —2026-09-22:** T009/T010/T011 are source accepted after
+**Earlier T011 handover —2026-09-22 (superseded execution state):** T009/T010/T011 are source accepted after
 independent Sol reviews and owner corrections. T011 final is
 `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; assembled application source is
 `ab370a4273784bd750bf5f59289594a31d097739` on `codex/bridge-t011-handover`.
