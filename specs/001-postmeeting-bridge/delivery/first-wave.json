@@ -605,6 +605,47 @@
       "result_sha": "1123146ce60ac3636d9a38af8be90467c1df90bf",
       "review_report": "specs/001-postmeeting-bridge/delivery/integration-matrix-source-review.md",
       "integration_sha": "ce52b1f9b0fe527c8a84c3e80f0eed92e0f46907"
+    },
+    {
+      "task": "T021",
+      "status": "implementation_dispatched",
+      "base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98",
+      "branch": "codex/bridge-t021-offline-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t021-opus/Ip_inventory",
+      "route": "Claude Code claude-opus-5-5 high",
+      "provider_session_id": "43675db1-2332-459d-9376-98a210e19298",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/offline-api.md"
+      ],
+      "prerequisites": [
+        "T009",
+        "T014",
+        "T017A",
+        "T020"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes."
+    },
+    {
+      "task": "T022",
+      "status": "implementation_dispatched",
+      "base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98",
+      "branch": "codex/bridge-t022-recipient-pack",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t022-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32aa15acffeOiX7v983vArcrf",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/recipient-validation.md",
+        "specs/001-postmeeting-bridge/delivery/configuration-example.json"
+      ],
+      "prerequisites": [
+        "T010",
+        "T015",
+        "T017A",
+        "T020"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes."
     }
   ],
   "muse_route": {
@@ -630,7 +671,7 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T020_source_accepted_T021_T022_released",
+    "status": "T021_T022_full_preparation_dispatched",
     "action": "Full T021 offline API to Opus and T022 recipient preparation to Muse on one pinned reviewed base",
     "hold": "T025 awaits reviewed T021/T022/T024 and exact complete candidate",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
@@ -638,13 +679,13 @@
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
-    "next_shared_base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33"
+    "next_shared_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98"
   },
   "lead_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
   "latest_provider_preflight": {
     "opencode_route": "active opencode-go/muse-spark-1.3-contributor#high, high variant and source tools verified",
     "opencode_usage_percent": {
-      "rolling": 3,
+      "rolling": 4,
       "weekly": 41,
       "monthly": 21
     },
@@ -652,12 +693,12 @@
     "opencode_training": "existing paid-training consent enabled; unchanged; public tracked synthetic source only",
     "claude_route": "claude-opus-5-5 high; existing Max",
     "claude_usage_percent": {
-      "session": 5,
+      "session": 0,
       "weekly": 31,
       "fable": 24
     },
     "claude_credit": "balance CA$0; auto-reload off",
-    "boundary": "2026-09-23 fresh UI refresh before operator-preparation assignments; 20% reserve, no reset/purchase/settings changes, raw identifiers/logs excluded",
+    "boundary": "2026-09-23 fresh UI refresh immediately before T021/T022 parallel dispatch; 20% reserve; no reset/purchase/settings changes; raw identifiers/logs excluded",
     "native_codex_weekly_used_percent": 38
   },
   "recipient_policy_amendment": {
