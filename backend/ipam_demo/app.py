@@ -638,6 +638,7 @@ def create_app() -> FastAPI:
             normalized_key = workflow._text(idempotency_key, "idempotency_key", 200)
             principal_id = request.state.access_context.principal_id
             items = [item for item in items if item.get("actor_id") == principal_id
+                     and item.get("idempotency_key") == normalized_key
                      and item.get("payload", {}).get("idempotency_key") == normalized_key]
         items = redact_foreign_actors(items, request.state.access_context.principal_id)
         return inventory.page(items, limit, offset)
