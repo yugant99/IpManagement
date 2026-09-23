@@ -104,21 +104,26 @@ use its own independent reviewer rather than assume that relative name is routab
 After takeover, pin a shared base from the final source assembly and freeze the
 T012/T013 wire boundary before dispatch. T012 leases only `backend/ipam_demo/app.py`
 and `models.py`; T013 leases only `ticket_handoff.py` and `workflow.py`. These can
-run in parallel in isolated `codex/` worktrees with GPT-6 Luna high, then receive
-independent GPT-6 Sol high source review. T014 follows both; T015/T016 follow their
+run in parallel in isolated `codex/` worktrees. The user's latest routing choice
+assigns the complete T012 API slice to Muse 1.3 high in OpenCode and the complete
+T013 durable ticket-core slice to Opus 5.5 in Claude Code, not token micro-tasks.
+The lead freezes their shared wire first; GPT-6 Sol high independently reviews
+both outputs and cross-boundary invariants. T014 follows both; T015/T016 follow their
 actual graph edges and must not race on shared UI/backend files. Do not advance
 the frozen review bases `codex/bridge-migration-integration` (`36dbfb90f3178c07ed9c7d0a55b54370a563bf7f`)
 or `codex/bridge-lifecycle-integration` (`3add18986096e8fd9bc6ac509db28fc08b6bf2a6`).
 
 ## Decisions to preserve
 
-- Default routes at handoff: Astra lead; GPT-6 Luna high implementation; GPT-6
-  Sol high independent review and escalation. The user's later 2026-09-22 update
-  permits considering OpenCode Muse 1.3 high and a bounded Opus 5.5 Claude Code
-  assignment, superseding the earlier blanket pause. These are available options,
-  not mandatory substitutions or authorization for extra spend. Check the exact
-  route/limits and give either model a small, isolated task with a retained output
-  before widening use. The user's Meta-training permission covers this synthetic
+- Latest user routing: Astra leads; Muse 1.3 high in OpenCode owns full T012;
+  Opus 5.5 in Claude Code owns full T013; GPT-6 Sol high independently reviews
+  and escalates, and GPT-6 Luna high remains available for later or fallback
+  implementation. This supersedes the earlier OpenCode/Claude stop and the
+  older Terra/DeepSeek owner labels for these two undispatched tasks. First verify
+  the exact model route/usage, pin one shared base and enforce disjoint worktrees
+  and files; do not buy capacity or substitute a model silently if unavailable.
+  These are substantial coherent assignments, not tiny pilots or unlimited
+  open-ended work. The user's Meta-training permission covers this synthetic
   repository, not private customer documents, credentials or untracked outputs.
   T027 still needs an actual exact-candidate independent review or a recorded
   pending gate; the old design advisory does not satisfy it. Do not inspect or
@@ -169,8 +174,10 @@ source milestone. Register your actual task ID as the persistent receiving lead.
 Do not restart planning or repeat the model setup work.
 
 Repository: /Users/yuganthareshsoni/Downloads/Ip_inventory.
-Start by reading the complete handover at:
-/Users/yuganthareshsoni/.codex/worktrees/ipam-main-lead-4/Ip_inventory/docs/handoffs/main-lead-5.0.md
+Start by reading this amended handover on branch codex/bridge-next-merge-note at:
+/Users/yuganthareshsoni/.codex/worktrees/bridge-next-merge-note/Ip_inventory/docs/handoffs/main-lead-5.0.md
+Its documentation amendment is PR #80 against codex/bridge-t011-handover;
+do not mistake that documentation PR for the bridge-to-main merge.
 It pins the final source assembly, accepted feature SHAs/PRs, worker IDs, limits and
 next file leases. Refresh Git/task status before editing; preserve dirty work and
 all existing workers. Main is still 04eba98cb8673406d1e5d38c5318fb963cc77ff7.
@@ -183,11 +190,14 @@ reviews and authorization-and-ownership record from that assembly. Latest dated
 amendments control historical prose. Then continue T012 reservation API and T013
 simulated ticket core from a pinned shared base, with explicit disjoint leases.
 
-Use GPT-6 Luna for implementation and GPT-6 Sol for independent review/escalation;
-Astra remains lead. The user's later update allows a bounded OpenCode Muse 1.3
-high pilot and a small Opus 5.5 Claude Code assignment if useful. Check the route,
-usage and data boundary first; do not treat either option as a mandatory change,
-buy capacity, repeat setup or pass private source material to a training route.
+Astra remains lead. After freezing the T012/T013 wire, assign Muse 1.3 high in
+OpenCode the full T012 reservation API and Opus 5.5 in Claude Code the full T013
+durable simulated ticket core, on separate `codex/` worktrees from the same pinned
+base. These are meaningful feature assignments. GPT-6 Sol high independently
+reviews both before integration; Luna high remains available for later slices or
+an explained fallback. Check exact routes, usage and data boundary first; do not
+buy capacity, repeat setup, overlap file ownership or send private source material
+to a training route. Update older task-owner labels when dispatching.
 
 Keep this source-only until the already authorized bounded T025 disposable
 synthetic acceptance gate has its prerequisites. No routine tests/build/runtime,
@@ -197,8 +207,8 @@ Follow docs/MAIN_MERGE_POLICY.md: complete technical Tier A, exact-candidate T02
 pass, closed blocking reviews and T028 lead adjudication of all gate dispositions.
 Then merge promptly through the PR. A truthfully pending human rehearsal limits
 human-handoff claims, not that technical merge. Use authorized GPT-6 Sol for T027
-final review; any small Opus advisory is additional, not a silent substitute for
-that gate. No main merge before these gates pass or an explicit earlier-merge
+final review; Opus's T013 implementation is not a substitute for independent
+review. No main merge before these gates pass or an explicit earlier-merge
 policy amendment.
 Preserve the source/runtime/portable/human evidence distinctions and all three
 111-row ledgers. Keep Spencer's human gates honest and Tier B locked.
