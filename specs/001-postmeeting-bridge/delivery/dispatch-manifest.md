@@ -1,5 +1,7 @@
 # Locked first dispatch manifest — Main Lead 4.0
 
+**Current ownership amendment — 2026-09-23:** The user confirmed the Spencer preparation had not been assigned and directed agents to complete T020/T022/T024. [Controlling assignment and gates](operator-preparation-ownership.md). The earlier Spencer packet below is historical; T026 still requires actual human evidence or an honest pending disposition.
+
 **Latest handover checkpoint —2026-09-22:** T009/T010/T011 are source accepted,
 T011 at `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`, draft PR78. Application source
 assembly is `ab370a4273784bd750bf5f59289594a31d097739` on

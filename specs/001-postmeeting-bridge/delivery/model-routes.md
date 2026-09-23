@@ -8,19 +8,21 @@ T012 used `opencode-go/muse-spark-1.3-contributor#high`; complete T013 used
 Claude Code `claude-opus-5-5` with high effort. T014/T016 were already assigned to
 native GPT-6 Luna high and retain their original correction owners.
 
-Next coherent assignments: full T015 workflow UI to Muse1.3 high and full T017
-notice API to Opus5.5 high after reviewed prerequisites. Give Muse the larger
-subsequent share (T018/T023 when graph and file leases permit). Native GPT-6 Sol
-high independently reviews before source integration; Luna remains later fallback
-and current author, not a replacement for the requested external implementations.
+Current source closure includes full T015/T018/T023 Muse and T017/T017A Opus,
+with retained Luna T016B. User released the unassigned Spencer preparation to agents:
+full T020 matrix to Muse, T021 offline API to Opus and T022 recipient preparation to
+Muse after T020 review, then T024 package implementation to Muse after T021/T022/T023.
+Independent GPT-6 Sol high reviews each before source integration; Luna remains
+available for independent T025 or an explained fallback. Astra leads. See
+operator-preparation-ownership.md; no human receipt is inferred.
 
-Exact source-only tool permissions and isolated worktrees exclude private documents,
-credentials, untracked outputs and external directories. Existing Muse paid-training
-consent was already enabled at takeover; no setting was changed. Latest read-only
-usage: Go rolling0%/week40%/month20%; Claude session4%/week31%/Fable24%. Credits
-remain disabled or zero, auto-reload off; no purchase/reset. Retain20% reserve.
-See first-wave.json and main-lead-5.0-takeover.md for exact sessions/candidates.
-No application checks before gated T025, no Tier B or main merge before T028.
+Exact source-only permissions and isolated tracked-source worktrees exclude private
+documents, credentials, untracked outputs and external directories. Existing Muse
+paid-training consent remains unchanged. Fresh UI usage before preparation dispatch:
+Go rolling3%/week41%/month21%; Claude session5%/week31%/Fable24%. Credits disabled
+or zero, auto-reload off; no purchase/reset. Retain20% reserve. Exact sessions and
+candidates are recorded in first-wave.json. No application checks before gated
+T025; no Tier B or main merge before T028.
 
 ## Earlier user-directed replacements (superseded for new dispatch)
 

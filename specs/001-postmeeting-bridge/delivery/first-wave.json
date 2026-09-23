@@ -413,7 +413,7 @@
       "pull_request": "https://github.com/yugant99/IpManagement/pull/85",
       "integration_sha": "c5121d4d85c6972fe5ae39315a5a413a96a07599",
       "review_report": "specs/001-postmeeting-bridge/delivery/notice-source-review.md",
-      "acceptance_gap": "Legacy Operator-only source behavior is superseded by the explicitly authorized T016A/T016B/T017A recipient amendment; implementation and T025 evidence remain pending."
+      "acceptance_gap": "Legacy Operator-only semantics superseded by source-reviewed T016A/T016B/T017A/T018 configured recipient amendment; runtime remains T025."
     },
     {
       "task": "T015",
@@ -536,7 +536,7 @@
     },
     {
       "task": "T018",
-      "status": "implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
       "branch": "codex/bridge-t018-notice-ui",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t018-muse/Ip_inventory",
@@ -553,11 +553,15 @@
       ],
       "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-ui-wire.md",
       "review_route": "Independent Codex GPT-6 Sol high",
-      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes."
+      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes.",
+      "result_sha": "6173efa8e1d09e89cb35e44ffc99aa589bcaea63",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/93",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-ui-source-review.md",
+      "integration_sha": "a2b567b670129671f85498729753c4d577d4768e"
     },
     {
       "task": "T023",
-      "status": "implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
       "branch": "codex/bridge-t023-state-recovery",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t023-muse/Ip_inventory",
@@ -573,7 +577,11 @@
       ],
       "wire_contract": "specs/001-postmeeting-bridge/contracts/state-recovery-wire.md",
       "review_route": "Independent Codex GPT-6 Sol high",
-      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes."
+      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes.",
+      "result_sha": "adb2dc18fe747d4ff97a90f1a21bcdc4382f9fea",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/92",
+      "review_report": "specs/001-postmeeting-bridge/delivery/state-recovery-source-review.md",
+      "integration_sha": "a711d1ee84ba3d8959f18471bc2acf930c3ce7a5"
     }
   ],
   "muse_route": {
@@ -599,11 +607,11 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T018_and_T023_full_features_dispatched",
-    "action": "Main Lead5 continues critical path with full Muse T015 and Opus T017 after exact common base pin",
-    "hold": "T025 awaits T018/T021/T022/T023/T024 and dependencies; Spencer T020 matrix remains outstanding",
+    "status": "T018_T023_source_accepted_operator_preparation_reassigned",
+    "action": "User released unstarted Spencer preparation to agents; next full T020 Muse, then T021 Opus and T022 Muse, then T024 Muse with Sol source review.",
+    "hold": "T025 awaits reviewed T020/T021/T022/T024 and exact complete candidate",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
+    "application_source_sha": "a2b567b670129671f85498729753c4d577d4768e",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
@@ -613,9 +621,9 @@
   "latest_provider_preflight": {
     "opencode_route": "active opencode-go/muse-spark-1.3-contributor#high, high variant and source tools verified",
     "opencode_usage_percent": {
-      "rolling": 1,
-      "weekly": 40,
-      "monthly": 20
+      "rolling": 3,
+      "weekly": 41,
+      "monthly": 21
     },
     "opencode_credit": "disabled; balance0",
     "opencode_training": "existing paid-training consent enabled; unchanged; public tracked synthetic source only",
@@ -626,7 +634,7 @@
       "fable": 24
     },
     "claude_credit": "balance CA$0; auto-reload off",
-    "boundary": "2026-09-23 fresh UI refresh before next recipient API/UI/state dispatch: preserve20% reserve; no reset/purchase/settings changes; raw account identifiers/logs excluded",
+    "boundary": "2026-09-23 fresh UI refresh before operator-preparation assignments; 20% reserve, no reset/purchase/settings changes, raw identifiers/logs excluded",
     "native_codex_weekly_used_percent": 26
   },
   "recipient_policy_amendment": {
@@ -638,8 +646,20 @@
       "T016B": "retained Luna T016 lifecycle author",
       "T017A": "retained Opus5.5 high T017 API author"
     },
-    "status": "recipient_core_and_API_source_accepted_T018_UI_and_T025_evidence_pending",
+    "status": "recipient_foundation_core_API_UI_source_accepted_runtime_unverified",
     "reviewer": "Independent GPT-6 Sol high",
-    "gate": "T018/T023 now wait for T017A; T025/T028 unchanged, no runtime before prerequisites"
+    "gate": "T025/T028 unchanged; no runtime before complete prerequisite candidate"
+  },
+  "operator_preparation_amendment": {
+    "authorization": "2026-09-23 user explicitly directed agents to do unassigned Spencer preparation; tomorrow assignment left open",
+    "record": "specs/001-postmeeting-bridge/delivery/operator-preparation-ownership.md",
+    "owners": {
+      "T020": "Muse1.3 high",
+      "T021": "Opus5.5 high",
+      "T022": "Muse1.3 high",
+      "T024": "Muse1.3 high",
+      "T026": "Astra records actual human evidence or pending"
+    },
+    "reviewer": "Independent GPT-6 Sol high"
   }
 }

@@ -61,7 +61,7 @@ UI, feeds, tokens or secrets into SQLite or treat them as snapshot contents.
 Document these output semantics in concise CLI help/result guidance. Keep existing
 CLI interfaces and confirmation requirements compatible.
 
-## Remaining gates supplied to Spencer
+## Remaining gates supplied to the package owner
 
 Result guidance requires authenticated selected-domain GET /api/readiness with
 HTTP200 and all six booleans true: process_ready, schema_ready, data_ready,
@@ -69,4 +69,4 @@ static_ready, configuration_ready, domain_state_compatible. State commands do no
 call the endpoint or manufacture those results. A separate selected-domain
 business-state/evidence comparison and actual human signoff are still required.
 No task may promote restore success, an equal config digest or six booleans into
-portable/human evidence. Spencer retains T020/T022/T024/T026. T025/T028 unchanged.
+portable/human evidence. The user reassigned unstarted operator preparation to agents; see delivery/operator-preparation-ownership.md. Actual T026 human evidence remains separate. T025/T028 unchanged.

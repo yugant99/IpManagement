@@ -128,3 +128,27 @@ used (74% remaining); no reset/purchase. No application execution occurred.
 Spencer T020 worktree remains clean atab005d8bf3b6c57e0a071707796d18514c278674
 without the matrix; preserve T020/T022/T024/T026 ownership. PR79 remains draft,
 unchanged aaec3b625ff84554e93e3116d8102a3eb5c347e7. T025/T028 gates unchanged.
+
+
+## Recipient/UI/recovery source closure and released preparation — 2026-09-23
+
+Configured-recipient foundation T016A8cd51d5, lifecycle T016B678cb8c and API
+T017Acae954c were independently source-closed and assembled at5c2181c. Full Muse
+T0186173efa and T023adb2dc1 now join them at
+`a2b567b670129671f85498729753c4d577d4768e`. Sol closed three notice UI findings
+and two recovery publication findings after original-author corrections. Source
+reports retain exact candidates and unexecuted runtime limits.
+
+The user clarified Spencer had not been assigned the preparation and explicitly
+asked agents to do it. This supersedes the earlier human dependency for
+T020/T022/T024; the old prepared checkout stays untouched. See
+[the new ownership record](../../specs/001-postmeeting-bridge/delivery/operator-preparation-ownership.md).
+Muse receives complete T020, T022 and T024; Opus receives complete T021 when its
+prerequisites close. Sol independently reviews, Astra integrates. No tomorrow
+assignment or human acknowledgement is invented.
+
+Fresh Git/PR review found main unchanged at04eba98, PR79 draft unchanged aaec3b6,
+and no open review threads on PR79/84/92/93. Stacked PR85–91 are marked merged by
+inclusion into the source integration branch, not main. T025 still awaits the
+complete prerequisite candidate; no application execution has occurred. T028,
+all evidence-class boundaries and the Tier B lock remain controlling.

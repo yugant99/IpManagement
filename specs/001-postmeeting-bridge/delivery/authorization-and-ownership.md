@@ -1,5 +1,7 @@
 # T001 — Main Lead 5.0 authorization and ownership
 
+**Current ownership amendment — 2026-09-23:** The user confirmed the Spencer preparation had not been assigned and directed agents to complete T020/T022/T024. [Controlling assignment and gates](operator-preparation-ownership.md). The earlier Spencer packet below is historical; T026 still requires actual human evidence or an honest pending disposition.
+
 **Main Lead 5.0 takeover — 2026-09-22:** GPT-6 Astra task `01a0ccc7-6219-73c1-bd3b-1521bb71a837` is the user-authorized persistent lead from the accepted T011 source checkpoint. Main Lead 4.0 and earlier leads are reference-only for new coordination; retained workers keep their correction ownership. The controlling pickup includes PR #80 at `352f5a7ba891b4c13c9670beb9eee7d0b60bc764`, on published T011 handover `aaec3b625ff84554e93e3116d8102a3eb5c347e7`. [Takeover and merge-readiness record](../../../docs/handoffs/main-lead-5.0-takeover.md). T012 is assigned to OpenCode Muse 1.3 high and T013 to Claude Code Opus 5.5 high after shared-wire/base freeze; GPT-6 Sol high independently reviews both. This latest user grant supersedes the older provider pause and undispatched handover hold. Source acceptance does not establish runtime acceptance. T025 remains gated; T028 is the next bridge-to-main merge. Spencer and Tier B boundaries remain unchanged.
 
 Historical Main Lead 4.0 record follows.
