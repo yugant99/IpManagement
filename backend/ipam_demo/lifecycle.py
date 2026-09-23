@@ -25,6 +25,13 @@ def _version(value, field):
     return workflow._version(value, field)
 
 
+def _uuid(value):
+    try:
+        return str(value if isinstance(value, UUID) else UUID(str(value)))
+    except (TypeError, ValueError, AttributeError) as exc:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404) from exc
+
+
 def _duration(value):
     if value is None:
         return 24
@@ -70,10 +77,7 @@ def _history(connection, reservation_id):
 
 
 def get_reservation(connection, reservation_id):
-    try:
-        object_id = str(UUID(reservation_id))
-    except (TypeError, ValueError, AttributeError) as exc:
-        raise AppError("NOT_FOUND", "The requested resource was not found.", 404) from exc
+    object_id = _uuid(reservation_id)
     row = _resource(connection, object_id)
     item = _reservation(row)
     item["history"] = _history(connection, object_id)
@@ -95,14 +99,14 @@ def list_reservations(connection):
 
 
 def list_release_requests(connection, reservation_id):
-    object_id = str(UUID(reservation_id))
+    object_id = _uuid(reservation_id)
     _resource(connection, object_id)
     return [_release_request_payload(row) for row in connection.execute(
         "SELECT * FROM reservation_release_requests WHERE reservation_id=? ORDER BY created_at,id", (object_id,))]
 
 
 def get_release_request(connection, reservation_id, request_id):
-    object_id, release_id = str(UUID(reservation_id)), str(UUID(request_id))
+    object_id, release_id = _uuid(reservation_id), _uuid(request_id)
     _resource(connection, object_id)
     row = connection.execute(
         "SELECT * FROM reservation_release_requests WHERE id=? AND reservation_id=?", (release_id, object_id)).fetchone()
@@ -207,7 +211,7 @@ def extend_reservation(connection, reservation_id, payload):
                                 "expected_baseline_version", "duration_hours", "reason"})
     actor = workflow.require_actor(payload.get("actor_id"), "inventory_edit")
     context = _context()
-    object_id = str(UUID(reservation_id))
+    object_id = _uuid(reservation_id)
     current = _resource(connection, object_id)
     key = _text(payload.get("idempotency_key"), "idempotency_key", 200)
     normalized = {"actor_id": actor["id"], "idempotency_key": key, "reservation_id": object_id,
@@ -277,7 +281,7 @@ def create_release_request(connection, reservation_id, payload):
                                 "expected_baseline_version", "reason"})
     actor = workflow.require_actor(payload.get("actor_id"), "inventory_edit")
     context = _context()
-    object_id = str(UUID(reservation_id))
+    object_id = _uuid(reservation_id)
     current = _resource(connection, object_id)
     key = _text(payload.get("idempotency_key"), "idempotency_key", 200)
     normalized = {"actor_id": actor["id"], "idempotency_key": key, "reservation_id": object_id,
@@ -332,7 +336,7 @@ def decide_release_request(connection, reservation_id, request_id, payload):
                                 "expected_pool_version", "expected_baseline_version", "reason"})
     actor = workflow.require_actor(payload.get("actor_id"), "approve")
     context = _context()
-    reservation_id, request_id = str(UUID(reservation_id)), str(UUID(request_id))
+    reservation_id, request_id = _uuid(reservation_id), _uuid(request_id)
     current = _resource(connection, reservation_id)
     request = connection.execute(
         "SELECT * FROM reservation_release_requests WHERE id=? AND reservation_id=?", (request_id, reservation_id)).fetchone()
