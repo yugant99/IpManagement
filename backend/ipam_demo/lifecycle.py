@@ -41,6 +41,170 @@ def _duration(value):
     return value
 
 
+def _notice_context():
+    context = _context()
+    workflow.access.require_role(context, "viewer")
+    return context
+
+
+def _notice_resource(connection, notice_id):
+    context = _notice_context()
+    row = connection.execute(
+        "SELECT n.*,r.scope_id,r.pool_id,r.address,s.domain FROM reservation_notices n "
+        "JOIN reservations r ON r.id=n.reservation_id JOIN scopes s ON s.id=r.scope_id WHERE n.id=?",
+        (notice_id,)).fetchone()
+    if row is None or row["pool_id"] != workflow.STATIC_POOL_ID:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    if row["domain"] != context.selected_domain:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    workflow._require_scope_domain(connection, row["scope_id"])
+    return row
+
+
+def _notice_payload(row):
+    context = _notice_context()
+    return {
+        "id": row["id"],
+        "reservation_id": row["reservation_id"],
+        "episode_number": row["episode_number"],
+        "policy_revision": row["policy_revision"],
+        "first_due_at": row["first_due_at"],
+        "alert_level": row["alert_level"],
+        "owner_reference": row["owner_reference"],
+        "state": row["state"],
+        "acknowledgement_version": row["acknowledgement_version"],
+        "notification_version": row["notification_version"],
+        "acknowledged_at": row["acknowledged_at"],
+        "acknowledged_by": row["acknowledged_by"] if row["acknowledged_by"] == context.principal_id else None,
+        "acknowledgement_reason": row["acknowledgement_reason"] if row["acknowledged_by"] == context.principal_id else None,
+        "acknowledgement_current": (row["acknowledged_at"] is not None
+                                    and row["acknowledgement_version"] == row["notification_version"]),
+        "acknowledgement_kind": "operator_acknowledgement",
+        "owner_signoff": False,
+        "resolved_at": row["resolved_at"],
+        "resolution_reason": row["resolution_reason"],
+        "synthetic": True,
+    }
+
+
+def list_reservation_notices(connection):
+    context = _notice_context()
+    return [_notice_payload(row) for row in connection.execute(
+        "SELECT n.* FROM reservation_notices n JOIN reservations r ON r.id=n.reservation_id "
+        "JOIN scopes s ON s.id=r.scope_id WHERE r.pool_id=? AND s.domain=? "
+        "ORDER BY n.first_due_at DESC,n.reservation_id,n.episode_number DESC",
+        (workflow.STATIC_POOL_ID, context.selected_domain))]
+
+
+def get_reservation_notice(connection, notice_id):
+    row = _notice_resource(connection, _uuid(notice_id))
+    return _notice_payload(row)
+
+
+def evaluate_reservation_notices(connection):
+    """Create due episodes and raise due alerts to alarms using protected server UTC."""
+    context, pool, _, _ = workflow._selected_static_pool(connection)
+    actor = workflow.require_actor(context.principal_id, "inventory_edit")
+    now = _now()
+    now_stamp = _stamp(now)
+    instant = now.astimezone(timezone.utc)
+    reservations = connection.execute(
+        "SELECT * FROM reservations WHERE pool_id=? AND scope_id=? AND family=4 AND state='reserved' "
+        "ORDER BY id", (pool["id"], pool["scope_id"])).fetchall()
+    created = upgraded = 0
+    for reservation in reservations:
+        try:
+            expires = datetime.fromisoformat(reservation["expires_at"].replace("Z", "+00:00")).astimezone(timezone.utc)
+        except (TypeError, ValueError, AttributeError) as exc:
+            raise AppError("RESERVATION_NOTICE_DATA_INVALID", "A reservation expiry is invalid; evaluation stopped.", 500) from exc
+        if instant < expires:
+            continue
+        level = "alarm" if instant >= expires + timedelta(hours=24) else "alert"
+        active = connection.execute(
+            "SELECT * FROM reservation_notices WHERE reservation_id=? AND state IN ('open','acknowledged') "
+            "ORDER BY episode_number DESC LIMIT 1", (reservation["id"],)).fetchone()
+        if active is None:
+            episode = connection.execute(
+                "SELECT COALESCE(MAX(episode_number),0)+1 AS next_episode FROM reservation_notices WHERE reservation_id=?",
+                (reservation["id"],)).fetchone()["next_episode"]
+            notice_id = str(uuid4())
+            connection.execute(
+                "INSERT INTO reservation_notices(id,reservation_id,episode_number,policy_revision,first_due_at,"
+                "alert_level,owner_reference,state,acknowledgement_version,notification_version) "
+                "VALUES (?,?,?,?,?,?,?,'open',1,1)",
+                (notice_id, reservation["id"], episode, reservation["policy_revision"], reservation["expires_at"],
+                 level, reservation["owner_reference"]))
+            workflow.audit_event(
+                connection, actor_id=actor["id"], action="reservation.notice.created", outcome="succeeded",
+                reason="Reservation reached its UTC expiry and remains held for review.", subject_id=notice_id,
+                scope_id=reservation["scope_id"], pool_id=reservation["pool_id"], address=reservation["address"],
+                details={"reservation_id": reservation["id"], "episode_number": episode,
+                         "first_due_at": reservation["expires_at"], "alert_level": level,
+                         "notification_version": 1, "owner_reference": reservation["owner_reference"]})
+            created += 1
+            continue
+        if level == "alarm" and active["alert_level"] == "alert":
+            changed = connection.execute(
+                "UPDATE reservation_notices SET alert_level='alarm',state='open',notification_version=notification_version+1 "
+                "WHERE id=? AND state IN ('open','acknowledged') AND alert_level='alert'",
+                (active["id"],))
+            if changed.rowcount == 1:
+                workflow.audit_event(
+                    connection, actor_id=actor["id"], action="reservation.notice.alarm", outcome="succeeded",
+                    reason="The reservation remained held 24 hours after expiry; the alarm needs current acknowledgement.",
+                    subject_id=active["id"], scope_id=reservation["scope_id"], pool_id=reservation["pool_id"],
+                    address=reservation["address"],
+                    details={"reservation_id": reservation["id"], "episode_number": active["episode_number"],
+                             "previous_notification_version": active["notification_version"],
+                             "notification_version": active["notification_version"] + 1,
+                             "alert_level": "alarm", "prior_acknowledgement_retained": bool(active["acknowledged_at"])})
+                upgraded += 1
+    notices = list_reservation_notices(connection)
+    result = {"evaluated_at": now_stamp, "created_count": created, "alarm_upgrade_count": upgraded,
+              "notices": notices, "synthetic": True}
+    return result, False
+
+
+def acknowledge_reservation_notice(connection, notice_id, payload):
+    object_id = _uuid(notice_id)
+    current = _notice_resource(connection, object_id)
+    context = _context()
+    actor_id = payload.get("actor_id", context.principal_id) if isinstance(payload, dict) else context.principal_id
+    if actor_id is None:
+        actor_id = context.principal_id
+    actor = workflow.require_actor(actor_id, "inventory_edit")
+    workflow._payload(payload, {"actor_id", "expected_notification_version", "reason"})
+    expected = _version(payload.get("expected_notification_version"), "expected_notification_version")
+    reason = _text(payload.get("reason"), "reason", 2000)
+    if current["state"] == "resolved":
+        raise AppError("NOTICE_RESOLVED", "A resolved reservation notice cannot be acknowledged.", 409)
+    if current["notification_version"] != expected:
+        raise AppError("STALE_NOTICE", "The reservation notice changed; refresh before acknowledging.", 409)
+    if (current["state"] == "acknowledged"
+            and current["acknowledgement_version"] == expected
+            and current["acknowledged_by"] == actor["id"]
+            and current["acknowledgement_reason"] == reason):
+        return _notice_payload(current), True
+    if (current["state"] == "acknowledged"
+            and current["acknowledgement_version"] == expected):
+        raise AppError("NOTICE_ALREADY_ACKNOWLEDGED", "This notice version already has an immutable acknowledgement.", 409)
+    changed = connection.execute(
+        "UPDATE reservation_notices SET state='acknowledged',acknowledgement_version=?,acknowledged_at=?,"
+        "acknowledged_by=?,acknowledgement_reason=? WHERE id=? AND state IN ('open','acknowledged') "
+        "AND notification_version=?",
+        (expected, _stamp(_now()), actor["id"], reason, object_id, expected))
+    if changed.rowcount != 1:
+        raise AppError("STALE_NOTICE", "The reservation notice changed; refresh before acknowledging.", 409)
+    workflow.audit_event(
+        connection, actor_id=actor["id"], action="reservation.notice.operator_acknowledgement",
+        outcome="succeeded", reason=reason, subject_id=object_id, scope_id=current["scope_id"],
+        pool_id=current["pool_id"], address=current["address"],
+        details={"reservation_id": current["reservation_id"], "episode_number": current["episode_number"],
+                 "notification_version": expected, "acknowledgement_version": expected,
+                 "owner_reference": current["owner_reference"], "owner_signoff": False})
+    return get_reservation_notice(connection, object_id), False
+
+
 def _context():
     context = workflow._access_context.get()
     if (context is None or context.selected_domain is None or context.selected_domain not in context.domains
@@ -268,6 +432,8 @@ def extend_reservation(connection, reservation_id, payload):
         "VALUES (?,?,?,?,?,?,?,?,?)",
         (str(uuid4()), object_id, next_version, "extended", actor["id"], workflow._now(), normalized["reason"],
          workflow._json(before), workflow._json(after)))
+    workflow.resolve_reservation_notices(connection, object_id, actor_id=actor["id"],
+                                         resolution_reason="reservation_extended", occurred_at=workflow._now())
     connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE id=?", (pool["id"],))
     connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
     workflow.audit_event(connection, actor_id=actor["id"], action="reservation.extend", outcome="succeeded",
@@ -404,6 +570,8 @@ def decide_release_request(connection, reservation_id, request_id, payload):
             "VALUES (?,?,?,?,?,?,?,?,?)",
             (str(uuid4()), reservation_id, next_version, "released", actor["id"], now, normalized["reason"],
              workflow._json(before), workflow._json(after)))
+        workflow.resolve_reservation_notices(connection, reservation_id, actor_id=actor["id"],
+                                             resolution_reason="approved_local_release", occurred_at=now)
         connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE id=?", (pool["id"],))
         connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
     changed = connection.execute(

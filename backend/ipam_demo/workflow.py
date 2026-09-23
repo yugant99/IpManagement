@@ -152,6 +152,91 @@ def _pool(connection, object_id=STATIC_POOL_ID):
     return pool, ranges, exclusions
 
 
+def _selected_static_pool(connection):
+    """Return the designated local IPv4 pool only inside the selected domain."""
+    context = _access_context.get()
+    if (context is None or context.selected_domain is None or context.selected_domain not in context.domains
+            or context.is_evidence_coordinator):
+        raise AppError("FORBIDDEN", "Select a permitted domain before accessing domain data.", 403)
+    access.require_role(context, "viewer")
+    row = connection.execute(
+        "SELECT p.scope_id,s.domain FROM pools p JOIN scopes s ON s.id=p.scope_id WHERE p.id=?",
+        (STATIC_POOL_ID,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    _require_pool_domain(connection, STATIC_POOL_ID)
+    if row["domain"] != context.selected_domain:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    pool, ranges, exclusions = _pool(connection, STATIC_POOL_ID)
+    return context, pool, ranges, exclusions
+
+
+def current_static_occupancy(connection):
+    """Current local-static IPv4 ledger occupancy, separate from saved run metrics."""
+    context, pool, ranges, exclusions = _selected_static_pool(connection)
+    assignable = (sum(end - start + 1 for start, end in ranges)
+                  - sum(end - start + 1 for start, end in exclusions))
+    allocations = connection.execute(
+        "SELECT COUNT(*) AS count FROM allocations WHERE pool_id=? AND scope_id=? AND family=4",
+        (pool["id"], pool["scope_id"])).fetchone()["count"]
+    holds = connection.execute(
+        "SELECT COUNT(*) AS count FROM reservations WHERE pool_id=? AND scope_id=? AND family=4 AND state='reserved'",
+        (pool["id"], pool["scope_id"])).fetchone()["count"]
+    occupied = allocations + holds
+    return {
+        "metric": "current_static_ipv4_occupancy",
+        "pool_id": pool["id"],
+        "scope_id": pool["scope_id"],
+        "domain": context.selected_domain,
+        "family": 4,
+        "unit": "IPv4 addresses",
+        "as_of": _now(),
+        "components": {
+            "active_allocations": {"count": allocations, "unit": "IPv4 addresses"},
+            "reserved_holds": {"count": holds, "unit": "IPv4 addresses", "includes_expired": True},
+            "occupied_total": {"count": occupied, "unit": "IPv4 addresses"},
+            "assignable_capacity": {"count": assignable, "unit": "IPv4 addresses"},
+            "remaining_assignable": {"count": assignable - occupied, "unit": "IPv4 addresses"},
+        },
+        "provenance": {
+            "source": "current local intended ledger",
+            "capacity": "designated static IPv4 pool ranges minus exclusions",
+            "allocations": "allocations in the designated pool and selected scope",
+            "reservations": "reservations with state=reserved, including expired holds",
+            "saved_runs_modified": False,
+            "synthetic": True,
+        },
+        "synthetic": True,
+    }
+
+
+def resolve_reservation_notices(connection, reservation_id, *, actor_id, resolution_reason, occurred_at=None):
+    """Close active notice episodes atomically with their reservation transition."""
+    rows = connection.execute(
+        "SELECT n.* FROM reservation_notices n WHERE n.reservation_id=? AND n.state IN ('open','acknowledged') "
+        "ORDER BY n.episode_number", (reservation_id,)).fetchall()
+    if not rows:
+        return 0
+    reservation = connection.execute("SELECT * FROM reservations WHERE id=?", (reservation_id,)).fetchone()
+    if reservation is None:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    _require_scope_domain(connection, reservation["scope_id"])
+    resolved_at = occurred_at or _now()
+    for row in rows:
+        changed = connection.execute(
+            "UPDATE reservation_notices SET state='resolved',resolved_at=?,resolution_reason=? "
+            "WHERE id=? AND state IN ('open','acknowledged')",
+            (resolved_at, resolution_reason, row["id"]))
+        if changed.rowcount == 1:
+            audit_event(connection, actor_id=actor_id, action="reservation.notice.resolved", outcome="succeeded",
+                        reason=resolution_reason, subject_id=row["id"], scope_id=reservation["scope_id"],
+                        pool_id=reservation["pool_id"], address=reservation["address"],
+                        details={"reservation_id": reservation_id, "episode_number": row["episode_number"],
+                                 "notification_version": row["notification_version"],
+                                 "resolution_reason": resolution_reason})
+    return len(rows)
+
+
 def _eligibility(connection, pool, ranges, exclusions, candidate, clock, *, reservation_id=None):
     address = ip_address(candidate)
     if address.version != 4 or not any(a <= int(address) <= b for a, b in ranges):
@@ -410,6 +495,8 @@ def decide_request(connection, object_id, payload):
                 "VALUES (?,?,?,?,?,?,?,?,?)",
                 (str(uuid4()), reservation["id"], next_version, "converted", actor["id"], _now(), reason,
                  _json(before_reservation), _json(after_reservation)))
+            resolve_reservation_notices(connection, reservation["id"], actor_id=actor["id"],
+                                        resolution_reason="reservation_converted", occurred_at=_now())
         connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE id=?", (pool["id"],))
         connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
         downstream = "not_requested" if tracked else "simulated_failure" if simulation else "simulated_success"
