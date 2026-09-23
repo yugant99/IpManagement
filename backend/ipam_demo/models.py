@@ -235,3 +235,73 @@ class MigrationOperationReadback(StrictResponse):
     action: Literal["assessment.create", "assessment.signoff"]
     assessment: MigrationAssessmentDetail | None
     original_outcome: MigrationAssessmentCreateOutcome | MigrationAssessmentSignoffOutcome | None
+
+
+class ReservationHistoryEntry(StrictResponse):
+    """Sanitized reservation history entry; raw before_json/after_json never leave the API."""
+
+    id: str
+    reservation_id: str
+    version: int
+    action: str
+    actor_id: str | None
+    occurred_at: str
+    reason: str
+    before: dict[str, Any] | None
+    after: dict[str, Any]
+
+
+class ReservationSummary(StrictResponse):
+    """Sanitized reservation projection; foreign actor identity is redacted to None."""
+
+    id: str
+    scope_id: str
+    prefix_id: str
+    pool_id: str
+    family: int
+    address: str
+    owner_reference: str
+    service_reference: str
+    created_by: str | None
+    reason: str
+    created_at: str
+    expires_at: str
+    version: int
+    policy_revision: str
+    state: str
+    converted_allocation_id: str | None
+    released_at: str | None
+    synthetic: bool
+
+
+class ReservationDetail(ReservationSummary):
+    history: list[ReservationHistoryEntry]
+
+
+class ReservationReleaseRequest(StrictResponse):
+    """Sanitized release proposal/decision; idempotency keys and payload digests stay hidden."""
+
+    id: str
+    reservation_id: str
+    reservation_version: int
+    requester_id: str | None
+    reason: str
+    expected_pool_version: int
+    expected_baseline_version: int
+    state: str
+    created_at: str
+    decided_at: str | None
+    approver_id: str | None
+    decision_reason: str | None
+    synthetic: bool
+
+
+class ReservationOperationReadback(StrictResponse):
+    """Exact-key recovery readback; a missing own-key record returns found=false and null outcomes."""
+
+    found: bool
+    action: Literal["reservation.create", "reservation.extend",
+                    "reservation.release.propose", "reservation.release.decision"]
+    original_outcome: ReservationSummary | ReservationReleaseRequest | None
+    current_reservation: ReservationSummary | None
+    current_release_request: ReservationReleaseRequest | None
