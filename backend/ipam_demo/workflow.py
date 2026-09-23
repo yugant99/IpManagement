@@ -220,7 +220,10 @@ def workflow_status(connection):
             "demo_clock_at": meta["demo_clock_at"], "synthetic": True,
             "limitations": ["The local static ledger is authoritative only inside this demo.",
                             "Pending requests do not reserve addresses. Approval rechecks the exact candidate and versions.",
-                            "External provisioning is simulated."]}
+                            "Local approval changes only the local ledger.",
+                            "Ticket delivery is a separate simulated handoff.",
+                            "External provisioning is unsupported and not requested; stored legacy "
+                            "downstream status remains historical."]}
 
 
 def _request_payload(row):
@@ -245,7 +248,12 @@ def list_requests(connection):
         "SELECT * FROM allocation_requests ORDER BY created_at DESC,id DESC")]
 
 
-def create_request(connection, payload):
+def create_request(connection, payload, *, configuration):
+    """Create a request and, for a new row only, its one simulated handoff intent.
+
+    ``configuration`` is the reviewed configuration already bound by the caller's
+    write boundary; it supplies routing. Replays never backfill an intent.
+    """
     _payload(payload, ("actor_id", "idempotency_key", "pool_id", "candidate", "pool_version", "baseline_version",
                        "owner", "purpose", "reason", "supersedes_request_id", "reservation_id",
                        "service_reference", "reservation_version"))
@@ -317,6 +325,9 @@ def create_request(connection, payload):
                          "baseline_version": meta["baseline_version"], "limitations": limitations,
                          "authority": "local_static_ledger", "reserved": bool(reservation_id),
                          "reservation_id": reservation_id})
+    # Imported here because ticket_handoff depends on this module's helpers.
+    from . import ticket_handoff
+    ticket_handoff.create_intent(connection, object_id, context=_access_context.get(), configuration=configuration)
     return get_request(connection, object_id), False
 
 
@@ -335,6 +346,14 @@ def decide_request(connection, object_id, payload):
     if row is None:
         raise AppError("NOT_FOUND", "No allocation request exists with that ID.", 404)
     _require_scope_domain(connection, row["scope_id"])
+    # Intent-backed requests keep the local decision independent of the ticket handoff.
+    # Legacy rows without an intent retain their historical simulated downstream status.
+    tracked = connection.execute(
+        "SELECT 1 FROM ticket_intents WHERE source_request_id=? AND action='allocation.request'",
+        (object_id,)).fetchone() is not None
+    if tracked and simulation:
+        raise AppError("SIMULATION_UNSUPPORTED", "This request uses the separate simulated ticket handoff; "
+                       "local decisions do not simulate delivery or provisioning.", 422, {"field": "simulate_failure"})
     if row["actor_id"] == actor["id"]:
         raise AppError("SELF_APPROVAL_FORBIDDEN", "A request needs a different permitted decision actor.", 403)
     if row["state"] != "pending":
@@ -393,7 +412,7 @@ def decide_request(connection, object_id, payload):
                  _json(before_reservation), _json(after_reservation)))
         connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE id=?", (pool["id"],))
         connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
-        downstream = "simulated_failure" if simulation else "simulated_success"
+        downstream = "not_requested" if tracked else "simulated_failure" if simulation else "simulated_success"
         after = {"state": "approved", "allocation_id": allocation_id, "pool_version": pool["pool_version"] + 1,
                  "baseline_version": meta["baseline_version"] + 1, "local_outcome": "allocated", "downstream_status": downstream}
     connection.execute(
