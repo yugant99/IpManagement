@@ -152,3 +152,37 @@ ordinal/effect separation, route lineage, lookup uncertainty, local/ticket indep
 and source compatibility. T025 later observes these on the final assembled disposable
 synthetic candidate after all prerequisites. Source review is not runtime, portable,
 human or production acceptance. Tier B remains locked.
+
+## T012 exact-key recovery amendment — independent source review
+
+Sol's review of T012 `c5b59cb4a47e07a87b594f13bee0ca7316c0d965` found that
+list/detail alone cannot recover a lost create/proposal response after a reload
+clears the payload. Add GET `/api/reservation-operations/{idempotency_key}` with
+action query enum reservation.create, reservation.extend,
+reservation.release.decision, reservation.release.propose. Proposal lookup also
+requires reservation_id. The first three use existing tier_a_operation_receipts;
+proposal lookup uses its own requester/key row, never a new schema receipt action.
+
+Restrict lookup to current principal, selected domain and exact action/key, using
+ordinary authorized Viewer readback. Reauthorize the receipt's current resource
+scope and related reservation before decoding/disclosing historical outcome.
+For proposal lookup authorize the supplied and saved reservation before comparing
+identities. A foreign/unclassifiable target remains a generic404. Reconcile raw
+receipt target_kind/target_id, reservation identity and historical version/state
+against canonical reservation/history or immutable release decision before
+projection. Inconsistent receipt data is a generic409 integrity error, not a
+different outcome or an exposed raw payload. A later extension/conversion/release
+must not invalidate a valid historical receipt merely because current state differs.
+
+Return a strict allowlisted DTO: found, action, original_outcome,
+current_reservation, current_release_request. For missing own-key records return
+found=false and null outcomes. Found create/extend carries sanitized historical
+reservation outcome plus current reservation; found proposal/decision carries
+the sanitized release outcome plus current reservation/current release request.
+Foreign actor redaction and raw-JSON exclusions apply identically to read and
+mutation responses. Missing/denied/failed readback does not prove an in-flight
+operation cannot commit or authorize replacement. T015 must retain that ambiguity.
+
+This completes C-A's existing recovery requirement without changing schema,
+legacy payload hashes, source base or file ownership. The frozen base remains
+b557137; this review-driven documentary amendment is separately committed by lead.
