@@ -14,9 +14,9 @@ Scheduling contract for the manual acquisition:
 | Script | Purpose |
 |---|---|
 | `build.sh` | Build the `ipam-demo:local` image for `linux/amd64`. |
-| `start.sh` | Bring the service up detached (loopback publish on `127.0.0.1:8000`). |
-| `stop.sh` | Stop the service; persistent volume `ipam_demo_data` is kept. |
-| `health.sh` | Poll `/healthz` from the host with an interpreted exit code. |
+| `start.sh` | Bring the service up detached (loopback publish on `127.0.0.1:8000`). Requires explicit `IPAM_DATA_VOLUME` and `IPAM_ACCESS_CONFIG` (see below). |
+| `stop.sh` | Stop the service; the explicit data volume is kept. |
+| `health.sh` | Anonymous `/healthz` liveness from the host (default), or protected `/api/readiness` with all six booleans (`--readiness` with a domain-Operator token file and explicit domain). Liveness alone never establishes readiness. |
 | `logs.sh` | Follow (default) or one-shot inspect service logs. |
 
 ## State commands (require stopped service)
@@ -34,17 +34,33 @@ Every state wrapper and snapshot operation checks that the service is not runnin
 with a clear message otherwise; the container's exclusive
 `.ipam_demo.lock` enforces the same invariant server-side.
 
-## Rich demo acquisition
+## Rich demo acquisition (coordinator credential, no auto-retry)
 
 | Script | Purpose |
 |---|---|
-| `acquire.sh` | Trigger one manual acquisition via `POST /api/schedule/run` with the operator-supplied idempotency key. Retain the same key across retries so a replay returns the committed result without advancing another cycle. |
+| `acquire.sh` | Manual `POST /api/schedule/run` with a separately provisioned coordinator token file: bootstrap without domain, verify the trusted coordinator identity, send the explicit current configuration pins with the original stable key and reason. No automatic write retry and no replacement key — an ambiguous transport outcome stays unknown until the operator re-runs the exact command. |
 
-## Snapshot storage
+The coordinator sends no `X-IPAM-Domain` header and no `actor_id` (the
+server derives the actor from the trusted bearer). Coordinator and
+domain-Operator credentials are separately provisioned files; neither
+token ever appears in argv, URLs, logs, Compose environment, images,
+snapshots or browser storage.
 
-Snapshots live inside the `ipam_demo_data` named volume at
-`/data/snapshots/` (created 0700 by the wrapper). To retrieve them
-outside the volume, use `scripts/ops/snapshots.sh export <name>
+## Snapshot storage (paired SQLite + sidecar)
+
+Snapshots live inside the explicit data volume (`IPAM_DATA_VOLUME`) at
+`/data/snapshots/` (created 0700 by the wrapper). Every backup writes a
+pair: `<name>.sqlite3` plus its `<name>.sqlite3.recovery.json` manifest,
+which binds the closed snapshot bytes (SHA-256, size, schema) to the
+observed configuration identity — never the configuration itself or any
+credential. Transfer and keep the PAIR together (one
+`snapshots.sh export`/`import` run per file, matching names, checksums
+checked on both); a restore without its sidecar is classified
+`unverified` legacy/data-rescue, while a present sidecar classifies as
+`like_for_like` or `changed_configuration`. Neither classification is
+readiness: run `health.sh --readiness` separately. Full handoff:
+[`operator-handoff.md`](../../specs/001-postmeeting-bridge/delivery/operator-handoff.md).
+To retrieve snapshots outside the volume, use `scripts/ops/snapshots.sh export <name>
 <host-path>`; the reverse is `... import <host-path> [<name>]`. These
 subcommands stream through a one-shot app-user container and take the core
 app-data lock. They work after `stop.sh` removes the service container.
@@ -63,3 +79,10 @@ passed into the helper as code; it is not another service or database layer.
   `docs/RUNNING.md`.
 - The compose file (`compose.yaml`) at the repo root is authoritative;
   do not copy it elsewhere and re-tag paths.
+- Compose requires explicit environment: `IPAM_DATA_VOLUME` names the
+  recorded disposable volume for this candidate (a new candidate records
+  a NEW name; deliberate reuse is recorded; a different Compose project
+  name alone does not isolate a globally named volume), and
+  `IPAM_ACCESS_CONFIG` points at the separately provisioned reviewed
+  configuration file, mounted read-only. No token belongs in Compose
+  environment, images, CLI arguments, logs or snapshots.

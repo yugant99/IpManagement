@@ -67,32 +67,48 @@ scripts/ops/seed.sh
 # 3. Start the service, loopback-only on 127.0.0.1:8000.
 scripts/ops/start.sh
 
-# 4. Confirm readiness. Expect HTTP 200 once seed has run.
+# 4. Confirm liveness. Expect HTTP 200 with {"process_ready": true}.
 scripts/ops/health.sh
 
-# 5. Trigger the first manual acquisition (cycle 1). Retain the same
-#    idempotency key across retries so a replay returns the committed
-#    result rather than advancing another cycle.
-scripts/ops/acquire.sh part6-initial-cycle1
+# 4b. Confirm protected readiness (separate domain-Operator token file,
+#     explicit domain, current configuration pins). Success requires HTTP
+#     200 AND all six booleans true; liveness alone never suffices.
+scripts/ops/health.sh --readiness --token-file <operator-token-file> --domain <domain>
+
+# 5. Trigger the first manual acquisition (cycle 1) with the separately
+#    provisioned coordinator token file. The script bootstraps without a
+#    domain, verifies the coordinator identity, and POSTs the original
+#    stable key AND reason with the current pins. No automatic retry and
+#    no replacement key: an ambiguous transport outcome stays unknown
+#    until the operator re-runs the exact command.
+scripts/ops/acquire.sh --token-file <coordinator-token-file> \
+    --key part6-initial-cycle1 --reason "Prepare initial rich demo"
 ```
 
-`scripts/ops/acquire.sh` posts the accepted payload
+`scripts/ops/acquire.sh` performs the manual coordinator acquisition
+described above: bootstrap without domain, trusted coordinator identity,
+explicit current configuration pins, then the original stable key AND
+reason in `POST /api/schedule/run` with no domain header:
 
-```json
-{
-  "actor_id": "demo-approver",
-  "reason": "Prepare initial rich demo",
-  "idempotency_key": "part6-initial-cycle1"
-}
+```sh
+scripts/ops/acquire.sh --token-file <coordinator-token-file> \
+    --key part6-initial-cycle1 --reason "Prepare initial rich demo"
 ```
 
-to `POST /api/schedule/run`. On a fresh store this acquires cycle 1,
-imports the nine source envelopes and saves the reconciliation run.
-Do not enable the timer.
+On a fresh store this acquires cycle 1, imports the nine source
+envelopes and saves the reconciliation run. A `201` (fresh) or `200`
+(replay of the original operation) is success; a transport failure
+leaves the outcome unknown and keeps the same key. Do not enable the
+timer. Do not pass a coordinator token on the command line or in the
+environment of unrelated commands; the script reads it from the
+protected file only.
 
-Open <http://127.0.0.1:8000/> for the UI, <http://127.0.0.1:8000/api/docs>
-for the OpenAPI browser and <http://127.0.0.1:8000/healthz> for the raw
-readiness payload.
+Open <http://127.0.0.1:8000/> for the UI and
+<http://127.0.0.1:8000/healthz> for the raw liveness payload
+(`{"process_ready": true}` only — never readiness). The protected
+OpenAPI reference at `/api/docs` requires a valid bearer sent as an
+`Authorization` header from protected storage (never a URL or command
+argument); plain browser navigation cannot attach it.
 
 ### Foundation-baseline alternative
 
@@ -108,7 +124,8 @@ with `scripts/ops/seed.sh --scenario baseline` instead. The rich
 | Stop | `scripts/ops/stop.sh` (data volume kept) |
 | Tail logs (follow) | `scripts/ops/logs.sh` |
 | Last N lines, no follow | `scripts/ops/logs.sh --tail 200` |
-| Poll readiness | `scripts/ops/health.sh` |
+| Poll liveness | `scripts/ops/health.sh` (anonymous `/healthz`; never readiness) |
+| Confirm readiness | `scripts/ops/health.sh --readiness --token-file <operator-token-file> --domain <domain>` |
 
 The service must be **stopped** before running any state command
 (`seed.sh`, `migrate.sh`, `backup.sh`, `restore.sh`, `reset.sh`)
@@ -117,36 +134,71 @@ The wrappers check this and refuse with a clear message; the app's
 exclusive `.ipam_demo.lock` inside `IPAM_DATA_DIR` enforces the same
 invariant server-side and returns `DATA_IN_USE`.
 
+## Reviewed access configuration and credentials
+
+The reviewed access configuration is provisioned separately outside the
+repository and snapshots. Export `IPAM_ACCESS_CONFIG` pointing at the
+enabled file; Compose mounts it read-only at
+`/run/ipam/access-config.json` and refuses to start without it. The
+closed key set and provisioning procedure are in the T022 recipient
+pack; the shape-only disabled example must never be enabled as shipped.
+
+Two credentials are provisioned as separate protected files (exactly 64
+lowercase hex characters each; `chmod 600`; never in argv, URLs, logs,
+Compose environment, images, snapshots or browser storage):
+
+- Coordinator token file — evidence coordinator principal, no domain.
+  Used only by `scripts/ops/acquire.sh` (bootstrap without domain, then
+  the pinned acquisition POST).
+- Domain-Operator token file — Operator principal in one explicitly
+  selected domain. Used only by `scripts/ops/health.sh --readiness`.
+
+A `401` means the token is unknown, disabled, expired or revoked: clear
+it and never retry with it. A `409 ACCESS_CONTEXT_STALE` (or pins that
+no longer match the server's current headers) means the configuration
+changed: bootstrap again under the new pins.
+
 ## Health, readiness and restart
 
-`GET /healthz` returns JSON with `process_ready`, `schema_ready`,
-`data_ready`, `static_ready`, `code`, `reason`, `schema_version` and
-`contract_revision`. HTTP `200` means the schema is present and the
-store has been seeded. HTTP `503` with `code == "SETUP_NEEDED"` means
-the schema exists but seed has not yet run — the UI surfaces a
-setup-needed view instead of erroring out.
+`GET /healthz` is minimal anonymous process liveness only: it returns
+exactly `{"process_ready": true}` while the process serves HTTP. It
+never discloses configuration, schema, data or domain state and proves
+nothing about readiness or business state.
+
+Protected readiness is `GET /api/readiness` with a domain-Operator
+token file, an explicitly selected permitted domain and the current
+configuration pins (`scripts/ops/health.sh --readiness`). Success
+requires HTTP `200` AND all six booleans true — `process_ready`,
+`schema_ready`, `data_ready`, `static_ready`, `configuration_ready`,
+`domain_state_compatible` — with allowlisted reasons otherwise. Six
+true booleans still do not establish business-state recovery, which
+needs its own separate comparison, nor human acceptance.
 
 - The container `HEALTHCHECK` polls `/healthz` every 30 s and reports
   unhealthy on `503`. Compose's `restart: unless-stopped` policy is
   intentionally **not** health-driven; the container is only restarted
   after a real process exit. There is no first-run restart loop before
   seed by design.
-- `scripts/ops/health.sh` distinguishes `SETUP_NEEDED` (exit code 1)
-  from other 5xx (2) and transport failures (3) so operator automation
-  does not silently treat an unseeded service as healthy.
+- `scripts/ops/health.sh` exits `0` for confirmed liveness or for
+  readiness with all six booleans true, `1` when readiness answers but
+  is not fully true (reasons printed), `2` for usage/local validation
+  failures, `3` for transport failures and `4` for 401/403 credential or
+  grant refusals — so operator automation never mistakes liveness,
+  partial readiness or a stale credential for ready.
 
 ## Data location and persistence
 
 - Container path: `/data` (writable, owned by uid/gid `10001`).
-- Named volume: `ipam_demo_data` — managed by Docker on the host.
+- Named volume: the explicit `IPAM_DATA_VOLUME` — managed by Docker on
+  the host; Compose refuses to start when it is unset or empty. Record a
+  NEW disposable volume name per candidate; deliberate reuse is recorded.
   This name is global to the engine: a different Compose project name does
-  **not** isolate data. Before first use, establish that this volume is absent
-  on a dedicated engine or select a separate disposable source copy and change
-  only `volumes.ipam_data.name` to a unique name. Record the diff/hash and use
-  a distinct `COMPOSE_PROJECT_NAME` too. The wrappers set their Compose file
-  explicitly, so an environment-only `COMPOSE_FILE` override is insufficient.
-  Some wrapper log messages name the default volume literally; use the rendered
-  Compose configuration and actual mount inspection as the identity evidence.
+  **not** isolate data. Before first use, establish that the recorded
+  volume is absent, or record the deliberate reuse. The wrappers set
+  their Compose file explicitly, so an environment-only `COMPOSE_FILE`
+  override is insufficient. Wrapper log messages report the actual
+  configured volume; use the rendered Compose configuration and actual
+  mount inspection as the identity evidence.
 - Files under `/data`:
   - `ipam_demo.sqlite3` — the application database.
   - `snapshots/` — populated by `scripts/ops/backup.sh` (0700, uid 10001).
@@ -159,7 +211,7 @@ setup-needed view instead of erroring out.
     up. See [Diagnostics](#diagnostics) for the correct
     `DATA_IN_USE` recovery.
 
-To inspect the volume from the host: `docker volume inspect ipam_demo_data`.
+To inspect the volume from the host: `docker volume inspect "${IPAM_DATA_VOLUME}"`.
 
 For an unverified development-only bind-mount variant, edit the service
 `volumes:` entry in a separate disposable source copy's `compose.yaml` and
@@ -312,10 +364,10 @@ acceptance, signatures, license clearance or customer readiness.
 scripts/ops/stop.sh
 ```
 
-Runs `docker compose down --remove-orphans`. The `ipam_demo_data`
-named volume is preserved. To fully discard local state (development
-only), run `docker volume rm ipam_demo_data` after `stop.sh`;
-recipient hosts must not do this.
+Runs `docker compose down --remove-orphans`. The explicit data volume
+(`IPAM_DATA_VOLUME`) is preserved. To fully discard local state
+(development only), run `docker volume rm "${IPAM_DATA_VOLUME}"` after
+`stop.sh`; recipient hosts must not do this.
 
 ## Diagnostics
 
@@ -323,8 +375,11 @@ recipient hosts must not do this.
   `scripts/ops/logs.sh --tail 200` (one-shot). Every request carries
   a server-generated `X-Request-ID`; grep the logs by that ID for a
   single request's trail.
-- Health JSON — `scripts/ops/health.sh` prints the raw body and
-  exits with a distinguishable code per state (see above).
+- Liveness JSON — `scripts/ops/health.sh` prints the raw `/healthz`
+  body (liveness only, never readiness). Readiness JSON —
+  `scripts/ops/health.sh --readiness` prints the raw `/api/readiness`
+  body; success needs HTTP 200 with all six booleans true. Both exit
+  with a distinguishable code per state (see above).
 - `DATA_IN_USE` — the lock file normally remains after exit; the
   kernel releases its lock when the holder exits, including after
   `SIGKILL`. Identify and stop the process/container holding this

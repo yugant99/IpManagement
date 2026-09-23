@@ -77,8 +77,16 @@ EXPOSE 8000
 
 USER ipam:ipam
 
-# HEALTHCHECK reports readiness only; it does not drive restarts. An unseeded
-# service returns 503 SETUP_NEEDED — reported as "unhealthy" by design.
+# HEALTHCHECK is minimal anonymous process liveness only: /healthz answers
+# {"process_ready": true} while the process serves HTTP. It proves nothing
+# about schema, data, configuration or domain readiness — operator readiness
+# is the protected GET /api/readiness with all six booleans true
+# (scripts/ops/health.sh --readiness). Readiness shortfalls surface there
+# as 503 with allowlisted reasons — reported as "unhealthy" by design,
+# never as a restart signal.
+LABEL ipam.healthcheck.scope="liveness-only" \
+      ipam.healthcheck.endpoint="/healthz" \
+      ipam.readiness.endpoint="/api/readiness (protected: Operator token file + domain + pins, six booleans)"
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD curl --fail --silent --show-error --max-time 3 \
       http://127.0.0.1:8000/healthz > /dev/null || exit 1
