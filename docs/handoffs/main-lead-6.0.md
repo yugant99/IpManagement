@@ -134,11 +134,15 @@ fixes; preserve independent user tasks, including “Fix 3D agent UI with DeepSe
 No deployment, customer access, new infrastructure, questionnaire-row promotion or
 Tier B release is implied. **Tier B remains locked.**
 
+## Current route correction — 2026-09-23
+
+The user explicitly corrected the route to **`opencode-go/muse-spark-1.3-contributor#high`**. Its active/enabled high variant and live synthetic `PREFLIGHT_OK` response are confirmed. Spark Contributor owns complete T024. The provisional DeepSeek fallback session was interrupted before any edits; its clean isolated worktree is preserved. DeepSeek remains a recorded standby fallback, with no overlapping author lease. Earlier free-route preference below is superseded.
+
 ## Registered takeover and live preflight — 2026-09-23
 
 Lead branch `codex/main-lead-6-bridge` starts at exact PR97 amendment `ddc644aabeda40e85d416b6a27b4652f2a7d543e`, containing reviewed assembly `e6b76edaa9ae5b82a0c409fec151bf52168036bc`. Fresh Git/PR state matches the outgoing checkpoint; main remains `04eba98cb8673406d1e5d38c5318fb963cc77ff7`. The retained OpenCode T012/T015/T016A/T018/T020/T022/T023 sessions report succeeded/idle. Independent user tasks and original worktrees are untouched.
 
-Spark Free exact route/high variant is catalogued active/enabled, but two minimal synthetic probes (ordinary and standalone OpenCode CLI) returned `provider.auth` HTTP403, “OpenCode's free tier can only be used from within OpenCode”. No attempted bypass, route substitution or account change. **Recorded fallback: DeepSeek V4.1 Flash high owns complete T024**, in a new isolated worktree from the registered publication base. This follows the user's explicit fallback authority, preserves the nine-path lease and does not split the feature. Spark has no dispatched T024 author.
+Spark Free exact route/high variant is catalogued active/enabled, but two minimal synthetic probes (ordinary and standalone OpenCode CLI) returned `provider.auth` HTTP403, “OpenCode's free tier can only be used from within OpenCode”. No attempted bypass, route substitution or account change. **Historical provisional fallback, superseded by the route correction above: DeepSeek V4.1 Flash high was briefly assigned T024**, in a new isolated worktree from the registered publication base. This follows the user's explicit fallback authority, preserves the nine-path lease and does not split the feature. Spark has no dispatched T024 author.
 
 DeepSeek exact `opencode-go/deepseek-v4.1-flash#high` returned `PREFLIGHT_OK`; native `gpt-6-sol` high and `gpt-6-luna` high returned their synthetic probe replies. Go console: rolling 0%, weekly42%, monthly21% used; credits disabled, balance0. Codex weekly49% used. The20% reserve survives. Current free/paid training controls are enabled and unchanged; only tracked public synthetic source may reach OpenCode. Raw provider evidence is local under `/tmp/ipam-lead6`.
 

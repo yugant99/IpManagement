@@ -657,8 +657,8 @@
     },
     {
       "task": "T024",
-      "status": "resumed_preflight_complete_fallback_selected",
-      "route": "opencode-go/deepseek-v4.1-flash#high",
+      "status": "spark_contributor_preflight_passed_pending_dispatch",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
       "base_sha": null,
       "required_source_assembly": "e6b76edaa9ae5b82a0c409fec151bf52168036bc",
       "branch": null,
@@ -676,11 +676,11 @@
         "scripts/ops/backup.sh"
       ],
       "review_route": "Independent GPT-6 Sol high",
-      "release_condition": "Base publication pin after lead registration; complete nine-path feature assigned to DeepSeek fallback; independent Sol review before integration",
+      "release_condition": "Pin corrected registration publication; assign complete nine-path T024 to Spark Contributor; Sol independently reviews",
       "pickup": "docs/handoffs/main-lead-6.0.md",
       "nonclaims": "T024 source not yet implemented; T025 unrun",
-      "preferred_route": "opencode/muse-spark-1.3-contributor-free#high",
-      "fallback_reason": "Preferred free route returned provider.auth HTTP403 in OpenCode run and standalone run; no route bypass or account change. User authorized recorded DeepSeek fallback."
+      "preferred_route": "opencode-go/muse-spark-1.3-contributor#high",
+      "fallback_reason": "Latest user explicitly corrected routing to Spark Contributor. Prior DeepSeek session interrupted before any edits; retained isolated worktree is clean. DeepSeek remains standby fallback only."
     }
   ],
   "muse_route": {
@@ -706,8 +706,8 @@
   },
   "current_handover_gate": {
     "milestone": "T024-ready after T021/T022/T023 independent source closure",
-    "status": "T024_resumed_preflight_in_progress",
-    "action": "Preflight exact routes, then assign complete T024",
+    "status": "T024_spark_contributor_preflight_passed",
+    "action": "Dispatch complete T024 to Spark Contributor",
     "hold": "No application checks before prerequisite-complete T025",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "a2b567b670129671f85498729753c4d577d4768e",
@@ -735,7 +735,8 @@
     "native_routes": "gpt-6-sol high SOL_PREFLIGHT_OK; gpt-6-luna high LUNA_PREFLIGHT_OK",
     "reserve": "20% reserve retained",
     "evidence_root": "/tmp/ipam-lead6",
-    "opus": "unavailable per user; not probed/resumed; no timer"
+    "opus": "unavailable per user; not probed/resumed; no timer",
+    "spark_contributor": "Exact opencode-go/muse-spark-1.3-contributor#high active/enabled; synthetic deny-all-tool probe PREFLIGHT_OK, session ses_f3087e62affewDLimZQvx4jNco"
   },
   "recipient_policy_amendment": {
     "authorization": "Explicit user selection: reviewed domain/scope Operator recipient; immutable notification-version binding; explicit in-app acknowledgement is receipt",
@@ -791,7 +792,7 @@
       "Codex gpt-6-luna high",
       "Codex gpt-6-sol high"
     ],
-    "preflight_status": "Fresh API catalog/high variants, console usage/privacy and synthetic probes recorded; Spark Free403, DeepSeek fallback selected",
+    "preflight_status": "User corrected preferred route to Spark Contributor; exact Go route/high probe passed. Free-route403 retained as historical only.",
     "opus_status": "user says unavailable next couple hours; no dispatch/resume/timed autoretry",
     "boundary": "T024 authorized; no application runtime before prerequisite-complete T025; T028 main gate unchanged"
   }
