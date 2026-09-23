@@ -357,7 +357,12 @@ def resolve_notice_recipient(configuration: ReviewedConfiguration, domain: str, 
         return {"recipient_id": None, "routing_status": "unassigned", "routing_reason": "missing_mapping",
                 "configuration_revision": configuration.revision, "configuration_digest": configuration.digest}
     principal = configuration.principals.get(recipient_id)
-    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    if now is None:
+        current = datetime.now(timezone.utc).astimezone(timezone.utc)
+    else:
+        if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
+            raise ValueError("now must be an aware datetime")
+        current = now.astimezone(timezone.utc)
     if principal is None:
         reason = "unknown_principal"
     elif not principal.enabled:

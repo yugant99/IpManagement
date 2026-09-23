@@ -67,7 +67,7 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
     if identity != APPLICATION_ID:
         raise AppError("UNRECOGNIZED_DATABASE", "Database identity is not IPAM demo. Existing data was preserved.")
     if found_version != version:
-        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1 through 5, stop the service and run python -m ipam_demo migrate.",
+        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1 through 6, stop the service and run python -m ipam_demo migrate.",
                        details={"found": found_version, "supported": version})
     expected = {"app_meta", "scopes", "prefixes", "pools", "allocations"}
     if version >= 2:
