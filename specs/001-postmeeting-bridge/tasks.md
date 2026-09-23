@@ -97,7 +97,7 @@ T012/T013 are independently source-reviewed at `0e8fb4b`/`a5ce063`, with T014/T0
 
 - [ ] T015 [P] [US2] Show reservation/decisions and independent local/ticket states, correlation/attempt cap/unknown lookup/simulated receipt; provisioning unsupported/not requested. Files: `frontend/src/Workflow.tsx`, `frontend/src/workflowApi.ts`.
 
-  Prerequisites: T010 T014; owner: DeepSeek UI under Terra; FR-003 FR-004 FR-019. Completion: Complete allocation and unused release path; downstream failure preserves visible local state.
+  Prerequisites: T010 T014; owner: Muse 1.3 high in OpenCode; FR-003 FR-004 FR-019. Completion: Complete allocation and unused release path; downstream failure preserves visible local state.
 
 
 ## Phase 5 — US3 evidence and operational conditions (P2)
@@ -110,7 +110,7 @@ Goal/gate: exact current/saved metric identity and due conditions; arithmetic/ac
 
 - [ ] T017 [US3] Integrate bounded evaluate/notice/current static occupancy endpoints with protected UTC/config context; timer default off, no new monitor/retry service. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
 
-  Prerequisites: T014 T016; owner: Terra in Codex; FR-003 FR-006 FR-008. Completion: All new reads/actions scoped and authority bounded.
+  Prerequisites: T014 T016; owner: Opus 5.5 high in Claude Code; FR-003 FR-006 FR-008. Completion: All new reads/actions scoped and authority bounded.
 
 - [ ] T018 [P] [US3] Present alert/alarm, ack/resolution and current static versus saved DHCP with units/time/components; preserve safe child editing, unknown semantics and existing thresholds. Files: `frontend/src/Workflow.tsx`, `frontend/src/CapacityReports.tsx`, `frontend/src/workflowApi.ts`.
 

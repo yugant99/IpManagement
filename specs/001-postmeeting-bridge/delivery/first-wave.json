@@ -414,6 +414,45 @@
       "integration_sha": "c5121d4d85c6972fe5ae39315a5a413a96a07599",
       "review_report": "specs/001-postmeeting-bridge/delivery/notice-source-review.md",
       "acceptance_gap": "FR006 trusted owner/recipient mapping and delivery remain open; operator acknowledgement does not waive this criterion."
+    },
+    {
+      "task": "T015",
+      "status": "source_implementation_dispatched",
+      "base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "branch": "codex/bridge-t015-workflow-ui",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t015-muse/Ip_inventory",
+      "provider_session_id": "ses_f32fa18a3ffeyQNRKi43do4bPA",
+      "owned_paths": [
+        "frontend/src/Workflow.tsx",
+        "frontend/src/workflowApi.ts"
+      ],
+      "prerequisites": [
+        "T014"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/workflow-ui-wire.md",
+      "review_route": "Codex GPT-6 Sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git."
+    },
+    {
+      "task": "T017",
+      "status": "source_implementation_dispatched",
+      "base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865",
+      "route": "Claude Code claude-opus-5-5 high",
+      "branch": "codex/bridge-t017-notice-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t017-opus/Ip_inventory",
+      "provider_session_id": "695fa2f2-0540-45b1-9bd4-0a708a6e8137",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "prerequisites": [
+        "T014",
+        "T016"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-api-wire.md",
+      "review_route": "Codex GPT-6 Sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git."
     }
   ],
   "muse_route": {
@@ -439,14 +478,15 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T014_T016_source_accepted_next_T015_T017",
+    "status": "T015_T017_source_dispatched",
     "action": "Main Lead5 continues critical path with full Muse T015 and Opus T017 after exact common base pin",
     "hold": "T025 remains prerequisite-gated; FR006 owner mapping and Spencer prerequisites open",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "ede6cb6511c71011e6295fd46bf9d7c400a7db39",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
-    "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7"
+    "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
+    "next_shared_base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865"
   },
   "lead_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
   "latest_provider_preflight": {
