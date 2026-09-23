@@ -418,3 +418,81 @@ class ReservationOperationReadback(StrictResponse):
     original_outcome: ReservationSummary | ReservationReleaseRequest | None
     current_reservation: ReservationSummary | None
     current_release_request: ReservationReleaseRequest | None
+
+
+class ReservationNotice(StrictResponse):
+    """Local reservation notice episode; an operator acknowledgement, never owner signoff or delivery proof.
+
+    Foreign acknowledged_by/acknowledgement_reason are redacted to None by the lifecycle projection.
+    """
+
+    id: str
+    reservation_id: str
+    episode_number: int
+    policy_revision: str
+    first_due_at: str
+    alert_level: Literal["alert", "alarm"]
+    owner_reference: str
+    state: Literal["open", "acknowledged", "resolved"]
+    acknowledgement_version: int
+    notification_version: int
+    acknowledged_at: str | None
+    acknowledged_by: str | None
+    acknowledgement_reason: str | None
+    acknowledgement_current: bool
+    acknowledgement_kind: Literal["operator_acknowledgement"]
+    owner_signoff: Literal[False]
+    resolved_at: str | None
+    resolution_reason: Literal["reservation_extended", "reservation_converted", "approved_local_release"] | None
+    synthetic: Literal[True]
+
+
+class ReservationNoticeEvaluation(StrictResponse):
+    """Server-UTC evaluation result; notices is the selected-domain canonical notice list."""
+
+    evaluated_at: str
+    created_count: int
+    alarm_upgrade_count: int
+    notices: list[ReservationNotice]
+    synthetic: Literal[True]
+
+
+class StaticOccupancyCount(StrictResponse):
+    count: int
+    unit: Literal["IPv4 addresses"]
+
+
+class StaticReservedHolds(StaticOccupancyCount):
+    includes_expired: Literal[True]
+
+
+class StaticOccupancyComponents(StrictResponse):
+    active_allocations: StaticOccupancyCount
+    reserved_holds: StaticReservedHolds
+    occupied_total: StaticOccupancyCount
+    assignable_capacity: StaticOccupancyCount
+    remaining_assignable: StaticOccupancyCount
+
+
+class StaticOccupancyProvenance(StrictResponse):
+    source: Literal["current local intended ledger"]
+    capacity: str
+    allocations: str
+    reservations: str
+    saved_runs_modified: Literal[False]
+    synthetic: Literal[True]
+
+
+class CurrentStaticOccupancy(StrictResponse):
+    """Current local-static ledger occupancy; independent of immutable saved DHCP run metrics."""
+
+    metric: Literal["current_static_ipv4_occupancy"]
+    pool_id: str
+    scope_id: str
+    domain: str
+    family: Literal[4]
+    unit: Literal["IPv4 addresses"]
+    as_of: str
+    components: StaticOccupancyComponents
+    provenance: StaticOccupancyProvenance
+    synthetic: Literal[True]
