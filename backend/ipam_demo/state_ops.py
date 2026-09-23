@@ -279,7 +279,14 @@ def _classify_configuration(saved: dict, current: dict) -> str:
     return "unverified"
 
 
-def _publish_manifest(manifest: Path, document: dict) -> None:
+def _publish_manifest(manifest: Path, document: dict, *, on_published=None) -> None:
+    """Link the manifest no-clobber, then report publication before later durability steps.
+
+    on_published runs immediately after the final name exists, ahead of the
+    fallible directory fsync and scratch cleanup, so callers record partial
+    publication accurately. Only the owned temporary name is ever removed;
+    already published snapshot/manifest names are never deleted to mask failure.
+    """
     descriptor, name = tempfile.mkstemp(prefix=".ipam-recovery-", suffix=".json", dir=manifest.parent)
     temporary = Path(name)
     try:
@@ -292,12 +299,18 @@ def _publish_manifest(manifest: Path, document: dict) -> None:
         except FileExistsError as exc:
             raise AppError("OUTPUT_EXISTS", "Recovery manifest destination already exists; choose a new snapshot filename.",
                            409, {"manifest": str(manifest)}) from exc
+        if on_published is not None:
+            on_published()
         _sync_directory(manifest.parent)
     finally:
+        # This exact private scratch path was created for this operation only.
         try:
             temporary.unlink(missing_ok=True)
         except OSError as exc:
             logger.error("Cannot remove temporary recovery manifest %s: %s", temporary, exc)
+            raise AppError("STATE_CLEANUP_FAILED",
+                           "Temporary recovery manifest could not be removed; inspect the reported path.",
+                           details={"remaining_paths": [str(temporary)]}) from exc
 
 
 def _prepare_removal(database: Path) -> list[Path]:
@@ -367,11 +380,10 @@ def backup_database(directory: Path, output: str | Path) -> dict:
                         "snapshot_bytes": snapshot_bytes, "schema_version": metadata["schema_version"],
                         "captured_at": datetime.now(timezone.utc).isoformat(), "configuration": configuration}
             try:
-                _publish_manifest(manifest, document)
-            except (AppError, OSError) as exc:
                 # The published snapshot is retained; never delete it or claim clean success.
+                _publish_manifest(manifest, document, on_published=lambda: state.update(manifest_published=True))
+            except (AppError, OSError) as exc:
                 raise _failure(exc, "backup", state) from exc
-            state["manifest_published"] = True
             return {"status": "backed_up", **state, **metadata, "scope": "entire_sqlite_database",
                     "snapshot_sha256": snapshot_sha256, "snapshot_bytes": snapshot_bytes,
                     "captured_at": document["captured_at"], "configuration": configuration,
