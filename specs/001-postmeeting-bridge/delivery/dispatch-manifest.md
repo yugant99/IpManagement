@@ -1,5 +1,15 @@
 # Locked first dispatch manifest — Main Lead 4.0
 
+**Latest handover checkpoint —2026-09-22:** T009/T010/T011 are source accepted,
+T011 at `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`, draft PR78. Application source
+assembly is `ab370a4273784bd750bf5f59289594a31d097739` on
+`codex/bridge-t011-handover`; subsequent publication adds handover documents only.
+T011 task is `01a0cca1-3873-79a0-ad54-e3f2ae0f25fb`; all completed workers are
+idle and retained for assigned fixes. The user will start a new lead with
+[the exact pickup and prompt](../../../docs/handoffs/main-lead-5.0.md).
+T012/T013 remain undispatched. No runtime/main-merge/ledger promotion. Latest
+Luna/Sol/Astra routing and Claude/OpenCode stops override older sections below.
+
 **Current source-adopted specification: `e8bc0ed08a8b3734d5278578828c8eb58b9f5d52`.**
 Initial adopted base: `6b66f943b7c7783285bfd1f70859ede42380bf60`.
 Supplied original specification: `9df8393171af632b126a9801fe4cca73b1c575d1`.

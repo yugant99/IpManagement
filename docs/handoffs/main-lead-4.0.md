@@ -1,5 +1,15 @@
 # Main Lead 4.0 — post-meeting bridge transfer
 
+**Current stopping point —2026-09-22:** The user requested a new lead after T011.
+T009/T010/T011 now have independent source review closure; T011 is accepted at
+`3fcdb49d955c39cf08f0a0d6f9483384e43163b1`. Complete
+[Main Lead 5.0 pickup and copyable prompt](main-lead-5.0.md) pins the assembled
+application source `ab370a4273784bd750bf5f59289594a31d097739` and exact worker registry.
+T012/T013 are undispatched. Main Lead 4.0 remains registered until the user starts
+the receiver; no invented receiver ID or automatic task creation. All Claude use
+is stopped, OpenCode paused, runtime/human/portable gates unchanged. The dated
+execution-state sections below are retained history.
+
 Registered 2026-09-22 by explicit user handoff. Task `01a0cade-506f-7442-97da-0cc09b4f9929`, host `local`, read from the current task environment. Main Lead 4.0 (GPT-6 Astra) now owns scope/contracts, dependencies, file leases, acceptance/evidence classification, PR coordination and global status. Main Lead 3.0 and older leads remain historical references. No title alone changes ownership.
 
 ## Exact pickup

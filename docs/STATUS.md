@@ -1,10 +1,14 @@
 # Current project status
 
-**Latest bridge update —2026-09-22:** T009 API is source accepted at
-`daede1905304c5d5bd363ff230b5f6371763eb49` after independent Sol review and receipt
-integrity correction. T010 UI continues; T011 reservation core is released on a
-separate Luna lease. Further Claude use is stopped; OpenCode stays paused. The
-runtime, human/portable, main-merge and ledger limits below remain unchanged.
+**Latest bridge update —2026-09-22:** T009/T010/T011 are source accepted after
+independent Sol reviews and owner corrections. T011 final is
+`3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; assembled application source is
+`ab370a4273784bd750bf5f59289594a31d097739` on `codex/bridge-t011-handover`.
+The user requested this stopping point and will start the new lead with
+[the complete Main Lead 5.0 pickup and prompt](handoffs/main-lead-5.0.md).
+No receiver is registered yet. T012/T013 remain undispatched. Further Claude use
+is stopped; OpenCode stays paused. Runtime/T025, human/portable, main-merge and all
+three ledger limits remain unchanged. Earlier execution-state paragraphs are history.
 
 **Bridge migration source closure —2026-09-22:** T008 is source accepted at `776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509` after GPT-6 Luna corrections and independent GPT-6 Sol closure of five findings; [review](../specs/001-postmeeting-bridge/delivery/migration-source-review.md), draft PR75. T009 API and T010 UI are the next released source assignments. Claude Code is updated to 2.1.280 and the single authorized Opus 5.5 lineage advisory completed. OpenCode remains paused. Runtime/T025, human/portable gates and all ledgers remain unchanged; no main merge.
 
