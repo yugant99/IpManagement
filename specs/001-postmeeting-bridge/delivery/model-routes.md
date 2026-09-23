@@ -1,5 +1,24 @@
 # Active model routes —2026-09-22
 
+## Main Lead 6.0 handoff — latest user routing
+
+The receiver registers its actual task ID on takeover; Astra remains lead. Read
+`docs/handoffs/main-lead-6.0.md`. Available worker pool: Muse Spark 1.3 Free and
+DeepSeek V4.1 Flash in OpenCode, GPT-6 Luna/Sol high in Codex. Primary T024 route is
+`opencode/muse-spark-1.3-contributor-free#high`; meaningful non-overlapping work or
+explained fallback may use `opencode-go/deepseek-v4.1-flash#high`. Both exact IDs and
+high variants were observed active/enabled in the catalog at handoff. Catalog is
+not usage or live prompt availability; refresh both before dispatch. No worker has
+been started by this handoff.
+
+Opus is unavailable for the next couple of hours per the user: no new/resumed Claude
+jobs, timed auto-retries or critical-path dependence. Preserve completed ownership;
+record any urgent fallback explicitly. Luna may independently perform gated T025;
+Sol independently reviews complete implementations/shared invariants and final T027.
+No purchases, resets, capacity/settings changes, private inputs or untracked outputs.
+Existing contributor data-use boundaries apply even when a route is free. The prior
+Go Spark route below records historical execution, not current free-route preference.
+
 ## Current Main Lead5 routing
 
 Astra task `01a0ccc7-6219-73c1-bd3b-1521bb71a837` leads. Explicit takeover and

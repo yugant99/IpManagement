@@ -1,0 +1,137 @@
+# Main Lead 6.0 — transfer from the T024-ready source checkpoint
+
+The user requested a new lead and handover prompt, with a revised worker pool.
+Outgoing lead: Astra / Main Lead 5.0, task `01a0ccc7-6219-73c1-bd3b-1521bb71a837`.
+**Incoming actual task ID: not registered yet.** The receiving task must register
+its own actual ID in the lead/oversight/status records; do not copy the outgoing ID
+or invent a receiver. Astra remains lead; the pool below is for delegated work.
+No new task or worker was created by this handoff publication.
+
+## Next mergeable point
+
+**T028 remains the next bridge-to-main merge.** Required: complete technical Tier A,
+exact-candidate T025 evidence, closed blocking source/final reviews and recorded
+T026/T027/business dispositions. PR79 and PR84 are draft source checkpoints, not
+runtime-verified candidates ready for main. No earlier merge is authorized by this
+transfer. Read `docs/MAIN_MERGE_POLICY.md`; do not restart planning.
+
+## Exact source and current state
+
+- Completed publication: `9cb0725e28985b944a1296ea6d1bde403491d465`,
+  `codex/bridge-ticket-integration`, [PR84](https://github.com/yugant99/IpManagement/pull/84).
+- Complete T021/T022/T023 source assembly: `e6b76edaa9ae5b82a0c409fec151bf52168036bc`.
+- Application source assembly: `a2b567b670129671f85498729753c4d577d4768e`; schema 7.
+- T021 Opus: `3007bf33dd3481f1b85723b0a1c4971036b5f089`, PR96.
+- T022 Muse: `c231663ef9a9747c83288523da9ede93977bef42`, PR95.
+- T023 Muse: `adb2dc18fe747d4ff97a90f1a21bcdc4382f9fea`, PR92.
+- All three are independently source-closed by GPT-6 Sol high and integrated into
+  the bridge. PR95/96 are merged into that branch, not main. Their source review
+  receipts are in `specs/001-postmeeting-bridge/delivery/`.
+- Main refreshed at `04eba98cb8673406d1e5d38c5318fb963cc77ff7`;
+  PR79 open/draft at `aaec3b625ff84554e93e3116d8102a3eb5c347e7`.
+- T024 is ready but **unstarted**; T025 is **unrun**. Original Muse/Opus jobs
+  completed and their sessions are retained, not running feature work.
+
+This documentation amendment is on `codex/main-lead-6-handoff`, based exactly on
+publication `9cb0725`, in
+`/Users/yuganthareshsoni/.codex/worktrees/ipam-main-lead-6-handoff/Ip_inventory`.
+Read this newest amendment, then `main-lead-5-t024-pickup.md`. Refresh Git, PRs and
+worker state; pin one source base containing both the reviewed assembly and this
+amendment before dispatch. Preserve commits and the old frozen T012/T013 base.
+
+The prior sleep hold remains respected in this outgoing task: publication does not
+start T024. When the user sends the receiving prompt authorizing takeover/resume,
+continue T024 there. No new planning interview is needed.
+
+## Current model pool — supersedes older dispatch wording
+
+The user's latest pool is Spark 1.3 and DeepSeek V4.1 Flash in OpenCode, plus GPT-6
+Luna and GPT-6 Sol in Codex. The active local OpenCode catalog labels the user's
+“Meta Spark 1.3 / Muse” as **Muse Spark 1.3**; do not invent a `meta/...` model ID.
+Catalog metadata was refreshed for this handoff; it is not a live usage/quota check.
+
+| Role / model | Route | Handoff status |
+|---|---|---|
+| Full T024 primary author — Muse Spark 1.3 Free, high | `opencode/muse-spark-1.3-contributor-free#high` | Listed active/enabled with high variant; prefer this explicit free route after preflight |
+| Substantial non-overlapping implementation or explained unavailable-author fallback — DeepSeek V4.1 Flash, high | `opencode-go/deepseek-v4.1-flash#high` | Listed active/enabled with high variant; use existing allowance only |
+| Independent T025 verifier or explained later-slice fallback — GPT-6 Luna, high | Codex `gpt-6-luna`, high | Use a separate verifier worker; do not self-accept implementation |
+| Independent full source/shared-invariant review and final T027 — GPT-6 Sol, high | Codex `gpt-6-sol`, high | Keep separate from the implementation author |
+
+The historical Muse route `opencode-go/muse-spark-1.3-contributor#high` is also
+catalogued, but was the completed work's actual route. Do not silently substitute
+it for the explicit free route or infer that a route is usable/free from a model
+name or cost telemetry. Freshly verify exact route, variant, data-use terms,
+actual availability and usage before meaningful dispatch; retain the 20% reserve.
+A minimal synthetic-only access probe may establish availability, but is not an
+application test or feature assignment. Do not send private material as a probe.
+
+**Opus 5.5 is unavailable for the next couple of hours, per the user.** Do not
+start or resume Claude/Opus now; do not automatically retry it on a guessed timer.
+Do not make it a critical-path dependency. Preserve completed Opus sessions and
+source ownership; if an urgent correction cannot wait, record an explicit bounded
+fallback owner/lease (DeepSeek or Luna) instead of silently taking over the files.
+No new Grok/Fable calls, unrequested providers, purchases, top-ups, resets, overage
+activation or account/privacy-setting changes.
+
+For all training-enabled OpenCode routes, use only tracked public synthetic source
+through relative-path allowlists in isolated worktrees. Never expose private/customer
+documents, credentials, logs/untracked outputs or other directories. Free access
+changes the cost choice, not the information boundary.
+
+## T024 assignment and fixed decisions
+
+Give one complete T024 operator/package feature to the primary author after route
+preflight, on a new `codex/` branch and isolated worktree. Do not split a coherent
+feature into micro-tests or manufacture work to use every model. DeepSeek is
+available for meaningful non-overlapping work or a documented fallback. Sol reviews
+the complete result and shared invariants before integration; Astra adjudicates.
+
+Use the detailed T024 behavior in `main-lead-5-t024-pickup.md` and the current
+`delivery/operator-preparation-ownership.md`. Exact nine-path lease:
+
+1. `scripts/ops/acquire.sh`
+2. `scripts/ops/health.sh`
+3. `scripts/ops/README.md`
+4. `specs/001-postmeeting-bridge/delivery/operator-handoff.md`
+5. `Dockerfile`
+6. `compose.yaml`
+7. `docs/RUNNING.md` — bridge auth/readiness/config text only.
+8. `scripts/ops/start.sh` — readiness/actual-volume text only; no flow changes.
+9. `scripts/ops/backup.sh` — readiness/actual-volume text only; no flow changes.
+
+Separate coordinator acquisition and domain-Operator readiness credentials; protect
+tokens from argv, logs, URLs, Compose environment/images and snapshots. Explicit
+bootstrap/current pins, stable original acquisition key/reason, no automatic write
+retry. `/healthz` is minimal liveness; protected readiness requires all six exact
+boolean fields true. Require explicit `IPAM_DATA_VOLUME` and a new recorded disposable
+candidate volume; project-name changes alone do not isolate a globally named volume.
+Mount reviewed access configuration separately/read-only. Keep stopped recovery,
+paired SQLite/manifest transfer and business comparison distinct. No new ops framework.
+
+The configured-recipient disposition stays settled: one reviewed Operator per
+domain/scope, immutable notification-version binding, explicit in-app receipt.
+Descriptive owner reference is not trusted business-owner signoff.
+
+## Remaining execution and evidence boundaries
+
+No routine application tests or test additions, builds, imports, typechecks, lint,
+SQL/DB execution, app servers/browser checks before prerequisite-complete T025.
+Resuming T024 does not pass or waive T025 prerequisites. The user's existing T025
+scope is disposable synthetic exact-candidate validation only. Preserve that scope;
+work outside it needs new authority. No runtime is authorized in this outgoing
+handoff publication, and no source review is runtime evidence.
+
+Required next sequence: T024 source/review/integration → T025 exact-candidate
+technical evidence → T026 honest actual-human evidence or pending disposition →
+T027 final Sol review → T028 lead acceptance and main merge if all gates pass.
+An unavailable actual recipient/portable target does not prevent local technical
+T025 on a separately pinned disposable target. T025 must perform/pass required
+business-state comparisons; human rehearsal pending alone limits human-handoff
+claims rather than blocking a technically validated merge.
+
+Spencer was never assigned the earlier prepared work. Agents took over T020/T022
+and future T024; no tomorrow Spencer task or human acknowledgement is invented.
+Keep his old prepared worktree untouched. Retained Luna T014/T016 authors own their
+fixes; preserve independent user tasks, including “Fix 3D agent UI with DeepSeek”.
+No deployment, customer access, new infrastructure, questionnaire-row promotion or
+Tier B release is implied. **Tier B remains locked.**

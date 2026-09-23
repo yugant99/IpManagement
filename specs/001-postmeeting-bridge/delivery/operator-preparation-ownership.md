@@ -1,5 +1,7 @@
 # Agent ownership of operator preparation — 2026-09-23
 
+**Latest Main Lead 6.0 routing amendment:** Read `docs/handoffs/main-lead-6.0.md`. T024 primary remains Spark 1.3 high, now preferring exact free route `opencode/muse-spark-1.3-contributor-free#high` after fresh preflight. DeepSeek V4.1 Flash and native Luna are available for meaningful separate work or an explained fallback; Sol independently reviews. Opus is temporarily unavailable. This handoff does not start T024.
+
 The user clarified that Spencer had not actually been assigned the prepared work
 and explicitly directed the agents to do it, leaving a different Spencer assignment
 for tomorrow. This supersedes the former Spencer dependency for T020/T022/T024.

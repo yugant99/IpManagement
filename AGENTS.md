@@ -1,5 +1,7 @@
 # Agent entry point
 
+**Latest transfer:** The user authorized Main Lead 6.0 from the T024-ready source checkpoint. The receiver must register its actual task ID; none is invented here. Read [the new handoff](docs/handoffs/main-lead-6.0.md). Main Lead 5.0 is outgoing; prior lead records below remain history after acceptance. No T024 dispatch occurs in this handoff publication.
+
 Read [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) before changing this repository.
 
 Then read, in order:
