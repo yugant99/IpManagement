@@ -29,16 +29,21 @@ is guessed; no live customer facts, new infrastructure, or broad vendor research
 
 ## 1. Selection rule and completeness (for Sol, against all 111 public rows)
 
-- **Included (§3, 44 rows):** every row whose primary category is Integration
-  (19 rows: 011, 036, 041, 042, 044, 045, 046, 047, 048, 049, 050, 051, 052, 055,
-  056, 058, 061, 067, 098) **plus** every cross-category row bearing an
-  API/event/orchestration/delivery/readback integration clause (25 rows: 001, 009,
-  010, 012, 013, 022, 033, 034, 037, 039, 043, 053, 059, 060, 063, 068, 069, 070,
-  072, 081, 082, 087, 089, 091, 096).
-- **Omitted (§5, 67 rows):** rows with no integration clause (pure local
-  application logic, deployment topology, scale measurement, or business/provider
-  evidence). Each omitted ID has a one-line disposition in §5; 44 + 67 = 111, no
-  invented rows, no denominator or evidence promotion.
+- **Included (§3, 48 rows):** the union of (a) every row whose primary category is
+  Integration (19 rows: 011, 036, 041, 042, 044, 045, 046, 047, 048, 049, 050,
+  051, 052, 055, 056, 058, 061, 067, 098) and (b) every row whose coverage.csv
+  task gate lists T020 (28 rows: 009, 010, 011, 012, 013, 039, 041, 042, 043,
+  044, 045, 046, 047, 055, 056, 060, 067, 068, 070, 081, 082, 090, 091, 092, 096,
+  098, 104, 106 — union of (a)+(b) is 36 rows) **plus** 12 justified
+  cross-category rows bearing an API/event/orchestration/delivery/readback
+  integration clause (001, 022, 033, 034, 037, 053, 059, 063, 069, 072, 087,
+  089). RFP-090/092/104/106 are included per their explicit T020 gate with
+  honest preparation/unknown dispositions; retained evidence classes are
+  preserved, not promoted.
+- **Omitted (§5, 63 rows):** rows with no integration clause and no T020 gate
+  (pure local application logic, deployment topology, scale measurement, or
+  business/provider evidence). Each omitted ID has a one-line disposition in
+  §5; 48 + 63 = 111, no invented rows, no denominator or evidence promotion.
 - Retained evidence classes below are copied from `docs/QUESTIONNAIRE_ROW_MAP.md`;
   only the Lead may change them.
 
@@ -63,9 +68,16 @@ is guessed; no live customer facts, new infrastructure, or broad vendor research
   despite routing/delivery failure; ticket approval never authorizes IPAM mutation;
   provisioning is unsupported/not requested.
 - **Durable ticket effect / unknown / readback (C-T):** effect commit is durable
-  and distinct from response observation; ambiguous outcomes stay `unknown` until
-  definitive-absence readback; three total manual attempts; 5 s observation budget
-  is a deadline, not a sleep; no auto-retry, queue, or budget reset.
+  and distinct from response observation. An `unknown` outcome resolves two
+  ways: a persisted effect found by exact same correlation + business digest
+  resolves it to `delivered` (attempt row updated to delivered with the actual
+  synthetic ticket ID); definitive absence is the no-effect / fenced-failure
+  path (crashed attempt fenced as failed, or zero-attempt intent closed as
+  failed only when its source request is rejected or its linked reservation
+  released — an active source keeps pending/routing_blocked). Readback never
+  claims success without a found effect. Three total manual attempts; 5 s
+  observation budget is a deadline, not a sleep; no auto-retry, queue, or
+  budget reset.
 - **Recipient ack as in-app receipt (notice-recipient-wire):** one configured
   Operator recipient per (domain, scope_id); immutable binding per notice
   notification version; only that recipient's explicit in-app acknowledgement
@@ -78,7 +90,9 @@ Format per row: requirement · interface/direction · product/contract/version �
 source/change authority · principal/role · payload-error-retry-readback · mode ·
 responsible role · evidence pointers · gap · next gate.
 Owner-role abbreviations follow T002: Lead, Grok-int (requirements/integration
-sublead), Terra (schema/API owner), Spencer (operator/package), Human-int
+sublead), Terra (schema/API owner), Muse 1.3 high (T020/T022/T024 operator
+preparation; Spencer's former preparation role is historical/superseded per
+`delivery/operator-preparation-ownership.md`), Human-int
 (unassigned vendor-contract owner), Human-biz (unassigned business owner),
 Luna (independent verifier, needs validation authority).
 
@@ -91,12 +105,17 @@ Authority: Lead contracts; change via reviewed config (C-T routes) / schema owne
 (C-L). Principal: Requester proposes, Approver decides, Operator attempts ticket.
 Payload/error/retry/readback: idempotency-key replay; 409 changed-payload; exact-key
 recovery (`GET /api/handoff-operations`, allocation list `idempotency_key` filter);
-unknown preserved, no silent replacement. Mode: source-implemented (T012–T015).
+unknown preserved, no silent replacement. Current bridge source implements
+reservation, extension, and independent unused release (conservative refusal only
+while a linked intent is pending/routing_blocked/unknown). Mode: source-implemented (T012–T015).
 Responsible: Terra (API), original authors retain fixes. Evidence:
 `backend/ipam_demo/app.py:698-777` (handoff routes), `:1073-1269` (reservation
 routes); `contracts/reservation-ticket-wire.md`, `contracts/ticket-api-wire.md`;
-`docs/QUESTIONNAIRE_ROW_MAP.md` RFP-001. Gap: release/reclaim lifecycle absent
-(Tier B locked). Next gate: T025 runtime observation; Tier B needs T029 contract.
+`docs/QUESTIONNAIRE_ROW_MAP.md` RFP-001. Historical old-baseline note, kept
+separate: the S5-12 `primary/workflow-recovery-summary.json` observation belongs
+to the pre-bridge baseline and is not bridge runtime evidence. Gap: allocated
+reclaim/reuse remains Tier B (locked); Tier A provisioning is
+unsupported/not_requested (a labeled absence, not a simulation). Next gate: T025 runtime observation; Tier B needs T029 contract.
 
 ### RFP-009 Request portal — Demonstrated (cross-category: local request UI/API)
 Requirement: requester subnet request flow. Interface: in-app request/approval API
@@ -110,7 +129,7 @@ provisioning. Next gate: T025; enterprise portal needs Human-int contract (out o
 Requirement: one central API + shared state serving UI. Interface: local HTTP API
 (inbound). Product: single-process FastAPI + SQLite, known. Authority: Terra;
 topology change needs Lead + T019 HA gate. Principal: all authenticated roles.
-Mode: source-implemented (single local service). Responsible: Terra; Spencer for
+Mode: source-implemented (single local service). Responsible: Terra; Muse for
 packaging (T024). Evidence: app.py routes; row-map RFP-010; FR-009 spec §347-363.
 Gap: single failure point; no HA/distributed claim. Next gate: T025; HA needs
 FR-016 protocol + authorized observation (T019 §2).
@@ -153,11 +172,11 @@ liveness, anonymous) + proposed authenticated `GET /api/readiness` (six booleans
 reservation due/alert/alarm notices are in-app lifecycle records, not platform
 alerts. Direction: outbound-to-operator (read). Product: local wrappers known;
 alert route/delivery **unverified**. Authority: Terra (endpoint semantics),
-Spencer (wrappers, T024). Principal: Operator (readiness); coordinator excluded
+Muse (wrappers, T024). Principal: Operator (readiness); coordinator excluded
 from domain data. Payload/error/retry/readback: all-six-true else failure status
 with allowlisted reasons; no raw startup detail; readiness never proves business
 recovery. Mode: source-implemented (liveness + in-app notices); alerting
-integration missing. Responsible: Terra/Spencer. Evidence:
+integration missing. Responsible: Terra/Muse. Evidence:
 `contracts/access.md` §§ readiness/operator-boundary; `contracts/state-recovery-wire.md`
 § remaining gates; row-map RFP-022. Gap: no monitoring service, route, or
 delivery proof. Next gate: T024 wrapper bound to authenticated readiness; T025.
@@ -237,8 +256,12 @@ change = config revision + explicit reassignment. Principal: Operator
 (attempt/readback/reassign); Viewer reads; coordinator has no domain rights.
 Payload/error/retry/readback: allowlisted business payload (domain/action, opaque
 service ref, source request ID, correlation, revisions, reason code); no raw
-envelope/token; 3 manual attempts; 5 s budget; unknown until definitive-absence
-readback; exact-key `handoff-operations` recovery; zero-attempt reassignment only;
+envelope/token; 3 manual attempts; 5 s budget; `unknown` resolves to `delivered`
+only when a persisted effect is found by exact same correlation +
+`business_payload_digest` (attempt updated with the actual synthetic ticket ID);
+definitive absence is the no-effect/fenced-failure path, never a delivery claim;
+exact-key `handoff-operations` recovery; strict readback body field names in
+§4.3 (`key`/`digest` aliases rejected); zero-attempt reassignment only;
 no route change after attempt. Mode: simulated (local); external missing.
 Responsible: Terra/T014 author; original authors retain fixes. Evidence:
 `contracts/ticketing.md`; `contracts/ticket-api-wire.md`;
@@ -287,8 +310,13 @@ source-authority §FR-009 (RFP-046 row); row-map RFP-046. Gap: no adapter.
 Next gate: same official-contract gate as RFP-041.
 
 ### RFP-047 Provisioning — Missing as external (Integration; FR-004)
-Requirement: provisioning-system integration. Interface: none external; local
-allocation + `provisioning_status=not_requested` label. Product: **no vendor**.
+Requirement: provisioning-system integration. Interface: none external; the
+ticket handoff DTO projection carries constant `provisioning_status=
+"not_requested"` (models.py `TicketHandoffSummary:185`, set in
+ticket_handoff.py:419) while new allocation requests carry the separate legacy
+column `downstream_status="not_requested"` (workflow.py:450,502,507; legacy rows
+may carry `simulated_success`/`simulated_failure`) — two distinct fields on two
+distinct projections, never interchanged. Product: **no vendor**.
 Authority: Lead (Tier A provisioning unsupported/not requested). Principal: n/a.
 Payload: local decision vs simulated ticket shown separately; UI states
 "provisioning unsupported/not requested". Mode: missing (external); local
@@ -338,11 +366,17 @@ pool policy fixed (no per-domain list). Principal: Operator (create/extend/
 propose), Approver (independent decision; no direct edit grant). Payload/error/
 retry/readback: strict positive versions; duration 1–168 h (default 24);
 idempotency-key replay; cross-table eligibility in one immediate transaction;
-conservative unused-release refusal while linked intent pending/unknown. Mode:
+conservative unused-release refusal while linked intent pending/unknown. Current
+bridge source implements reservation, extension, and independent unused release
+(an unlinked hold releases normally). Mode:
 source-implemented (T011/T012). Responsible: Terra; original authors retain
 fixes. Evidence: `contracts/lifecycle.md`; `contracts/reservation-ticket-wire.md`
-§§T012/conversion-identity; app.py `:1073-1269`. Gap: reservation lifecycle
-absent; pending requests do not reserve; external provisioning simulated.
+§§T012/conversion-identity; app.py `:1073-1269`. Historical old-baseline note,
+kept separate: S5-12 allocation observations belong to the pre-bridge baseline,
+not bridge runtime evidence. Gap: reservation lifecycle is Tier A complete but
+allocated reclaim/reuse remains Tier B (locked); pending requests do not
+reserve; Tier A provisioning is unsupported/not_requested (labeled absence, not
+simulated).
 Next gate: T025 success/refusal/replay/concurrency; Tier B reclaim locked.
 
 ### RFP-055 DNS changes — Missing (Integration; FR-012)
@@ -419,17 +453,24 @@ Evidence: source-authority §FR-010; row-map RFP-067. Gap: DNS and CMTS absent;
 one sample cannot complete validation. Next gate: each authority evidenced
 separately, then join contract.
 
-### RFP-068 Run schedule — Demonstrated (cross-category: timer as event source)
-Requirement: configurable local scheduling (6 h configurable + manual Run now).
-Interface: `GET/POST /api/schedule` (coordinator-only run/config), internal
-timer default off. Product: local scheduler, known. Authority: privileged
-evidence/configuration operator for config changes (stopped/reload procedure);
-ordinary domain operators have no schedule rights. Principal: coordinator.
-Payload: enable/disable, manual-due reset, version/actor controls; config-race
-and overdue execution observed in controlled time. Mode: source-implemented
-(bounded). Responsible: Terra. Evidence: row-map RFP-068. Gap: S5-09 partial
-branches (held-guard, no OS-signal-in-flight, no elapsed-hour endurance).
-Next gate: T025; endurance/live excluded.
+### RFP-068 Run schedule — Demonstrated (cross-category: coordinator-only schedule wire)
+Requirement: configurable local scheduling plus manual Run now. Interface: `GET
+/api/schedule` (coordinator-only status read, app.py:511 — requires coordinator
+`read` + full feed authority); `POST /api/schedule` **always 403, including the
+coordinator** (app.py:517-519 — no HTTP schedule mutation exists; configuration
+changes go through the reviewed stopped-service replacement procedure only);
+`POST /api/schedule/run` (manual coordinator acquisition, app.py:521-528, 201
+fresh / 200 replay via `X-Acquisition-Replay`). There is no enable/disable HTTP
+mutation in bridge source, and no old controlled-time evidence is promoted to
+bridge runtime. Product: local scheduler, known. Authority: coordinator-only
+run/status; config replacement = reviewed stopped-service procedure (ordinary
+domain operators have no schedule rights). Principal: coordinator.
+Payload: manual acquisition payload with idempotency/replay; busy/failure shown
+separately. Mode: source-implemented (bounded; wire as above, runtime
+unobserved). Responsible: Terra. Evidence: app.py `:511-528`; row-map RFP-068.
+Gap: S5-09 partial branches from the old baseline (held-guard, no
+OS-signal-in-flight, no elapsed-hour endurance) remain old-baseline limits, not
+bridge claims. Next gate: T025; endurance/live excluded.
 
 ### RFP-069 Reconciliation reports — Demonstrated (cross-category: export interface)
 Requirement: run reports + export matching saved results. Interface: `GET /api/
@@ -461,8 +502,15 @@ Principal: configured recipient acknowledges own binding; others see redacted
 projection (`is_current_recipient`, allowlisted reasons only). Payload/error/
 retry/readback: exact notice/version; different-route 409 until evaluate renews;
 same version/actor/reason replay returns original receipt; exact-version GET
-recovery; GET never reroutes. Mode: source-implemented (T016A/B, T017A, T018).
-Responsible: Terra/Luna/Opus authors (retain fixes). Evidence:
+recovery; GET never reroutes. Two evidences kept strictly separate, no
+equivalence: (a) **historical S5-13** finding/exception notification with
+pending-flag acknowledgement (`primary/exception-summary.json`,
+`primary/exception-acknowledged.txt`) — pre-bridge baseline, in-app transport
+only; (b) **new FR006 bridge source implementation** above (T016A/B, T017A,
+T018), runtime unobserved. A reservation acknowledgement never clears an
+exception pending flag, a reservation condition, or a hold; resolution,
+delivery, and acknowledgement are distinct states. Mode: (a) historical
+Demonstrated retained class, (b) source-implemented. Responsible: Terra/Luna/Opus authors (retain fixes). Evidence:
 `contracts/notice-recipient-wire.md`; app.py `:1119-1210`;
 `backend/ipam_demo/lifecycle.py:182-308`. Gap: in-app only; no external
 integration. Next gate: T025 notice/ack/replay cases; human receipt is T026.
@@ -509,6 +557,28 @@ Evidence: row-map RFP-089 (excluded from final 51-ID mapping); T019 evidence
 vocabulary. Gap: schema preservation ≠ customer migration validation. Next gate:
 T022 pack + authorized customer evidence (out of Tier A runtime).
 
+### RFP-090 App deployment — Demonstrated (T020 gate; FR-021 operator pack)
+Requirement: application package deployment interface for the operator handoff.
+Interface: packaged app + stopped backup/restore/readiness protocol (T023/T024
+boundary); no new infrastructure. Direction: operator consumes package.
+Product/contract/version: existing Linux amd64 target work (T022 declares one
+target or its unavailability); bridge package source known at inspected
+candidate, runtime unobserved. Authority: Muse (operator pack, T024, reassigned
+from Spencer per `delivery/operator-preparation-ownership.md`; Spencer retains
+no current authority) with
+core-supplied protected configuration/application contract (T023); Astra/Main
+Lead 5.0 accountable. Principal: operator roles (pack consumers); coordinator credential vs domain
+credential separation (C-A/C-O). Payload/error/retry/readback: stopped
+backup/restore with recovery manifest + sidecar classification
+(like_for_like/changed_configuration/unverified); six-boolean authenticated
+readiness; missing assets/invalid schema/failed readiness block visibly, never
+quietly re-seed. Mode: source-implemented preparation (T023 done); package
+assembly and runtime pending T024/T025. Responsible: Muse (pack, T024), Terra
+(core contract). Evidence: `contracts/state-recovery-wire.md`;
+`contracts/operator.md`; coverage.csv RFP-090 (T020 gate); row-map RFP-090.
+Gap: portable/human evidence separate (T024/T025/T026). Next gate: T022 target
+declaration → T024 pack → T025 observation; T028 merge.
+
 ### RFP-091 Orchestration deployment — Partial (cross-category: FR-007)
 Requirement: broader orchestration platform / external orchestration
 integrations. Interface: fixed local workflow deployed (same binary); no
@@ -518,6 +588,22 @@ Mode: source-implemented (fixed workflow deployment); orchestration missing.
 Responsible: Terra; Human-int (future). Evidence: row-map RFP-091; coverage.csv
 RFP-091. Gap: fixed workflow ≠ orchestration platform. Next gate: T025; platform
 claim needs selected product + observed integration (out of Tier A).
+
+### RFP-092 Training material — Documentary (T020 gate; FR-021 handoff docs)
+Requirement: user/operator guidance material for recipient handoff. Interface:
+documentary (`DEMO_STORY.md`, `DEMO_RUNBOOK.md`, `STATE_OPERATIONS.md`, final
+procedural handoff); no training delivery interface exists. Product: guidance
+docs known; delivered program **absent**. Authority: Lead (material); Astra
+records true T026 human evidence or a pending disposition — no agent or former
+assignee rehearsal substitutes. Principal:
+operator/recipient readers. Payload/error/retry/readback: n/a (documents);
+substantive guidance supplied, practice/acceptance unobserved. Mode: documentary
+preparation; retained class Documentary preserved, not promoted. Responsible:
+Lead; Astra records true T026 human evidence or pending (no recipient invented
+here). Evidence: row-map RFP-092; coverage.csv
+RFP-092 (T020 gate). Gap: no delivered training program, human practice, or
+recipient acceptance. Next gate: T022 recipient pack → T026 actual human
+evidence or pending disposition.
 
 ### RFP-096 Provider DNS/DHCP — Missing (cross-category scale/integration; FR-007)
 Requirement: provider-scale DNS/DHCP serving + integration + load evidence.
@@ -538,6 +624,36 @@ identifier). Gap: fixed local request supplies no subscriber capability.
 Next gate: official subscriber-system contract + identity mapping + observed
 outcome (out of Tier A; Tier B reassignment is local-only).
 
+### RFP-104 Knowledge transfer — Missing (T020 gate; FR-021 human gate)
+Requirement: accepted recipient knowledge-transfer program with walkthrough/
+practice/acknowledgement. Interface: none yet — T022 will produce
+`recipient-validation.md` + `configuration-example.json`; T026 records actual
+human evidence. Product: no transfer program. Authority: Lead assigns actual
+people; agents prepare, never acknowledge. Principal: actual human recipient
+(unassigned until Lead names). Payload/error/retry/readback: future actual ack
+fields on pinned candidate; agent reproduction is never a substitute. Mode:
+missing (outcome); preparation tasks T022/T026 own the path. Retained class
+Missing preserved. Responsible: Astra/Lead (records true human evidence or
+pending); Muse owns T022 preparation (Spencer's former preparation assignment
+is superseded, retained here as history only). Evidence: row-map RFP-104; coverage.csv RFP-104
+(T020 gate); `delivery/operator-preparation-ownership.md`. Gap: no accepted
+program, walkthrough, practice, or acknowledgement. Next gate: reviewed T020 →
+T022 pack → T026 actual evidence or pending disposition limiting the package claim.
+
+### RFP-106 Dependency disclosure — Documentary (T020 gate; FR-021 pack manifest)
+Requirement: pinned dependency disclosure for the operator package. Interface:
+manifest/lock files consumed by T024 pack (`pyproject.toml`, `uv.lock`,
+`frontend/package.json`, `frontend/package-lock.json`) + S5-01
+`primary/environment-inputs.json`. Product: pinned core manifests known;
+complete transitive/container license disclosure **unverified**. Authority:
+Muse (T024 records actual Compose plugin version, deps/licenses/presenter
+path; reassigned from Spencer, who retains no current authority); Lead adjudicates. Principal: operator/packager. Payload/error/retry/
+readback: manifests pin versions; complete notices remain a T024 deliverable.
+Mode: documentary preparation; retained class Documentary preserved. Responsible:
+Muse (T024). Evidence: row-map RFP-106; coverage.csv RFP-106 (T020 gate).
+Gap: complete transitive/container license disclosure and notices unverified.
+Next gate: T024 dependency/license inventory → T025 exact-candidate check.
+
 ## 4. Detailed contracts (selected only: local HTTP API, C-M assessment, ticket simulator)
 
 ### 4.1 Selected local HTTP API (source-implemented, runtime unobserved)
@@ -549,8 +665,14 @@ outcome (out of Tier A; Tier B reassignment is local-only).
   `{idempotency_key, pool_id, candidate, pool_version, baseline_version,
   owner_reference, service_reference, reason, duration_hours=24 (1..168)}`;
   extend `{idempotency_key, expected_version, expected_pool_version,
-  expected_baseline_version, reason, duration_hours}`; release propose/decide
-  `{expected…, reason, key}` + decision `{action: approve|reject}`; 201 fresh /
+  expected_baseline_version, reason, duration_hours}`; release propose strict
+  `{actor_id?, idempotency_key, expected_version, expected_pool_version,
+  expected_baseline_version, reason}` and release decision strict
+  `{actor_id?, idempotency_key, action: approve|reject, expected_version,
+  expected_pool_version, expected_baseline_version, reason}`
+  (`lifecycle.py:628-639,679-699`; optional `actor_id` must match the trusted
+  principal; no literal `key` alias is accepted — the field is
+  `idempotency_key`); 201 fresh /
   200 replay with `X-Request-Replay`; exact-key recovery `GET /api/
   reservation-operations?idempotency_key=…&action=…` (+`reservation_id` for
   propose). Allocation links `reservation_id` only with `service_reference` +
@@ -606,12 +728,19 @@ outcome (out of Tier A; Tier B reassignment is local-only).
   → 409. Missing route → `routing_blocked` (request still created).
 - **Attempt (manual only):** `reserve_attempt` (ordinal reserved first, consumed
   forever) → `commit_simulator_effect` (durable, distinct) → `observe_attempt`,
-  three separately committed, freshly authorized transactions; body
+  three separately committed, freshly authorized transactions; strict body
   `{expected_version, idempotency_key, synthetic_scenario: success |
-  definitive_failure | committed_response_lost | no_effect_response_lost}`;
+  definitive_failure | committed_response_lost | no_effect_response_lost}`
+  plus optional `actor_id` matching the authenticated principal
+  (`ticket_handoff.py:627-628`);
   scenario + assignment version pinned in attempt digest. 5 s budget = deadline.
-- **Readback/ack/reassign:** readback needs `{expected_version, key, correlation,
-  digest}` → found + actual synthetic ID, definitive-absence, or sanitized
+- **Readback/ack/reassign:** `POST …/readback` accepts only the strict body
+  `{expected_version, idempotency_key, correlation, business_payload_digest}`
+  plus optional `actor_id` which must match the authenticated principal
+  (`ticket_handoff.py:803-805`; `key`/`digest` aliases are rejected by the
+  strict payload allowlist). Readback returns found + actual synthetic ID
+  (found resolves unknown to delivered, attempt row updated), definitive-absence
+  (no-effect/fenced-failure path only), or sanitized
   error; error stays unknown; definitive absence permits retry; uncertain attempt
   fences before failed. Ack pins effect/ticket, explicitly simulated, grants no
   local authority. Reassign: zero-attempt pending/routing_blocked only, current
@@ -628,7 +757,7 @@ outcome (out of Tier A; Tier B reassignment is local-only).
   delivered effects remain. UI label: "Simulated ticketing handoff — ServiceNow
   mapping pending." Provisioning: unsupported/not requested, always separate.
 
-## 5. Omissions disposition (67 rows, no integration clause)
+## 5. Omissions disposition (63 rows, no integration clause and no T020 gate)
 
 Local-application (no external interface; C-A/C-L/C-M local behavior only):
 002 dual-stack records, 003 subnet editing, 004 permissions, 005 activity audit,
@@ -642,16 +771,16 @@ usage, 071 run history, 073 utilization, 074 forecasting, 075 candidate space,
 Deployment/topology (no integration wire; T019/T023–T024 own the boundary):
 008 tenant isolation, 014 single-failure-point, 015 deployment modes, 016
 failover, 017 geography, 018 backup/restore, 019 recovery point, 020 recovery
-time, 021 encryption, 023 hybrid, 024 virtual-network (packaging ≠ inventory),
-090 app deployment, 092 training material (documentary, human gate T026 separate).
+time, 021 encryption, 023 hybrid, 024 virtual-network (packaging ≠ inventory).
 Scale/measurement (no protocol run; T019 §3 values are planning assumptions):
 025 carrier scale, 093 large inventory, 094 millions of records, 097 concurrency.
 Delivery/business (documentary or human-owned; T019/T026 own the gates):
 032 governance, 038 workflow docs, 040 maturity (missing), 079 ownership, 080
 lifecycle process, 083 review cadence, 086 improvement method, 088 migration
 plan, 099 references, 100 telecom refs, 101 large ref, 102 method, 103 staffing,
-104 knowledge transfer (missing; T026 pending), 105 roadmap, 106 dependencies,
+105 roadmap,
 107 support, 108 licensing, 109 SLA, 110 compliance.
+(RFP-090/092/104/106 carry an explicit T020 gate and are dispositioned in §3.)
 
 ## 6. Unknown-vendor-fact register (closed; no guesses)
 
@@ -705,7 +834,10 @@ plan, 099 references, 100 telecom refs, 101 large ref, 102 method, 103 staffing,
   `contracts/notice-recipient-wire.md`, `contracts/state-recovery-wire.md`,
   `spec.md` FR-004/007/009/010/011/012, and current implementation presence via
   `backend/ipam_demo/app.py` (handoff :698–777, reservation :1073–1269, notice
-  :1119–1210, migration :1878–1964), `ticket_handoff.py` (six entry points),
+  :1119–1210, migration :1878–1964, schedule :511–528), `ticket_handoff.py` (six entry points,
+  strict readback/attempt payload allowlists :627/803, handoff DTO
+  `provisioning_status` :419), `models.py` (`TicketHandoffSummary:185`),
+  `workflow.py` (allocation `downstream_status` :450/502/507),
   `lifecycle.py` (notice evaluate/ack/versioned recovery).
 - Consistency notes: all §4 routes/fields exist at the inspected candidate;
   T002's unverified-vendor cells are copied as unverified (T002 stays
@@ -716,21 +848,37 @@ plan, 099 references, 100 telecom refs, 101 large ref, 102 method, 103 staffing,
 - Limits: source-only — every `source-implemented` claim awaits T025 exact-
   candidate observation; every `simulated` claim is local-only; every `missing`
   cell needs its §6 gate before any integration credit.
+- Correction pass (Sol whole-review + Astra, seven grounded blockers) applied
+  over prior T020 commit `4c55eb7101263654fc6803978dce7e670933de70`: (1) added
+  RFP-090/092/104/106 per T020 gate, selection now union Integration ∪ T020-gate
+  (36) + 12 justified cross-category = 48, omissions 63; (2) unknown resolves to
+  delivered on found effect, absence is no-effect/fenced path only; (3) RFP-068
+  rewired to actual coordinator-only GET / always-403 POST / manual run POST;
+  (4) RFP-001/053 gaps state implemented unused release, Tier B reclaim, and
+  unsupported-not-simulated provisioning with old-baseline notes separated;
+  (5) RFP-072 splits historical S5-13 finding ack from new FR006 notices, no
+  equivalence; (6) RFP-047 separates ticket-DTO `provisioning_status` from
+  allocation-column `downstream_status`; (7) §4.3 uses strict readback/attempt
+  field names, aliases rejected. All 44 original row meanings preserved.
 
 READY FOR PROJECT-LEAD REVIEW — Stage T020: T020 integration matrix at inspected
 candidate `b8f294fc19b635dcf3c784125fd804d8a1a2616b` (branch
 `codex/bridge-t020-agent-matrix`), assembly `a2b567b670129671f85498729753c4d577d4768e`.
-Row coverage: 44 included (19 primary-Integration + 25 cross-category; RFP-048/049/050
-share one block, all three covered) with full per-row fields and §4 detailed contracts;
-67 omitted with §5 disposition; 111 total, no invented rows. Modes: local interfaces
-source-implemented where stated (runtime unobserved, T025 pending); only RFP-042's
-ticket leg is simulated-local with its external leg missing; RFP-039 is the
-documentary matrix itself (pending review); all §6 vendor facts unverified.
+Row coverage: 48 included — union of Category=Integration (19) and coverage.csv
+T020 gate (28), i.e. 36 rows, plus 12 justified cross-category rows
+(001/022/033/034/037/053/059/063/069/072/087/089; RFP-048/049/050 share one
+block, all three covered) — with full per-row fields and §4 detailed contracts;
+63 omitted with §5 disposition; 111 total, no invented rows, no promotion
+(RFP-090 Demonstrated / 092 Documentary / 104 Missing / 106 Documentary
+retained). Modes: local interfaces source-implemented where stated (runtime
+unobserved, T025 pending); only RFP-042's ticket leg is simulated-local with
+its external leg missing; RFP-039 is the documentary matrix itself (pending
+review); all §6 vendor facts unverified.
 Gaps: all §6 vendor facts unknown with Human-int gates; runtime (T025), human
 (T026), portable/business (T024/T028) separate. Source-only limits: no tests,
 builds, runtime, or private sources touched; one file leased, no other edits.
 Draft next prompt: "Sol, independently review
 `specs/001-postmeeting-bridge/delivery/integration-matrix.md` at the T020 commit
-against T002/T019/contracts/row-map for completeness (44+67=111), unverified-cell
+against T002/T019/contracts/row-map/coverage.csv for completeness (48+63=111), unverified-cell
 fidelity, and any guessed endpoint/version/auth or simulated-as-live entry; then
 release T021 (Opus) and T022 (Muse) on the reviewed matrix."
