@@ -47,7 +47,7 @@ nothing below invents them:
 | Future hash | Value today |
 |---|---|
 | Exact T025 candidate source | PENDING (T025 prerequisite-gated) |
-| Built image digest | PENDING (T024 packaging, then T025) |
+| Built image digest | PENDING (T025 build of T024 prepared source; T024 source-only cannot provide an observed built image digest) |
 | Built UI asset hash | PENDING |
 | Feed asset hashes at observation time | PENDING (pins above are source pins, not observations) |
 | Enabled reviewed-config revision + digest | PENDING (example in §5 is shape-only, disabled) |
@@ -70,12 +70,16 @@ authorized gate, not to T024; this template records no version.
 | Prior target state | The earlier disposable VM and all dedicated provider resources were destroyed and verified absent; prior evidence stays tied to its exact historical candidate only |
 
 Do not invent a host, recipient or acknowledgement to fill this table. Until an
-actual tracked `current-target-evidence` record exists, the target is
-UNAVAILABLE: that blocks target-specific observed runtime, portable and human
-claims (§9), but it does not block later authorized T024 source/docs
-implementation, which needs no host selection merely to write source. Per the
-user's explicit instruction, work STOPS before T024 and resumes tomorrow; no
-target is selected and no actual observation exists.
+actual tracked `current-target-evidence` record exists, the actual recipient
+Linux amd64 / portable target is UNAVAILABLE: that blocks target-specific
+portability and human observations (§9), but it does not block later
+authorized T024 source/docs implementation, which needs no host selection
+merely to write source, nor does it block technical local T025 on its own
+explicitly pinned disposable synthetic local target once source and permission
+prerequisites complete. Do not conflate that disposable technical target with
+the future human/portable target. Per the user's explicit instruction, work
+STOPS before T024 and resumes tomorrow; neither target has been executed and
+no actual observation exists.
 
 ## 3. Recipient prerequisites (all must hold before any observation)
 
@@ -415,10 +419,10 @@ Agent reproduction of the steps is preparation, not receipt.
 
 | Missing state | Disposition |
 |---|---|
-| Target (§2) UNAVAILABLE/UNSELECTED | Blocks target-specific observed runtime, portable and human claims; does not block later authorized T024 source/docs preparation (currently STOPPED per user instruction until tomorrow); T025 observations additionally need a selected target |
+| Actual recipient Linux amd64 / portable target (§2) UNAVAILABLE/UNSELECTED | Blocks target-specific portability and human observations; does not block later authorized T024 source/docs preparation (currently STOPPED per user instruction until tomorrow), nor technical local T025 on its own explicitly pinned disposable synthetic local target after source/permission prerequisites |
 | Image/UI/feed/config/schema/evidence hashes (§1) PENDING | Blocks exact-candidate claims; source pins are not observations |
 | Six readiness booleans not all true (§4) | Blocks operation claims; failure reasons stay allowlisted |
-| Required technical restore / business-state comparison (§4/§7) absent | Blocks T025 and technical acceptance: the selected-domain comparison of retained candidate/configuration against business-state evidence is a required gate alongside the six booleans |
+| Required technical restore / business-state comparison (§4/§7) absent | Blocks T025 PASSING and technical acceptance: the selected-domain comparison of retained candidate/configuration against business-state evidence is performed and recorded by the authorized T025 observation itself, after source prerequisites complete |
 | Actual human rehearsal / acknowledgement (§8) pending | Limits the human-handoff claim to the technical package only; alone it does not block a technically validated merge (MAIN_MERGE_POLICY.md) |
 | Snapshot sidecar absent/mismatched (§7) | Legacy/data-rescue path only (`unverified`), or refusal before replacement |
 
