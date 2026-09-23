@@ -433,7 +433,8 @@
       "wire_contract": "specs/001-postmeeting-bridge/contracts/workflow-ui-wire.md",
       "review_route": "Codex GPT-6 Sol high independent worker",
       "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git.",
-      "result_sha": "06f9a15080fce5b860d5d5cd58c5de1d41f95432"
+      "result_sha": "06f9a15080fce5b860d5d5cd58c5de1d41f95432",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/88"
     },
     {
       "task": "T017",

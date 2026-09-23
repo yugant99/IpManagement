@@ -141,13 +141,13 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
 - [ ] T021 [US4] Pin offline API to candidate with auth/domain/errors/reviewed versions/replay/raw-versus-projection/simulation examples; reuse authenticated interactive reference. Files: `specs/001-postmeeting-bridge/delivery/offline-api.md`.
 
-  Prerequisites: T009 T014 T017 T020; owner: Grok 4.7 requirements/integration sublead; FR-009 FR-015 FR-019. Completion: Source-accurate examples distinguish illustrative from observed; no secret/vendor invention.
+  Prerequisites: T009 T014 T017A T020; owner: Grok 4.7 requirements/integration sublead; FR-009 FR-015 FR-019. Completion: Source-accurate examples distinguish illustrative from observed; no secret/vendor invention.
 
 - [ ] T022 [P] [US4] Day2 two-hour finish: one recipient prerequisites/config template, migration reconciliation/counts/signoff/cancel boundary, separate operational compensation, actual acknowledgement fields. Files: `specs/001-postmeeting-bridge/delivery/recipient-validation.md`, `specs/001-postmeeting-bridge/delivery/configuration-example.json`.
 
-  Prerequisites: T010 T015 T020; owner: Spencer under Luna coordination; FR-002 FR-014 FR-021. Completion: One Linux amd64 target declared or explicitly unavailable; no fabricated signoff/cutover.
+  Prerequisites: T010 T015 T020 T017A; owner: Spencer under Luna coordination; FR-002 FR-014 FR-021. Completion: One Linux amd64 target declared or explicitly unavailable; no fabricated signoff/cutover.
 
-- [ ] T023 [US4] Integrate schema6 stopped backup/restore/readiness and supply protected configuration/application contract to Spencer; preserve one worker and global evidence coordinator boundary. No implicit migration/reseed; no packaging edits in core. Files: `backend/ipam_demo/state_ops.py`, `backend/ipam_demo/__main__.py`. Preserve historical revision references; record changed-configuration recovery distinctly, apply normal staleness, and require all six C-A readiness booleans plus separate business-state evidence.
+- [ ] T023 [US4] Integrate current schema7 stopped backup/restore/readiness and supply protected configuration/application contract to Spencer; preserve one worker and global evidence coordinator boundary. No implicit migration/reseed; no packaging edits in core. Files: `backend/ipam_demo/state_ops.py`, `backend/ipam_demo/__main__.py`. Preserve historical revision references; record changed-configuration recovery distinctly, apply normal staleness, and require all six C-A readiness booleans plus separate business-state evidence.
 
   Prerequisites: T003 T017A; owner: Terra in Codex; FR-005 FR-016 FR-021. Completion: Supported history survives recognized state operations; code/UI/config/secrets not assumed in snapshots.
 
