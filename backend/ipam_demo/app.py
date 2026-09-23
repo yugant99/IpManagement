@@ -12,11 +12,13 @@ from uuid import UUID, uuid4
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
+from pydantic import ValidationError
 from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import __version__, feed_adapter, inventory, inventory_commands, lifecycle, migration_compare, reconciliation, reports, source_catalog, workflow
+from . import (__version__, feed_adapter, inventory, inventory_commands, lifecycle, migration_compare,
+               reconciliation, reports, source_catalog, ticket_handoff, workflow)
 from . import access
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
@@ -24,7 +26,9 @@ from .models import (Allocation, MigrationAssessmentCreateRequest, MigrationAsse
                      MigrationAssessmentMutation, MigrationAssessmentPage,
                      MigrationAssessmentSignoffRequest, MigrationOperationReadback,
                      Page, Pool, Prefix, PrefixDetail, ReservationDetail, ReservationHistoryEntry,
-                     ReservationOperationReadback, ReservationReleaseRequest, ReservationSummary, Scope)
+                     ReservationOperationReadback, ReservationReleaseRequest, ReservationSummary, Scope,
+                     TicketHandoffDetail, TicketHandoffMutation, TicketHandoffOperationReadback,
+                     TicketHandoffSummary)
 from .scheduler import SyntheticScheduler
 from .store import (SCHEMA_VERSION, connect, data_directory,
                     exclusive_data_access, initialize_schema, require_initialized,
@@ -625,10 +629,16 @@ def create_app() -> FastAPI:
         return JSONResponse(result, headers={"X-Decision-Replay": str(replay).lower()})
 
     @app.get("/api/allocation-requests")
-    def requests(request: Request, limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+    def requests(request: Request, limit: Limit = 50, offset: Offset = 0,
+                 idempotency_key: TextFilter = None, connection=Depends(database)):
         ordinary_domain(request)
         scopes = allowed_scope_ids(connection, request)
         items = [item for item in workflow.list_requests(connection) if item.get("scope_id") in scopes]
+        if idempotency_key is not None:
+            normalized_key = workflow._text(idempotency_key, "idempotency_key", 200)
+            principal_id = request.state.access_context.principal_id
+            items = [item for item in items if item.get("actor_id") == principal_id
+                     and item.get("payload", {}).get("idempotency_key") == normalized_key]
         items = redact_foreign_actors(items, request.state.access_context.principal_id)
         return inventory.page(items, limit, offset)
 
@@ -661,6 +671,301 @@ def create_app() -> FastAPI:
         result, replay = audited_write(request, payload, "allocation_decision", decide, str(object_id))
         result = redact_foreign_actors(result, request.state.access_context.principal_id)
         return JSONResponse(result, headers={"X-Decision-Replay": str(replay).lower()})
+
+    def handoff_scope(connection, request, intent_id):
+        row = connection.execute(
+            "SELECT ti.id,ti.domain,ti.source_request_id,ar.scope_id,s.domain AS scope_domain "
+            "FROM ticket_intents ti JOIN allocation_requests ar ON ar.id=ti.source_request_id "
+            "JOIN scopes s ON s.id=ar.scope_id WHERE ti.id=?", (str(intent_id),)).fetchone()
+        if row is None or row["domain"] != row["scope_domain"]:
+            raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+        require_domain(request, connection, row["scope_id"])
+        return row
+
+    def handoff_mutation(request, payload, action, intent_id, operation):
+        def execute(connection):
+            handoff_scope(connection, request, intent_id)
+            require_local_role(request, "operator")
+            return operation(connection)
+        result, replay = audited_write(request, payload, action, execute, str(intent_id))
+        response = TicketHandoffMutation.model_validate(result).model_dump()
+        return JSONResponse(response, headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.get("/api/handoffs", response_model=Page[TicketHandoffSummary])
+    def list_handoffs(request: Request, source_request_id: UUID | None = None,
+                      limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+        ordinary_domain(request)
+        items = ticket_handoff.list_handoffs(
+            connection, context=request.state.access_context,
+            configuration=request.state.access_configuration,
+            source_request_id=str(source_request_id) if source_request_id else None)
+        safe = [TicketHandoffSummary.model_validate(item).model_dump() for item in items]
+        return inventory.page(safe, limit, offset)
+
+    @app.get("/api/handoffs/{object_id}", response_model=TicketHandoffDetail)
+    def get_handoff(object_id: UUID, request: Request, connection=Depends(database)):
+        ordinary_domain(request)
+        item = ticket_handoff.get_handoff(
+            connection, str(object_id), context=request.state.access_context,
+            configuration=request.state.access_configuration)
+        return TicketHandoffDetail.model_validate(item).model_dump()
+
+    @app.post("/api/handoffs/{object_id}/attempt", status_code=201)
+    def attempt_handoff(object_id: UUID, request: Request, payload: dict):
+        intent_id = str(object_id)
+        reserved, replay = audited_write(request, payload, "ticket.attempt.reserve", lambda connection: (
+            handoff_scope(connection, request, intent_id),
+            require_local_role(request, "operator"),
+            ticket_handoff.reserve_attempt(
+                connection, intent_id, payload, context=request.state.access_context,
+                configuration=request.state.access_configuration))[2])
+        if replay:
+            safe = TicketHandoffMutation.model_validate(reserved).model_dump()
+            return JSONResponse(safe, status_code=200, headers={"X-Request-Replay": "true"})
+
+        attempt_id = reserved["operation"]["attempt"]["id"]
+        phase_payload = {"idempotency_key": payload.get("idempotency_key")}
+        if "actor_id" in payload:
+            phase_payload["actor_id"] = payload["actor_id"]
+
+        try:
+            effected, _ = audited_write(request, phase_payload, "ticket.attempt.effect", lambda connection: (
+                handoff_scope_for_attempt(connection, request, attempt_id),
+                require_local_role(request, "operator"),
+                ticket_handoff.commit_simulator_effect(
+                    connection, attempt_id, phase_payload, context=request.state.access_context,
+                    configuration=request.state.access_configuration))[2])
+            observed, _ = audited_write(request, phase_payload, "ticket.attempt.observe", lambda connection: (
+                handoff_scope_for_attempt(connection, request, attempt_id),
+                require_local_role(request, "operator"),
+                ticket_handoff.observe_attempt(
+                    connection, attempt_id, phase_payload, context=request.state.access_context,
+                    configuration=request.state.access_configuration))[2])
+        except AppError as exc:
+            if exc.status not in (401, 403, 404):
+                exc.details = {**exc.details, "handoff_id": intent_id, "attempt_id": attempt_id,
+                               "readback_required": True,
+                               "recovery_action": f"POST /api/handoffs/{intent_id}/readback"}
+            raise
+        safe = TicketHandoffMutation.model_validate(observed).model_dump()
+        return JSONResponse(safe, status_code=201, headers={"X-Request-Replay": "false"})
+
+    def handoff_scope_for_attempt(connection, request, attempt_id):
+        row = connection.execute("SELECT intent_id FROM ticket_attempts WHERE id=?", (str(attempt_id),)).fetchone()
+        if row is None:
+            raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+        return handoff_scope(connection, request, row["intent_id"])
+
+    @app.post("/api/handoffs/{object_id}/readback")
+    def readback_handoff(object_id: UUID, request: Request, payload: dict):
+        return handoff_mutation(request, payload, "ticket.readback", str(object_id), lambda connection:
+            ticket_handoff.readback_handoff(
+                connection, str(object_id), payload, context=request.state.access_context,
+                configuration=request.state.access_configuration))
+
+    @app.post("/api/handoffs/{object_id}/acknowledge")
+    def acknowledge_handoff(object_id: UUID, request: Request, payload: dict):
+        return handoff_mutation(request, payload, "ticket.acknowledge", str(object_id), lambda connection:
+            ticket_handoff.acknowledge_handoff(
+                connection, str(object_id), payload, context=request.state.access_context,
+                configuration=request.state.access_configuration))
+
+    @app.post("/api/handoffs/{object_id}/reassign")
+    def reassign_handoff(object_id: UUID, request: Request, payload: dict):
+        return handoff_mutation(request, payload, "ticket.reassign", str(object_id), lambda connection:
+            ticket_handoff.reassign_handoff(
+                connection, str(object_id), payload, context=request.state.access_context,
+                configuration=request.state.access_configuration))
+
+    def handoff_receipt_integrity():
+        return AppError("TICKET_HANDOFF_INTEGRITY", "The saved ticket handoff record is inconsistent.", 409)
+
+    def decode_handoff_receipt_result(receipt, expected_keys):
+        try:
+            result = json.loads(receipt["result_json"])
+        except (TypeError, ValueError) as exc:
+            raise handoff_receipt_integrity() from exc
+        if not isinstance(result, dict) or set(result) != set(expected_keys):
+            raise handoff_receipt_integrity()
+        return result
+
+    def validate_handoff_receipt_string(value):
+        if not isinstance(value, str):
+            raise handoff_receipt_integrity()
+        return value
+
+    def validate_handoff_receipt_version(value):
+        if type(value) is not int or value < 1:
+            raise handoff_receipt_integrity()
+        return value
+
+    def handoff_operation_readback(connection, request, idempotency_key, action):
+        ordinary_domain(request)
+        key = workflow._text(idempotency_key, "idempotency_key", 200)
+        context = request.state.access_context
+        receipt = connection.execute(
+            "SELECT * FROM tier_a_operation_receipts WHERE principal_id=? AND domain=? AND action=? "
+            "AND idempotency_key=?", (context.principal_id, context.selected_domain, action, key)).fetchone()
+        if receipt is None:
+            return {"found": False, "action": action, "original_operation": None, "current_handoff": None}
+
+        if action == "ticket.attempt":
+            target_id = receipt["target_id"]
+            if not isinstance(target_id, str):
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+            try:
+                UUID(target_id)
+            except (TypeError, ValueError, AttributeError) as exc:
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404) from exc
+            attempt_row = connection.execute("SELECT * FROM ticket_attempts WHERE id=?", (target_id,)).fetchone()
+            if attempt_row is None:
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+            # Authorize the canonical intent and source request before decoding saved receipt JSON.
+            detail = ticket_handoff.get_handoff(
+                connection, attempt_row["intent_id"], context=context,
+                configuration=request.state.access_configuration)
+            if receipt["target_kind"] != "ticket_attempt":
+                raise handoff_receipt_integrity()
+            try:
+                handoff = TicketHandoffDetail.model_validate(detail).model_dump()
+            except ValidationError as exc:
+                raise handoff_receipt_integrity() from exc
+            saved = decode_handoff_receipt_result(
+                receipt, ("intent_id", "attempt_id", "ordinal", "route_assignment_version", "synthetic_scenario"))
+            validate_handoff_receipt_string(saved["intent_id"])
+            validate_handoff_receipt_string(saved["attempt_id"])
+            validate_handoff_receipt_version(saved["ordinal"])
+            validate_handoff_receipt_version(saved["route_assignment_version"])
+            validate_handoff_receipt_string(saved["synthetic_scenario"])
+            if (saved["intent_id"] != handoff["id"] or saved["attempt_id"] != target_id
+                    or saved["ordinal"] != attempt_row["ordinal"]
+                    or saved["route_assignment_version"] != attempt_row["route_assignment_version"]
+                    or saved["synthetic_scenario"] != attempt_row["synthetic_scenario"]
+                    or attempt_row["intent_id"] != handoff["id"]):
+                raise handoff_receipt_integrity()
+            attempts = {item["id"]: item for item in handoff["attempts"]}
+            current_attempt = attempts.get(target_id)
+            if (current_attempt is None or current_attempt["ordinal"] != saved["ordinal"]
+                    or current_attempt["route_assignment_version"] != saved["route_assignment_version"]
+                    or current_attempt["synthetic_scenario"] != saved["synthetic_scenario"]):
+                raise handoff_receipt_integrity()
+            assignment_versions = {item["assignment_version"] for item in handoff["route_history"]}
+            if saved["route_assignment_version"] not in assignment_versions:
+                raise handoff_receipt_integrity()
+            original_attempt = {**current_attempt, "result": "pending", "reason": None,
+                                "ended_at": None, "observed_ticket_id": None, "observed_effect_id": None}
+            original = {"phase": "reserve", "attempt": original_attempt}
+        else:
+            intent_id = receipt["target_id"]
+            if not isinstance(intent_id, str):
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+            try:
+                UUID(intent_id)
+            except (TypeError, ValueError, AttributeError) as exc:
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404) from exc
+            # Scope and serialize the canonical target before parsing any saved operation result.
+            detail = ticket_handoff.get_handoff(
+                connection, intent_id, context=context,
+                configuration=request.state.access_configuration)
+            if receipt["target_kind"] != "ticket_intent":
+                raise handoff_receipt_integrity()
+            try:
+                handoff = TicketHandoffDetail.model_validate(detail).model_dump()
+            except ValidationError as exc:
+                raise handoff_receipt_integrity() from exc
+            if action == "ticket.reassign":
+                saved = decode_handoff_receipt_result(receipt, ("intent_id", "assignment_version"))
+                validate_handoff_receipt_string(saved["intent_id"])
+                validate_handoff_receipt_version(saved["assignment_version"])
+                if saved["intent_id"] != handoff["id"]:
+                    raise handoff_receipt_integrity()
+                assignment = next((item for item in handoff["route_history"]
+                                   if item["assignment_version"] == saved["assignment_version"]), None)
+                if assignment is None or assignment["assigned_by"] != context.principal_id:
+                    raise handoff_receipt_integrity()
+                original = {"phase": "reassign", "assignment": assignment}
+            else:
+                if action == "ticket.readback":
+                    try:
+                        saved = json.loads(receipt["result_json"])
+                    except (TypeError, ValueError) as exc:
+                        raise handoff_receipt_integrity() from exc
+                    if (not isinstance(saved, dict)
+                            or set(saved) not in ({"intent_id", "event_id", "outcome"},
+                                                 {"intent_id", "event_id", "outcome", "resolution"})):
+                        raise handoff_receipt_integrity()
+                    saved.setdefault("resolution", None)
+                else:
+                    saved = decode_handoff_receipt_result(receipt, ("intent_id", "event_id", "outcome"))
+                validate_handoff_receipt_string(saved["intent_id"])
+                validate_handoff_receipt_string(saved["event_id"])
+                validate_handoff_receipt_string(saved["outcome"])
+                if saved.get("resolution") is not None:
+                    validate_handoff_receipt_string(saved["resolution"])
+                expected_type = "readback" if action == "ticket.readback" else "recipient_acknowledgement"
+                allowed_outcomes = {"found", "definitive_absence", "error"} if action == "ticket.readback" else {"acknowledged"}
+                if saved["intent_id"] != handoff["id"] or saved["outcome"] not in allowed_outcomes:
+                    raise handoff_receipt_integrity()
+                if action == "ticket.readback" and saved["resolution"] not in (
+                        None, "uncertain_attempt_absent", "zero_attempt_source_rejected",
+                        "zero_attempt_reservation_released"):
+                    raise handoff_receipt_integrity()
+                event = connection.execute(
+                    "SELECT * FROM ticket_handoff_events WHERE operation_receipt_id=? AND id=?",
+                    (receipt["id"], saved["event_id"])).fetchone()
+                if event is None:
+                    raise handoff_receipt_integrity()
+                intent = connection.execute("SELECT * FROM ticket_intents WHERE id=?", (handoff["id"],)).fetchone()
+                if (event["intent_id"] != handoff["id"] or event["actor_id"] != context.principal_id
+                        or event["event_type"] != expected_type or event["outcome"] != saved["outcome"]
+                        or event["correlation"] != intent["correlation"]
+                        or event["business_payload_digest"] != intent["business_payload_digest"]
+                        or (action == "ticket.acknowledge" and event["acknowledgement_mode"] != "simulated")
+                        or (action == "ticket.readback" and event["acknowledgement_mode"] is not None)):
+                    raise handoff_receipt_integrity()
+                public_events = {item["id"]: item for item in handoff["events"]}
+                public_event = public_events.get(saved["event_id"])
+                if public_event is None or public_event["resolution"] != saved.get("resolution"):
+                    raise handoff_receipt_integrity()
+                public_attempts = {item["id"]: item for item in handoff["attempts"]}
+                if event["attempt_id"] is None:
+                    if any(event[key] is not None for key in
+                           ("route_assignment_version", "synthetic_scenario", "effect_id", "returned_ticket_id")):
+                        raise handoff_receipt_integrity()
+                else:
+                    linked_attempt = public_attempts.get(event["attempt_id"])
+                    if (linked_attempt is None
+                            or event["route_assignment_version"] != linked_attempt["route_assignment_version"]
+                            or event["synthetic_scenario"] != linked_attempt["synthetic_scenario"]
+                            or (event["effect_id"] is not None
+                                and event["effect_id"] != linked_attempt["observed_effect_id"])
+                            or (event["returned_ticket_id"] is not None
+                                and event["returned_ticket_id"] != linked_attempt["observed_ticket_id"])
+                            or ((event["effect_id"] is None) != (event["returned_ticket_id"] is None))):
+                        raise handoff_receipt_integrity()
+                if (public_event["event_type"] != expected_type or public_event["outcome"] != saved["outcome"]
+                        or public_event["actor_id"] != context.principal_id
+                        or public_event["attempt_id"] != event["attempt_id"]
+                        or public_event["effect_id"] != event["effect_id"]
+                        or public_event["returned_ticket_id"] != event["returned_ticket_id"]):
+                    raise handoff_receipt_integrity()
+                original = {"phase": "readback" if action == "ticket.readback" else "acknowledge",
+                            "event": public_event}
+
+        safe = TicketHandoffOperationReadback.model_validate(
+            {"found": True, "action": action, "original_operation": original,
+             "current_handoff": handoff}).model_dump()
+        return safe
+
+    @app.get("/api/handoff-operations", response_model=TicketHandoffOperationReadback)
+    def recover_handoff_operation(request: Request, idempotency_key: TextFilter = None,
+                                  action: Literal["ticket.attempt", "ticket.reassign",
+                                                  "ticket.readback", "ticket.acknowledge"] = Query(...),
+                                  connection=Depends(database)):
+        if idempotency_key is None:
+            raise AppError("INVALID_INPUT", "idempotency_key must be nonempty text, at most 200 characters.", 422,
+                           {"field": "idempotency_key"})
+        return handoff_operation_readback(connection, request, idempotency_key, action)
 
     RESERVATION_SUMMARY_KEYS = ("id", "scope_id", "prefix_id", "pool_id", "family", "address",
                                 "owner_reference", "service_reference", "reason", "created_at",
