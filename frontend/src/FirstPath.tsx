@@ -100,7 +100,7 @@ function Envelope({ batchId }: { batchId: string }) {
   return <JsonValue value={envelope.data} />;
 }
 
-function ReceiptDetail({ id, scopes, onClose }: { id: string; scopes: Scope[]; onClose: () => void }) {
+function ReceiptDetail({ id, scopes, onClose, onAssess }: { id: string; scopes: Scope[]; onClose: () => void; onAssess?: (batchId: string) => void }) {
   const [revision, setRevision] = useState(0);
   const [showEnvelope, setShowEnvelope] = useState(false);
   const receipt = useApiResource<Receipt>(`/api/imports/${encodeURIComponent(id)}`, revision);
@@ -114,6 +114,10 @@ function ReceiptDetail({ id, scopes, onClose }: { id: string; scopes: Scope[]; o
         {receipt.data.limitations.length > 0 && <ul className="limitation-list">{receipt.data.limitations.map((item, index) => <li key={index}>{item}</li>)}</ul>}
       </section>
       <section className="detail-section"><h3>Declared and effective coverage</h3><CoverageList coverage={receipt.data.coverage} scopes={scopes} /></section>
+      {receipt.data.source_kind === "inventory_staged" && receipt.data.application_status === "staged"
+        && receipt.data.input_rows > 0 && receipt.data.accepted_rows === receipt.data.input_rows
+        && receipt.data.rejected_rows === 0 && receipt.data.duplicate_rows === 0 && onAssess
+        && <section className="detail-section"><h3>Migration comparison</h3><p className="quiet">This receipt is wholly accepted staged intended inventory. Assessing it creates an immutable comparison; it does not activate the candidate.</p><button type="button" className="secondary" onClick={() => onAssess(receipt.data.id)}>Assess this staged receipt</button></section>}
       <ImportRecords batchId={id} />
       <section className="detail-section"><button className="secondary" aria-expanded={showEnvelope} onClick={() => setShowEnvelope(!showEnvelope)}>{showEnvelope ? "Hide" : "Load"} original envelope</button>{showEnvelope && <Envelope batchId={id} />}</section>
     </>}
@@ -233,7 +237,7 @@ function RunResults({ run, scopes }: { run: SavedRun; scopes: Scope[] }) {
   </section>;
 }
 
-export default function FirstPath({ scopes }: { scopes: Scope[] }) {
+export default function FirstPath({ scopes, onAssess }: { scopes: Scope[]; onAssess?: (batchId: string) => void }) {
   const mayImport = hasRole("Operator");
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
@@ -303,7 +307,7 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
       {importError && <><ErrorNotice error={importError} title="No new import receipt confirmed" /><p className="quiet">If the request timed out or lost its connection, it may have been saved. Reload saved imports before retrying; identical replay returns the original receipt.</p></>}
       {importResult && <div className={`notice import-result ${importResult.receipt.application_status}`} role="status"><h3>{importResult.replay ? "Identical replay — original receipt returned" : "Staged candidate saved"}</h3><p><code>{importResult.receipt.source_id}</code> · {importResult.receipt.input_rows} input rows: {importResult.receipt.accepted_rows} accepted, {importResult.receipt.rejected_rows} rejected, {importResult.receipt.duplicate_rows} duplicate.</p><p>{importResult.replay ? "No new ingestion sequence was created." : "No calculation was triggered. The evidence operator manages global reconciliation."}</p>{importError && <p>This is the last confirmed receipt, from before the failed request.</p>}<button className="text-button" onClick={() => setReceiptId(importResult.receipt.id)}>Open this receipt</button></div>}
       <ImportHistory revision={importRevision} selectedId={receiptId} onSelect={setReceiptId} refresh={() => setImportRevision((value) => value + 1)} />
-      {receiptId && <ReceiptDetail key={receiptId} id={receiptId} scopes={scopes} onClose={() => setReceiptId(null)} />}
+      {receiptId && <ReceiptDetail key={receiptId} id={receiptId} scopes={scopes} onClose={() => setReceiptId(null)} onAssess={onAssess} />}
     </section>
     <SourceCatalog scopes={scopes} revision={importRevision} onSelect={setReceiptId} />
     <section className="path-step" aria-labelledby="compute-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">2</span><div><h2 id="compute-heading">Open a saved domain run</h2><p className="quiet">The evidence operator manages global reconciliation. This view reads permitted saved domain projections.</p></div></div>

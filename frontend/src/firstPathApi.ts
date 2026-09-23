@@ -34,6 +34,72 @@ export interface Receipt {
   reconciliation?: { batch_id: string; status: "succeeded" | "busy" | "failed" | "skipped"; run_id?: string; replay: boolean; audit_recorded?: boolean; error?: { code: string; message: string } };
 }
 
+export interface MigrationAssessmentSummary {
+  id: string;
+  source_batch_id: string;
+  source: { id: string; source_id: string; source_run_id: string; source_kind: string; envelope_hash: string; ingested_at: string } | null;
+  canonical_hash: string;
+  domain: string;
+  mapping_revision: string;
+  authority_revision: string;
+  policy_revision: string;
+  baseline_version: number;
+  input_count: number;
+  accepted_count: number;
+  rejected_count: number;
+  duplicate_count: number;
+  added_count: number;
+  changed_count: number;
+  unchanged_count: number;
+  conflicting_count: number;
+  active_only_acknowledged: boolean;
+  active_only_count: number;
+  created_by: string | null;
+  created_by_current_principal: boolean;
+  created_at: string;
+  version: number;
+  state: string;
+  signer_id: string | null;
+  signed_by_current_principal: boolean;
+  signed_at: string | null;
+  signoff_reason: string | null;
+  supersedes_id: string | null;
+  supersedes_reason: string | null;
+  digest: string;
+  current: boolean;
+  staleness_reasons: string[];
+}
+
+export interface MigrationAssessmentDetail extends MigrationAssessmentSummary {
+  rows: { source_record_id: string; matching_key: string; candidate: unknown; active: unknown | null; disposition: "added" | "changed" | "unchanged" | "conflicting"; reason: string }[];
+  active_only: { matching_key: string; active: unknown; reason: string }[];
+}
+
+export interface MigrationAssessmentPage extends Page<MigrationAssessmentSummary> {
+  baseline_version: number;
+}
+
+export interface MigrationSignoffReceipt {
+  assessment_id: string;
+  assessment_digest: string;
+  signer_id: string;
+  signed_at: string;
+  signed_version: number;
+}
+
+export interface MigrationMutationResponse {
+  assessment: MigrationAssessmentSummary;
+  replayed: boolean;
+  original_signoff: MigrationSignoffReceipt | null;
+}
+
+export interface MigrationOperationReadback {
+  found: boolean;
+  action: "assessment.create" | "assessment.signoff";
+  assessment: MigrationAssessmentDetail | null;
+  original_outcome: { assessment_id: string; assessment_digest: string; signer_id?: string; signed_at?: string; signed_version?: number } | null;
+}
+
 export type SelectedBatch = Pick<Receipt, "id" | "source_id" | "source_run_id" | "source_kind" | "coverage">;
 
 export interface SourceCatalogEntry {
@@ -131,4 +197,42 @@ export async function uploadSource(body: string, signal: AbortSignal) {
     onResponse: (response) => { replay = response.headers.get("X-Import-Replay") === "true"; },
   });
   return { receipt, replay };
+}
+
+export function loadMigrationAssessments(offset: number, signal: AbortSignal) {
+  return request<MigrationAssessmentPage>(`/api/migration-assessments?limit=50&offset=${offset}`, signal);
+}
+
+export function loadMigrationAssessment(id: string, signal: AbortSignal) {
+  return request<MigrationAssessmentDetail>(`/api/migration-assessments/${encodeURIComponent(id)}`, signal);
+}
+
+export function createMigrationAssessment(payload: {
+  source_batch_id: string;
+  expected_baseline_version: number;
+  idempotency_key: string;
+  reason: string;
+  supersedes_id?: string;
+  supersedes_reason?: string;
+}, signal: AbortSignal) {
+  return request<MigrationMutationResponse>("/api/migration-assessments", signal, false, {
+    method: "POST", body: JSON.stringify(payload),
+  });
+}
+
+export function signoffMigrationAssessment(id: string, payload: {
+  expected_version: number;
+  expected_digest: string;
+  active_only_acknowledged: boolean;
+  idempotency_key: string;
+  reason: string;
+}, signal: AbortSignal) {
+  return request<MigrationMutationResponse>(`/api/migration-assessments/${encodeURIComponent(id)}/signoff`, signal, false, {
+    method: "POST", body: JSON.stringify(payload),
+  });
+}
+
+export function readMigrationOperation(action: "assessment.create" | "assessment.signoff", key: string, signal: AbortSignal) {
+  const params = new URLSearchParams({ action, idempotency_key: key });
+  return request<MigrationOperationReadback>(`/api/migration-assessments/operation-receipt?${params}`, signal);
 }
