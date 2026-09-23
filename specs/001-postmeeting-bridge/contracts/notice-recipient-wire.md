@@ -70,8 +70,13 @@ than silently discard or guess acknowledgement data.
 
 ## Lifecycle and projections
 
-Keep protected context and current designated pool/scope policy. Notice reads,
-evaluate and acknowledge receive reviewed configuration explicitly as a keyword;
+Keep protected context and current designated pool/scope policy. The exact leaf signatures are list_reservation_notices(connection, *, configuration),
+get_reservation_notice(connection, notice_id, *, configuration),
+evaluate_reservation_notices(connection, *, configuration), and
+acknowledge_reservation_notice(connection, notice_id, payload, *, configuration).
+Add get_reservation_notice_notification(connection, notice_id, notification_version,
+*, configuration) for exact-version recovery. Notice reads, evaluate and acknowledge
+receive reviewed configuration explicitly as a keyword;
 all HTTP call sites pass request.state.access_configuration under existing current
 request/transaction guards. Preserve caller-owned atomic transactions, no connection,
 commit, server, scheduler or external delivery service in the leaf.

@@ -463,7 +463,7 @@
     },
     {
       "task": "T016A",
-      "status": "source_implementation_dispatched",
+      "status": "source_review_pending_with_known_blocker",
       "base_sha": "b24e50728c9dcd071a4f69534e9110c6d3e58348",
       "branch": "codex/bridge-t016a-recipient-foundation",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016a-muse/Ip_inventory",
@@ -480,7 +480,9 @@
       ],
       "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
       "review_route": "Independent Codex GPT-6 Sol high",
-      "prohibited": "No frozen schema6 edit, unleased source, tests/build/typecheck/import/DB/runtime/shell/network/private or untracked content, extra agents/models/spend. Lead publishes."
+      "prohibited": "No frozen schema6 edit, unleased source, tests/build/typecheck/import/DB/runtime/shell/network/private or untracked content, extra agents/models/spend. Lead publishes.",
+      "result_sha": "de7bdd25a5a970ae08266c17f3f917833da67dd6",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/89"
     }
   ],
   "muse_route": {
