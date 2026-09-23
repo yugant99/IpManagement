@@ -190,6 +190,77 @@ def _receipt_event(connection, receipt, intent_id):
     return row
 
 
+def _strict_version(value):
+    return type(value) is int and value >= 1
+
+
+def recover_reassignment(connection, receipt, *, context, configuration):
+    """Sanitized canonical assignment created by one own ticket.reassign receipt.
+
+    Shared by POST replay and read-only recovery. Only the receipt's single exact
+    succeeded audit anchor links it to an assignment; saved result data is checked,
+    never trusted. Older unanchored receipts fail closed; no chronology guessing.
+    """
+    _authorize(context, configuration, "viewer", mutation=True)
+    if (receipt is None or receipt["principal_id"] != context.principal_id
+            or receipt["domain"] != context.selected_domain or receipt["action"] != "ticket.reassign"
+            or not isinstance(receipt["target_id"], str)):
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    intent = _intent(connection, receipt["target_id"], context)
+    if receipt["target_kind"] != "ticket_intent" or not isinstance(receipt["idempotency_key"], str):
+        raise _integrity()
+    try:
+        result = json.loads(receipt["result_json"])
+    except (TypeError, ValueError) as exc:
+        raise _integrity() from exc
+    # Validate types before any SQL parameter, hash or arithmetic use.
+    if (not isinstance(result, dict) or set(result) != {"intent_id", "assignment_version"}
+            or result["intent_id"] != intent["id"] or not _strict_version(result["assignment_version"])
+            or result["assignment_version"] < 2):
+        raise _integrity()
+    version = result["assignment_version"]
+    assignment = _assignment(connection, intent["id"], version)
+    previous = _assignment(connection, intent["id"], version - 1)
+    anchors = []
+    for row in connection.execute("SELECT * FROM audit_events WHERE action='ticket.reassign' AND outcome='succeeded'"):
+        try:
+            details = json.loads(row["details_json"])
+        except (TypeError, ValueError):
+            continue
+        if isinstance(details, dict) and details.get("operation_receipt_id") == receipt["id"]:
+            anchors.append((row, details))
+    if len(anchors) != 1:
+        raise _integrity()
+    row, details = anchors[0]
+    before, after = details.get("before"), details.get("after")
+    if (not isinstance(before, dict) or not isinstance(after, dict) or not _strict_version(before.get("version"))
+            or before.get("state") not in ("pending", "routing_blocked")):
+        raise _integrity()
+    # Exact type equality keeps bool from matching int and None from matching text.
+    pairs = ((row["subject_id"], intent["id"]), (row["request_id"], intent["source_request_id"]),
+             (row["scope_id"], intent["scope_id"]), (row["pool_id"], intent["pool_id"]),
+             (row["actor_id"], receipt["principal_id"]), (assignment["assigned_by"], receipt["principal_id"]),
+             (row["reason"], assignment["reason"]), (details.get("intent_id"), intent["id"]),
+             (details.get("correlation"), intent["correlation"]),
+             (details.get("business_payload_digest"), intent["business_payload_digest"]),
+             (details.get("mode"), "simulated"),
+             (before.get("route_assignment_version"), previous["assignment_version"]),
+             (before.get("route_revision"), previous["route_revision"]), (before.get("team"), previous["team"]),
+             (after.get("state"), "pending"), (after.get("version"), before["version"] + 1),
+             (after.get("route_assignment_version"), version),
+             (after.get("configuration_revision"), assignment["configuration_revision"]),
+             (after.get("route_revision"), assignment["route_revision"]), (after.get("team"), assignment["team"]),
+             (after.get("assigned_at"), assignment["assigned_at"]))
+    if any(type(saved) is not type(canonical) or saved != canonical for saved, canonical in pairs):
+        raise _integrity()
+    original = workflow._hash({"principal_id": receipt["principal_id"], "intent_id": intent["id"],
+                               "expected_version": before["version"], "idempotency_key": receipt["idempotency_key"],
+                               "reason": assignment["reason"]})
+    if receipt["request_digest"] != original:
+        raise _integrity()
+    return _assignment_projection(assignment, context.principal_id)
+
+
 def _require_attempt_receipt(connection, context, key, attempt_id):
     """Effect and observation share the reserving principal's ticket.attempt receipt identity."""
     row = _receipt(connection, context, "ticket.attempt", key)
@@ -501,15 +572,12 @@ def reassign_handoff(connection, intent_id, payload, *, context, configuration):
     digest = workflow._hash(normalized)
     receipt = _receipt(connection, context, "ticket.reassign", normalized["idempotency_key"])
     if receipt is not None:
-        original = _replayed_intent(connection, receipt, context, digest)
-        try:
-            version = json.loads(receipt["result_json"])["assignment_version"]
-        except (TypeError, ValueError, KeyError) as exc:
-            raise _integrity() from exc
-        assignment = _assignment(connection, original["id"], version)
-        return _result(connection, context, configuration, original["id"],
-                       {"phase": "reassign",
-                        "assignment": _assignment_projection(assignment, context.principal_id)}), True
+        # Authorizes the original target and proves its exact assignment before any conflict disclosure.
+        assignment = recover_reassignment(connection, receipt, context=context, configuration=configuration)
+        if receipt["request_digest"] != digest:
+            raise _conflict()
+        return _result(connection, context, configuration, receipt["target_id"],
+                       {"phase": "reassign", "assignment": assignment}), True
     if intent["version"] != normalized["expected_version"]:
         raise _stale()
     if intent["state"] not in ("pending", "routing_blocked") or _attempts(connection, object_id):
@@ -533,14 +601,18 @@ def reassign_handoff(connection, intent_id, payload, *, context, configuration):
         (version, object_id, intent["version"], intent["current_route_assignment_version"]))
     if changed.rowcount != 1:
         raise _stale()
+    receipt_id = _save_receipt(connection, context, "ticket.reassign", normalized["idempotency_key"], digest,
+                               "ticket_intent", object_id, {"intent_id": object_id, "assignment_version": version})
+    # The assignment row has no receipt column; this succeeded audit is the canonical
+    # link from the exact receipt to the exact assignment it created.
     _audit(connection, context, intent, "ticket.reassign", normalized["reason"],
-           {"before": {"state": intent["state"], "route_assignment_version": current["assignment_version"],
+           {"operation_receipt_id": receipt_id,
+            "before": {"state": intent["state"], "version": intent["version"],
+                       "route_assignment_version": current["assignment_version"],
                        "route_revision": current["route_revision"], "team": current["team"]},
-            "after": {"state": "pending", "route_assignment_version": version,
+            "after": {"state": "pending", "version": intent["version"] + 1, "route_assignment_version": version,
                       "configuration_revision": str(configuration.revision),
-                      "route_revision": route.revision, "team": route.team}})
-    _save_receipt(connection, context, "ticket.reassign", normalized["idempotency_key"], digest, "ticket_intent",
-                  object_id, {"intent_id": object_id, "assignment_version": version})
+                      "route_revision": route.revision, "team": route.team, "assigned_at": now}})
     assignment = _assignment(connection, object_id, version)
     return _result(connection, context, configuration, object_id,
                    {"phase": "reassign", "assignment": _assignment_projection(assignment, context.principal_id)}), False
