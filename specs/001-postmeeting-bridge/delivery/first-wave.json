@@ -316,6 +316,48 @@
       ],
       "acceptance": "Exact designated local IPv4 hold, extension, atomic matching conversion and independent unused release with retained history and current authorization; no double hold or implicit expiry reclaim.",
       "prohibited": "Unleased paths; tests/build/import/runtime/DB/config; Claude/Fable/Opus/OpenCode or other model calls; nested agents; T012/T013/further implementation; main merge or self-acceptance."
+    },
+    {
+      "task": "T012",
+      "status": "source_implementation_dispatched",
+      "base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
+      "branch": "codex/bridge-t012-reservation-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t012-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f332f5dceffef5rsc94kEc2YA3",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/reservation-ticket-wire.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prerequisites": [
+        "T011 source acceptance",
+        "Shared wire freeze and source-base pin",
+        "Exact route and usage preflight"
+      ],
+      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes."
+    },
+    {
+      "task": "T013",
+      "status": "source_implementation_dispatched",
+      "base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
+      "branch": "codex/bridge-t013-ticket-core",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t013-opus/Ip_inventory",
+      "route": "Claude Code claude-opus-5-5 high",
+      "provider_session_id": "98b4bcd2-0c2a-4315-9c14-3d7e372cb911",
+      "owned_paths": [
+        "backend/ipam_demo/ticket_handoff.py",
+        "backend/ipam_demo/workflow.py"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/reservation-ticket-wire.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prerequisites": [
+        "T011 source acceptance",
+        "Shared wire freeze and source-base pin",
+        "Exact route and usage preflight"
+      ],
+      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes."
     }
   ],
   "muse_route": {
@@ -341,13 +383,14 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "receiver_registered_shared_wire_freeze_in_progress",
+    "status": "takeover_complete_T012_T013_dispatched",
     "action": "Use docs/handoffs/main-lead-5.0.md; receiver registers its actual task ID when started by user",
-    "hold": "T012/T013 dispatch requires frozen shared wire and pinned common base; route/usage preflight completed.",
+    "hold": "T014 waits for both complete exact-SHA source reviews and integration; T025 prerequisite gate unchanged.",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "ab370a4273784bd750bf5f59289594a31d097739",
     "publication_branch": "codex/bridge-t011-handover",
-    "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837"
+    "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
+    "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7"
   },
   "lead_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837"
 }

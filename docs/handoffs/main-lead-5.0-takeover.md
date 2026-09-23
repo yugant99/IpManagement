@@ -26,3 +26,9 @@ Claude Code existing auth is claude.ai/firstParty/Max. Refreshed usage page: ses
 ## Data and evidence boundary
 
 Workers receive isolated tracked-source worktrees only. No private attachments, assessment/, audit/, outputs/, credentials, user stores, home configuration or other workspace reads. Muse consent covers only this public synthetic repository. Restrict worker tools to source reads and leased-file edits; lead handles Git publication. No tests, builds, imports, typechecks, database creation, servers, browser app checks or routine runtime work before T025. Preserve the20% reserve, Spencer's separate tasks and all three111-row ledgers; Tier B remains locked. No deployment, infrastructure, customer access or portable/human acceptance follows.
+
+## Dispatch checkpoint
+
+Shared frozen source base `b557137279f09abb6979618d6eea7ca24fc27ef7`; accepted feature lineage was confirmed as ancestors by Git. T012 and T013 are dispatched in their isolated worktrees on that base. Sol independently reviewed the freeze and closed the two compatibility decisions; attempt phases must share ticket.attempt identity rather than invent schema receipt actions. Exact provider session IDs and leases are in first-wave.json.
+
+The initial Muse session was blocked by a lead-authored permission pattern using absolute internal paths. It made no edits. The corrected session allowlists exact tracked relative paths for read and the two leased relative paths for edit, following OpenCode V2 permission semantics; shell/external directories remain denied. This was a tool-permission correction, not a provider/privacy failure or model substitution. Claude init metadata confirms claude-opus-5-5, dontAsk mode and only Read/Glob/Grep/Edit/Write tools. Logs remain outside the repository and are not model inputs. Runtime remains unverified.
