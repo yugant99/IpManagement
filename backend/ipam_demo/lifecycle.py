@@ -48,12 +48,12 @@ def _notice_context():
 
 
 def _notice_resource(connection, notice_id):
-    context = _notice_context()
+    context, pool, _, _ = workflow._selected_static_pool(connection)
     row = connection.execute(
         "SELECT n.*,r.scope_id,r.pool_id,r.address,s.domain FROM reservation_notices n "
         "JOIN reservations r ON r.id=n.reservation_id JOIN scopes s ON s.id=r.scope_id WHERE n.id=?",
         (notice_id,)).fetchone()
-    if row is None or row["pool_id"] != workflow.STATIC_POOL_ID:
+    if row is None or row["pool_id"] != pool["id"] or row["scope_id"] != pool["scope_id"]:
         raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
     if row["domain"] != context.selected_domain:
         raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
@@ -61,48 +61,159 @@ def _notice_resource(connection, notice_id):
     return row
 
 
-def _notice_payload(row):
-    context = _notice_context()
+def _notice_recipient(configuration, notice, *, now=None):
+    return workflow.access.resolve_notice_recipient(configuration, notice["domain"], notice["scope_id"], now=now)
+
+
+def _notification_row(connection, notice_id, notification_version):
+    return connection.execute(
+        "SELECT * FROM reservation_notice_notifications WHERE notice_id=? AND notification_version=?",
+        (notice_id, notification_version)).fetchone()
+
+
+def _notification_payload(row, *, current_principal, current_route):
+    if row is None:
+        return None
+    acknowledged = (row["acknowledged_by"] is not None and row["acknowledged_at"] is not None
+                    and row["acknowledgement_reason"] is not None)
+    own_binding = current_principal in (row["recipient_id"], row["acknowledged_by"])
+    if row["routing_status"] == "legacy_unbound":
+        delivery_status = "legacy_unbound"
+        acknowledgement_kind = "legacy_operator" if acknowledged else None
+    elif row["routing_status"] == "unassigned":
+        delivery_status, acknowledgement_kind = "unassigned", None
+    elif row["routing_status"] == "unroutable":
+        delivery_status, acknowledgement_kind = "recipient_unavailable", None
+    elif acknowledged:
+        delivery_status, acknowledgement_kind = "acknowledged", "recipient_in_app"
+    elif (current_route["routing_status"] != "assigned"
+          or current_route["recipient_id"] != row["recipient_id"]):
+        delivery_status, acknowledgement_kind = "recipient_unavailable", None
+    else:
+        delivery_status, acknowledgement_kind = "awaiting_receipt", None
+    in_app_receipt = (row["routing_status"] == "assigned" and acknowledged
+                      and row["acknowledged_by"] == row["recipient_id"])
+    current_recipient = (row["routing_status"] == "assigned" and current_route["routing_status"] == "assigned"
+                         and row["recipient_id"] is not None
+                         and row["recipient_id"] == current_route["recipient_id"] == current_principal)
     return {
-        "id": row["id"],
-        "reservation_id": row["reservation_id"],
-        "episode_number": row["episode_number"],
-        "policy_revision": row["policy_revision"],
-        "first_due_at": row["first_due_at"],
-        "alert_level": row["alert_level"],
-        "owner_reference": row["owner_reference"],
-        "state": row["state"],
-        "acknowledgement_version": row["acknowledgement_version"],
+        "notice_id": row["notice_id"],
         "notification_version": row["notification_version"],
+        "recipient_id": row["recipient_id"] if own_binding else None,
+        "configuration_revision": row["configuration_revision"],
+        "configuration_digest": row["configuration_digest"],
+        "routing_status": row["routing_status"],
+        "routing_reason": row["routing_reason"],
+        "issued_at": row["issued_at"],
+        "acknowledged_by": row["acknowledged_by"] if own_binding else None,
         "acknowledged_at": row["acknowledged_at"],
-        "acknowledged_by": row["acknowledged_by"] if row["acknowledged_by"] == context.principal_id else None,
-        "acknowledgement_reason": row["acknowledgement_reason"] if row["acknowledged_by"] == context.principal_id else None,
-        "acknowledgement_current": (row["state"] == "acknowledged" and row["acknowledged_at"] is not None
-                                    and row["acknowledgement_version"] == row["notification_version"]),
-        "acknowledgement_kind": "operator_acknowledgement",
+        "acknowledgement_reason": row["acknowledgement_reason"] if own_binding else None,
+        "delivery_status": delivery_status,
+        "is_current_recipient": current_recipient,
+        "acknowledgement_kind": acknowledgement_kind,
         "owner_signoff": False,
-        "resolved_at": row["resolved_at"],
-        "resolution_reason": row["resolution_reason"],
+        "in_app_receipt": in_app_receipt,
+    }
+
+
+def _notice_payload(connection, notice, configuration):
+    context = _notice_context()
+    route = _notice_recipient(configuration, notice, now=_now())
+    history_rows = connection.execute(
+        "SELECT * FROM reservation_notice_notifications WHERE notice_id=? ORDER BY notification_version",
+        (notice["id"],)).fetchall()
+    history = [_notification_payload(row, current_principal=context.principal_id, current_route=route)
+               for row in history_rows]
+    current_row = next((row for row in history_rows if row["notification_version"] == notice["notification_version"]), None)
+    current_notification = _notification_payload(
+        current_row, current_principal=context.principal_id, current_route=route)
+    actual_versions = [row["notification_version"] for row in history_rows]
+    complete_versions = list(range(1, notice["notification_version"] + 1))
+    if not history_rows or current_notification is None:
+        history_coverage = "missing_child"
+    elif any(row["routing_status"] == "legacy_unbound" for row in history_rows):
+        history_coverage = "partial_legacy"
+    elif actual_versions != complete_versions:
+        history_coverage = "partial"
+    else:
+        history_coverage = "complete"
+    return {
+        "id": notice["id"],
+        "reservation_id": notice["reservation_id"],
+        "episode_number": notice["episode_number"],
+        "policy_revision": notice["policy_revision"],
+        "first_due_at": notice["first_due_at"],
+        "alert_level": notice["alert_level"],
+        "owner_reference": notice["owner_reference"],
+        "state": notice["state"],
+        "acknowledgement_version": notice["acknowledgement_version"],
+        "notification_version": notice["notification_version"],
+        "acknowledged_at": notice["acknowledged_at"],
+        "acknowledged_by": notice["acknowledged_by"] if notice["acknowledged_by"] == context.principal_id else None,
+        "acknowledgement_reason": notice["acknowledgement_reason"] if notice["acknowledged_by"] == context.principal_id else None,
+        "acknowledgement_current": (current_notification is not None
+                                    and notice["state"] == "acknowledged"
+                                    and current_notification["acknowledgement_kind"] == "recipient_in_app"
+                                    and current_notification["delivery_status"] == "acknowledged"),
+        "current_notification": current_notification,
+        "notification_history": history,
+        "notification_history_coverage": history_coverage,
+        "delivery_status": current_notification["delivery_status"] if current_notification else None,
+        "is_current_recipient": current_notification["is_current_recipient"] if current_notification else False,
+        "acknowledgement_kind": current_notification["acknowledgement_kind"] if current_notification else None,
+        "owner_signoff": False,
+        "in_app_receipt": current_notification["in_app_receipt"] if current_notification else False,
+        "resolved_at": notice["resolved_at"],
+        "resolution_reason": notice["resolution_reason"],
         "synthetic": True,
     }
 
 
-def list_reservation_notices(connection):
-    context = _notice_context()
-    return [_notice_payload(row) for row in connection.execute(
-        "SELECT n.* FROM reservation_notices n JOIN reservations r ON r.id=n.reservation_id "
-        "JOIN scopes s ON s.id=r.scope_id WHERE r.pool_id=? AND s.domain=? "
+def list_reservation_notices(connection, *, configuration):
+    context, pool, _, _ = workflow._selected_static_pool(connection)
+    return [_notice_payload(connection, row, configuration) for row in connection.execute(
+        "SELECT n.*,r.scope_id,r.pool_id,r.address,s.domain FROM reservation_notices n "
+        "JOIN reservations r ON r.id=n.reservation_id JOIN scopes s ON s.id=r.scope_id "
+        "WHERE r.pool_id=? AND r.scope_id=? AND s.domain=? "
         "ORDER BY n.first_due_at DESC,n.reservation_id,n.episode_number DESC",
-        (workflow.STATIC_POOL_ID, context.selected_domain))]
+        (pool["id"], pool["scope_id"], context.selected_domain))]
 
 
-def get_reservation_notice(connection, notice_id):
+def get_reservation_notice(connection, notice_id, *, configuration):
     row = _notice_resource(connection, _uuid(notice_id))
-    return _notice_payload(row)
+    return _notice_payload(connection, row, configuration)
 
 
-def evaluate_reservation_notices(connection):
-    """Create due episodes and raise due alerts to alarms using protected server UTC."""
+def get_reservation_notice_notification(connection, notice_id, notification_version, *, configuration):
+    notice_id = _uuid(notice_id)
+    notice = _notice_resource(connection, notice_id)
+    version = _version(notification_version, "notification_version")
+    notification = _notification_row(connection, notice_id, version)
+    if notification is None:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    context = _notice_context()
+    route = _notice_recipient(configuration, notice, now=_now())
+    result = _notification_payload(notification, current_principal=context.principal_id, current_route=route)
+    result["reservation_id"] = notice["reservation_id"]
+    result["episode_number"] = notice["episode_number"]
+    return result
+
+
+def _insert_notice_notification(connection, notice, notification_version, route, issued_at):
+    connection.execute(
+        "INSERT INTO reservation_notice_notifications(notice_id,notification_version,recipient_id,"
+        "configuration_revision,configuration_digest,routing_status,routing_reason,issued_at) "
+        "VALUES (?,?,?,?,?,?,?,?)",
+        (notice["id"], notification_version, route["recipient_id"], route["configuration_revision"],
+         route["configuration_digest"], route["routing_status"], route["routing_reason"], issued_at))
+
+
+def _routing_identity(notification):
+    return (notification["recipient_id"], notification["routing_status"], notification["routing_reason"])
+
+
+def evaluate_reservation_notices(connection, *, configuration):
+    """Create due notice episodes or bind a new recipient version using server UTC."""
     context, pool, _, _ = workflow._selected_static_pool(connection)
     actor = workflow.require_actor(context.principal_id, "inventory_edit")
     now = _now()
@@ -111,7 +222,7 @@ def evaluate_reservation_notices(connection):
     reservations = connection.execute(
         "SELECT * FROM reservations WHERE pool_id=? AND scope_id=? AND family=4 AND state='reserved' "
         "ORDER BY id", (pool["id"], pool["scope_id"])).fetchall()
-    created = upgraded = 0
+    created = renewed = upgraded = 0
     for reservation in reservations:
         try:
             expires = datetime.fromisoformat(reservation["expires_at"].replace("Z", "+00:00"))
@@ -123,6 +234,8 @@ def evaluate_reservation_notices(connection):
         if instant < expires:
             continue
         level = "alarm" if instant >= expires + timedelta(hours=24) else "alert"
+        route = workflow.access.resolve_notice_recipient(configuration, context.selected_domain,
+                                                         pool["scope_id"], now=now)
         active = connection.execute(
             "SELECT * FROM reservation_notices WHERE reservation_id=? AND state IN ('open','acknowledged') "
             "ORDER BY episode_number DESC LIMIT 1", (reservation["id"],)).fetchone()
@@ -137,38 +250,62 @@ def evaluate_reservation_notices(connection):
                 "VALUES (?,?,?,?,?,?,?,'open',1,1)",
                 (notice_id, reservation["id"], episode, reservation["policy_revision"], reservation["expires_at"],
                  level, reservation["owner_reference"]))
+            notice = connection.execute("SELECT * FROM reservation_notices WHERE id=?", (notice_id,)).fetchone()
+            _insert_notice_notification(connection, notice, 1, route, now_stamp)
             workflow.audit_event(
                 connection, actor_id=actor["id"], action="reservation.notice.created", outcome="succeeded",
                 reason="Reservation reached its UTC expiry and remains held for review.", subject_id=notice_id,
                 scope_id=reservation["scope_id"], pool_id=reservation["pool_id"], address=reservation["address"],
                 details={"reservation_id": reservation["id"], "episode_number": episode,
                          "first_due_at": reservation["expires_at"], "alert_level": level,
-                         "notification_version": 1, "owner_reference": reservation["owner_reference"]})
+                         "notification_version": 1, "routing_status": route["routing_status"],
+                         "routing_reason": route["routing_reason"],
+                         "configuration_revision": route["configuration_revision"],
+                         "configuration_digest": route["configuration_digest"]})
             created += 1
             continue
-        if level == "alarm" and active["alert_level"] == "alert":
-            changed = connection.execute(
-                "UPDATE reservation_notices SET alert_level='alarm',state='open',notification_version=notification_version+1 "
-                "WHERE id=? AND state IN ('open','acknowledged') AND alert_level='alert'",
-                (active["id"],))
-            if changed.rowcount == 1:
-                workflow.audit_event(
-                    connection, actor_id=actor["id"], action="reservation.notice.alarm", outcome="succeeded",
-                    reason="The reservation remained held 24 hours after expiry; the alarm needs current acknowledgement.",
-                    subject_id=active["id"], scope_id=reservation["scope_id"], pool_id=reservation["pool_id"],
-                    address=reservation["address"],
-                    details={"reservation_id": reservation["id"], "episode_number": active["episode_number"],
-                             "previous_notification_version": active["notification_version"],
-                             "notification_version": active["notification_version"] + 1,
-                             "alert_level": "alarm", "prior_acknowledgement_retained": bool(active["acknowledged_at"])})
-                upgraded += 1
-    notices = list_reservation_notices(connection)
-    result = {"evaluated_at": now_stamp, "created_count": created, "alarm_upgrade_count": upgraded,
-              "notices": notices, "synthetic": True}
+        current = _notification_row(connection, active["id"], active["notification_version"])
+        needs_alarm = level == "alarm" and active["alert_level"] == "alert"
+        missing_binding = current is None
+        legacy_binding = current is not None and current["routing_status"] == "legacy_unbound"
+        route_changed = current is not None and not legacy_binding and _routing_identity(current) != (
+            route["recipient_id"], route["routing_status"], route["routing_reason"])
+        if not (needs_alarm or missing_binding or legacy_binding or route_changed):
+            continue
+        previous_version = active["notification_version"]
+        next_version = previous_version + 1
+        next_level = "alarm" if needs_alarm else active["alert_level"]
+        _insert_notice_notification(connection, active, next_version, route, now_stamp)
+        changed = connection.execute(
+            "UPDATE reservation_notices SET notification_version=?,alert_level=?,state='open' "
+            "WHERE id=? AND notification_version=? AND state IN ('open','acknowledged')",
+            (next_version, next_level, active["id"], previous_version))
+        if changed.rowcount != 1:
+            raise AppError("STALE_NOTICE", "The reservation notice changed during evaluation.", 409)
+        old_status = current["routing_status"] if current is not None else "missing_child"
+        old_reason = current["routing_reason"] if current is not None else "missing_child"
+        workflow.audit_event(
+            connection, actor_id=actor["id"], action="reservation.notice.notification_bound", outcome="succeeded",
+            reason="The due notice received a new version for an alarm, recipient change, or binding renewal.",
+            subject_id=active["id"], scope_id=reservation["scope_id"], pool_id=reservation["pool_id"],
+            address=reservation["address"],
+            details={"reservation_id": reservation["id"], "episode_number": active["episode_number"],
+                     "previous_notification_version": previous_version, "notification_version": next_version,
+                     "previous_routing_status": old_status, "routing_status": route["routing_status"],
+                     "previous_routing_reason": old_reason, "routing_reason": route["routing_reason"],
+                     "configuration_revision": route["configuration_revision"],
+                     "configuration_digest": route["configuration_digest"],
+                     "alarm_upgrade": needs_alarm, "legacy_renewal": legacy_binding,
+                     "missing_child_renewal": missing_binding})
+        renewed += 1
+        upgraded += int(needs_alarm)
+    notices = list_reservation_notices(connection, configuration=configuration)
+    result = {"evaluated_at": now_stamp, "created_count": created, "renewed_count": renewed,
+              "alarm_upgrade_count": upgraded, "notices": notices, "synthetic": True}
     return result, False
 
 
-def acknowledge_reservation_notice(connection, notice_id, payload):
+def acknowledge_reservation_notice(connection, notice_id, payload, *, configuration):
     object_id = _uuid(notice_id)
     current = _notice_resource(connection, object_id)
     context = _context()
@@ -176,9 +313,18 @@ def acknowledge_reservation_notice(connection, notice_id, payload):
     if actor_id is None:
         actor_id = context.principal_id
     actor = workflow.require_actor(actor_id, "inventory_edit")
-    _, pool, _, _ = workflow._selected_static_pool(connection)
-    if pool["id"] != current["pool_id"] or pool["scope_id"] != current["scope_id"]:
-        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    route = _notice_recipient(configuration, current, now=_now())
+    bound = _notification_row(connection, object_id, current["notification_version"])
+    if bound is None:
+        raise AppError("NOTICE_BINDING_MISSING", "Evaluate the notice before acknowledging its recipient receipt.", 409)
+    is_bound_recipient = bound["routing_status"] == "assigned" and bound["recipient_id"] == actor["id"]
+    is_current_recipient = route["routing_status"] == "assigned" and route["recipient_id"] == actor["id"]
+    if not is_bound_recipient:
+        if is_current_recipient:
+            raise AppError("NOTICE_ROUTE_CHANGED", "Evaluate the notice to bind the current recipient before acknowledgement.", 409)
+        raise AppError("FORBIDDEN", "Only the bound notice recipient may acknowledge this version.", 403)
+    if not is_current_recipient:
+        raise AppError("NOTICE_ROUTE_CHANGED", "Evaluate the notice to bind the current recipient before acknowledgement.", 409)
     workflow._payload(payload, {"actor_id", "expected_notification_version", "reason"})
     expected = _version(payload.get("expected_notification_version"), "expected_notification_version")
     reason = _text(payload.get("reason"), "reason", 2000)
@@ -186,29 +332,39 @@ def acknowledge_reservation_notice(connection, notice_id, payload):
         raise AppError("NOTICE_RESOLVED", "A resolved reservation notice cannot be acknowledged.", 409)
     if current["notification_version"] != expected:
         raise AppError("STALE_NOTICE", "The reservation notice changed; refresh before acknowledging.", 409)
-    if (current["state"] == "acknowledged"
-            and current["acknowledgement_version"] == expected
-            and current["acknowledged_by"] == actor["id"]
-            and current["acknowledgement_reason"] == reason):
-        return _notice_payload(current), True
-    if (current["state"] == "acknowledged"
-            and current["acknowledgement_version"] == expected):
-        raise AppError("NOTICE_ALREADY_ACKNOWLEDGED", "This notice version already has an immutable acknowledgement.", 409)
+    if current["state"] not in ("open", "acknowledged"):
+        raise AppError("NOTICE_INELIGIBLE", "This notice is not eligible for acknowledgement.", 409)
+    if bound["acknowledged_by"] is not None:
+        if (bound["acknowledged_by"] == actor["id"]
+                and bound["acknowledgement_reason"] == reason):
+            return _notice_payload(connection, current, configuration), True
+        raise AppError("NOTICE_ALREADY_ACKNOWLEDGED", "This notice version already has an immutable recipient receipt.", 409)
+    now_stamp = _stamp(_now())
     changed = connection.execute(
-        "UPDATE reservation_notices SET state='acknowledged',acknowledgement_version=?,acknowledged_at=?,"
-        "acknowledged_by=?,acknowledgement_reason=? WHERE id=? AND state IN ('open','acknowledged') "
-        "AND notification_version=?",
-        (expected, _stamp(_now()), actor["id"], reason, object_id, expected))
+        "UPDATE reservation_notice_notifications SET acknowledged_by=?,acknowledged_at=?,acknowledgement_reason=? "
+        "WHERE notice_id=? AND notification_version=? AND routing_status='assigned' AND recipient_id=? "
+        "AND acknowledged_by IS NULL AND acknowledged_at IS NULL AND acknowledgement_reason IS NULL",
+        (actor["id"], now_stamp, reason, object_id, expected, actor["id"]))
     if changed.rowcount != 1:
-        raise AppError("STALE_NOTICE", "The reservation notice changed; refresh before acknowledging.", 409)
+        raise AppError("NOTICE_ALREADY_ACKNOWLEDGED", "This notice version already has an immutable recipient receipt.", 409)
+    parent = connection.execute(
+        "UPDATE reservation_notices SET state='acknowledged',acknowledgement_version=?,acknowledged_by=?,"
+        "acknowledged_at=?,acknowledgement_reason=? WHERE id=? AND notification_version=? "
+        "AND state IN ('open','acknowledged')",
+        (expected, actor["id"], now_stamp, reason, object_id, expected))
+    if parent.rowcount != 1:
+        raise AppError("STALE_NOTICE", "The reservation notice changed during acknowledgement.", 409)
     workflow.audit_event(
-        connection, actor_id=actor["id"], action="reservation.notice.operator_acknowledgement",
+        connection, actor_id=actor["id"], action="reservation.notice.recipient_acknowledgement",
         outcome="succeeded", reason=reason, subject_id=object_id, scope_id=current["scope_id"],
         pool_id=current["pool_id"], address=current["address"],
         details={"reservation_id": current["reservation_id"], "episode_number": current["episode_number"],
-                 "notification_version": expected, "acknowledgement_version": expected,
-                 "owner_reference": current["owner_reference"], "owner_signoff": False})
-    return get_reservation_notice(connection, object_id), False
+                 "notification_version": expected, "routing_status": bound["routing_status"],
+                 "configuration_revision": bound["configuration_revision"],
+                 "configuration_digest": bound["configuration_digest"], "in_app_receipt": True,
+                 "owner_signoff": False})
+    updated = _notice_resource(connection, object_id)
+    return _notice_payload(connection, updated, configuration), False
 
 
 def _context():
