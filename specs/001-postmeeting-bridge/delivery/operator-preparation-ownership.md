@@ -2,7 +2,7 @@
 
 **Current takeover:** Astra/Main Lead 6.0, task `01a0cf70-c4e0-7ed2-b50b-834609e6d909`, now owns coordination. The user resumed T024 on 2026-09-23; the former sleep hold below is historical. The same nine-path lease remains fixed. DeepSeek V4.1 Flash high is the recorded complete-feature fallback if Spark is unavailable; no overlapping author is assigned. Sol independently reviews and Luna remains the separate gated T025 verifier.
 
-**Latest Main Lead 6.0 routing amendment:** Read `docs/handoffs/main-lead-6.0.md`. T024 primary remains Spark 1.3 high, now preferring exact free route `opencode/muse-spark-1.3-contributor-free#high` after fresh preflight. DeepSeek V4.1 Flash and native Luna are available for meaningful separate work or an explained fallback; Sol independently reviews. Opus is temporarily unavailable. This handoff does not start T024.
+**Latest Main Lead 6.0 routing amendment:** Read `docs/handoffs/main-lead-6.0.md`. T024 primary remains Spark 1.3 high, using the user-corrected exact route `opencode-go/muse-spark-1.3-contributor#high` after a successful live preflight. DeepSeek V4.1 Flash and native Luna are available for meaningful separate work or an explained fallback; Sol independently reviews. Opus is temporarily unavailable. Main Lead 6.0 has now dispatched T024; earlier hold paragraphs below are historical.
 
 The user clarified that Spencer had not actually been assigned the prepared work
 and explicitly directed the agents to do it, leaving a different Spencer assignment
@@ -11,7 +11,7 @@ The prepared Spencer worktree remains untouched at
 `ab005d8bf3b6c57e0a071707796d18514c278674`, with no implementation or acknowledgement
 inferred. No message was sent to Spencer and no tomorrow task is invented.
 
-Astra/Main Lead 5.0 remains accountable. Complete feature assignments, each in a
+Astra/Main Lead 6.0 is accountable. Complete feature assignments, each in a
 new isolated `codex/` worktree with explicit owned paths and pinned prerequisites:
 
 | Task | Author | Release condition | Owned output |
@@ -19,7 +19,7 @@ new isolated `codex/` worktree with explicit owned paths and pinned prerequisite
 | T020 integration matrix | Muse 1.3 high, OpenCode | Accepted T002 and current source base | `integration-matrix.md` |
 | T021 offline API | Opus 5.5 high, Claude Code | Reviewed T020 plus T009/T014/T017A | `offline-api.md` |
 | T022 recipient preparation | Muse 1.3 high, OpenCode | Reviewed T020 plus T010/T015/T017A | `recipient-validation.md`, `configuration-example.json` |
-| T024 operator/package implementation | Muse 1.3 high, OpenCode | Reviewed T021/T022/T023 | Nine narrowly bounded paths below; user hold before dispatch |
+| T024 operator/package implementation | Muse 1.3 high, OpenCode | Reviewed T021/T022/T023 | Nine narrowly bounded paths below; Spark Contributor dispatched at base4ee3a58 |
 
 GPT-6 Sol high independently reviews each full result and shared invariants before
 source integration. Native Luna high remains available for independent T025 or an

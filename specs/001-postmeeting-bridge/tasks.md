@@ -153,7 +153,7 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
   Prerequisites: T003 T017A; owner: Muse1.3 high in OpenCode; FR-005 FR-016 FR-021. Completion: Supported history survives recognized state operations; code/UI/config/secrets not assumed in snapshots.
 
-- [ ] T024 [US4] Day3 operator/package preparation: Muse owns Dockerfile/Compose liveness/config wiring, protected separate coordinator credential for acquisition and domain credential for readiness, stable keys and all-boolean readiness. Pin state/code/UI/config assets, stopped recovery, dependencies/licenses/presenter path. Source preparation only; observed Compose plugin version belongs to later T025. Require explicit `IPAM_DATA_VOLUME`. Files: `scripts/ops/acquire.sh`, `scripts/ops/health.sh`, `scripts/ops/README.md`, `specs/001-postmeeting-bridge/delivery/operator-handoff.md`, `Dockerfile`, `compose.yaml`, `docs/RUNNING.md` (bridge auth/readiness/config text), `scripts/ops/start.sh` and `scripts/ops/backup.sh` (readiness/volume text only). User hold: do not start T024 until tomorrow resume.
+- [ ] T024 [US4] Day3 operator/package preparation: Muse owns Dockerfile/Compose liveness/config wiring, protected separate coordinator credential for acquisition and domain credential for readiness, stable keys and all-boolean readiness. Pin state/code/UI/config assets, stopped recovery, dependencies/licenses/presenter path. Source preparation only; observed Compose plugin version belongs to later T025. Require explicit `IPAM_DATA_VOLUME`. Files: `scripts/ops/acquire.sh`, `scripts/ops/health.sh`, `scripts/ops/README.md`, `specs/001-postmeeting-bridge/delivery/operator-handoff.md`, `Dockerfile`, `compose.yaml`, `docs/RUNNING.md` (bridge auth/readiness/config text), `scripts/ops/start.sh` and `scripts/ops/backup.sh` (readiness/volume text only). User resumed T024 on 2026-09-23; Spark Contributor high is dispatched from `4ee3a583d3ee36bef4197f6babae52c8eea48d3a` in its nine-path lease. Source review and runtime remain pending.
 
   Prerequisites: T021 T022 T023; owner: Muse 1.3 high in OpenCode; FR-009 FR-016 FR-020 FR-021. Completion: Wrappers/docs match core auth contract; no token args/logging; no universal portability/license-clearance claim.
 
@@ -177,13 +177,13 @@ mark Fable completed. Historical task-graph role labels do not override this upd
 
   Prerequisites: T025; owner: Astra records actual human evidence or pending disposition; FR-020 FR-021. Completion: Human-handoff claim only with actual acknowledgement; agent reproduction not substitute.
 
-- [ ] T027 Final pre-acceptance Fable advisory on the exact implementation candidate and retained T025 evidence for contradictions/history/authority/recovery/false claims and critical-path feasibility. Files: `specs/001-postmeeting-bridge/delivery/fable-advisory.md`.
+- [ ] T027 Final pre-acceptance GPT-6 Sol high review on the exact implementation candidate and retained T025 evidence for contradictions/history/authority/recovery/false claims and critical-path feasibility. Files: `specs/001-postmeeting-bridge/delivery/fable-advisory.md`.
 
-  Prerequisites: T024 T025; owner: Fable via Claude Code CLI, direct advisory to Main Lead; FR-001 FR-002 FR-003 FR-004 FR-005 FR-009 FR-016 FR-021. Completion: Actual candidate advice or a user-run prompt with lead adjudication of open findings; Fable is advisory and not an implementation dependency. The separate post-spec/dispatch-lock design advisory (FABLE-DESIGN after T001) does not complete T027.
+  Prerequisites: T024 T025; owner: independent GPT-6 Sol high in Codex, review to Main Lead; FR-001 FR-002 FR-003 FR-004 FR-005 FR-009 FR-016 FR-021. Completion: Actual exact-candidate/evidence review with lead adjudication and closure of blocking findings; no Fable completion is claimed. The separate post-spec/dispatch-lock design advisory (FABLE-DESIGN after T001) does not complete T027.
 
-- [ ] T028 Adjudicate evidence/Fable/human/business gates, accept only proved clauses, coordinate PR merges and authorized next stage prompt; incomplete Tier A remains partial. Files: `specs/001-postmeeting-bridge/delivery/lead-adjudication.md`, `docs/STATUS.md`, `docs/QUESTIONNAIRE_ROW_MAP.md`.
+- [ ] T028 Adjudicate evidence/Sol/human/business gates, accept only proved clauses, coordinate PR merges and authorized next stage prompt; incomplete Tier A remains partial. Files: `specs/001-postmeeting-bridge/delivery/lead-adjudication.md`, `docs/STATUS.md`, `docs/QUESTIONNAIRE_ROW_MAP.md`.
 
-  Prerequisites: T025 T026 T027; owner: Astra / Main Lead 5.0; FR-001 FR-020 FR-021. Completion: Lead alone changes canonical ledger/status; no hidden external gate or92-completed claim.
+  Prerequisites: T025 T026 T027; owner: Astra / Main Lead 6.0; FR-001 FR-020 FR-021. Completion: Lead alone changes canonical ledger/status; no hidden external gate or92-completed claim.
 
 
 ## Optional Tier B — off the three-day critical path
@@ -263,7 +263,7 @@ push after three or earlier for interruption/handoff. Lead coordinates merges/ac
 
 Conditional schema edge: T035 adds T030 only if the allocated-release migration was selected first; its recorded predecessor/schema SHA must be accepted before any write. Otherwise DHCP independently takes the next reserved revision. T040 adds completed selected branch task IDs before review.
 
-## T024-ready checkpoint — user hold, 2026-09-23
+## Historical T024-ready checkpoint — prior user hold, 2026-09-23
 
 T021 `3007bf3`, T022 `c231663` and T023 `adb2dc1` have independent Sol source
 closure; complete source assembly `e6b76edaa9ae5b82a0c409fec151bf52168036bc`.
@@ -271,3 +271,5 @@ T021/T022 checked markers mean documentary source completion, not observed API o
 recipient acceptance. T024 remains unchecked and unstarted, held until the user
 resumes tomorrow. T025 remains unrun. See
 [the exact pickup](../../docs/handoffs/main-lead-5-t024-pickup.md).
+
+The latest user takeover/resume supersedes the historical sleep hold above. T024 is now dispatched to Spark Contributor high; T025 remains unrun and prerequisite-gated. See the Main Lead6 transfer and first-wave registry.
