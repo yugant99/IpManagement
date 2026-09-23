@@ -201,7 +201,8 @@ if ! [[ "${DOMAIN}" =~ ^[A-Za-z0-9._-]{1,200}$ && "${DOMAIN}" != "*" ]]; then
 fi
 
 # Credential file, enforced exactly as in acquire.sh and after URL/domain
-# validation: O_NOFOLLOW open (no lstat/open symlink race), descriptor
+# validation: O_RDONLY|O_NOFOLLOW|O_NONBLOCK open (no lstat/open symlink
+# race; a FIFO fails fast instead of blocking — the descriptor fstat
 # fstat (regular file, owner-only mode, current-user ownership), read
 # bounded to 67 bytes, exact 64-lowercase-hex content with at most one
 # documented terminal newline. The Python reader writes the bearer line
@@ -213,7 +214,7 @@ if ! python3 - "${TOKEN_FILE}" "${CURL_CONFIG}" <<'PY' 2>/dev/null; then
 import os, re, stat, sys
 token_path, config_path = sys.argv[1], sys.argv[2]
 try:
-    fd = os.open(token_path, os.O_RDONLY | os.O_NOFOLLOW)
+    fd = os.open(token_path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
 except OSError:
     sys.exit("open refused")
 try:

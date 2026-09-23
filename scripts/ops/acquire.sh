@@ -158,8 +158,10 @@ chmod 600 "${CURL_CONFIG}"
 
 # Credential file, enforced before any network use (and after URL
 # validation, so no directive is parsed before the origin is known safe).
-# The Python reader opens with O_NOFOLLOW (a swapped-in symlink fails the
-# open itself — no lstat/open race), then checks the open descriptor with
+# The Python reader opens with O_RDONLY|O_NOFOLLOW|O_NONBLOCK (a swapped-in
+# symlink fails the open itself — no lstat/open race — and a FIFO fails
+# fast instead of blocking indefinitely; the fstat regular-file check then
+# refuses anything that is not a regular file), then checks the open
 # fstat: regular file, owner-only mode (any group/other bit refuses),
 # owned by the current user. The read is bounded to 67 bytes (valid
 # content is at most 65: 64 hex plus one terminal newline), so no
@@ -173,7 +175,7 @@ if ! python3 - "${TOKEN_FILE}" "${CURL_CONFIG}" <<'PY' 2>/dev/null; then
 import os, re, stat, sys
 token_path, config_path = sys.argv[1], sys.argv[2]
 try:
-    fd = os.open(token_path, os.O_RDONLY | os.O_NOFOLLOW)
+    fd = os.open(token_path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
 except OSError:
     sys.exit("open refused")
 try:
