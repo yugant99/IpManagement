@@ -282,12 +282,17 @@
     },
     {
       "task": "T011",
-      "status": "running_source_implementation",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "3add18986096e8fd9bc6ac509db28fc08b6bf2a6",
       "route": "Codex gpt-6-luna high",
       "branch": "codex/bridge-t011-reservations",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/7802/Ip_inventory",
       "client_thread_id": "client-new-thread:25614e1f-3e34-42fc-b63d-1d8b6808ae45",
+      "thread_id": "01a0cca1-3873-79a0-ad54-e3f2ae0f25fb",
+      "result_sha": "3fcdb49d955c39cf08f0a0d6f9483384e43163b1",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/78",
+      "review_report": "specs/001-postmeeting-bridge/delivery/lifecycle-source-review.md",
       "prerequisites": ["T009 source acceptance", "Lead C-L service and reservation version clarification"],
       "owned_paths": ["backend/ipam_demo/lifecycle.py", "backend/ipam_demo/workflow.py"],
       "acceptance": "Exact designated local IPv4 hold, extension, atomic matching conversion and independent unused release with retained history and current authorization; no double hold or implicit expiry reclaim.",
@@ -321,8 +326,11 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "action": "Prepare exact-checkpoint handover prompt for user to start a new lead",
+    "status": "complete_source_only_user_starts_new_lead",
+    "action": "Use docs/handoffs/main-lead-5.0.md; receiver registers its actual task ID when started by user",
     "hold": "Do not dispatch T012, T013 or later tasks before handover",
-    "existing_work": "T010 resumed in original task; T009 already source accepted"
+    "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
+    "application_source_sha": "ab370a4273784bd750bf5f59289594a31d097739",
+    "publication_branch": "codex/bridge-t011-handover"
   }
 }

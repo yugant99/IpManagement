@@ -56,26 +56,30 @@ T005/T006/T007 are source accepted at `aee0ade8bbeb6405aab4a6cf0c35079d76e6318e`
 
 Goal/gate: account for all candidate inputs with no active writes; independent count/conflict/stale/sign-off evidence.
 
-- [ ] T008 [US1] Reuse parser/receipts for immutable assessment. Enforce input=accepted+rejected+duplicate and accepted=added+changed+unchanged+conflicting; conflict precedence, active-only separation, governed snapshot and independent sign-off/staleness; no promotion. Preserve canonical normalized JSON replay (whitespace/key-order equivalent); abandoning review changes no persisted state. Files: `backend/ipam_demo/migration_compare.py`.
+- [x] T008 [US1] Reuse parser/receipts for immutable assessment. Enforce input=accepted+rejected+duplicate and accepted=added+changed+unchanged+conflicting; conflict precedence, active-only separation, governed snapshot and independent sign-off/staleness; no promotion. Preserve canonical normalized JSON replay (whitespace/key-order equivalent); abandoning review changes no persisted state. Files: `backend/ipam_demo/migration_compare.py`.
 
   Prerequisites: T007; owner: DeepSeek backend under Terra; FR-002 FR-014. Completion: Exactly one class per accepted row; partial/conflicted/stale cannot sign; active state unchanged.
 
-- [ ] T009 [US1] Expose C-M create/list/detail/signoff/export with existing AppError/transaction, trusted context and idempotency/version guards. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
+- [x] T009 [US1] Expose C-M create/list/detail/signoff/export with existing AppError/transaction, trusted context and idempotency/version guards. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
 
   Prerequisites: T008; owner: Terra in Codex; FR-002 FR-005 FR-009. Completion: Only independent exact-current assessment sign-off; no cutover endpoint.
 
-- [ ] T010 [P] [US1] Render receipt/comparison layers, active-only/conflict/refused/stale/sign-off states and scoped same-assessment export; no activation control. Files: `frontend/src/MigrationCompare.tsx`, `frontend/src/FirstPath.tsx`, `frontend/src/firstPathApi.ts`, `frontend/src/App.tsx`.
+- [x] T010 [P] [US1] Render receipt/comparison layers, active-only/conflict/refused/stale/sign-off states and scoped same-assessment export; no activation control. Files: `frontend/src/MigrationCompare.tsx`, `frontend/src/FirstPath.tsx`, `frontend/src/firstPathApi.ts`, `frontend/src/App.tsx`.
 
   Prerequisites: T008 T006; owner: DeepSeek UI under Terra; FR-002 FR-019. Completion: Usable assessment against T009; visible complete accounting and immutable provenance.
 
+
+T008/T009/T010 have source-only acceptance at the exact SHAs in delivery/migration-source-review.md. Checked markers record implementation/source review, not observed runtime acceptance.
 
 ## Phase 4 — US2 local change and simulated handoff (P1)
 
 Goal/gate: exact local approved transition with independent honest ticket outcome; refusal/replay/unknown/readback evidence.
 
-- [ ] T011 [US2] Implement exact local IPv4 reservation/extension/conversion/independent unused release: default24h/max168h, positive version, reserved/converted/released; immediate transaction checks both hold tables and eligible claims, matching owner/service and lineage, pool/baseline bump not denominator history. Files: `backend/ipam_demo/lifecycle.py`, `backend/ipam_demo/workflow.py`.
+- [x] T011 [US2] Implement exact local IPv4 reservation/extension/conversion/independent unused release: default24h/max168h, positive version, reserved/converted/released; immediate transaction checks both hold tables and eligible claims, matching owner/service and lineage, pool/baseline bump not denominator history. Files: `backend/ipam_demo/lifecycle.py`, `backend/ipam_demo/workflow.py`.
 
   Prerequisites: T009; owner: DeepSeek backend under Terra; FR-003 FR-014. Completion: No double hold, substitution, self-approval or free-on-expiry; local cancellation distinct from reclaim.
+
+T011 has source-only acceptance at `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; see delivery/lifecycle-source-review.md. The user requested handover here. T012/T013 remain undispatched until the user starts the new lead; T025 remains open.
 
 - [ ] T012 [US2] Expose C-L reservation/create/extend/release-request/decision and optional reservation_id allocation API; derive principal/domain and audit in existing write boundary. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
 
