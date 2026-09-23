@@ -177,7 +177,7 @@ mark Fable completed. Historical task-graph role labels do not override this upd
 
   Prerequisites: T025; owner: Astra records actual human evidence or pending disposition; FR-020 FR-021. Completion: Human-handoff claim only with actual acknowledgement; agent reproduction not substitute.
 
-- [ ] T027 Final pre-acceptance GPT-6 Sol high review on the exact implementation candidate and retained T025 evidence for contradictions/history/authority/recovery/false claims and critical-path feasibility. Files: `specs/001-postmeeting-bridge/delivery/fable-advisory.md`.
+- [ ] T027 Final pre-acceptance GPT-6 Sol high review on the exact implementation candidate and retained T025 evidence for contradictions/history/authority/recovery/false claims and critical-path feasibility. Files: `specs/001-postmeeting-bridge/delivery/sol-final-review.md` (actual reviewer and visible task recorded; the historical Fable design advisory remains separate).
 
   Prerequisites: T024 T025; owner: independent GPT-6 Sol high in Codex, review to Main Lead; FR-001 FR-002 FR-003 FR-004 FR-005 FR-009 FR-016 FR-021. Completion: Actual exact-candidate/evidence review with lead adjudication and closure of blocking findings; no Fable completion is claimed. The separate post-spec/dispatch-lock design advisory (FABLE-DESIGN after T001) does not complete T027.
 
