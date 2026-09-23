@@ -57,3 +57,9 @@ local evidence scope after this gate; retain every criterion and blocker. No act
 recipient Linux target or human acknowledgement exists. Main stays unchanged;
 T028 still requires passing exact-candidate evidence, final Sol T027 and recorded
 T026/business dispositions. No questionnaire promotion, deployment or Tier B release.
+
+## T024 correction from independent T025 observations
+
+Independent Luna observed wrapper bootstrap JSON parsing fail despite HTTP200: curl config single-dash `-silent`/`-show-error` were short-option clusters, inadvertently including response headers in the body. Original Spark author corrected all three config writers in acquire/health at **`f8d381adb3a604251b5486ecfa10148bb1491f81`**. Visible independent GPT-6 Sol task `01a0cf9a-ce88-7f90-8556-1fa4b131bf26` confirmed the exact three-line delta and preserved token custody, curl CLI flags, proxy/redirect restrictions, response separation, replay and readiness invariants. No author/reviewer runtime check ran.
+
+PR102 integrated at **`0c20a7ba82c9802d20223d164efdc830e9ab1eac`**. Visible separate Luna task `01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f` owns affected runtime rerun and complete T025 evidence on that frozen candidate. Source correction is not a passing runtime gate. Earlier failed candidate records remain retained; main, portable/human, questionnaire and TierB boundaries are unchanged.
