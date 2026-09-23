@@ -120,6 +120,119 @@ class StrictResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
 
+class TicketRouteAssignment(StrictResponse):
+    assignment_version: int
+    configuration_revision: str
+    route_revision: str
+    team: str | None
+    reason: str | None
+    assigned_at: str
+    assigned_by: str | None
+
+
+class TicketAttempt(StrictResponse):
+    id: str
+    ordinal: int
+    route_assignment_version: int
+    synthetic_scenario: Literal["success", "definitive_failure", "committed_response_lost", "no_effect_response_lost"]
+    started_at: str
+    observation_deadline_at: str
+    ended_at: str | None
+    result: Literal["pending", "unknown", "delivered", "failed"]
+    reason: str | None
+    observed_ticket_id: str | None
+    observed_effect_id: str | None
+
+
+class TicketHandoffEvent(StrictResponse):
+    id: str
+    event_type: Literal["readback", "recipient_acknowledgement"]
+    outcome: str
+    resolution: str | None
+    attempt_id: str | None
+    effect_id: str | None
+    returned_ticket_id: str | None
+    error_code: str | None
+    acknowledgement_mode: str | None
+    occurred_at: str
+    actor_id: str | None
+
+
+class TicketHandoffSummary(StrictResponse):
+    id: str
+    domain: str
+    source_request_id: str
+    source_request_state: str
+    action: Literal["allocation.request"]
+    correlation: str
+    business_payload_digest: str
+    business_payload: dict[str, str | int]
+    contract_version: Literal["internal-ticket-simulator/v1"]
+    mode: Literal["simulated"]
+    state: Literal["pending", "routing_blocked", "unknown", "delivered", "failed"]
+    version: int
+    created_at: str
+    current_route_assignment_version: int
+    route: TicketRouteAssignment
+    attempt_limit: int
+    attempts_used: int
+    attempts_remaining: int
+    observation_budget_seconds: int
+    latest_attempt: TicketAttempt | None
+    readback_required: bool
+    resolution_reason: str | None
+    recipient_acknowledged: bool
+    provisioning_status: Literal["not_requested"]
+    label: str
+    simulated: bool
+    synthetic: bool
+    availability_evaluated: bool
+    attempt_allowed: bool | None
+    attempt_block_reason: str | None
+    reassignment_allowed: bool | None
+
+
+class TicketHandoffDetail(TicketHandoffSummary):
+    route_history: list[TicketRouteAssignment]
+    attempts: list[TicketAttempt]
+    events: list[TicketHandoffEvent]
+
+
+class TicketAttemptOperation(StrictResponse):
+    phase: Literal["reserve", "effect", "observe"]
+    attempt: TicketAttempt
+    effect_phase_recorded: bool | None = None
+
+
+class TicketAssignmentOperation(StrictResponse):
+    phase: Literal["reassign"]
+    assignment: TicketRouteAssignment
+
+
+class TicketEventOperation(StrictResponse):
+    phase: Literal["readback", "acknowledge"]
+    event: TicketHandoffEvent
+
+
+class TicketHandoffMutation(StrictResponse):
+    handoff: TicketHandoffDetail
+    operation: TicketAttemptOperation | TicketAssignmentOperation | TicketEventOperation
+
+
+class TicketHandoffOriginalOperation(StrictResponse):
+    phase: Literal["reserve", "reassign", "readback", "acknowledge"]
+    attempt: TicketAttempt | None = None
+    assignment: TicketRouteAssignment | None = None
+    event: TicketHandoffEvent | None = None
+
+
+class TicketHandoffOperationReadback(StrictResponse):
+    found: bool
+    action: Literal["ticket.attempt", "ticket.reassign", "ticket.readback", "ticket.acknowledge"]
+    original_operation: TicketHandoffOriginalOperation | None
+    current_handoff: TicketHandoffDetail | None
+
+
 class MigrationAssessmentCreateRequest(StrictRequest):
     source_batch_id: str
     expected_baseline_version: StrictInt
