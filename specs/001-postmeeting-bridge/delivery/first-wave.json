@@ -657,7 +657,7 @@
     },
     {
       "task": "T024",
-      "status": "source_implementation_running",
+      "status": "source_accepted_runtime_unverified",
       "route": "opencode-go/muse-spark-1.3-contributor#high",
       "base_sha": "4ee3a583d3ee36bef4197f6babae52c8eea48d3a",
       "required_source_assembly": "e6b76edaa9ae5b82a0c409fec151bf52168036bc",
@@ -678,9 +678,29 @@
       "review_route": "Independent GPT-6 Sol high",
       "release_condition": "Dispatched after live Spark Contributor high preflight; independent Sol full review before source integration",
       "pickup": "docs/handoffs/main-lead-6.0.md",
-      "nonclaims": "T024 source not yet implemented; T025 unrun",
+      "nonclaims": "Independent source closure only; T025 has not yet produced evidence; no main/portable/human acceptance",
       "preferred_route": "opencode-go/muse-spark-1.3-contributor#high",
-      "fallback_reason": "Latest user explicitly corrected routing to Spark Contributor. Prior DeepSeek session interrupted before any edits; retained isolated worktree is clean. DeepSeek remains standby fallback only."
+      "fallback_reason": "Latest user explicitly corrected routing to Spark Contributor. Prior DeepSeek session interrupted before any edits; retained isolated worktree is clean. DeepSeek remains standby fallback only.",
+      "result_sha": "7e50122ac6c7bc837bd89db6b9029035065b1b57",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/99",
+      "source_integration_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
+      "review_record": "specs/001-postmeeting-bridge/delivery/operator-package-source-review.md"
+    },
+    {
+      "task": "T025",
+      "status": "released_exact_candidate_disposable_local",
+      "route": "Codex gpt-6-luna high",
+      "worker": "/root/luna_t025_verifier",
+      "base_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
+      "branch": "codex/bridge-t025-luna",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-luna/Ip_inventory",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/independent-evidence.md",
+        "specs/001-postmeeting-bridge/delivery/evidence/t025/"
+      ],
+      "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
+      "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
+      "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker"
     }
   ],
   "muse_route": {
@@ -705,17 +725,17 @@
     "instruction": "Do not dispatch/resume Opus or automatically retry on a timer. Preserve original ownership; explicit bounded fallback only."
   },
   "current_handover_gate": {
-    "milestone": "T024-ready after T021/T022/T023 independent source closure",
-    "status": "T024_source_implementation_running",
-    "action": "Receive Spark complete result and independently source-review",
-    "hold": "No application checks before prerequisite-complete T025",
+    "milestone": "T024 independently source-closed and integrated",
+    "status": "T025_released_exact_candidate_disposable_local",
+    "action": "Independent Luna records complete required technical evidence and blockers",
+    "hold": "No main merge before T028; portable/human remain separate; Tier B locked",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "a2b567b670129671f85498729753c4d577d4768e",
-    "publication_branch": "codex/bridge-ticket-integration",
+    "application_source_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
+    "publication_branch": "codex/main-lead-6-bridge",
     "receiver_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
     "next_shared_base_sha": null,
-    "source_assembly_sha": "e6b76edaa9ae5b82a0c409fec151bf52168036bc",
+    "source_assembly_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
     "pickup": "docs/handoffs/main-lead-6.0.md",
     "completed_preparation_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98"
   },
@@ -725,18 +745,19 @@
     "spark_free": "active/enabled catalog high; two synthetic deny-all-tool probes returned provider.auth HTTP403: OpenCode free tier can only be used from within OpenCode",
     "deepseek": "exact opencode-go/deepseek-v4.1-flash#high synthetic deny-all-tool probe PREFLIGHT_OK",
     "opencode_usage_percent": {
-      "rolling": 0,
-      "weekly": 42,
+      "rolling": 1,
+      "weekly": 43,
       "monthly": 21
     },
     "opencode_credit": "disabled; balance0",
     "data_use": "Current paid/free training controls enabled, unchanged. Public tracked synthetic source only. Free route has no numeric quota receipt; availability failed.",
-    "native_codex_weekly_used_percent": 49,
+    "native_codex_weekly_used_percent": 57,
     "native_routes": "gpt-6-sol high SOL_PREFLIGHT_OK; gpt-6-luna high LUNA_PREFLIGHT_OK",
     "reserve": "20% reserve retained",
     "evidence_root": "/tmp/ipam-lead6",
     "opus": "unavailable per user; not probed/resumed; no timer",
-    "spark_contributor": "Exact opencode-go/muse-spark-1.3-contributor#high active/enabled; synthetic deny-all-tool probe PREFLIGHT_OK, session ses_f3087e62affewDLimZQvx4jNco"
+    "spark_contributor": "Exact opencode-go/muse-spark-1.3-contributor#high active/enabled; synthetic deny-all-tool probe PREFLIGHT_OK, session ses_f3087e62affewDLimZQvx4jNco",
+    "usage_snapshot_note": "Go usage refreshed after first full Spark source result; native usage refreshed before T025 release. Percentages are used, not remaining."
   },
   "recipient_policy_amendment": {
     "authorization": "Explicit user selection: reviewed domain/scope Operator recipient; immutable notification-version binding; explicit in-app acknowledgement is receipt",
@@ -782,7 +803,7 @@
     "incoming_role": "Main Lead 6.0 / Astra",
     "incoming_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
     "outgoing_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
-    "status": "takeover_registered_T024_spark_dispatched",
+    "status": "takeover_registered_T024_source_closed_T025_released",
     "handoff": "docs/handoffs/main-lead-6.0.md",
     "base_publication": "9cb0725e28985b944a1296ea6d1bde403491d465",
     "amendment_branch": "codex/main-lead-6-handoff",

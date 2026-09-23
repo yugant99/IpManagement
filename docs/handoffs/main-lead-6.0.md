@@ -1,5 +1,7 @@
 # Main Lead 6.0 — transfer from the T024-ready source checkpoint
 
+**Current checkpoint:** T024 full source independently closed at Spark `7e50122ac6c7bc837bd89db6b9029035065b1b57`, source-integrated via PR99/100 at `68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8`. [Review and correction record](../../specs/001-postmeeting-bridge/delivery/operator-package-source-review.md). Separate Luna T025 is released on that exact assembly in `codex/bridge-t025-luna`, disposable native local synthetic target only. Release is not runtime acceptance. Main is unchanged; T028 gates and all nonclaims below remain controlling. Earlier unstarted/dispatch/route snapshots below are historical.
+
 The user requested a new lead and handover prompt, with a revised worker pool.
 Outgoing lead: Astra / Main Lead 5.0, task `01a0ccc7-6219-73c1-bd3b-1521bb71a837`.
 **Incoming actual task ID: `01a0cf70-c4e0-7ed2-b50b-834609e6d909`**, registered on 2026-09-23 from the active environment and app registry. The user authorized takeover and resumption of T024. Earlier outgoing publication holds below are historical; the nine-path lease and gates remain controlling. Astra remains lead; the pool below is for delegated work.
