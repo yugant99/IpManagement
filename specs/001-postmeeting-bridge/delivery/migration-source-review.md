@@ -75,3 +75,26 @@ Main Lead accepts T009 as source-only. Draft PR76 remains unmerged, application
 execution unverified. This releases T011 against T009 plus the lead's explicit
 reservation service/version clarification in contracts/lifecycle.md. T010 and
 the final assembled migration UI/API review are still pending.
+
+## T010 UI source closure
+
+Initial Luna candidate `d58ef6466b4e98fc1208cb8cd87632d759240eb3`, draft
+[PR77](https://github.com/yugant99/IpManagement/pull/77), adds MigrationCompare and
+changes only FirstPath.tsx, firstPathApi.ts and App.tsx alongside it. Independent Sol
+review cross-checked the actual accepted T009 API at
+`daede1905304c5d5bd363ff230b5f6371763eb49`. Wire/types, roles and independent
+sign-off, separate counts/active-only/current versus historical labels, authenticated
+request/download context and exact ambiguous-operation recovery were coherent in source.
+
+Sol found one P2 selection race: changing the selected assessment briefly left the
+previous ready detail actionable. Luna correction
+`4b0b7d71bff38014539d1ff3c5a06c6c06631db2` synchronously clears detail for a
+different selection and requires matching selected/detail IDs for rendering,
+sign-off eligibility/submission and export. Same-row selection stays usable; exact
+retry retains its original target. Sol closed the exact delta and the lead read it.
+
+Main Lead accepts T010 source only. The resumed task is
+`01a0cb5f-6dcf-7080-90ea-fffcc1743645`; its correction lease is now idle and retained
+for assigned fixes. No build/typecheck/test/browser/runtime occurred. API/UI source
+compatibility does not establish observed integrated behavior. The final handover
+assembly must preserve both accepted heads; T025 remains the runtime gate.
