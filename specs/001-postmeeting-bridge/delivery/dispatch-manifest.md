@@ -237,3 +237,20 @@ preserving old unreserved normalization/replay. Cross-table holds, atomic conver
 independent unused release, history and version bumps are its bounded deliverable.
 No API/UI/schema edits or execution; T012/T013 remain dependency-held until source
 review. Sol remains independent reviewer; Claude/OpenCode remain stopped/paused.
+
+### User-requested T011 handover milestone
+
+After the office pause, the user explicitly resumed Codex work and asked for a new-lead
+handover once T011 is complete. T010 was resumed in its original task/worktree from
+staged work. T009 was already finished and source accepted, so it was not reimplemented.
+T011 is dispatched to GPT-6 Luna from actual shared source base
+`3add18986096e8fd9bc6ac509db28fc08b6bf2a6` on codex/bridge-lifecycle-integration.
+That base combines accepted T009 with lead publication
+`ebe8e018d32d8a083d607f2a86117d4a984cfdaf`; it changes no main or frozen migration PR base.
+
+Finish T011 implementation, independent Sol review and any bounded corrections, then
+publish a copyable exact-checkpoint handover prompt. Record T010's actual disposition
+and retained worker leases. **Do not dispatch T012/T013 or later work before this
+handover.** The user will start the new lead; do not create or register one on inference.
+Source completion remains separate from T025 runtime, API/UI follow-ons and human
+acceptance. Further Claude use remains stopped and OpenCode remains paused.
