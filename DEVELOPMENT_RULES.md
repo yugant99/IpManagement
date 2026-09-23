@@ -27,6 +27,7 @@ These rules apply to every human and agent working on this repository. The goal 
 - Open a PR for a ready feature. State goal IDs, behavior, focused validation actually performed, simulations/unverified limits and any contract changes. The lead arranges a bounded independent review, resolves relevant conflicts and merges; do not trigger a full test suite just because a PR exists.
 - Use a merge that preserves the feature's coherent commits by default. Do not squash or rewrite a contributor's history solely to tidy the graph. After merge, use a new branch for the next feature.
 - A branch may be checkpointed before release readiness. Only merge feature behavior whose required correctness/integration evidence is recorded, or clearly identified documentation-only changes. Do not use commit count as a merge criterion.
+- Follow [the explicit main merge rule](docs/MAIN_MERGE_POLICY.md). For the current bridge, the lead merges at T028 after complete technical Tier A, exact-candidate T025 evidence, closed blocking reviews and recorded gate dispositions. Pending human rehearsal limits human-handoff claims; it does not alone block a validated technical-package merge. Merge promptly when those gates pass.
 - If a push fails, record the error and the local branch/commit. Fix the actual cause; never report it as pushed.
 
 ## 3. Small code and one owner per boundary

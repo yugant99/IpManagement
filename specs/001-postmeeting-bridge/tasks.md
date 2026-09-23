@@ -146,6 +146,15 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
 ## Phase 7 — Independent evidence and lead adjudication
 
+**Current merge/routing clarification —2026-09-22:** Follow
+[the explicit main merge rule](../../docs/MAIN_MERGE_POLICY.md). T028 merges the
+complete technical Tier A candidate after exact-candidate T025 passes and blocking
+reviews close. Record T026 human status honestly; its permitted pending disposition
+limits claims but does not alone block technical-package integration. The user's
+Claude stop supersedes the old T027 Fable route below: GPT-6 Sol performs that final
+candidate/evidence review intent, with the actual route recorded. Do not invoke or
+mark Fable completed. Historical task-graph role labels do not override this update.
+
 - [ ] T025 Only after explicit validation permission, observe quickstart Tier A success/denial/stale/replay/concurrency/unknown/aging and stopped recovery at exact candidate; missing permission is not run and blocks runtime acceptance. Include domain denial of every global job/callback and no replay leakage; normalized-content duplicate control. Files: `specs/001-postmeeting-bridge/delivery/independent-evidence.md`.
 
   Prerequisites: T018 T019 T021 T022 T023 T024; owner: Luna independent verifier; FR-001 FR-002 FR-003 FR-004 FR-005 FR-006 FR-008 FR-009 FR-013 FR-015 FR-016 FR-019 FR-021. Completion: Every Tier A criterion has independent evidence or blocker; no reduced passing bar.
