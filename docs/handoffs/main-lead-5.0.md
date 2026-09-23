@@ -1,5 +1,7 @@
 # Main Lead 5.0 pickup after T011
 
+**Receiver registered:** Main Lead 5.0 / GPT-6 Astra, task `01a0ccc7-6219-73c1-bd3b-1521bb71a837`, by the user on 2026-09-22. [Live takeover record](main-lead-5.0-takeover.md). The prepared pickup below is retained as transfer history; its unregistered/undispatched wording no longer controls.
+
 Prepared by Main Lead 4.0 (`01a0cade-506f-7442-97da-0cc09b4f9929`) at the user's
 requested T011 stopping point. The user will start the receiving task. Main Lead 5.0
 is not registered yet; no task ID is invented. Register the actual receiver only
