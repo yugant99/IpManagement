@@ -67,3 +67,24 @@ routing/recipient permission/delivery remains an acceptance gap; no T025 passing
 bar or main-merge policy is waived. See C-L's explicit clarification. Spencer's
 T020 worktree remains clean at ab005d8 and integration-matrix.md is not yet present.
 These are retained gaps, not inferred completed work.
+
+## Continued routing and notice source integration
+
+The latest delegated user update prioritizes coherent Muse and Opus feature ownership,
+with more upcoming implementation load for Muse. Existing Luna T014/T016 authors
+retain corrections. Next assignments are full T015 workflow UI to Muse1.3 high and
+full T017 notice API to Opus5.5 high, after their source prerequisites and disjoint
+leases are released. Muse T018/T023 are intended subsequent graph-ready slices.
+Sol independently reviews all implementations; Astra remains lead.
+
+Fresh read-only preflight: Go active exact Muse contributor/high route with source
+tools; rolling0%, weekly40%, monthly20% used, credits off/balance0, existing paid
+training consent unchanged. Claude Opus5.5/high remains on existing Max; refreshed
+usage session4%, weekly31%, Fable24%, credits CA$0/auto-reload off. No capacity or
+settings change; retain20% reserve and tracked-public-source-only inputs.
+
+T016 `1be8bbdf4a0ed11bc82c75da7a89f2deadaeaf74` (PR85) is independently source-closed
+and integrated at `c5121d4d85c6972fe5ae39315a5a413a96a07599`. T014 PR86 remains
+under correction at `0e5d1046f9ddb2fec95b3a8647dbcd26ffd11799`: canonical allocation
+key matching is closed; exact reassignment recovery requires the shared T013 audit
+anchor validator in both POST replay and GET recovery. No runtime gate has run.

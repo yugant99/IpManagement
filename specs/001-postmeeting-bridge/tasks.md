@@ -104,7 +104,7 @@ T012/T013 are independently source-reviewed at `0e8fb4b`/`57dd7736`, integrated 
 
 Goal/gate: exact current/saved metric identity and due conditions; arithmetic/ack/unknown evidence.
 
-- [ ] T016 [US3] Implement UTC reservation episodes/evaluate/ack: due alert, due+24h alarm, no auto-free; resolve on extension/conversion/release; preserve finding clearance and historical metrics, expose current active-hold occupancy separately. Files: `backend/ipam_demo/lifecycle.py`, `backend/ipam_demo/workflow.py`.
+- [x] T016 [US3] Implement UTC reservation episodes/evaluate/ack: due alert, due+24h alarm, no auto-free; resolve on extension/conversion/release; preserve finding clearance and historical metrics, expose current active-hold occupancy separately. Files: `backend/ipam_demo/lifecycle.py`, `backend/ipam_demo/workflow.py`.
 
   Prerequisites: T013; owner: GPT-6 Luna high in Codex; FR-003 FR-006 FR-008. Completion: One due episode, ack not clearance, no forged finding IDs or saved-run rewriting.
 
