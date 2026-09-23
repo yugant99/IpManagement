@@ -323,7 +323,6 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       .then(items => {
         if (controller.signal.aborted) return;
         setNotices(items);
-        if (selectedNoticeId && !items.items.some(item => item.id === selectedNoticeId)) setSelectedNoticeId("");
       })
       .catch((failure: unknown) => { if (!controller.signal.aborted) setError(`Reservation notices failed to load. ${readableError(failure)}`); });
     return () => controller.abort();
@@ -946,18 +945,54 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       setRecoveryStatus(`The saved notice acknowledgement belongs to ${pointer.principal_id} in domain ${pointer.domain}. Reauthenticate that original context before reading it back.`);
       return;
     }
-    setReadbackRevision(value => value + 1);
+    const controller = new AbortController();
+    operation.current = controller;
+    setBusy(true); setError(""); setMessage("");
+    try {
+      const recovered = await loadNoticeVersion(pointer.target_id, pointer.notification_version, controller.signal);
+      if (controller.signal.aborted) return;
+      const ownReceipt = recovered.acknowledged_by === pointer.principal_id
+        && recovered.acknowledgement_kind === "recipient_in_app"
+        && recovered.in_app_receipt === true
+        && recovered.delivery_status === "acknowledged"
+        && recovered.reservation_id === pointer.secondary_id;
+      if (!ownReceipt) {
+        setRecoveryStatus("Authorized exact-version readback did not confirm your own receipt on the original version and parent. It remains unknown and replacement writes are blocked; the exact retry payload is retained and no silent replacement will be sent.");
+        return;
+      }
+      setRecoveredNoticeVersion(recovered);
+      confirmPointerClear();
+      priorAmbiguity.current = false;
+      setSelectedNoticeId(recovered.notice_id);
+      setNoticeOffset(0);
+      history(recovered.reservation_id);
+      setRecoveryStatus("The original notice receipt was confirmed by authorized exact-version readback. Current notice state is shown separately and may differ after renewal.");
+      setRevision(value => value + 1);
+    } catch (failure) {
+      if (!controller.signal.aborted) {
+        setRecoveryStatus(`Authorized exact-version readback failed. The earlier acknowledgement remains unresolved and replacement writes are blocked; the exact retry payload is retained. ${readableError(failure)}`);
+      }
+    } finally {
+      operation.current = null;
+      if (!controller.signal.aborted) setBusy(false);
+    }
   }
 
-  function noticeDeliveryLabel(detail: ReservationNotice): string {
+  function noticeDeliveryLabel(detail: ReservationNotice, actorId: string): string {
     const current = detail.current_notification;
-    if (detail.state === "resolved") return "resolved — retained history; resolution never means delivery";
-    if (current === null) return "unknown — current binding missing";
-    if (current.delivery_status === "acknowledged") return "acknowledged — own in-app receipt on this version";
-    if (current.delivery_status === "awaiting_receipt") return "awaiting receipt — bound recipient has not acknowledged";
-    if (current.delivery_status === "unassigned") return "unassigned — no reviewed recipient mapping";
-    if (current.delivery_status === "recipient_unavailable") return "recipient unavailable — configured recipient ineligible or route changed";
-    return "legacy unbound — old operator acknowledgement only, never recipient receipt";
+    const resolution = detail.state === "resolved"
+      ? "resolved — retained history only; resolution never means delivery. "
+      : "";
+    if (current === null) return `${resolution}current binding unknown — missing child`;
+    if (current.delivery_status === "acknowledged") {
+      return current.acknowledged_by === actorId
+        ? `${resolution}acknowledged — your own in-app receipt on this version`
+        : `${resolution}acknowledged — in-app receipt recorded; recipient identity redacted for this principal`;
+    }
+    if (current.delivery_status === "awaiting_receipt") return `${resolution}awaiting receipt — bound recipient has not acknowledged`;
+    if (current.delivery_status === "unassigned") return `${resolution}unassigned — no reviewed recipient mapping`;
+    if (current.delivery_status === "recipient_unavailable") return `${resolution}recipient unavailable — configured recipient ineligible or route changed`;
+    return `${resolution}legacy unbound — old operator acknowledgement only, never recipient receipt`;
   }
 
   function notificationLabel(item: ReservationNoticeNotification): string {
@@ -1283,9 +1318,10 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <td>{item.state} · {item.delivery_status ?? "unknown"}</td>
             <td>v{item.notification_version} · {item.notification_history_coverage.replaceAll("_", " ")}</td>
             <td><button className="secondary" disabled={locked} onClick={() => { setSelectedNoticeId(item.id); setAckReason(""); setRecoveredNoticeVersion(null); }}>Open notice</button></td></tr>)}
-        </tbody></table></div>{!notices.total && <p>No reservation notices in this view. Run an explicit evaluation after a hold passes its expiry.</p>}<PageButtons page={notices} change={setNoticeOffset} /></>}
+        </tbody></table></div>{!notices.total && <p>No reservation notices in this view. Run an explicit evaluation after a hold passes its expiry.</p>}<PageButtons page={notices} change={setNoticeOffset} />
+        {selectedNoticeId && !notices.items.some(item => item.id === selectedNoticeId) && <p className="quiet">The selected notice is outside this list page or filter; the selection is retained and its current detail loads independently below, or is reported unknown if unavailable. A recovered original receipt, if any, is historical only and never substitutes for current state.</p>}</>}
         {pointer?.action === "notice.acknowledge" && <div className="notice error" role="status"><p>Unresolved acknowledgement for notice <code>{pointer.target_id}</code> version {pointer.notification_version} in reservation <code>{pointer.secondary_id}</code>. It belongs to {pointer.principal_id} in domain {pointer.domain}. A missing, denied or mismatched receipt stays unknown and blocks replacement; no silent replacement will be sent.</p>
-          <button type="button" className="secondary" disabled={busy || !!attempt || !!storageError} onClick={() => void checkNoticeReceipt()}>Confirm original receipt (exact version)</button></div>}
+          <button type="button" className="secondary" disabled={busy || !!storageError} onClick={() => void checkNoticeReceipt()}>Confirm original receipt (exact version)</button></div>}
         {recoveredNoticeVersion && <div className="notice" role="status"><h3>Recovered original receipt · version {recoveredNoticeVersion.notification_version}</h3>
           <dl className="facts"><dt>Notice</dt><dd><code>{recoveredNoticeVersion.notice_id}</code> · reservation <code>{recoveredNoticeVersion.reservation_id}</code> · episode {recoveredNoticeVersion.episode_number}</dd>
             <dt>Receipt</dt><dd>{recoveredNoticeVersion.acknowledged_by ?? "redacted"} · {recoveredNoticeVersion.acknowledged_at ?? "unknown time"} · {recoveredNoticeVersion.acknowledgement_reason ?? "redacted"}</dd>
@@ -1296,7 +1332,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           <dl className="facts"><dt>First due (server)</dt><dd>{noticeDetail.first_due_at}</dd>
             <dt>Owner reference</dt><dd>{noticeDetail.owner_reference}</dd>
             <dt>Policy revision</dt><dd>{noticeDetail.policy_revision}</dd>
-            <dt>Receipt</dt><dd>{noticeDeliveryLabel(noticeDetail)}</dd>
+            <dt>Receipt</dt><dd>{noticeDeliveryLabel(noticeDetail, actorId)}</dd>
             <dt>Current recipient</dt><dd>{noticeDetail.is_current_recipient ? "you are the current bound recipient" : "you are not the current recipient"}</dd>
             <dt>Acknowledgement kind</dt><dd>{noticeDetail.acknowledgement_kind ?? "none"}</dd>
             <dt>Owner signoff</dt><dd>{String(noticeDetail.owner_signoff)} — never implied by acknowledgement</dd>
