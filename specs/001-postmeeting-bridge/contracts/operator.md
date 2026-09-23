@@ -1,6 +1,6 @@
 # C-O: Operator and recipient boundary
 
-Q081–Q099; FR-009/016/017/020/021. Spencer owns operator artifacts/wrappers, core owns schema/app.
+Q081–Q099; FR-009/016/017/020/021. The user reassigned unstarted operator preparation to agents on 2026-09-23. Astra coordinates Muse/Opus preparation; core owns schema/app. See delivery/operator-preparation-ownership.md.
 
 Day1 matrix inventories every RFP integration clause; detailed contracts only for selected
 local APIs and simulator. Each row: requirement, interface, direction, product/contract version,
@@ -34,7 +34,7 @@ Existing health wrapper currently treats any HTTP200 as ready; future wrapper mu
 authenticated /api/readiness and all required booleans. Container HEALTHCHECK instead
 uses minimal /healthz liveness. Acquire wrapper must obtain the separately provisioned fixed evidence-coordinator credential securely,
 without token command arguments/logging, preserve stable idempotency and reject actor mismatch.
-Core defines the auth contract; Spencer changes wrappers only after that contract is frozen.
+Core defines the auth contract; the T024 owner changes wrappers only after that contract is frozen.
 
 No new licensing engine. Document future preserve-service expiry alarm intent and assign
 commercial terms, references, staffing, SLA/compliance/distribution rights to human roles.

@@ -582,6 +582,24 @@
       "pull_request": "https://github.com/yugant99/IpManagement/pull/92",
       "review_report": "specs/001-postmeeting-bridge/delivery/state-recovery-source-review.md",
       "integration_sha": "a711d1ee84ba3d8959f18471bc2acf930c3ce7a5"
+    },
+    {
+      "task": "T020",
+      "status": "implementation_dispatched",
+      "base_sha": "b8f294fc19b635dcf3c784125fd804d8a1a2616b",
+      "branch": "codex/bridge-t020-agent-matrix",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t020-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32b85484ffe3rzKZMmJ8uKzG3",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/integration-matrix.md"
+      ],
+      "prerequisites": [
+        "T002 source acceptance",
+        "Explicit user release of unstarted Spencer preparation"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "prohibited": "No tests/build/import/typecheck/lint/DB/SQL/runtime/private/untracked/credentials/network/shell/Git/extra agents/models/purchases; source tools, lead publishes."
     }
   ],
   "muse_route": {
