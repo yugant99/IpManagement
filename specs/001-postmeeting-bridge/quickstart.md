@@ -6,29 +6,38 @@ Source implementation/review is progressing separately. None of the observations
 has been executed for this bridge; T025 prerequisites and exact-candidate pin still govern.
 
 ## Prerequisites and candidate
-Main Lead records implementation/validation authorization, exact candidate SHA and selected
-Linux amd64 target. Pin image/UI/feed assets plus schema/config revision, fixture hash and
-isolated data volume. Docker Engine>=24 with the Compose plugin (record exact version; accepted experiment used 5.5.1), Bash/curl/Python3.11+ host tooling;
-application Python3.12 from its image/native dependency lock. No dependency upgrades.
+Main Lead records implementation/validation authorization, exact candidate SHA and the declared
+disposable synthetic technical target. A separately pinned native local T025 target is permitted;
+the unavailable recipient Linux amd64 target remains a separate portable/human evidence gate.
+Pin UI/feed assets, schema/config revision, fixture hash and isolated data directory/volume;
+record an image digest only if an image was actually built under applicable authority.
+Native execution uses application Python3.12 and the committed dependency locks. The future
+Linux amd64 package target requires Docker Engine>=24 with the Compose plugin (record the
+actual version), Bash/curl/Python3.11+ host tooling. No dependency upgrades.
 Use an explicitly isolated disposable synthetic store; changing Compose project alone is
 insufficient because the current volume name is global. Never point recovery exercises at
 the user's live store. Provision separate requester/operator and independent approver tokens
 via the reviewed offline procedure; no token content in evidence or command history.
 
-## Existing operator command sequence (later, on the declared synthetic target)
-From the pinned repository, after reading scripts/ops/README.md and docs/STATE_OPERATIONS.md:
+## Packaged operator command sequence (only on an authorized declared package target)
+This package sequence does not authorize Docker or provision a recipient target. For the
+reviewed wrapper interface and recovery policy, read `delivery/operator-handoff.md`,
+`scripts/ops/README.md` and `docs/RUNNING.md`. Set explicit `IPAM_DATA_VOLUME` and
+`IPAM_ACCESS_CONFIG` first; provision protected token files separately. Never use the
+user's existing data volume. Native local T025 records its own exact commands in evidence.
 
 ```sh
 scripts/ops/build.sh
 scripts/ops/seed.sh --scenario rich
 scripts/ops/start.sh
-scripts/ops/health.sh
-scripts/ops/acquire.sh bridge-initial-acquisition
+scripts/ops/health.sh --readiness --token-file /protected/operator.token --domain demo-core
+scripts/ops/acquire.sh --token-file /protected/coordinator.token --key bridge-initial-acquisition --reason "Initial synthetic T025 acquisition"
 ```
 
-These wrappers require the future C-A/C-O auth and readiness updates. The evidence operator supplies the
-separate coordinator token through the approved protected input mechanism; do not paste it into arguments.
-If state already exists, seed must refuse; do not reset it. Acquire retries retain the same key.
+The T024 wrappers use separate coordinator and domain-Operator token files; only file paths,
+never token contents, enter arguments. If state already exists, seed must refuse; do not reset
+or reseed as a readiness fallback. Acquire retries retain the same key and reason after an
+explicit operator decision; ambiguous outcomes remain unknown until exact replay evidence.
 Check all protected readiness booleans and compiled UI, not HTTP200 alone. The timer stays off.
 
 ## Independent acceptance observations
@@ -79,7 +88,7 @@ scripts/ops/backup.sh bridge-review.sqlite3
 scripts/ops/snapshots.sh list
 scripts/ops/restore.sh bridge-review.sqlite3 --confirm
 scripts/ops/start.sh
-scripts/ops/health.sh
+scripts/ops/health.sh --readiness --token-file /protected/operator.token --domain demo-core
 ```
 Stop/start operations here are future instructions, not executed. Snapshot restores state,
 not code/UI/config/credentials; pin/provision those separately. Restore never implicitly
