@@ -50,3 +50,10 @@ session snapshot is cumulative: input68/output91514 (includes thinking51701),
 cache-read4456040/cache-created211647, list-cost metadata4.414936 USD, existing Max
 subscription. Do not sum cumulative Claude resume snapshots or treat list cost as
 actual billed spend. Raw provider logs remain outside the public repository.
+
+T014 and T016 are dispatched on exact publication `fb3723a5de9f20179adfc869a61558585c200865`
+in separate worktrees and codex branches. Their native worker paths and file leases
+are registered in first-wave.json. T014 owns app/models; T016 owns lifecycle/workflow.
+No old worker checkout was changed. The integration is draft PR84. T015 waits for
+T014 source acceptance; T017 waits for both T014/T016. Spencer T020 remains a separate
+human prerequisite, not an agent-completed matrix.

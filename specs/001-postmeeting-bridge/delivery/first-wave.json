@@ -366,6 +366,45 @@
       "pull_request": "https://github.com/yugant99/IpManagement/pull/83",
       "review_report": "specs/001-postmeeting-bridge/delivery/reservation-ticket-source-review.md",
       "integration_sha": "6599ae493edcb897a407d90570b68efd5affcea2"
+    },
+    {
+      "task": "T014",
+      "status": "source_implementation_dispatched",
+      "base_sha": "fb3723a5de9f20179adfc869a61558585c200865",
+      "branch": "codex/bridge-t014-ticket-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t014-api/Ip_inventory",
+      "route": "Codex gpt-6-luna high",
+      "worker": "/root/t014_ticket_api",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "prerequisites": [
+        "T012",
+        "T013"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/ticket-api-wire.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/runtime/DB/private data/untracked outputs/external model calls/delegation; no unleased edits, self-acceptance or main merge."
+    },
+    {
+      "task": "T016",
+      "status": "source_implementation_dispatched",
+      "base_sha": "fb3723a5de9f20179adfc869a61558585c200865",
+      "branch": "codex/bridge-t016-reservation-notices",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016-notices/Ip_inventory",
+      "route": "Codex gpt-6-luna high",
+      "worker": "/root/t016_reservation_notices",
+      "owned_paths": [
+        "backend/ipam_demo/lifecycle.py",
+        "backend/ipam_demo/workflow.py"
+      ],
+      "prerequisites": [
+        "T013"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/lifecycle.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/runtime/DB/private data/untracked outputs/external model calls/delegation; no unleased edits, self-acceptance or main merge."
     }
   ],
   "muse_route": {
@@ -391,7 +430,7 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T012_T013_source_integrated",
+    "status": "T014_T016_source_dispatched",
     "action": "Use docs/handoffs/main-lead-5.0.md; receiver registers its actual task ID when started by user",
     "hold": "T014 and T016 source implementation released after independent closure; T025 remains prerequisite-gated.",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
