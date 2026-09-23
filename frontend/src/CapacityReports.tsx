@@ -3,6 +3,8 @@ import type { FormEvent } from "react";
 import { currentContext, downloadProtected, request } from "./api";
 import type { Page, Scope } from "./api";
 import type { Finding, RunSummary, SavedRun } from "./firstPathApi";
+import { loadStaticOccupancy } from "./workflowApi";
+import type { CurrentStaticOccupancy } from "./workflowApi";
 
 interface Metric {
   pool_id: string; scope_id: string; scope_name: string; family: 4 | 6; cidr: string; name: string; capacity: string;
@@ -55,6 +57,9 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   const [name, setName] = useState("Reconciliation review");
   const [reason, setReason] = useState("");
   const [selectedColumns, setSelectedColumns] = useState(columns);
+  const [occupancy, setOccupancy] = useState<CurrentStaticOccupancy | null>(null);
+  const [occupancyError, setOccupancyError] = useState("");
+  const [occupancyDomain, setOccupancyDomain] = useState("");
 
   async function loadRuns(append = false) {
     setBusy(true); setError("");
@@ -71,6 +76,32 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
       .catch((error: unknown) => { if (!controller.signal.aborted) setError(error instanceof Error ? error.message : "Could not load reporting data."); });
     return () => controller.abort();
   }, []);
+  useEffect(() => {
+    let domain = "";
+    try { domain = currentContext().selected_domain ?? ""; } catch { domain = ""; }
+    if (!domain) { setOccupancy(null); setOccupancyDomain(""); return; }
+    if (occupancyDomain !== domain) {
+      setOccupancy(null);
+      setOccupancyDomain(domain);
+    }
+    const controller = new AbortController();
+    setOccupancyError("");
+    loadStaticOccupancy(controller.signal)
+      .then(current => {
+        if (controller.signal.aborted) return;
+        try {
+          if (currentContext().selected_domain !== domain) return;
+        } catch { return; }
+        setOccupancy(current);
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          setOccupancy(null);
+          setOccupancyError(`Current static occupancy is unknown. ${error instanceof Error ? error.message : "Could not load current occupancy."}`);
+        }
+      });
+    return () => controller.abort();
+  }, [occupancyDomain]);
   async function selectRun(id: string) {
     setBusy(true); setError(""); setNotice("");
     try { setRun(await request<CapacityRun>(`/api/runs/${id}`, new AbortController().signal)); }
@@ -132,6 +163,20 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   return <section aria-labelledby="capacity-heading">
     <div className="page-heading"><div><p className="eyebrow">Saved calculations</p><h1 id="capacity-heading">Capacity and reports</h1><p className="intro">Inspect saved occupancy, compare two runs, and export the evidence you reviewed.</p></div><button className="secondary" disabled={busy} onClick={() => { void loadRuns(); }}>Reload run list</button></div>
     <div className="evidence-banner"><strong>Synthetic lease occupancy</strong><span>Hourly samples approximate the source history. Lease counts do not measure traffic, and candidate space is not proven reclaimable.</span></div>
+    <section className="inventory-panel" aria-labelledby="current-occupancy-heading"><h2 id="current-occupancy-heading">Current static IPv4 occupancy</h2>
+      <p className="quiet">Current ledger occupancy only — metric current_static_ipv4_occupancy in IPv4 addresses. Separate from the immutable saved DHCP runs below and their run time, p95, forecast and unknowns. Saved runs are never modified.</p>
+      {occupancyError && <p className="notice error" role="alert">{occupancyError}</p>}
+      {occupancy ? <dl className="facts"><dt>Pool / scope / domain</dt><dd><code>{occupancy.pool_id}</code> · <code>{occupancy.scope_id}</code> · {occupancy.domain} · IPv{occupancy.family}</dd>
+        <dt>As of (server UTC)</dt><dd>{occupancy.as_of}</dd>
+        <dt>Unit</dt><dd>{occupancy.unit}</dd>
+        <dt>Active allocations</dt><dd>{occupancy.components.active_allocations.count} {occupancy.components.active_allocations.unit}</dd>
+        <dt>Reserved holds (expired included)</dt><dd>{occupancy.components.reserved_holds.count} {occupancy.components.reserved_holds.unit}</dd>
+        <dt>Occupied total</dt><dd>{occupancy.components.occupied_total.count} {occupancy.components.occupied_total.unit}</dd>
+        <dt>Assignable capacity</dt><dd>{occupancy.components.assignable_capacity.count} {occupancy.components.assignable_capacity.unit}</dd>
+        <dt>Remaining assignable</dt><dd>{occupancy.components.remaining_assignable.count} {occupancy.components.remaining_assignable.unit}</dd>
+        <dt>Provenance</dt><dd>{occupancy.provenance.source} · {occupancy.provenance.capacity} · {occupancy.provenance.allocations} · {occupancy.provenance.reservations}</dd></dl>
+        : !occupancyError && <p role="status">Loading current occupancy…</p>}
+    </section>
     {error && <div className="notice error" role="alert"><p>{error}</p><p>Previously loaded results remain pinned to their displayed IDs and times.</p></div>}
     {notice && <p className="notice" role="status">{notice}</p>}
     <label className="report-run-select">Saved run<select disabled={busy} value={run?.id ?? ""} onChange={(event) => { if (event.target.value) void selectRun(event.target.value); }}><option value="">Select a saved run</option>{runs.map((item) => <option key={item.id} value={item.id}>{item.created_at} · {item.id}</option>)}</select></label>
