@@ -1,0 +1,176 @@
+{
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "migration": {
+    "staged_intended_receipt": {
+      "input": 55,
+      "accepted": 55,
+      "rejected": 0,
+      "duplicate": 0,
+      "equation_holds": true,
+      "exact_replay": 200,
+      "changed_identity_content": 409
+    },
+    "assessment": {
+      "accepted": 55,
+      "added": 0,
+      "changed": 0,
+      "unchanged": 55,
+      "conflicting": 0,
+      "equation_holds": true,
+      "active_only_rows": 1,
+      "active_only_is_not_deletion": true,
+      "digest_anchor_recomputed_on_read": true,
+      "self_signoff": 403,
+      "independent_signoff": 200,
+      "stale_baseline": 409,
+      "no_active_inventory_write": true
+    },
+    "invalid_duplicate_mixed_bounds": {
+      "malformed_intended_candidate_cidr": {
+        "http": 422,
+        "error": "INVALID_IMPORT",
+        "receipt_created": false
+      },
+      "duplicate_intended_row": {
+        "http": 422,
+        "error": "INVALID_IMPORT",
+        "receipt_created": false
+      },
+      "mixed_domain_intended_envelope": {
+        "http": 403,
+        "error": "FORBIDDEN",
+        "receipt_created": false
+      },
+      "observation_import_over_10000_rows": {
+        "http": 413,
+        "error": "IMPORT_TOO_LARGE",
+        "rows": 10001,
+        "receipt_created": false
+      },
+      "generic_raw_import_body_over_10MiB": {
+        "http": 413,
+        "error": "UPLOAD_LIMIT",
+        "bytes": 10485770,
+        "receipt_created": false
+      },
+      "refused_imports_active_state_unchanged": true,
+      "intended_stage_count_equation": {
+        "before_after_source_batches": [
+          20,
+          20
+        ],
+        "before_after_baseline_version": [
+          9,
+          9
+        ],
+        "before_after_active_counts_equal": true
+      },
+      "scope_note": "Malformed CIDR is the staged intended-candidate probe; row-count bound is an observation-source import probe; byte cap is the generic upload boundary, not a canonical intended-row receipt."
+    },
+    "foreign_domain": {
+      "assessment_detail": 404,
+      "assessment_export": 404,
+      "import_detail": 404,
+      "reservation_detail": 404,
+      "ticket_detail": 404
+    }
+  },
+  "schema_migration": {
+    "schema_6_to_7_known_fixture": "succeeded explicitly on disposable clone",
+    "malformed_schema6_acknowledgement": {
+      "migration_refused": true,
+      "failure": "v7 legacy guard CHECK failure surfaced as STORE_ERROR",
+      "user_version_after": 6,
+      "history_table_created": false,
+      "database_bytes_unchanged": true
+    }
+  },
+  "recovery": {
+    "populated_schema": 7,
+    "full_table_compare": {
+      "table_count": 32,
+      "all_equal": true,
+      "integrity": "ok",
+      "application_id_equal": true,
+      "user_version_equal": true
+    },
+    "nonzero_history_retained": [
+      "allocations",
+      "audit_events",
+      "migration_assessment_rows",
+      "reservation_notice_notifications",
+      "reservations",
+      "schedule_operations",
+      "ticket_attempts",
+      "ticket_handoff_events",
+      "ticket_intents",
+      "ticket_simulator_effects"
+    ],
+    "same_configuration": "like_for_like; database replaced; protected readiness six of six true; selected-domain readbacks succeeded",
+    "other_classifications": {
+      "changed_configuration": "changed_configuration",
+      "unavailable_configuration": "unverified",
+      "legacy_missing_manifest": "unverified"
+    },
+    "refusals": {
+      "manifest_snapshot_mismatch": {
+        "refused": true,
+        "target_unchanged": true
+      },
+      "truncated_corrupt_snapshot": {
+        "refused": true,
+        "target_unchanged": true
+      },
+      "unsupported_schema": {
+        "error": "UNSUPPORTED_SCHEMA",
+        "target_unchanged": true
+      },
+      "nonstandalone_sidecar": {
+        "error": "SNAPSHOT_NOT_STANDALONE",
+        "target_unchanged": true
+      },
+      "busy_backup": {
+        "error": "DATA_IN_USE",
+        "snapshot_created": false
+      },
+      "busy_restore": {
+        "error": "DATA_IN_USE",
+        "target_unchanged": true,
+        "preserved_copy_created": false
+      }
+    },
+    "injected_failure_classes": [
+      "manifest publication failure",
+      "post-publication directory fsync failure",
+      "manifest scratch cleanup failure",
+      "snapshot scratch cleanup failure",
+      "active database replacement failure",
+      "restore candidate cleanup failure"
+    ],
+    "injected_failure_reporting": "failed operations surfaced STATE_FILESYSTEM_ERROR or STATE_CLEANUP_FAILED with publication, target-preservation, or exact remaining-path details; active target stayed unchanged when replacement failed",
+    "timed_stopped_restore": {
+      "scope": "owned disposable local synthetic clone",
+      "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+      "incident_boundary": "monotonic start immediately before stopped restore through first authenticated selected-domain business read; host/code/UI/config/dependency provisioning excluded",
+      "snapshot_age_seconds": 3382.714,
+      "restore_seconds": 1.191,
+      "ready_seconds_after_restore": 0.737,
+      "total_restore_to_business_read_seconds": 1.931,
+      "restore_status": "restored; database_replaced=true; manifest_available=true; schema=7",
+      "readiness_http": 200,
+      "readiness_checks_true": 6,
+      "business_read": "GET /api/prefixes?limit=1 returned HTTP 200 with one item",
+      "post_snapshot_clone_rows_replaced": {
+        "allocations": 0,
+        "reservations": 4,
+        "allocation_requests": 3,
+        "ticket_intents": 3,
+        "reservation_history": 5
+      },
+      "loss_disposition": "those later synthetic writes were intentionally replaced only in the disposable recovery-timed3 clone; no external or customer state was involved",
+      "source_feed_module": "tracked fixtures/evolving/ipam_synthetic_feed/__init__.py; SHA-256 6554aa7f69b7b53ddaad7adb653f3bda47f8ca30c7cda6ed1054ce43e0aeb680; installed from exact candidate; no harness substitution",
+      "runtime_environment": "Python 3.12.10; uv sync --locked completed before measurement",
+      "measurement_artifact": "candidate4/recovery-timed3/timed-recovery.json"
+    }
+  }
+}

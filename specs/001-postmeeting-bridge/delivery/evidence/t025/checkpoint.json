@@ -4,17 +4,127 @@
   "status": "in_progress",
   "scope": "disposable synthetic stores; loopback only",
   "observations": {
-    "reservation_race": {"status": "pass", "responses": [201, 409], "persisted_reservations": 1},
-    "browser_access": {"status": "pass", "selected_domain": "demo-core", "prefix_detail_loaded": true, "saved_domain_export_bytes": 2359059},
-    "browser_token_storage": {"status": "pass", "local_storage_keys": 0, "session_storage_keys": 0, "token_value_present": false, "reload_signed_out": true, "revocation_signed_out": true, "password_field_blank": true},
-    "populated_recovery": {"status": "pass", "tables_compared": 32, "all_equal": true, "integrity": "ok", "readiness_booleans_true": 6},
-    "migration_assessment": {"status": "pass", "accepted": 55, "added": 0, "changed": 0, "unchanged": 55, "conflicting": 0, "active_only": 1, "active_inventory_writes": 0},
-    "unknown_evidence": {"status": "pass", "incomplete_dhcp": true, "unknown_findings": 12, "prior_anomalies_that_remained_unknown": 4, "prior_anomalies_marked_healthy": 0},
-    "malformed_v6_ack_migration": {"status": "pass", "migration_refused": true, "schema_after": 6, "history_table_created": false, "database_bytes_unchanged": true},
-    "recovery_refusals": {"status": "partial", "unsupported_schema": "refused_target_unchanged", "non_standalone": "refused_target_unchanged", "busy_lock": "DATA_IN_USE_no_snapshot", "integrity_corrupt_input": "not_yet_recorded"},
-    "foreign_export": {"status": "not_run"},
-    "migration_malformed_and_bounds": {"status": "partial", "duplicate_envelope": "refused", "stale_assessment": "refused", "malformed_row_and_bounds": "not_yet_recorded"},
-    "saved_dhcp_unit_labels": {"status": "not_yet_recorded"}
+    "reservation_race": {
+      "status": "pass",
+      "responses": [
+        201,
+        409
+      ],
+      "persisted_reservations": 1
+    },
+    "browser_access": {
+      "status": "pass",
+      "selected_domain": "demo-core",
+      "prefix_detail_loaded": true,
+      "saved_domain_export_bytes": 2359059
+    },
+    "browser_token_storage": {
+      "status": "pass",
+      "local_storage_keys": 0,
+      "session_storage_keys": 0,
+      "token_value_present": false,
+      "reload_signed_out": true,
+      "revocation_signed_out": true,
+      "password_field_blank": true
+    },
+    "populated_recovery": {
+      "status": "pass",
+      "tables_compared": 32,
+      "all_equal": true,
+      "integrity": "ok",
+      "readiness_booleans_true": 6
+    },
+    "migration_assessment": {
+      "status": "pass",
+      "accepted": 55,
+      "added": 0,
+      "changed": 0,
+      "unchanged": 55,
+      "conflicting": 0,
+      "active_only": 1,
+      "active_inventory_writes": 0
+    },
+    "unknown_evidence": {
+      "status": "pass",
+      "incomplete_dhcp": true,
+      "unknown_findings": 12,
+      "prior_anomalies_that_remained_unknown": 4,
+      "prior_anomalies_marked_healthy": 0
+    },
+    "malformed_v6_ack_migration": {
+      "status": "pass",
+      "migration_refused": true,
+      "schema_after": 6,
+      "history_table_created": false,
+      "database_bytes_unchanged": true
+    },
+    "recovery_refusals": {
+      "status": "pass",
+      "unsupported_schema": "UNSUPPORTED_SCHEMA_target_unchanged",
+      "non_standalone": "SNAPSHOT_NOT_STANDALONE_target_unchanged",
+      "busy_backup": "DATA_IN_USE_no_snapshot",
+      "busy_restore": "DATA_IN_USE_target_unchanged_no_preserved_copy",
+      "corrupt_input": "refused_target_unchanged",
+      "manifest_mismatch": "refused_target_unchanged"
+    },
+    "foreign_export": {
+      "status": "pass",
+      "foreign_assessment_export": 404,
+      "foreign_detail_reads": {
+        "assessment": 404,
+        "import": 404,
+        "reservation": 404,
+        "ticket": 404
+      }
+    },
+    "migration_malformed_and_bounds": {
+      "status": "pass",
+      "malformed_intended_cidr": 422,
+      "duplicate_intended_row": 422,
+      "mixed_domain_envelope": 403,
+      "observation_rows_over_10000": 413,
+      "raw_import_bytes_over_10MiB": 413,
+      "receipts_created_for_refusals": false,
+      "active_state_unchanged": true
+    },
+    "saved_dhcp_unit_labels": {
+      "status": "pass",
+      "capacity": "assignable addresses",
+      "history": "saved hourly lease occupancy; sample counts and address counts shown",
+      "stale_or_incomplete": "Unknown, not zero",
+      "limitation": "synthetic lease occupancy is not traffic"
+    },
+    "candidate_continuity": {
+      "status": "pass",
+      "candidate1_full_build": "failed at TypeScript; provisional Vite output excluded",
+      "candidate2_full_build": "passed; pinned UI assets reused",
+      "candidate3_schedule_run": "30.006-second timeout with 0 response bytes; unknown retained",
+      "candidate4_manual_run": "201 and full detail readback"
+    },
+    "wrapper_security_specific_cases": {
+      "status": "pass_for_listed_cases",
+      "fifo": "refused in 43 ms before network",
+      "url_components": "path/query/fragment/userinfo/control rejected before network",
+      "header_injection": "rejected before network",
+      "proxy_hits": 0,
+      "redirect_followed": false,
+      "bash_trace_token_output": false,
+      "inconsistent_replay": 6,
+      "false_readiness": 1
+    },
+    "reservation_release": {
+      "status": "pass",
+      "approved_unused_unlinked": "state released; capacity restored from 4 to 5 remaining assignable IPv4 addresses",
+      "linked_pending": "EXTERNAL_EFFECT_UNRESOLVED; hold remains reserved",
+      "linked_unknown": "EXTERNAL_EFFECT_UNRESOLVED; hold remains reserved",
+      "independent_rejection": "hold preserved"
+    },
+    "timed_stopped_recovery": {
+      "status": "pass",
+      "restore_to_readiness_and_business_read_seconds": 1.931,
+      "readiness_checks_true": 6,
+      "scope": "disposable synthetic clone; post-snapshot clone writes intentionally replaced and counted"
+    }
   },
   "private_evidence": [
     "reservation-race-timed.json",
@@ -26,7 +136,18 @@
     "injected-failure-results.json",
     "refusal-probes.json",
     "migration-assessment.jsonl",
-    "wrapper-negative-matrix.json"
+    "wrapper-negative-matrix.json",
+    "migration-byte-bound.json",
+    "corrupt-refusal.json",
+    "busy-restore.json",
+    "refusal-codes.json",
+    "wrapper-security-probe.json",
+    "saved-dhcp-ui-evidence.json",
+    "candidate3/logs/wrapper-acquire-first.out",
+    "logs/ui-build-candidate2.log",
+    "candidate4/logs/release-completion.json",
+    "candidate4/logs/release-linked-refusal-corrected.json",
+    "candidate4/recovery-timed3/timed-recovery.json"
   ],
   "limitations": [
     "No human portability acknowledgement or production/customer evidence is claimed.",

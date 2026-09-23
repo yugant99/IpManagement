@@ -1,0 +1,14 @@
+{
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "actual_service_negative_matrix": {"bad_host": 2, "world_readable_token_file": 2, "malformed_token_shape": 2, "symlink_token_file": 2, "non_coordinator_principal": 4, "expired_coordinator": 4, "health_wrong_domain": 4, "health_bad_mode": 2},
+  "isolated_loopback_mock_matrix": {
+    "bad_url_components": {"path": 2, "query": 2, "fragment": 2, "userinfo": 2, "control_or_header_injection": 2, "network_requests": 0},
+    "fifo_token": {"exit": 2, "elapsed_ms": 43, "network_requests": 0},
+    "readiness_domain_header_injection": {"exit": 2, "network_requests": 0},
+    "inherited_bash_trace": {"acquire_exit": 0, "token_in_output": false},
+    "proxy_and_redirect": {"proxy_hits": 0, "redirect_target_hit": false, "token_in_output": false},
+    "inconsistent_replay_header_body_status": {"exit": 6, "outcome": "UNKNOWN", "token_in_output": false},
+    "http_200_with_false_readiness_boolean": {"exit": 1, "not_ready_reported": true}
+  },
+  "scope": "Results cover listed concrete cases; they do not claim an exhaustive security review."
+}
