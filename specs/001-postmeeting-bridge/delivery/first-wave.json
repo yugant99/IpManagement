@@ -417,7 +417,7 @@
     },
     {
       "task": "T015",
-      "status": "source_implementation_dispatched",
+      "status": "source_review_pending",
       "base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865",
       "route": "opencode-go/muse-spark-1.3-contributor#high",
       "branch": "codex/bridge-t015-workflow-ui",
@@ -432,7 +432,8 @@
       ],
       "wire_contract": "specs/001-postmeeting-bridge/contracts/workflow-ui-wire.md",
       "review_route": "Codex GPT-6 Sol high independent worker",
-      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git."
+      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git.",
+      "result_sha": "06f9a15080fce5b860d5d5cd58c5de1d41f95432"
     },
     {
       "task": "T017",
@@ -457,6 +458,27 @@
       "pull_request": "https://github.com/yugant99/IpManagement/pull/87",
       "integration_sha": "11e6728317d9c2da5296975f3f2f1bbce516e785",
       "review_report": "specs/001-postmeeting-bridge/delivery/notice-api-source-review.md"
+    },
+    {
+      "task": "T016A",
+      "status": "source_implementation_dispatched",
+      "base_sha": "b24e50728c9dcd071a4f69534e9110c6d3e58348",
+      "branch": "codex/bridge-t016a-recipient-foundation",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016a-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32eda1cbffeAumu1uotbBxqdf",
+      "owned_paths": [
+        "backend/ipam_demo/access.py",
+        "backend/ipam_demo/store.py",
+        "backend/ipam_demo/schema_v7.sql"
+      ],
+      "prerequisites": [
+        "T017",
+        "Explicit user recipient policy and lead/Sol wire freeze"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No frozen schema6 edit, unleased source, tests/build/typecheck/import/DB/runtime/shell/network/private or untracked content, extra agents/models/spend. Lead publishes."
     }
   ],
   "muse_route": {
@@ -482,11 +504,11 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T015_T017_source_dispatched",
+    "status": "T015_review_and_T016A_recipient_foundation",
     "action": "Main Lead5 continues critical path with full Muse T015 and Opus T017 after exact common base pin",
     "hold": "T025 remains prerequisite-gated; FR006 owner mapping and Spencer prerequisites open",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "ede6cb6511c71011e6295fd46bf9d7c400a7db39",
+    "application_source_sha": "11e6728317d9c2da5296975f3f2f1bbce516e785",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
@@ -520,7 +542,7 @@
       "T016B": "retained Luna T016 lifecycle author",
       "T017A": "retained Opus5.5 high T017 API author"
     },
-    "status": "contract_settled_implementation_pending",
+    "status": "T016A_dispatched_after_T017_source_acceptance",
     "reviewer": "Independent GPT-6 Sol high",
     "gate": "T018/T023 now wait for T017A; T025/T028 unchanged, no runtime before prerequisites"
   }
