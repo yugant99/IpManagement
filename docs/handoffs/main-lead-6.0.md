@@ -48,19 +48,20 @@ continue T024 there. No new planning interview is needed.
 The user's latest pool is Spark 1.3 and DeepSeek V4.1 Flash in OpenCode, plus GPT-6
 Luna and GPT-6 Sol in Codex. The active local OpenCode catalog labels the user's
 “Meta Spark 1.3 / Muse” as **Muse Spark 1.3**; do not invent a `meta/...` model ID.
-Catalog metadata was refreshed for this handoff; it is not a live usage/quota check.
+Exact route/high variants, synthetic availability probes and actual usage were refreshed
+before dispatch. The current user correction selects Contributor, not the free route.
 
 | Role / model | Route | Handoff status |
 |---|---|---|
-| Full T024 primary author — Muse Spark 1.3 Free, high | `opencode/muse-spark-1.3-contributor-free#high` | Listed active/enabled with high variant; prefer this explicit free route after preflight |
+| Full T024 primary author — Muse Spark 1.3 Contributor, high | `opencode-go/muse-spark-1.3-contributor#high` | Live preflight passed; complete T024 independently source-closed at7e50122 |
 | Substantial non-overlapping implementation or explained unavailable-author fallback — DeepSeek V4.1 Flash, high | `opencode-go/deepseek-v4.1-flash#high` | Listed active/enabled with high variant; use existing allowance only |
 | Independent T025 verifier or explained later-slice fallback — GPT-6 Luna, high | Codex `gpt-6-luna`, high | Use a separate verifier worker; do not self-accept implementation |
 | Independent full source/shared-invariant review and final T027 — GPT-6 Sol, high | Codex `gpt-6-sol`, high | Keep separate from the implementation author |
 
-The historical Muse route `opencode-go/muse-spark-1.3-contributor#high` is also
-catalogued, but was the completed work's actual route. Do not silently substitute
-it for the explicit free route or infer that a route is usable/free from a model
-name or cost telemetry. Freshly verify exact route, variant, data-use terms,
+The earlier free-route preference is superseded by the user's explicit Contributor
+correction. Do not dispatch `opencode/muse-spark-1.3-contributor-free#high`. The
+failed free-route probes below are historical evidence only. Never infer usable
+capacity from catalog presence or cost telemetry. Freshly verify route, data-use terms,
 actual availability and usage before meaningful dispatch; retain the 20% reserve.
 A minimal synthetic-only access probe may establish availability, but is not an
 application test or feature assignment. Do not send private material as a probe.

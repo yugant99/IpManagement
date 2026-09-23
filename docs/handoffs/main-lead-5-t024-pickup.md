@@ -1,6 +1,6 @@
 # Main Lead 5.0 — T024 ready, held for tomorrow
 
-**Superseding transfer/routing:** The user requested Main Lead 6.0. Read [the latest amendment](main-lead-6.0.md) before dispatch: prefer the explicit free Spark 1.3 route, DeepSeek V4.1 Flash is available, and Opus is temporarily unavailable. Technical scope/gates below remain intact; the old same-lead prompt and Go-route preference are historical.
+**Superseding transfer/routing:** The user requested Main Lead 6.0. Read [the latest amendment](main-lead-6.0.md) before dispatch: use the user-corrected exact `opencode-go/muse-spark-1.3-contributor#high` route; DeepSeek V4.1 Flash is the recorded fallback, and Opus is temporarily unavailable. Technical scope/gates below remain intact; the old same-lead prompt and earlier free-route preference are historical.
 
 User-authorized lead: **GPT-6 Astra / Main Lead 5.0**, task
 `01a0ccc7-6219-73c1-bd3b-1521bb71a837`.

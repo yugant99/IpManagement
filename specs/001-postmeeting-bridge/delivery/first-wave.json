@@ -117,7 +117,7 @@
       "dispatch_gate": "Do not dispatch; current T020 agent source and ownership are in next_wave/operator_preparation_amendment"
     }
   ],
-  "route_decision": "Main Lead 5.0 Astra; latest delegated user routing update prioritizes substantial Muse1.3 high and Opus5.5 high feature ownership after reviewed T012/T013. Muse receives more upcoming load: T015 workflow UI, then T018 UI and T023 state recovery as prerequisites/leases permit. Opus receives T017 notice API. Retain in-flight Luna T014/T016 correction ownership and independent Codex GPT-6 Sol high reviews. No tiny pilots, model substitution, purchased capacity or private data exposure.",
+  "route_decision": "Main Lead6 Astra owns coordination. User explicitly selected opencode-go/muse-spark-1.3-contributor#high, which authored complete T024 after live preflight. DeepSeek V4.1 Flash high is the recorded fallback with no overlapping active lease. GPT-6 Luna high independently verifies T025; GPT-6 Sol high independently reviews source/shared invariants and T027. Preserve original correction ownership. Opus unavailable, no dispatch/resume/timed retry. No private training inputs, purchases or Tier B release.",
   "next_wave": [
     {
       "task": "T004",
@@ -704,10 +704,10 @@
     }
   ],
   "muse_route": {
-    "authorization": "Latest delegated user update authorizes upcoming coherent feature load, led by T015/T018/T023 subject to prerequisites and disjoint file leases; only tracked public synthetic repository may reach existing training-enabled route.",
+    "authorization": "Current user-selected Spark Contributor high owns complete T024 and retained corrections; public tracked synthetic source only under unchanged existing training consent.",
     "exact_route": "opencode-go/muse-spark-1.3-contributor#high",
     "variant_verified": true,
-    "status": "preflight_verified_existing_training_consent_enabled_no_setting_change"
+    "status": "T024_independently_source_closed_original_author_retained"
   },
   "opus_t008_advisory": {
     "route": "claude-opus-5-5",
