@@ -9,7 +9,7 @@ from threading import Lock
 from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
-from fastapi import Depends, FastAPI, Query, Request
+from fastapi import Depends, FastAPI, Path, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from pydantic import ValidationError
@@ -26,7 +26,7 @@ from .models import (Allocation, CurrentStaticOccupancy, MigrationAssessmentCrea
                      MigrationAssessmentMutation, MigrationAssessmentPage,
                      MigrationAssessmentSignoffRequest, MigrationOperationReadback,
                      Page, Pool, Prefix, PrefixDetail, ReservationDetail, ReservationHistoryEntry,
-                     ReservationNotice, ReservationNoticeEvaluation,
+                     ReservationNotice, ReservationNoticeEvaluation, ReservationNoticeNotificationVersion,
                      ReservationOperationReadback, ReservationReleaseRequest, ReservationSummary, Scope,
                      TicketHandoffDetail, TicketHandoffMutation, TicketHandoffOperationReadback,
                      TicketHandoffSummary)
@@ -39,6 +39,8 @@ logger = logging.getLogger("ipam_demo")
 Limit = Annotated[int, Query(ge=1, le=200)]
 Offset = Annotated[int, Query(ge=0)]
 TextFilter = Annotated[str | None, Query(max_length=200)]
+# Canonical positive decimal only: no sign, bool, float, padding or leading zero; fits SQLite INTEGER.
+NotificationVersion = Annotated[str, Path(pattern="^[1-9][0-9]{0,17}$")]
 
 
 def _require_complete_feed_authority(config):
@@ -1121,7 +1123,8 @@ def create_app() -> FastAPI:
         supplied = str(reservation_id) if reservation_id else None
         if supplied is not None:
             require_domain(request, connection, reservation_scope_id(connection, supplied))
-        items = [project_notice(item) for item in lifecycle.list_reservation_notices(connection)
+        items = [project_notice(item) for item in lifecycle.list_reservation_notices(
+                     connection, configuration=request.state.access_configuration)
                  if supplied is None or item.get("reservation_id") == supplied]
         return inventory.page(items, limit, offset)
 
@@ -1129,7 +1132,28 @@ def create_app() -> FastAPI:
     def get_reservation_notice(object_id: UUID, request: Request, connection=Depends(database)):
         ordinary_domain(request)
         notice_scope(connection, request, str(object_id))
-        return project_notice(lifecycle.get_reservation_notice(connection, str(object_id)))
+        return project_notice(lifecycle.get_reservation_notice(
+            connection, str(object_id), configuration=request.state.access_configuration))
+
+    @app.get("/api/reservation-notices/{object_id}/notifications/{notification_version}",
+             response_model=ReservationNoticeNotificationVersion)
+    def get_reservation_notice_notification(object_id: UUID, notification_version: NotificationVersion,
+                                            request: Request, connection=Depends(database)):
+        # Read-only exact-version recovery: never binds, renews or reroutes; a missing version is not
+        # proof that an in-flight acknowledgement was absent.
+        ordinary_domain(request)
+        notice_id, version = str(object_id), int(notification_version)
+        notice = notice_scope(connection, request, notice_id)
+        result = lifecycle.get_reservation_notice_notification(
+            connection, notice_id, version, configuration=request.state.access_configuration)
+        try:
+            projected = ReservationNoticeNotificationVersion.model_validate(result).model_dump()
+        except ValidationError as exc:
+            raise notice_integrity_error() from exc
+        if (projected["notice_id"] != notice_id or projected["notification_version"] != version
+                or projected["reservation_id"] != notice["reservation_id"]):
+            raise notice_integrity_error()
+        return projected
 
     @app.post("/api/reservations/evaluate")
     def evaluate_reservation_notices(request: Request, payload: dict):
@@ -1139,7 +1163,8 @@ def create_app() -> FastAPI:
             workflow.require_actor(payload.get("actor_id"), "inventory_edit")
             # Server UTC and the current pool only: caller time, configuration or finding IDs are refused.
             workflow._payload(payload, {"actor_id"})
-            result, replay = lifecycle.evaluate_reservation_notices(connection)
+            result, replay = lifecycle.evaluate_reservation_notices(
+                connection, configuration=request.state.access_configuration)
             try:
                 return ReservationNoticeEvaluation.model_validate(result).model_dump(), replay
             except ValidationError as exc:
@@ -1167,9 +1192,16 @@ def create_app() -> FastAPI:
                 raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
             # Only the routing field is removed; any other unknown field reaches the strict leaf and is refused.
             forwarded = {key: value for key, value in payload.items() if key != "notice_id"}
-            result, replay = lifecycle.acknowledge_reservation_notice(connection, notice_id, forwarded)
+            result, replay = lifecycle.acknowledge_reservation_notice(
+                connection, notice_id, forwarded, configuration=request.state.access_configuration)
             projected = project_notice(result)
             if projected["id"] != notice_id or projected["reservation_id"] != reservation_id:
+                raise notice_integrity_error()
+            # Success or replay must show this principal's own in-app receipt on the exact requested version.
+            receipt = projected["current_notification"]
+            if (receipt is None or not receipt["in_app_receipt"]
+                    or receipt["notification_version"] != payload.get("expected_notification_version")
+                    or receipt["acknowledged_by"] != request.state.access_context.principal_id):
                 raise notice_integrity_error()
             return projected, replay
         result, replay = audited_write(request, payload, "reservation.notice.acknowledge", acknowledge, reservation_id)
