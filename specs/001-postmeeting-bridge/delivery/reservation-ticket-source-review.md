@@ -14,11 +14,13 @@ Draft PR82, exact candidate `c5b59cb4a47e07a87b594f13bee0ca7316c0d965`. App/mode
 2. No exact-key HTTP recovery after lost create/proposal response and reload; list/detail IDs alone cannot resolve the saved original-context key. Lead amended the wire in `f33fdfab2d22d4c129bb9339316b2504a1f1fc31` using existing receipts/proposal rows.
 3. Release decision must check Approver after target scoping and before leaf payload validation, preserving403 forbidden-operation precedence for a same-domain Viewer and404 for a foreign target.
 
-The same Muse session owns the correction batch. Source acceptance is held until exact corrected SHA and independent delta closure. Other inspected paths preserve T011 normalized hashes, selected-domain filtering before pagination, validated mutation projection and replay target authorization. Generated OpenAPI response typing is deferred to the T021 exact-candidate documentation gate.
+Muse corrected the initial findings in `177871f165495c390d954b3afd12899e194fe693`. Sol then required stronger canonical receipt reconciliation and original-versus-current proposal separation. Muse completed those fixes at `82187a77fb3a75bd9e3d9096c7d85ea4e7c43d0e`; independent delta review closed all six recovery findings. T012 is source-reviewed at that exact SHA, pending combined integration review. Other inspected paths preserve T011 normalized hashes, selected-domain filtering before pagination, validated mutation projection and replay target authorization. Generated OpenAPI response typing is deferred to the T021 exact-candidate documentation gate.
 
 ## T013 and combined review
 
-Implementation ongoing. No exact source candidate or acceptance recorded. Sol must independently inspect complete T013 source and combined T012/T013 interfaces before integration. T014 remains dependency-held until that gate.
+Draft PR83 initial complete core is `8d0b49e88bb8355a4f746cd1e1cdb721bb4dd12e`. Sol independently reviewed the full core, schema and combined call. Blocking finding: zero-attempt definitive absence did not resolve a rejected request's intent, permanently preventing unused hold release. Additional corrections: inaccurate provisioning wording and mutation authorization before payload semantics. Lead and Sol settled the bounded zero-attempt/disabled-acknowledgement clarification in the shared wire. Opus owns the correction batch; acceptance is held for its exact SHA and independent closure.
+
+Source review otherwise found compatible T012 configuration forwarding, atomic request/intent/audit, retained legacy hashes, local downstream_status=not_requested, immutable correlation/digest and attempted route, durable ordinal reservation before effect, distinct effect/observation transactions, no repeated effect on replay, matching actual-ID readback, and schema-compatible records. T014 remains dependency-held until corrected exact source is reviewed and integrated.
 
 ## Evidence boundary
 

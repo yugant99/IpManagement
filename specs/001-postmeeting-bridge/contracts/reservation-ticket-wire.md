@@ -186,3 +186,32 @@ operation cannot commit or authorize replacement. T015 must retain that ambiguit
 This completes C-A's existing recovery requirement without changing schema,
 legacy payload hashes, source base or file ownership. The frozen base remains
 b557137; this review-driven documentary amendment is separately committed by lead.
+
+## T013 source-review resolution clarification
+
+Sol's review of initial T013 `8d0b49e88bb8355a4f746cd1e1cdb721bb4dd12e`
+identified a release dead end for a rejected linked request that never attempted
+ticket delivery. A fresh authorized exact-correlation/digest readback that proves
+definitive absence resolves an eligible pending/routing_blocked zero-attempt intent
+to failed when the saved source request is rejected or its reservation is released.
+Record the reason, readback event and before/after audit. Do not create an attempt,
+claim delivery, cancel the request, release the hold or change lifecycle eligibility.
+An inconsistent zero-attempt delivered/unknown record is an integrity failure, not
+permission to overwrite its state. Active zero-attempt requests retain pending or
+routing_blocked so the existing reassignment path remains possible. If local
+rejection follows an earlier absence readback, a fresh readback is required; old-key
+replay does not silently resolve the new state. An uncertain attempted absence still
+fences that attempt before setting failed.
+
+C-T's disabled setting blocks new attempts/effects. Current authorized readback,
+history and explicitly simulated acknowledgement of a previously delivered exact
+persisted effect remain available. Acknowledgement requires the same version, key,
+correlation, digest, effect and ticket checks, creates no new delivery and grants no
+local decision authority. This interpretation was independently challenged by Sol
+and accepted by lead; no new external connector or broader mutation right follows.
+
+Ticket mutation leaves authorize current role/configuration before payload semantics;
+T014 also scopes the saved target before mutation dispatch. Workflow presentation
+says local approval affects only the local ledger, ticket delivery is separately
+simulated and provisioning is unsupported/not requested. Legacy stored statuses
+retain their historical meaning. Source base and file ownership remain unchanged.
