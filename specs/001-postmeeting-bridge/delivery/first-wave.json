@@ -264,17 +264,34 @@
     },
     {
       "task": "T010",
-      "status": "running_source_implementation",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "36dbfb90f3178c07ed9c7d0a55b54370a563bf7f",
       "wire_contract_sha": "37c3706d33a7416f0ef88cc6addfc3ffd9d160d8",
       "route": "Codex gpt-6-luna high",
       "branch": "codex/bridge-t010-migration-ui",
       "thread_id": "01a0cb5f-6dcf-7080-90ea-fffcc1743645",
+      "candidate_sha": "d58ef6466b4e98fc1208cb8cd87632d759240eb3",
+      "result_sha": "4b0b7d71bff38014539d1ff3c5a06c6c06631db2",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/77",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/e121/Ip_inventory",
       "prerequisites": ["T008 source acceptance", "T006 source acceptance"],
       "owned_paths": ["frontend/src/MigrationCompare.tsx", "frontend/src/FirstPath.tsx", "frontend/src/firstPathApi.ts", "frontend/src/App.tsx"],
       "acceptance": "Receipt and comparison accounting, active-only/conflict/refusal/stale/sign-off views, exact recovery and protected export using the frozen API, no activation.",
       "prohibited": "Unleased paths; tests/build/typecheck/lint/import/runtime/DB/config; OpenCode or other model calls; autonomous delegation; main merge or self-acceptance."
+    },
+    {
+      "task": "T011",
+      "status": "running_source_implementation",
+      "base_sha": "3add18986096e8fd9bc6ac509db28fc08b6bf2a6",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t011-reservations",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/7802/Ip_inventory",
+      "client_thread_id": "client-new-thread:25614e1f-3e34-42fc-b63d-1d8b6808ae45",
+      "prerequisites": ["T009 source acceptance", "Lead C-L service and reservation version clarification"],
+      "owned_paths": ["backend/ipam_demo/lifecycle.py", "backend/ipam_demo/workflow.py"],
+      "acceptance": "Exact designated local IPv4 hold, extension, atomic matching conversion and independent unused release with retained history and current authorization; no double hold or implicit expiry reclaim.",
+      "prohibited": "Unleased paths; tests/build/import/runtime/DB/config; Claude/Fable/Opus/OpenCode or other model calls; nested agents; T012/T013/further implementation; main merge or self-acceptance."
     }
   ],
   "muse_route": {
@@ -301,5 +318,11 @@
     "last_execution": "completed_before_stop_request",
     "queued_calls": 0,
     "instruction": "No Claude, Fable or Opus invocation without a new explicit user instruction; earlier optional advisory routing is superseded."
+  },
+  "current_handover_gate": {
+    "milestone": "T011 source implementation and independent review closure",
+    "action": "Prepare exact-checkpoint handover prompt for user to start a new lead",
+    "hold": "Do not dispatch T012, T013 or later tasks before handover",
+    "existing_work": "T010 resumed in original task; T009 already source accepted"
   }
 }
