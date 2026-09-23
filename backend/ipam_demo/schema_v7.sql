@@ -15,10 +15,13 @@ CREATE TABLE reservation_notice_notifications (
     acknowledged_at TEXT,
     acknowledgement_reason TEXT,
     PRIMARY KEY (notice_id, notification_version),
-    CHECK (notification_version > 0),
+    CHECK (typeof(notification_version) = 'integer' AND notification_version > 0),
     CHECK (routing_status IN ('assigned', 'unassigned', 'unroutable', 'legacy_unbound')),
     CHECK ((configuration_revision IS NULL AND configuration_digest IS NULL)
-        OR (configuration_revision > 0 AND configuration_digest IS NOT NULL)),
+        OR (configuration_revision IS NOT NULL
+        AND typeof(configuration_revision) = 'integer'
+        AND configuration_revision > 0
+        AND configuration_digest IS NOT NULL)),
     CHECK ((acknowledged_by IS NULL AND acknowledged_at IS NULL AND acknowledgement_reason IS NULL)
         OR (acknowledged_by IS NOT NULL AND acknowledged_at IS NOT NULL AND acknowledgement_reason IS NOT NULL)),
     CHECK (routing_status <> 'legacy_unbound'
@@ -26,21 +29,30 @@ CREATE TABLE reservation_notice_notifications (
         AND configuration_revision IS NULL
         AND configuration_digest IS NULL
         AND issued_at IS NULL
+        AND routing_reason IS NOT NULL
         AND routing_reason = 'legacy_unbound')),
     CHECK (routing_status = 'legacy_unbound'
-        OR (configuration_revision > 0
+        OR (configuration_revision IS NOT NULL
+        AND typeof(configuration_revision) = 'integer'
+        AND configuration_revision > 0
         AND configuration_digest IS NOT NULL
         AND issued_at IS NOT NULL)),
     CHECK (routing_status <> 'assigned'
         OR (recipient_id IS NOT NULL AND routing_reason IS NULL)),
     CHECK (routing_status <> 'unassigned'
-        OR (recipient_id IS NULL AND routing_reason = 'missing_mapping')),
+        OR (recipient_id IS NULL
+        AND routing_reason IS NOT NULL
+        AND routing_reason = 'missing_mapping')),
     CHECK (routing_status <> 'unroutable'
         OR (recipient_id IS NOT NULL
+        AND routing_reason IS NOT NULL
         AND routing_reason IN ('unknown_principal', 'disabled', 'expired', 'not_operator', 'wrong_domain'))),
     CHECK ((acknowledged_by IS NULL AND acknowledged_at IS NULL AND acknowledgement_reason IS NULL)
         OR routing_status = 'legacy_unbound'
-        OR (routing_status = 'assigned' AND acknowledged_by = recipient_id)),
+        OR (routing_status = 'assigned'
+        AND recipient_id IS NOT NULL
+        AND acknowledged_by IS NOT NULL
+        AND acknowledged_by = recipient_id)),
     CHECK (routing_status NOT IN ('unassigned', 'unroutable')
         OR (acknowledged_by IS NULL AND acknowledged_at IS NULL AND acknowledgement_reason IS NULL))
 );
@@ -65,7 +77,10 @@ INSERT INTO notice_v7_legacy_guard(marker)
     WHERE EXISTS (
         SELECT 1 FROM reservation_notices
         WHERE state = 'acknowledged'
-        AND (acknowledged_by IS NULL OR acknowledged_at IS NULL OR acknowledgement_reason IS NULL)
+        AND (acknowledged_by IS NULL
+        OR acknowledged_at IS NULL
+        OR acknowledgement_reason IS NULL
+        OR acknowledgement_version <> notification_version)
     );
 DROP TABLE notice_v7_legacy_guard;
 INSERT INTO reservation_notice_notifications (
