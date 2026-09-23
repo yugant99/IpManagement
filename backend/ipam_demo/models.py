@@ -294,3 +294,14 @@ class ReservationReleaseRequest(StrictResponse):
     approver_id: str | None
     decision_reason: str | None
     synthetic: bool
+
+
+class ReservationOperationReadback(StrictResponse):
+    """Exact-key recovery readback; a missing own-key record returns found=false and null outcomes."""
+
+    found: bool
+    action: Literal["reservation.create", "reservation.extend",
+                    "reservation.release.propose", "reservation.release.decision"]
+    original_outcome: ReservationSummary | ReservationReleaseRequest | None
+    current_reservation: ReservationSummary | None
+    current_release_request: ReservationReleaseRequest | None
