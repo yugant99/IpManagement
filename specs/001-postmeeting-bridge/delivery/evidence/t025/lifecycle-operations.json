@@ -1,0 +1,133 @@
+{
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "reservation": {
+    "designated_pool": "demo-core synthetic static IPv4",
+    "default_hold": {
+      "http": 201,
+      "default_expiry_about_hours": 24,
+      "exact_replay": 200,
+      "changed_content_same_key": 409
+    },
+    "wrong_pool": {
+      "http": 422,
+      "error": "POOL_NOT_AUTHORIZED"
+    },
+    "foreign_read_and_create": [
+      404,
+      404
+    ],
+    "concurrency": {
+      "barrier_started_requests": 2,
+      "results": [
+        201,
+        409
+      ],
+      "second_error": "STALE_REVIEW",
+      "persisted_reservations": 1
+    },
+    "occupancy_before": {
+      "allocations": 1,
+      "reserved": 0,
+      "occupied": 1,
+      "remaining": 12,
+      "unit": "IPv4 addresses"
+    },
+    "occupancy_after_hold": {
+      "allocations": 1,
+      "reserved": 1,
+      "occupied": 2,
+      "remaining": 11,
+      "unit": "IPv4 addresses"
+    },
+    "conversion": {
+      "request": 201,
+      "self_approval": 403,
+      "independent_approval": 200,
+      "allocation_created": true,
+      "hold_converted_atomically": true,
+      "occupied_after": 3,
+      "allocations_after": 2,
+      "reserved_after": 1,
+      "remaining_after": 10
+    },
+    "release": {
+      "independent_rejection": {
+        "proposal": 201,
+        "self_decision": 403,
+        "independent_rejection": 200,
+        "hold_preserved": true
+      },
+      "approved_unused_unlinked": {
+        "hold_create": 201,
+        "release_proposal": 201,
+        "independent_approval": 200,
+        "final_state": "released",
+        "capacity_before_hold": {
+          "reserved_holds": 2,
+          "occupied": 8,
+          "remaining_assignable": 5
+        },
+        "capacity_after_hold": {
+          "reserved_holds": 3,
+          "occupied": 9,
+          "remaining_assignable": 4
+        },
+        "capacity_after_release": {
+          "reserved_holds": 2,
+          "occupied": 8,
+          "remaining_assignable": 5
+        },
+        "unit": "IPv4 addresses"
+      },
+      "linked_pending_intent": {
+        "linked_allocation_request": 201,
+        "independent_release_approval": 409,
+        "error": "EXTERNAL_EFFECT_UNRESOLVED",
+        "hold_state_after": "reserved"
+      },
+      "linked_unknown_intent": {
+        "simulated_attempt": 409,
+        "intent_state": "unknown",
+        "effect_created": false,
+        "release_proposal": 409,
+        "error": "EXTERNAL_EFFECT_UNRESOLVED",
+        "hold_state_after": "reserved"
+      },
+      "harness_corrections": {
+        "initial_wrong_service_reference": "RESERVATION_MISMATCH; excluded as behavioral evidence",
+        "stale_pending_attempt": "STALE_REVIEW; excluded as proof of external-effect guard",
+        "corrected_pending_case": "fresh current-version request; pending intent refused at release approval"
+      }
+    }
+  },
+  "ticket_simulator": {
+    "success": {
+      "attempt": 201,
+      "exact_replay": 200,
+      "changed_scenario_same_key": 409,
+      "foreign_detail": 404
+    },
+    "committed_response_lost": {
+      "stored_state_after_lost_reply": "unknown",
+      "exact_readback_found_effect": true,
+      "delivered_only_after_effect_found": true
+    },
+    "no_effect_response_lost": {
+      "stored_state_after_lost_reply": "unknown",
+      "readback_proved_absence": true,
+      "retry_boundary": "definitive zero-effect path"
+    },
+    "attempt_cap": {
+      "definitive_failures": 3,
+      "fourth_attempt": 409,
+      "error": "ATTEMPT_BUDGET_EXHAUSTED"
+    },
+    "disabled_connector": {
+      "attempt": 409,
+      "error": "CONNECTOR_DISABLED",
+      "handoff_detail_and_readback_available": true,
+      "attempts_consumed": 0
+    },
+    "scope": "internal ticket simulator only; external provisioning unsupported/not requested"
+  }
+}

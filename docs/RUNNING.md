@@ -67,32 +67,50 @@ scripts/ops/seed.sh
 # 3. Start the service, loopback-only on 127.0.0.1:8000.
 scripts/ops/start.sh
 
-# 4. Confirm readiness. Expect HTTP 200 once seed has run.
+# 4. Confirm liveness. Expect HTTP 200 with {"process_ready": true}.
 scripts/ops/health.sh
 
-# 5. Trigger the first manual acquisition (cycle 1). Retain the same
-#    idempotency key across retries so a replay returns the committed
-#    result rather than advancing another cycle.
-scripts/ops/acquire.sh part6-initial-cycle1
+# 4b. Confirm protected readiness (separate domain-Operator token file,
+#     explicit domain, current configuration pins). Success requires HTTP
+#     200 AND all six booleans true; liveness alone never suffices.
+scripts/ops/health.sh --readiness --token-file <operator-token-file> --domain <domain>
+
+# 5. Trigger the first manual acquisition (cycle 1) with the separately
+#    provisioned coordinator token file. The script bootstraps without a
+#    domain, verifies the coordinator identity, and POSTs the original
+#    stable key AND reason with the current pins. No automatic retry and
+#    no replacement key: an ambiguous transport outcome stays unknown
+#    until the operator re-runs the exact command.
+scripts/ops/acquire.sh --token-file <coordinator-token-file> \
+    --key part6-initial-cycle1 --reason "Prepare initial rich demo"
 ```
 
-`scripts/ops/acquire.sh` posts the accepted payload
+`scripts/ops/acquire.sh` performs the manual coordinator acquisition
+described above: bootstrap without domain, trusted coordinator identity,
+explicit current configuration pins, then the original stable key AND
+reason in `POST /api/schedule/run` with no domain header:
 
-```json
-{
-  "actor_id": "demo-approver",
-  "reason": "Prepare initial rich demo",
-  "idempotency_key": "part6-initial-cycle1"
-}
+```sh
+scripts/ops/acquire.sh --token-file <coordinator-token-file> \
+    --key part6-initial-cycle1 --reason "Prepare initial rich demo"
 ```
 
-to `POST /api/schedule/run`. On a fresh store this acquires cycle 1,
-imports the nine source envelopes and saves the reconciliation run.
-Do not enable the timer.
+On a fresh store this acquires cycle 1, imports the nine source
+envelopes and saves the reconciliation run. Success needs the exact
+evidence triple (`201` + replay header false + body false for fresh,
+`200` + true + true for the original replay); a transport failure — or
+a missing/malformed/contradictory triple — leaves the outcome unknown
+and keeps the same key. Do not enable the
+timer. Do not pass a coordinator token on the command line or in the
+environment of unrelated commands; the script reads it from the
+protected file only.
 
-Open <http://127.0.0.1:8000/> for the UI, <http://127.0.0.1:8000/api/docs>
-for the OpenAPI browser and <http://127.0.0.1:8000/healthz> for the raw
-readiness payload.
+Open <http://127.0.0.1:8000/> for the UI and
+<http://127.0.0.1:8000/healthz> for the raw liveness payload
+(`{"process_ready": true}` only — never readiness). The protected
+OpenAPI reference at `/api/docs` requires a valid bearer sent as an
+`Authorization` header from protected storage (never a URL or command
+argument); plain browser navigation cannot attach it.
 
 ### Foundation-baseline alternative
 
@@ -108,7 +126,8 @@ with `scripts/ops/seed.sh --scenario baseline` instead. The rich
 | Stop | `scripts/ops/stop.sh` (data volume kept) |
 | Tail logs (follow) | `scripts/ops/logs.sh` |
 | Last N lines, no follow | `scripts/ops/logs.sh --tail 200` |
-| Poll readiness | `scripts/ops/health.sh` |
+| Poll liveness | `scripts/ops/health.sh` (anonymous `/healthz`; never readiness) |
+| Confirm readiness | `scripts/ops/health.sh --readiness --token-file <operator-token-file> --domain <domain>` |
 
 The service must be **stopped** before running any state command
 (`seed.sh`, `migrate.sh`, `backup.sh`, `restore.sh`, `reset.sh`)
@@ -117,36 +136,73 @@ The wrappers check this and refuse with a clear message; the app's
 exclusive `.ipam_demo.lock` inside `IPAM_DATA_DIR` enforces the same
 invariant server-side and returns `DATA_IN_USE`.
 
+## Reviewed access configuration and credentials
+
+The reviewed access configuration is provisioned separately outside the
+repository and snapshots. Export `IPAM_ACCESS_CONFIG` pointing at the
+enabled file; Compose mounts it read-only at
+`/run/ipam/access-config.json` and refuses to start without it. The
+closed key set and provisioning procedure are in the T022 recipient
+pack; the shape-only disabled example must never be enabled as shipped.
+
+Two credentials are provisioned as separate protected files (exactly 64
+lowercase hex characters each with at most one trailing newline;
+owner-only mode enforced by the wrappers, internal whitespace refused;
+never in shell variables, argv, URLs, logs, Compose environment, images,
+snapshots or browser storage; wrapper shell tracing disabled on entry):
+
+- Coordinator token file — evidence coordinator principal, no domain.
+  Used only by `scripts/ops/acquire.sh` (bootstrap without domain, then
+  the pinned acquisition POST).
+- Domain-Operator token file — Operator principal in one explicitly
+  selected domain. Used only by `scripts/ops/health.sh --readiness`.
+
+A `401` means the token is unknown, disabled, expired or revoked: clear
+it and never retry with it. A `409 ACCESS_CONTEXT_STALE` (or pins that
+no longer match the server's current headers) means the configuration
+changed: bootstrap again under the new pins.
+
 ## Health, readiness and restart
 
-`GET /healthz` returns JSON with `process_ready`, `schema_ready`,
-`data_ready`, `static_ready`, `code`, `reason`, `schema_version` and
-`contract_revision`. HTTP `200` means the schema is present and the
-store has been seeded. HTTP `503` with `code == "SETUP_NEEDED"` means
-the schema exists but seed has not yet run — the UI surfaces a
-setup-needed view instead of erroring out.
+`GET /healthz` is minimal anonymous process liveness only: it returns
+exactly `{"process_ready": true}` while the process serves HTTP. It
+never discloses configuration, schema, data or domain state and proves
+nothing about readiness or business state.
+
+Protected readiness is `GET /api/readiness` with a domain-Operator
+token file, an explicitly selected permitted domain and the current
+configuration pins (`scripts/ops/health.sh --readiness`). Success
+requires HTTP `200` AND all six booleans true — `process_ready`,
+`schema_ready`, `data_ready`, `static_ready`, `configuration_ready`,
+`domain_state_compatible` — with allowlisted reasons otherwise. Six
+true booleans still do not establish business-state recovery, which
+needs its own separate comparison, nor human acceptance.
 
 - The container `HEALTHCHECK` polls `/healthz` every 30 s and reports
   unhealthy on `503`. Compose's `restart: unless-stopped` policy is
   intentionally **not** health-driven; the container is only restarted
   after a real process exit. There is no first-run restart loop before
   seed by design.
-- `scripts/ops/health.sh` distinguishes `SETUP_NEEDED` (exit code 1)
-  from other 5xx (2) and transport failures (3) so operator automation
-  does not silently treat an unseeded service as healthy.
+- `scripts/ops/health.sh` exits `0` for confirmed liveness or for
+  readiness with all six booleans true, `1` when readiness answers but
+  is not fully true (reasons printed), `2` for usage/local validation
+  failures, `3` for transport failures and `4` for 401/403 credential or
+  grant refusals — so operator automation never mistakes liveness,
+  partial readiness or a stale credential for ready.
 
 ## Data location and persistence
 
 - Container path: `/data` (writable, owned by uid/gid `10001`).
-- Named volume: `ipam_demo_data` — managed by Docker on the host.
+- Named volume: the explicit `IPAM_DATA_VOLUME` — managed by Docker on
+  the host; Compose refuses to start when it is unset or empty. Record a
+  NEW disposable volume name per candidate; deliberate reuse is recorded.
   This name is global to the engine: a different Compose project name does
-  **not** isolate data. Before first use, establish that this volume is absent
-  on a dedicated engine or select a separate disposable source copy and change
-  only `volumes.ipam_data.name` to a unique name. Record the diff/hash and use
-  a distinct `COMPOSE_PROJECT_NAME` too. The wrappers set their Compose file
-  explicitly, so an environment-only `COMPOSE_FILE` override is insufficient.
-  Some wrapper log messages name the default volume literally; use the rendered
-  Compose configuration and actual mount inspection as the identity evidence.
+  **not** isolate data. Before first use, establish that the recorded
+  volume is absent, or record the deliberate reuse. The wrappers set
+  their Compose file explicitly, so an environment-only `COMPOSE_FILE`
+  override is insufficient. Wrapper log messages report the actual
+  configured volume; use the rendered Compose configuration and actual
+  mount inspection as the identity evidence.
 - Files under `/data`:
   - `ipam_demo.sqlite3` — the application database.
   - `snapshots/` — populated by `scripts/ops/backup.sh` (0700, uid 10001).
@@ -159,7 +215,7 @@ setup-needed view instead of erroring out.
     up. See [Diagnostics](#diagnostics) for the correct
     `DATA_IN_USE` recovery.
 
-To inspect the volume from the host: `docker volume inspect ipam_demo_data`.
+To inspect the volume from the host: `docker volume inspect "${IPAM_DATA_VOLUME}"`.
 
 For an unverified development-only bind-mount variant, edit the service
 `volumes:` entry in a separate disposable source copy's `compose.yaml` and
@@ -185,8 +241,10 @@ scripts/ops/seed.sh                     # rich (default, accepted demo)
 scripts/ops/seed.sh --scenario baseline # older foundation scenario
 ```
 
-Refuses `ALREADY_INITIALIZED` on an initialized store. To rebuild a
-new empty demo, run `scripts/ops/reset.sh --confirm` first.
+Refuses `ALREADY_INITIALIZED` on an initialized store. Stop and inspect
+the recorded volume identity; never reset or reseed as a readiness fallback.
+A new candidate uses its own new disposable volume. Deliberate reset is
+a separate explicitly confirmed operation, described below.
 
 ### Migrate
 
@@ -194,9 +252,9 @@ new empty demo, run `scripts/ops/reset.sh --confirm` first.
 scripts/ops/migrate.sh
 ```
 
-Advances a recognized v1/v2/v3/v4 database to the current schema. The
-service never migrates implicitly; state operations never migrate at
-all.
+Advances a recognized schema 1–6 database to current schema 7. The
+service never migrates implicitly; backup/restore preserve the source
+schema until this explicit stopped-service migration.
 
 ### Backup
 
@@ -205,9 +263,14 @@ scripts/ops/backup.sh                    # ipam-backup-YYYYMMDDTHHMMSSZ.sqlite3
 scripts/ops/backup.sh my-snapshot.sqlite3
 ```
 
-Writes a standalone snapshot to `/data/snapshots/<name>` using
-SQLite's backup API. Existing files at that destination are refused
-(`OUTPUT_EXISTS`); the core command never overwrites a prior snapshot.
+Writes a standalone SQLite snapshot to `/data/snapshots/<name>` and
+a paired `<name>.recovery.json` manifest bound to its closed bytes, size
+and schema. The manifest records sanitized observed configuration identity
+or explicit unavailability; it contains no configuration file or credentials.
+Existing destinations are refused (`OUTPUT_EXISTS`), never overwritten.
+If publication fails, inspect `output_published` and `manifest_published`
+and retain any published files; do not report the pair complete or retry
+automatically.
 
 To copy a snapshot out of the volume (service still stopped; use a new
 host filename in an existing directory):
@@ -215,7 +278,12 @@ host filename in an existing directory):
 ```sh
 scripts/ops/snapshots.sh list
 scripts/ops/snapshots.sh export my-snapshot.sqlite3 /host/path/my-snapshot.sqlite3
+scripts/ops/snapshots.sh export my-snapshot.sqlite3.recovery.json /host/path/my-snapshot.sqlite3.recovery.json
+(cd /host/path && sha256sum my-snapshot.sqlite3 my-snapshot.sqlite3.recovery.json > snapshot-SHA256SUMS)
 ```
+
+Keep both files and their checksum record together. A partial transfer is
+incomplete; transfer and verify the missing member before ordinary restore.
 
 ### Restore
 
@@ -231,8 +299,19 @@ current database. The pre-restore database is preserved as
 inspect these fields before retrying. If `migration_required` is
 `true`, run `scripts/ops/migrate.sh` (still stopped) before starting.
 
-Restoring a v1/v2/v3/v4 snapshot keeps that snapshot's schema
-version; current v5 restore returns `migration_required: false`.
+Restoring a recognized schema 1–6 snapshot keeps that schema and requires
+explicit migration; current schema 7 returns `migration_required: false`.
+
+A present sidecar must be safe, well formed and match the snapshot hash,
+size and schema; otherwise restore refuses before replacement. An absent
+sidecar permits explicitly classified `unverified` legacy/data rescue. A
+valid sidecar yields `like_for_like` only when saved and current observed
+configuration identities are both known and equal; known unequal identities
+yield `changed_configuration`; unavailable identity yields `unverified`.
+These classify configuration evidence only. After start, require all six
+protected readiness booleans and a separate selected-domain business-state
+comparison, including schema 7 notice/receipt history; neither restore success
+nor equal digests is business recovery or human acknowledgement.
 
 ### Reset
 
@@ -248,9 +327,17 @@ Reset never reseeds; run `scripts/ops/seed.sh` or
 
 ### Bringing a snapshot back in
 
-`scripts/ops/snapshots.sh import /host/path/foo.sqlite3` copies a
-standalone snapshot from the host into `/data/snapshots/` inside the
-volume. Stop the service first. Transfer uses a one-shot container running
+Import both members of the verified pair into `/data/snapshots/` inside
+the volume while the service is stopped:
+
+```sh
+(cd /host/path && sha256sum -c snapshot-SHA256SUMS)
+scripts/ops/snapshots.sh import /host/path/my-snapshot.sqlite3
+scripts/ops/snapshots.sh import /host/path/my-snapshot.sqlite3.recovery.json
+```
+
+The transfer helper accepts each standalone regular file; manifest content
+and binding are validated by core restore. Stop if either transfer fails. Transfer uses a one-shot container running
 as the app user, so it works after `stop.sh` has removed the service
 container. All snapshot operations take the existing app-data lock.
 Import/export refuse symlinks, multi-link files and SQLite companion files;
@@ -261,8 +348,11 @@ interrupted import may leave a `.import-*` scratch file; it is not a usable
 snapshot and is never promoted automatically. This is file transport, not
 an additional SQLite implementation: core restore validates application
 identity, schema and integrity. Keep the source unchanged during transfer.
-Follow with `scripts/ops/restore.sh foo.sqlite3 --confirm` to bring it
-online.
+Only after both members are present, use
+`scripts/ops/restore.sh my-snapshot.sqlite3 --confirm`, inspect its result,
+then migrate if required and start. Verify readiness and business state
+separately. An intentionally absent legacy sidecar remains an explicitly
+recorded unverified data-rescue exception, not a complete paired transfer.
 
 ## Offline recipient handoff
 
@@ -296,9 +386,12 @@ docker image inspect ipam-demo:local --format '{{.Id}}'
 
 Use the extracted scripts. Skip `build.sh`: startup and one-shot wrappers
 use `--pull never` and require the loaded `ipam-demo:local` image. For a new
-demo follow seed → start → health → acquire. For saved state, transfer an
-exported standalone snapshot separately with its checksum, then import →
-restore (explicit confirmation) → migrate only if required → start → health.
+demo follow seed → start → protected readiness → coordinator acquisition,
+using the separate token files and explicit domain/pins described above.
+For saved state, transfer the exported SQLite snapshot AND its deterministic
+`.recovery.json` sidecar with both checksums. Verify and import both →
+restore (explicit confirmation) → migrate only if required → start →
+protected readiness → selected-domain business-state comparison.
 Do not seed a restored database. Snapshot restoration also restores schedule
 settings; an enabled overdue schedule may acquire on startup. Use a known
 disabled snapshot for the bounded manual demo; enabled-snapshot recovery
@@ -312,10 +405,10 @@ acceptance, signatures, license clearance or customer readiness.
 scripts/ops/stop.sh
 ```
 
-Runs `docker compose down --remove-orphans`. The `ipam_demo_data`
-named volume is preserved. To fully discard local state (development
-only), run `docker volume rm ipam_demo_data` after `stop.sh`;
-recipient hosts must not do this.
+Runs `docker compose down --remove-orphans`. The explicit data volume
+(`IPAM_DATA_VOLUME`) is preserved. To fully discard local state
+(development only), run `docker volume rm "${IPAM_DATA_VOLUME}"` after
+`stop.sh`; recipient hosts must not do this.
 
 ## Diagnostics
 
@@ -323,8 +416,11 @@ recipient hosts must not do this.
   `scripts/ops/logs.sh --tail 200` (one-shot). Every request carries
   a server-generated `X-Request-ID`; grep the logs by that ID for a
   single request's trail.
-- Health JSON — `scripts/ops/health.sh` prints the raw body and
-  exits with a distinguishable code per state (see above).
+- Liveness JSON — `scripts/ops/health.sh` prints the raw `/healthz`
+  body (liveness only, never readiness). Readiness JSON —
+  `scripts/ops/health.sh --readiness` prints the raw `/api/readiness`
+  body; success needs HTTP 200 with all six booleans true. Both exit
+  with a distinguishable code per state (see above).
 - `DATA_IN_USE` — the lock file normally remains after exit; the
   kernel releases its lock when the holder exits, including after
   `SIGKILL`. Identify and stop the process/container holding this

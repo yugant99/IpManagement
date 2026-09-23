@@ -2,9 +2,12 @@
 
 from contextlib import contextmanager
 from datetime import datetime, timezone
+import hashlib
+import json
 import logging
 import os
 from pathlib import Path
+import re
 import sqlite3
 import stat
 import tempfile
@@ -16,6 +19,11 @@ from .store import MIGRATABLE_SCHEMA_VERSIONS, SCHEMA_VERSION, connect, exclusiv
 
 logger = logging.getLogger("ipam_demo")
 SIDECAR_SUFFIXES = ("-wal", "-shm", "-journal")
+RECOVERY_MANIFEST_SUFFIX = ".recovery.json"
+RECOVERY_MANIFEST_FORMAT_VERSION = 1
+RECOVERY_MANIFEST_MAX_BYTES = 65536
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
+_RECOVERY_SCHEMA_VERSIONS = frozenset((SCHEMA_VERSION, *MIGRATABLE_SCHEMA_VERSIONS))
 
 
 def _sidecars(path: Path) -> list[Path]:
@@ -168,6 +176,143 @@ def _assert_unchanged(path: Path, before) -> None:
                        details={"path": str(path)})
 
 
+def _manifest_path(snapshot: Path) -> Path:
+    return snapshot.with_name(snapshot.name + RECOVERY_MANIFEST_SUFFIX)
+
+
+def _observed_configuration() -> dict:
+    """Return sanitized observed config identity; never principals, digests of tokens, paths or raw config."""
+    try:
+        from .access import load_reviewed_configuration
+        configuration = load_reviewed_configuration()
+    except Exception:
+        return {"status": "unavailable", "revision": None, "digest": None, "policy_revision": None}
+    return {"status": "observed", "revision": configuration.revision,
+            "digest": configuration.digest, "policy_revision": configuration.policy_revision}
+
+
+def _snapshot_identity(path: Path) -> tuple[str, int]:
+    digest = hashlib.sha256()
+    size = 0
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+            size += len(chunk)
+    return digest.hexdigest(), size
+
+
+def _reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate manifest key")
+        result[key] = value
+    return result
+
+
+def _manifest_invalid(manifest: Path, reason: str) -> AppError:
+    return AppError("RECOVERY_MANIFEST_INVALID", "Recovery manifest is malformed or unsafe; nothing was replaced.",
+                    422, {"manifest": str(manifest), "reason": reason})
+
+
+def _validate_manifest_document(manifest: Path, value: object) -> dict:
+    if not isinstance(value, dict) or set(value) != {
+            "format_version", "snapshot_sha256", "snapshot_bytes",
+            "schema_version", "captured_at", "configuration"}:
+        raise _manifest_invalid(manifest, "top-level shape")
+    if type(value["format_version"]) is not int or value["format_version"] != RECOVERY_MANIFEST_FORMAT_VERSION:
+        raise _manifest_invalid(manifest, "format_version")
+    if not isinstance(value["snapshot_sha256"], str) or not _HEX64.fullmatch(value["snapshot_sha256"]):
+        raise _manifest_invalid(manifest, "snapshot_sha256")
+    if type(value["snapshot_bytes"]) is not int or isinstance(value["snapshot_bytes"], bool) or value["snapshot_bytes"] <= 0:
+        raise _manifest_invalid(manifest, "snapshot_bytes")
+    if type(value["schema_version"]) is not int or value["schema_version"] not in _RECOVERY_SCHEMA_VERSIONS:
+        raise _manifest_invalid(manifest, "schema_version")
+    if not isinstance(value["captured_at"], str):
+        raise _manifest_invalid(manifest, "captured_at")
+    try:
+        captured = datetime.fromisoformat(value["captured_at"].replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise _manifest_invalid(manifest, "captured_at") from exc
+    if captured.tzinfo is None or captured.utcoffset() != timezone.utc.utcoffset(captured):
+        raise _manifest_invalid(manifest, "captured_at")
+    configuration = value["configuration"]
+    if not isinstance(configuration, dict) or set(configuration) != {"status", "revision", "digest", "policy_revision"}:
+        raise _manifest_invalid(manifest, "configuration shape")
+    status = configuration["status"]
+    if status == "observed":
+        revision, digest, policy = configuration["revision"], configuration["digest"], configuration["policy_revision"]
+        if type(revision) is not int or isinstance(revision, bool) or revision < 1:
+            raise _manifest_invalid(manifest, "configuration revision")
+        if not isinstance(digest, str) or not _HEX64.fullmatch(digest):
+            raise _manifest_invalid(manifest, "configuration digest")
+        if not isinstance(policy, str) or not policy or policy != policy.strip() or len(policy) > 200:
+            raise _manifest_invalid(manifest, "configuration policy_revision")
+    elif status == "unavailable":
+        if configuration["revision"] is not None or configuration["digest"] is not None or configuration["policy_revision"] is not None:
+            raise _manifest_invalid(manifest, "configuration null coherence")
+    else:
+        raise _manifest_invalid(manifest, "configuration status")
+    return value
+
+
+def _read_manifest(manifest: Path) -> dict:
+    info = _regular_file(manifest)
+    if info.st_size == 0 or info.st_size > RECOVERY_MANIFEST_MAX_BYTES:
+        raise _manifest_invalid(manifest, "manifest size")
+    try:
+        with manifest.open("rb") as source:
+            raw = source.read(RECOVERY_MANIFEST_MAX_BYTES + 1)
+        if len(raw) > RECOVERY_MANIFEST_MAX_BYTES:
+            raise ValueError("manifest size")
+        value = json.loads(raw.decode("utf-8"), object_pairs_hook=_reject_duplicate_keys)
+    except (OSError, UnicodeDecodeError, ValueError, json.JSONDecodeError) as exc:
+        raise _manifest_invalid(manifest, "manifest parse") from exc
+    return _validate_manifest_document(manifest, value)
+
+
+def _classify_configuration(saved: dict, current: dict) -> str:
+    if saved.get("status") == "observed" and current.get("status") == "observed":
+        if saved.get("revision") == current.get("revision") and saved.get("digest") == current.get("digest"):
+            return "like_for_like"
+        return "changed_configuration"
+    return "unverified"
+
+
+def _publish_manifest(manifest: Path, document: dict, *, on_published=None) -> None:
+    """Link the manifest no-clobber, then report publication before later durability steps.
+
+    on_published runs immediately after the final name exists, ahead of the
+    fallible directory fsync and scratch cleanup, so callers record partial
+    publication accurately. Only the owned temporary name is ever removed;
+    already published snapshot/manifest names are never deleted to mask failure.
+    """
+    descriptor, name = tempfile.mkstemp(prefix=".ipam-recovery-", suffix=".json", dir=manifest.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as out:
+            out.write(json.dumps(document, sort_keys=True, indent=2, ensure_ascii=True) + "\n")
+            out.flush()
+            os.fsync(out.fileno())
+        try:
+            os.link(temporary, manifest)
+        except FileExistsError as exc:
+            raise AppError("OUTPUT_EXISTS", "Recovery manifest destination already exists; choose a new snapshot filename.",
+                           409, {"manifest": str(manifest)}) from exc
+        if on_published is not None:
+            on_published()
+        _sync_directory(manifest.parent)
+    finally:
+        # This exact private scratch path was created for this operation only.
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError as exc:
+            logger.error("Cannot remove temporary recovery manifest %s: %s", temporary, exc)
+            raise AppError("STATE_CLEANUP_FAILED",
+                           "Temporary recovery manifest could not be removed; inspect the reported path.",
+                           details={"remaining_paths": [str(temporary)]}) from exc
+
+
 def _prepare_removal(database: Path) -> list[Path]:
     """Let SQLite retire journal state; never discard nonempty recovery files."""
     _sidecar_state(database)
@@ -201,18 +346,25 @@ def _failure(exc: Exception, operation: str, state: dict) -> AppError:
 
 
 def backup_database(directory: Path, output: str | Path) -> dict:
-    state = {"output_published": False}
+    state: dict = {"output_published": False, "manifest_published": False}
     try:
         with _state_access(directory) as database:
             state["database"] = str(database)
             _regular_file(database)
             _sidecar_state(database)
             output = _external_path(output)
+            manifest = _manifest_path(output)
             state["output"] = str(output)
+            state["manifest"] = str(manifest)
             if output in [database, database.parent / ".ipam_demo.lock", *_sidecars(database)]:
                 raise AppError("UNSAFE_OUTPUT", "Backup output cannot name an active application file.")
+            if manifest in [database, database.parent / ".ipam_demo.lock", *_sidecars(database)]:
+                raise AppError("UNSAFE_OUTPUT", "Recovery manifest cannot name an active application file.")
             if output.exists() or output.is_symlink():
                 raise AppError("OUTPUT_EXISTS", "Backup destination already exists; choose a new filename.", 409)
+            if manifest.exists() or manifest.is_symlink():
+                raise AppError("OUTPUT_EXISTS", "Recovery manifest destination already exists; choose a new filename.", 409,
+                               {"manifest": str(manifest)})
             _standalone(output)
             with _read_only(database) as source:
                 _validate(source)
@@ -221,24 +373,59 @@ def backup_database(directory: Path, output: str | Path) -> dict:
                     _publish_new(temporary, output)
                     state["output_published"] = True
                 _sync_directory(output.parent)
-            return {"status": "backed_up", **state, **metadata, "scope": "entire_sqlite_database"}
+            snapshot_sha256, snapshot_bytes = _snapshot_identity(output)
+            _standalone(output)
+            configuration = _observed_configuration()
+            document = {"format_version": RECOVERY_MANIFEST_FORMAT_VERSION, "snapshot_sha256": snapshot_sha256,
+                        "snapshot_bytes": snapshot_bytes, "schema_version": metadata["schema_version"],
+                        "captured_at": datetime.now(timezone.utc).isoformat(), "configuration": configuration}
+            try:
+                # The published snapshot is retained; never delete it or claim clean success.
+                _publish_manifest(manifest, document, on_published=lambda: state.update(manifest_published=True))
+            except (AppError, OSError) as exc:
+                raise _failure(exc, "backup", state) from exc
+            return {"status": "backed_up", **state, **metadata, "scope": "entire_sqlite_database",
+                    "snapshot_sha256": snapshot_sha256, "snapshot_bytes": snapshot_bytes,
+                    "captured_at": document["captured_at"], "configuration": configuration,
+                    "next_step": ("Captured configuration is observed at backup, not proof of historical governance. "
+                                  "Confirm readiness separately via authenticated selected-domain GET /api/readiness "
+                                  "(all six true), a business-state comparison, and human signoff.")}
     except (AppError, OSError, sqlite3.Error) as exc:
         raise _failure(exc, "backup", state) from exc
 
 
 def restore_database(directory: Path, input_path: str | Path, *, confirm: bool = False) -> dict:
-    state = {"database_replaced": False, "preserved_database": None}
+    state: dict = {"database_replaced": False, "preserved_database": None,
+                   "manifest_available": False, "configuration_recovery": "unverified"}
     try:
         if not confirm:
             raise AppError("CONFIRMATION_REQUIRED", "Restore replaces application data. Repeat with --confirm.", 422)
         with _state_access(directory) as database:
             state["database"] = str(database)
             input_path = _external_path(input_path)
+            manifest_path = _manifest_path(input_path)
             state["input"] = str(input_path)
+            state["manifest"] = str(manifest_path)
             _regular_file(input_path)
-            if input_path == database:
+            if input_path == database or manifest_path == database:
                 raise AppError("UNSAFE_INPUT", "Restore input must be a separate standalone backup.")
             _standalone(input_path)
+            if manifest_path.exists() or manifest_path.is_symlink():
+                state["manifest_available"] = True
+                manifest_document = _read_manifest(manifest_path)
+            else:
+                manifest_document = None
+            saved_configuration: dict = (dict(manifest_document["configuration"]) if manifest_document is not None
+                                         else {"status": "unavailable", "revision": None,
+                                               "digest": None, "policy_revision": None})
+            before_stat = _regular_file(input_path)
+            before_sha256, before_size = _snapshot_identity(input_path)
+            if manifest_document is not None:
+                if (manifest_document["snapshot_sha256"] != before_sha256
+                        or manifest_document["snapshot_bytes"] != before_size):
+                    raise AppError("RECOVERY_MANIFEST_MISMATCH",
+                                   "Recovery manifest does not match the input snapshot bytes; nothing was replaced.",
+                                   422, {"manifest": str(manifest_path), "input": str(input_path)})
             original = _regular_file(database, optional=True)
             sidecars = _sidecar_state(database)
             if original is None and sidecars:
@@ -246,8 +433,22 @@ def restore_database(directory: Path, input_path: str | Path, *, confirm: bool =
                                details={"paths": [str(path) for path in sidecars]})
             with _temporary_database(database.parent) as candidate:
                 with _read_only(input_path) as source:
-                    _validate(source)
+                    input_metadata = _validate(source)
+                    if manifest_document is not None and manifest_document["schema_version"] != input_metadata["schema_version"]:
+                        raise AppError("RECOVERY_MANIFEST_MISMATCH",
+                                       "Recovery manifest schema does not match the input snapshot; nothing was replaced.",
+                                       422, {"manifest": str(manifest_path), "input": str(input_path)})
                     metadata = _snapshot(source, candidate)
+                # Input may have changed during the copy; revalidate identity and bytes.
+                # Candidate bytes need not match the input hash; the candidate is validated logically.
+                _assert_unchanged(input_path, before_stat)
+                after_sha256, after_size = _snapshot_identity(input_path)
+                if (after_sha256, after_size) != (before_sha256, before_size):
+                    raise AppError("STATE_CHANGED",
+                                   "Restore input changed during validation; nothing was replaced.",
+                                   details={"path": str(input_path)})
+                current_configuration = _observed_configuration()
+                state["configuration_recovery"] = _classify_configuration(saved_configuration, current_configuration)
                 # Full candidate validation has completed before any original DB work.
                 _assert_unchanged(database, original)
                 if original is not None:
@@ -275,7 +476,12 @@ def restore_database(directory: Path, input_path: str | Path, *, confirm: bool =
                 state["database_replaced"] = True
             _sync_directory(database.parent)
             return {"status": "restored", **state, **metadata,
-                    "migration_required": metadata["schema_version"] != SCHEMA_VERSION}
+                    "migration_required": metadata["schema_version"] != SCHEMA_VERSION,
+                    "saved_configuration": saved_configuration, "current_configuration": current_configuration,
+                    "next_step": ("Restore success is data replacement only. Confirm readiness separately via "
+                                  "authenticated selected-domain GET /api/readiness (all six true), a "
+                                  "business-state comparison, and human signoff; an equal config digest alone "
+                                  "is not readiness.")}
     except (AppError, OSError, sqlite3.Error) as exc:
         raise _failure(exc, "restore", state) from exc
 

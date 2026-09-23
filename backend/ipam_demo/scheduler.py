@@ -7,8 +7,9 @@ import sqlite3
 from threading import Event, Thread
 from uuid import uuid4
 
-from . import feed_adapter, reconciliation, workflow
+from . import access, feed_adapter, reconciliation, workflow
 from .errors import AppError, store_error
+from .models import AccessContext
 from .imports import import_envelope
 from .store import connect, require_initialized
 
@@ -28,7 +29,10 @@ def _instant(value):
 
 
 def _error_payload(error):
-    return {"code": error.code, "message": error.message, "details": error.details}
+    allowed = {"FEED_EXHAUSTED", "RUN_IN_PROGRESS", "STALE_SCHEDULE", "SYNTHETIC_FEED_UNAVAILABLE",
+               "FEED_IMPORT_REJECTED", "ACCESS_CONFIGURATION_INVALID", "ACCESS_CONFIGURATION_UNAVAILABLE"}
+    code = error.code if error.code in allowed else "SCHEDULE_UNAVAILABLE"
+    return {"code": code, "message": "Synthetic acquisition is unavailable until reviewed inputs are valid."}
 
 
 def _state(connection):
@@ -96,7 +100,13 @@ class SyntheticScheduler:
         result.pop("singleton")
         result["enabled"] = bool(result["enabled"])
         raw_error = result.pop("last_error_json")
-        result["last_error"] = json.loads(raw_error) if raw_error else None
+        if raw_error:
+            saved_error = json.loads(raw_error)
+            result["last_error"] = {"code": saved_error.get("code") if saved_error.get("code") in {
+                "RUN_IN_PROGRESS", "STALE_SCHEDULE", "FEED_EXHAUSTED"} else "SCHEDULE_UNAVAILABLE",
+                "message": "Synthetic acquisition did not complete."}
+        else:
+            result["last_error"] = None
         result["eligibility"] = {"eligible": error is None, "error": _error_payload(error) if error else None}
         result["in_progress"] = self.run_lock.locked()
         result["timer_error"] = self.timer_error
@@ -133,19 +143,33 @@ class SyntheticScheduler:
         self.timer_error = None
         self._wake.set()
 
-    def run_now(self, payload):
-        # No trusted system identity is accepted through the manual API.
-        try:
-            workflow._payload(payload, {"actor_id", "reason", "idempotency_key"})
-            actor = workflow.require_actor(payload.get("actor_id"), "inventory_edit")
-            reason = workflow._text(payload.get("reason"), "reason")
-            key = workflow._text(payload.get("idempotency_key"), "idempotency_key", 200)
-        except AppError as exc:
-            self._record_failure(exc, actor_id=payload.get("actor_id"), reason="Manual acquisition rejected.",
-                                 attempt_at=_stamp(_now()), expected=None, update_status=False)
-            raise
-        canonical = {"actor_id": actor["id"], "reason": reason, "idempotency_key": key}
-        return self._acquire(actor["id"], key, workflow._hash(canonical), reason)
+    def run_now(self, payload, *, authority_check=None):
+        workflow._payload(payload, {"actor_id", "reason", "idempotency_key"})
+        context = workflow._access_context.get()
+        if context is None or not context.is_evidence_coordinator:
+            raise AppError("FORBIDDEN", "The current principal is not permitted to run this evidence operation.", 403)
+        access.require_actor_match(context, payload.get("actor_id"))
+        reason = workflow._text(payload.get("reason"), "reason")
+        key = workflow._text(payload.get("idempotency_key"), "idempotency_key", 200)
+        if authority_check is None:
+            raise AppError("FORBIDDEN", "A freshly authenticated coordinator grant is required.", 403)
+        canonical = {"actor_id": context.principal_id, "reason": reason, "idempotency_key": key}
+        return self._acquire(context.principal_id, key, workflow._hash(canonical), reason,
+                             authority_check=authority_check)
+
+    def _timer_authority(self, connection):
+        configuration = access.load_reviewed_configuration()
+        principal = configuration.principals.get(configuration.coordinator_id)
+        if principal is None or not principal.enabled or principal.expires_at <= _now():
+            raise AppError("ACCESS_CONFIGURATION_INVALID", "Reviewed access configuration is unavailable.", 503)
+        registered = {row[0]: row[1] for row in connection.execute("SELECT id,domain FROM scopes")}
+        grants = feed_adapter.REGISTERED_SOURCE_SCOPE_GRANTS
+        if any(registered.get(scope_id) != domain or (source_id, scope_id) not in grants
+               for (source_id, scope_id), domain in configuration.source_domains.items()):
+            raise AppError("ACCESS_CONFIGURATION_INVALID", "Reviewed access configuration is unavailable.", 503)
+        if {(item.source_id, item.scope_id) for item in configuration.coordinator_grants} != set(grants):
+            raise AppError("ACCESS_CONFIGURATION_INVALID", "Reviewed access configuration is unavailable.", 503)
+        return configuration
 
     def _record_failure(self, error, *, actor_id, reason, attempt_at, expected, update_status=True):
         """Separate transaction after rollback, never pretend the error record succeeded."""
@@ -174,14 +198,23 @@ class SyntheticScheduler:
             error.message += " Failure status/audit could not be saved; see server logs."
             self.timer_error = _error_payload(error)
 
-    def _acquire(self, actor_id, key, fingerprint, reason, *, timer_expected=None):
+    def _acquire(self, actor_id, key, fingerprint, reason, *, timer_expected=None, authority_check=None):
         attempt_at = _stamp(_now())
+        context_token = None
+        if timer_expected is not None:
+            configuration = access.load_reviewed_configuration()
+            context_token = workflow.bind_access_context(AccessContext(
+                principal_id=configuration.coordinator_id, roles=[], domains=[], selected_domain=None,
+                configuration_revision=configuration.revision, configuration_digest=configuration.digest,
+                policy_revision=configuration.policy_revision, is_evidence_coordinator=True))
         if not self.run_lock.acquire(blocking=False):
             error = AppError("RUN_IN_PROGRESS", "Another acquisition or reconciliation is in progress. Retry the same operation after it completes.", 409)
             # Ordinary/manual calls return busy immediately. A due timer needs a
             # forward deadline so it cannot repeatedly compete with a long run.
             self._record_failure(error, actor_id=actor_id, reason=reason, attempt_at=attempt_at,
                                  expected=timer_expected, update_status=timer_expected is not None and not self._acquiring)
+            if context_token is not None:
+                workflow._access_context.reset(context_token)
             raise error
         self._acquiring = True
         expected = None
@@ -189,6 +222,10 @@ class SyntheticScheduler:
             with connect(self.path) as connection:
                 connection.execute("BEGIN")
                 require_initialized(connection)
+                if timer_expected is not None:
+                    self._timer_authority(connection)
+                elif authority_check:
+                    authority_check(connection)
                 replay = _replay(connection, actor_id, key, fingerprint)
                 if replay is not None:
                     return replay
@@ -205,6 +242,10 @@ class SyntheticScheduler:
             with connect(self.path) as connection, connection:
                 connection.execute("BEGIN IMMEDIATE")
                 require_initialized(connection)
+                if timer_expected is not None:
+                    self._timer_authority(connection)
+                elif authority_check:
+                    authority_check(connection)
                 replay = _replay(connection, actor_id, key, fingerprint)
                 if replay is not None:
                     return replay
@@ -255,11 +296,25 @@ class SyntheticScheduler:
                 "ACQUISITION_FAILED", "Synthetic acquisition failed. The cycle was rolled back; see server logs.", 500)
             if not isinstance(exc, AppError):
                 logger.exception("Synthetic acquisition failed")
+            if error.status in (401, 403) or error.code in {"ACCESS_CONTEXT_STALE", "ACCESS_CONFIGURATION_INVALID",
+                                                           "ACCESS_CONFIGURATION_UNAVAILABLE", "AUTHENTICATION_REQUIRED"}:
+                raise error
             self._record_failure(error, actor_id=actor_id, reason=reason, attempt_at=attempt_at, expected=expected)
+            safe_messages = {
+                "RUN_IN_PROGRESS": "Another acquisition or reconciliation is in progress. Retry the same operation after it completes.",
+                "STALE_SCHEDULE": "Schedule or cursor changed while preparing this cycle. Retry the same operation.",
+                "FEED_EXHAUSTED": "The synthetic feed has reached cycle 1460; no further advancement is available.",
+                "SYNTHETIC_FEED_UNAVAILABLE": "The pinned synthetic feed assets could not be loaded.",
+            }
+            error.message = safe_messages.get(error.code, "Synthetic acquisition failed. The cycle was rolled back; see the request ID.")
+            error.details = {key: value for key, value in error.details.items()
+                             if key in {"audit_recorded", "failure_recorded"} and type(value) is bool}
             raise error
         finally:
             self._acquiring = False
             self.run_lock.release()
+            if context_token is not None:
+                workflow._access_context.reset(context_token)
 
     def _loop(self):
         while not self._stopping:
@@ -270,6 +325,7 @@ class SyntheticScheduler:
                 with connect(self.path) as connection:
                     connection.execute("BEGIN")
                     require_initialized(connection)
+                    self._timer_authority(connection)
                     expected = _state(connection)
                 if expected["enabled"]:
                     due = _instant(expected["next_due_at"])

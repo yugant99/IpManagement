@@ -1,4 +1,4 @@
--- Stage 1 only. Future migrations require explicit shared-schema coordination.
+-- Core inventory schema. Later changes use explicit shared-schema migrations.
 CREATE TABLE app_meta (
     singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
     initialized INTEGER NOT NULL DEFAULT 0 CHECK (initialized IN (0, 1)),

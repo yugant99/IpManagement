@@ -1,0 +1,25 @@
+{
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "main_notice_timeline": [
+    {"event": "configured recipient acknowledges alert v1", "result": "success; exact replay preserved original receipt"},
+    {"event": "age escalation", "result": "alarm v2; stale v1 ack refused; v1 history retained"},
+    {"event": "recipient route changes", "result": "v3; prior recipient cannot ack new version; new recipient can"},
+    {"event": "recipient mapping missing", "result": "unassigned v4; ack refused"},
+    {"event": "legacy unbound notice renewal", "result": "bound v5; legacy v4 retained as partial legacy"},
+    {"event": "recipient disabled", "result": "unroutable v6; ack refused"},
+    {"event": "recipient expired", "result": "unroutable v7; expired bearer gets 401; reservation remains held"}
+  ],
+  "combined_age_and_route_change": {
+    "GET_before_evaluate_did_not_reroute": true,
+    "one_evaluation_renewed_count": 1,
+    "one_version_increment": "v1 to v2",
+    "old_recipient_can_read_own_old_receipt": true,
+    "old_recipient_can_ack_new_version": false,
+    "new_recipient_ack": 200,
+    "exact_ack_replay": 200,
+    "changed_reason_same_version": {"http": 409, "error": "NOTICE_ALREADY_ACKNOWLEDGED"},
+    "GET_after_ack_did_not_reroute": true,
+    "unrelated_lab_route_edit_renewed_notice": false
+  },
+  "history": "immutable per-version recipient/configuration/acknowledgement history; in-app receipt is not actual human handoff"
+}

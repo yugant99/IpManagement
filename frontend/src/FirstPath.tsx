@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { ApiError, request } from "./api";
+import { ApiError, currentContext, downloadProtected, hasRole, request } from "./api";
 import type { Page, Scope } from "./api";
-import { computeRun, uploadSourceWithReconciliation } from "./firstPathApi";
+import { uploadSource } from "./firstPathApi";
 import type { Coverage, EvidenceState, Finding, Receipt, RunSummary, SavedRun, SourceCatalogResponse, SourceRecord } from "./firstPathApi";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
@@ -100,7 +100,7 @@ function Envelope({ batchId }: { batchId: string }) {
   return <JsonValue value={envelope.data} />;
 }
 
-function ReceiptDetail({ id, scopes, onClose }: { id: string; scopes: Scope[]; onClose: () => void }) {
+function ReceiptDetail({ id, scopes, onClose, onAssess }: { id: string; scopes: Scope[]; onClose: () => void; onAssess?: (batchId: string) => void }) {
   const [revision, setRevision] = useState(0);
   const [showEnvelope, setShowEnvelope] = useState(false);
   const receipt = useApiResource<Receipt>(`/api/imports/${encodeURIComponent(id)}`, revision);
@@ -114,6 +114,10 @@ function ReceiptDetail({ id, scopes, onClose }: { id: string; scopes: Scope[]; o
         {receipt.data.limitations.length > 0 && <ul className="limitation-list">{receipt.data.limitations.map((item, index) => <li key={index}>{item}</li>)}</ul>}
       </section>
       <section className="detail-section"><h3>Declared and effective coverage</h3><CoverageList coverage={receipt.data.coverage} scopes={scopes} /></section>
+      {receipt.data.source_kind === "inventory_staged" && receipt.data.application_status === "staged"
+        && receipt.data.input_rows > 0 && receipt.data.accepted_rows === receipt.data.input_rows
+        && receipt.data.rejected_rows === 0 && receipt.data.duplicate_rows === 0 && onAssess
+        && <section className="detail-section"><h3>Migration comparison</h3><p className="quiet">This receipt is wholly accepted staged intended inventory. Assessing it creates an immutable comparison; it does not activate the candidate.</p><button type="button" className="secondary" onClick={() => onAssess(receipt.data.id)}>Assess this staged receipt</button></section>}
       <ImportRecords batchId={id} />
       <section className="detail-section"><button className="secondary" aria-expanded={showEnvelope} onClick={() => setShowEnvelope(!showEnvelope)}>{showEnvelope ? "Hide" : "Load"} original envelope</button>{showEnvelope && <Envelope batchId={id} />}</section>
     </>}
@@ -128,7 +132,7 @@ function ImportHistory({ revision, selectedId, onSelect, refresh }: { revision: 
     {receipts.status === "loading" && <p className="panel-message" role="status">Loading saved imports…</p>}
     {receipts.status === "error" && <ErrorNotice error={receipts.error} retry={refresh} />}
     {receipts.status === "ready" && <>
-      {!receipts.data.items.length && <p className="panel-message">No saved imports on this page. Upload a DHCP, routing or intended-policy envelope to begin.</p>}
+      {!receipts.data.items.length && <p className="panel-message">No permitted saved imports on this page.</p>}
       {!!receipts.data.items.length && <div className="table-scroll" tabIndex={0} role="region" aria-label="Saved source imports"><table><caption className="sr-only">Import receipts, newest ingestion sequence first.</caption><thead><tr><th scope="col">Source / run</th><th scope="col">Import status</th><th scope="col">Accepted / rejected / duplicate</th></tr></thead><tbody>{receipts.data.items.map((receipt) => <tr key={receipt.id} data-selected={selectedId === receipt.id}><td><button className="prefix-link" onClick={() => onSelect(receipt.id)}>{receipt.source_id}</button><div className="table-secondary mono">{receipt.source_run_id}</div><div className="table-secondary">Sequence {receipt.sequence} · {receipt.source_kind === "route_policy" ? "Intended policy" : receipt.source_kind === "dhcp" ? "Observed DHCP" : receipt.source_kind === "inventory_staged" ? "Staged inventory" : "Observed routing"}</div></td><td><span className={`import-status ${receipt.application_status}`}>{receipt.application_status}</span><div className="table-secondary">{receipt.input_rows} input rows</div></td><td>{receipt.accepted_rows} / {receipt.rejected_rows} / {receipt.duplicate_rows}</td></tr>)}</tbody></table></div>}
       <Pagination page={receipts.data} onChange={setOffset} label="Saved import pages" />
     </>}
@@ -142,8 +146,8 @@ function RunHistory({ revision, currentId, busy, onSelect, refresh }: { revision
     {runs.status === "loading" && <p role="status">Loading saved runs…</p>}
     {runs.status === "error" && <ErrorNotice error={runs.error} retry={refresh} />}
     {runs.status === "ready" && <>
-      {!runs.data.items.length && <p>No saved runs on this page.</p>}
-      <ul className="plain-list run-history">{runs.data.items.map((run) => <li key={run.id}><div><time>{run.created_at}</time><code>{run.id}</code><span className="quiet">{run.overview.total} total evaluations · {run.overview.anomalous} anomalous · {run.overview.healthy} healthy · {run.overview.unknown} unknown · {run.overview.not_applicable} not applicable</span></div><button className="secondary" disabled={busy || run.id === currentId} onClick={() => onSelect(run.id)}>{run.id === currentId ? "Open now" : "Open run"}</button></li>)}</ul>
+      {!runs.data.items.length && <p>Awaiting evidence from the evidence operator. No saved run is available for this domain.</p>}
+      <ul className="plain-list run-history">{runs.data.items.map((run) => <li key={run.id}><div><time>{run.created_at}</time><code>{run.id}</code><span className="quiet">Domain {currentContext().selected_domain} projection · {run.overview.total} evaluations · {run.overview.anomalous} anomalous · {run.overview.healthy} healthy · {run.overview.unknown} unknown · {run.overview.not_applicable} not applicable</span></div><button className="secondary" disabled={busy || run.id === currentId} onClick={() => onSelect(run.id)}>{run.id === currentId ? "Open now" : "Open run"}</button></li>)}</ul>
       <Pagination page={runs.data} onChange={setOffset} label="Saved run pages" />
     </>}
   </details>;
@@ -164,6 +168,7 @@ function SourceCatalog({ scopes, revision, onSelect }: { scopes: Scope[]; revisi
 function FindingDetail({ runId, findingId, scopes, onClose }: { runId: string; findingId: string; scopes: Scope[]; onClose: () => void }) {
   const [revision, setRevision] = useState(0);
   const [rawId, setRawId] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   const finding = useApiResource<Finding>(`/api/runs/${encodeURIComponent(runId)}/findings/${encodeURIComponent(findingId)}`, revision);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); heading.current?.scrollIntoView({ block: "nearest" }); }, []);
@@ -173,6 +178,7 @@ function FindingDetail({ runId, findingId, scopes, onClose }: { runId: string; f
     <p className="detail-subtitle">Pinned run <code>{runId}</code> · Synthetic calculation</p>
     {finding.status === "loading" && <p className="loading-line" role="status">Loading saved finding…</p>}
     {finding.status === "error" && <ErrorNotice error={finding.error} retry={() => setRevision((value) => value + 1)} />}
+    {downloadError && <p className="notice error" role="alert">{downloadError}</p>}
     {finding.status === "ready" && <>
       <section className="detail-section"><h3>Result and meaning</h3><div className="result-state"><EvidenceBadge state={finding.data.evidence_state} /><span>Rule severity: {finding.data.severity}</span></div><p>{finding.data.explanation}</p><dl className="facts compact"><dt>Network scope</dt><dd>{finding.data.subject.scope_name}</dd><dt>Scope ID</dt><dd><code>{finding.data.subject.scope_id}</code></dd><dt>Address family</dt><dd>IPv{finding.data.subject.family}</dd><dt>Subject ID / version</dt><dd><code>{finding.data.subject.id}</code> / {finding.data.subject.version}</dd><dt>Finding ID</dt><dd><code>{finding.data.id}</code></dd><dt>Rule / version</dt><dd><code>{finding.data.rule_id}</code> / {finding.data.rule_version}</dd></dl><h4 className="json-heading">Proposed next action</h4><p>{finding.data.proposed_action}</p><p className="quiet">This view records a calculation. It does not execute a network change.</p></section>
       <section className="detail-section"><h3>Time and applicability</h3><dl className="facts compact"><dt>Evaluation kind</dt><dd>{finding.data.evaluated_window.kind}</dd><dt>Start / demo clock</dt><dd><time>{finding.data.evaluated_window.start_at}</time></dd><dt>End</dt><dd><time>{finding.data.evaluated_window.end_at}</time></dd><dt>Validity convention</dt><dd><code>{finding.data.evaluated_window.interval_convention}</code></dd></dl><p className="quiet">Active route validity uses an inclusive start and exclusive end. Coverage end is the source assertion cutoff.</p></section>
@@ -184,7 +190,7 @@ function FindingDetail({ runId, findingId, scopes, onClose }: { runId: string; f
       <section className="detail-section"><h3>Limitations</h3>{finding.data.limitations.length ? <ul className="limitation-list">{finding.data.limitations.map((item, index) => <li key={index}>{item}</li>)}</ul> : <p>No additional limitations recorded for this finding.</p>}<p className="quiet">Unknown is insufficient evidence. Not applicable means this rule does not apply to the subject. Neither is a healthy routing claim.</p></section>
       <section className="detail-section"><h3>Input provenance</h3><details className="provenance"><summary>Intended inventory origin</summary><JsonValue value={finding.data.subject.origin} /></details>
         {!finding.data.input_references.length && <p>No input references were recorded.</p>}
-        {finding.data.input_references.map((reference, index) => <article className="inventory-record" key={`${reference.record_id ?? reference.batch_id ?? reference.source_id}-${index}`}><h4>{reference.kind.replaceAll("_", " ")}</h4><dl className="facts compact"><dt>Source</dt><dd><code>{reference.source_id}</code></dd><dt>Source run</dt><dd><code>{reference.source_run_id}</code></dd>{reference.batch_id && <><dt>Batch ID</dt><dd><code>{reference.batch_id}</code></dd></>}{reference.source_record_id && <><dt>Source record</dt><dd><code>{reference.source_record_id}</code></dd></>}{reference.audit_id && <><dt>Matching metadata audit</dt><dd><code>{reference.audit_id}</code> · <a href={`/api/audit?subject_id=${encodeURIComponent(finding.data.subject.id)}`} target="_blank" rel="noreferrer">View prefix audit JSON</a></dd></>}</dl>{reference.record_id && <button className="text-button" onClick={() => setRawId(reference.record_id!)}>Load stored raw record</button>}</article>)}
+        {finding.data.input_references.map((reference, index) => <article className="inventory-record" key={`${reference.record_id ?? reference.batch_id ?? reference.source_id}-${index}`}><h4>{reference.kind.replaceAll("_", " ")}</h4><dl className="facts compact"><dt>Source</dt><dd><code>{reference.source_id}</code></dd><dt>Source run</dt><dd><code>{reference.source_run_id}</code></dd>{reference.batch_id && <><dt>Batch ID</dt><dd><code>{reference.batch_id}</code></dd></>}{reference.source_record_id && <><dt>Source record</dt><dd><code>{reference.source_record_id}</code></dd></>}{reference.audit_id && <><dt>Matching metadata audit</dt><dd><code>{reference.audit_id}</code> · <button type="button" className="text-button" onClick={() => { void downloadProtected(`/api/audit?subject_id=${encodeURIComponent(finding.data.subject.id)}`, "prefix-domain-audit.json", new AbortController().signal).catch(error => setDownloadError(error instanceof Error ? error.message : "Audit download failed.")); }}>Download prefix audit JSON</button></dd></>}</dl>{reference.record_id && <button className="text-button" onClick={() => setRawId(reference.record_id!)}>Load stored raw record</button>}</article>)}
         {rawId && <><button className="text-button" onClick={() => setRawId(null)}>Close raw record</button><RawRecord key={rawId} id={rawId} /></>}
       </section>
     </>}
@@ -209,13 +215,13 @@ function RunResults({ run, scopes }: { run: SavedRun; scopes: Scope[] }) {
   function changePage(next: number) { setSelectedId(null); setOffset(next); }
   return <section className="run-results" aria-labelledby="run-heading">
     <div className="section-heading"><h3 id="run-heading">Saved calculation result</h3><span className="quiet">Synthetic · {run.rule_id}</span></div>
-    <dl className="run-identity facts"><dt>Pinned run</dt><dd><code>{run.id}</code></dd><dt>Created at</dt><dd><time>{run.created_at}</time></dd><dt>Fixed demo clock</dt><dd><time>{run.demo_clock_at}</time></dd><dt>Ledger / rule version</dt><dd>{run.ledger_version} / {run.rule_version}</dd></dl>
-    <p className="quiet run-help">All totals below come from this saved run across all scopes. Filters narrow the list only. New imports do not change this result.</p>
-    <dl className="overview-counts"><div><dt>Total evaluations in saved run</dt><dd>{run.overview.total}</dd></div>{(Object.keys(stateLabels) as EvidenceState[]).map((key) => <div key={key}><dt><EvidenceBadge state={key} /></dt><dd>{run.overview[key]}</dd></div>)}</dl>
-    <details className="selected-batches"><summary>Selected source batches ({run.selected_batches.length})</summary><p className="quiet">These saved receipts identify the evidence selected for this run. Completeness and freshness are evaluated separately.</p>{!run.selected_batches.length && <p>No source batches were available.</p>}{run.selected_batches.map((batch) => <article className="inventory-record" key={batch.id}><h4>{batch.source_id}</h4><dl className="facts compact"><dt>Source run</dt><dd><code>{batch.source_run_id}</code></dd><dt>Batch ID</dt><dd><code>{batch.id}</code></dd><dt>Ingested at</dt><dd><time>{batch.ingested_at}</time></dd><dt>Import status</dt><dd>{batch.application_status}</dd><dt>Accepted / rejected / duplicate</dt><dd>{batch.accepted_rows} / {batch.rejected_rows} / {batch.duplicate_rows}</dd></dl><CoverageList coverage={batch.coverage} scopes={scopes} /></article>)}</details>
+    <dl className="run-identity facts"><dt>Pinned run</dt><dd><code>{run.id}</code></dd><dt>Created at</dt><dd><time>{run.created_at}</time></dd><dt>Fixed demo clock</dt><dd><time>{run.demo_clock_at}</time></dd>{run.ledger_version !== undefined && <><dt>Ledger version</dt><dd>{run.ledger_version}</dd></>}<dt>Rule version</dt><dd>{run.rule_version}</dd></dl>
+    <p className="quiet run-help">Totals come from this saved run's selected-domain projection. Filters narrow the list only. New imports do not change this result.</p>
+    <dl className="overview-counts"><div><dt>Evaluations in {currentContext().selected_domain} projection</dt><dd>{run.overview.total}</dd></div>{(Object.keys(stateLabels) as EvidenceState[]).map((key) => <div key={key}><dt><EvidenceBadge state={key} /></dt><dd>{run.overview[key]}</dd></div>)}</dl>
+    <details className="selected-batches"><summary>Selected source batches ({run.selected_batches.length})</summary><p className="quiet">These source references and coverage are limited to the selected domain. Whole-batch ingestion time, import status, and accepted / rejected / duplicate counts are unavailable in this projection.</p>{!run.selected_batches.length && <p>No source batches are present in this domain projection.</p>}{run.selected_batches.map((batch) => <article className="inventory-record" key={batch.id}><h4>{batch.source_id}</h4><dl className="facts compact"><dt>Source kind</dt><dd>{batch.source_kind.replaceAll("_", " ")}</dd><dt>Source run</dt><dd><code>{batch.source_run_id}</code></dd><dt>Batch ID</dt><dd><code>{batch.id}</code></dd></dl><CoverageList coverage={batch.coverage} scopes={scopes} /></article>)}</details>
     <div className="filters result-filters"><label>Network scope<select value={scope} onChange={(event) => { setScope(event.target.value); changePage(0); }}><option value="">All network scopes</option>{scopes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label>Evidence state<select value={state} onChange={(event) => { setState(event.target.value); changePage(0); }}><option value="">All evidence states</option>{(Object.keys(stateLabels) as EvidenceState[]).map((key) => <option value={key} key={key}>{stateLabels[key]}</option>)}</select></label></div>
     <div className="filters result-filters"><label>Rule<select value={rule} onChange={(event) => { setRule(event.target.value); changePage(0); }}><option value="">All rules</option>{[...new Set(run.findings.map((finding) => finding.rule_id))].sort().map((id) => <option key={id}>{id}</option>)}</select></label><label>Severity<select value={severity} onChange={(event) => { setSeverity(event.target.value); changePage(0); }}><option value="">All severities</option>{["critical", "high", "warning"].map((value) => <option key={value}>{value}</option>)}</select></label></div>
-    <p className="filter-help result-count" role="status">{findings.status === "ready" ? findings.data.total ? `Showing ${findings.data.offset + 1}–${findings.data.offset + findings.data.items.length} of ${findings.data.total} matching findings; ${run.overview.total} total evaluations in this saved run.` : `0 matching findings; ${run.overview.total} total evaluations in this saved run.` : findings.status === "loading" ? "Matching findings are loading." : "Matching findings are unavailable; see the error message."}</p>
+    <p className="filter-help result-count" role="status">{findings.status === "ready" ? findings.data.total ? `Showing ${findings.data.offset + 1}–${findings.data.offset + findings.data.items.length} of ${findings.data.total} matching domain findings; ${run.overview.total} evaluations in this selected-domain projection.` : `0 matching findings; ${run.overview.total} evaluations in this selected-domain projection.` : findings.status === "loading" ? "Matching findings are loading." : "Matching findings are unavailable; see the error message."}</p>
     <div className={`inventory-layout${selectedId ? " has-detail" : ""}`}>
       <section className="inventory-panel" aria-label="Findings in selected run" aria-busy={findings.status === "loading"}>
         {findings.status === "loading" && <p className="panel-message" role="status">Loading findings from this run…</p>}
@@ -231,7 +237,8 @@ function RunResults({ run, scopes }: { run: SavedRun; scopes: Scope[] }) {
   </section>;
 }
 
-export default function FirstPath({ scopes }: { scopes: Scope[] }) {
+export default function FirstPath({ scopes, onAssess }: { scopes: Scope[]; onAssess?: (batchId: string) => void }) {
+  const mayImport = hasRole("Operator");
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<ApiError | null>(null);
@@ -240,10 +247,9 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
   const [importRevision, setImportRevision] = useState(0);
   const [runRevision, setRunRevision] = useState(0);
   const [run, setRun] = useState<SavedRun | null>(null);
-  const [runBusy, setRunBusy] = useState<"computing" | "opening" | null>(null);
+  const [runBusy, setRunBusy] = useState<"opening" | null>(null);
   const [runError, setRunError] = useState<ApiError | null>(null);
   const [newImport, setNewImport] = useState(false);
-  const [reconcileAfterImport, setReconcileAfterImport] = useState(false);
   const uploadController = useRef<AbortController | null>(null);
   const runController = useRef<AbortController | null>(null);
   useEffect(() => () => { uploadController.current?.abort(); runController.current?.abort(); }, []);
@@ -262,8 +268,10 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
       let body: string;
       try { body = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes); }
       catch { throw new ApiError("The selected file is not valid UTF-8. No upload was sent; save the source as UTF-8 JSON and try again.", "INVALID_ENCODING"); }
-      try { JSON.parse(body); } catch { throw new ApiError("The selected file is not valid JSON. No upload was sent.", "INVALID_JSON"); }
-      const result = await uploadSourceWithReconciliation(body, controller.signal, reconcileAfterImport);
+      let parsed: { scenario?: unknown; source_kind?: string };
+      try { parsed = JSON.parse(body); } catch { throw new ApiError("The selected file is not valid JSON. No upload was sent.", "INVALID_JSON"); }
+      if (!parsed || typeof parsed !== "object" || !("scenario" in parsed) || "source_kind" in parsed) throw new ApiError("Only staged intended-inventory candidates can be imported from this domain view.", "GLOBAL_IMPORT_UNAVAILABLE");
+      const result = await uploadSource(body, controller.signal);
       if (controller.signal.aborted) return;
       setImportResult(result);
       setReceiptId(result.receipt.id);
@@ -278,37 +286,36 @@ export default function FirstPath({ scopes }: { scopes: Scope[] }) {
     if (runBusy) return;
     const controller = new AbortController();
     runController.current = controller;
-    setRunBusy(id ? "opening" : "computing");
+    if (!id) return;
+    setRunBusy("opening");
     setRunError(null);
     try {
-      const result = id ? await request<SavedRun>(`/api/runs/${encodeURIComponent(id)}`, controller.signal) : await computeRun(controller.signal);
+      const result = await request<SavedRun>(`/api/runs/${encodeURIComponent(id)}`, controller.signal);
       if (controller.signal.aborted) return;
       setRun(result);
-      if (!id) { setNewImport(false); setRunRevision((value) => value + 1); }
     } catch (error) {
       if (!controller.signal.aborted) setRunError(asError(error));
     } finally { if (!controller.signal.aborted) setRunBusy(null); }
   }
 
   return <div className="first-path">
-    <div className="page-heading"><div><p className="eyebrow">Source evidence → saved calculation</p><h1>Source evidence and findings</h1><p className="intro">Import synthetic DHCP, routing and intended policy, then inspect saved calculations and findings.</p></div></div>
+    <div className="page-heading"><div><p className="eyebrow">Domain {currentContext().selected_domain} · saved projection</p><h1>Source evidence and findings</h1><p className="intro">Inspect permitted saved imports, calculations and findings.</p></div></div>
     <div className="evidence-banner"><strong>Synthetic inputs · Fixed demo clock</strong><span>Scope, policy and fresh complete coverage determine whether absence can be established. Missing evidence stays unknown.</span></div>
-    <section className="path-step" aria-labelledby="import-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">1</span><div><h2 id="import-heading">Import a source envelope</h2><p className="quiet">Choose a DHCP, routing or intended-policy JSON file. Intended-inventory uploads are staged and never overwrite the active ledger.</p></div></div>
-      <form className="source-upload" onSubmit={(event) => { void importFile(event); }}><label className="field-label">Source JSON<input type="file" accept=".json,application/json" disabled={importing || runBusy !== null} onChange={(event) => { setFile(event.target.files?.[0] ?? null); setImportError(null); }} aria-describedby="source-help" /></label><label className="checkbox-field"><input type="checkbox" checked={reconcileAfterImport} disabled={importing || runBusy !== null} onChange={(event) => setReconcileAfterImport(event.target.checked)} /> Reconcile after this import</label><button disabled={!file || importing || runBusy !== null} type="submit">{importing ? "Importing…" : "Import source"}</button></form>
-      <p className="filter-help" id="source-help">ipam-synthetic-v1 · Up to 10 MiB / 10,000 records · Expected-answer files are not rule inputs.</p>
+    <section className="path-step" aria-labelledby="import-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">1</span><div><h2 id="import-heading">Saved source receipts</h2><p className="quiet">Global observations, callbacks and reconciliation are managed by the evidence operator.</p></div></div>
+      {mayImport && <><form className="source-upload" onSubmit={(event) => { void importFile(event); }}><label className="field-label">Staged intended-inventory JSON<input type="file" accept=".json,application/json" disabled={importing || runBusy !== null} onChange={(event) => { setFile(event.target.files?.[0] ?? null); setImportError(null); }} aria-describedby="source-help" /></label><button disabled={!file || importing || runBusy !== null} type="submit">{importing ? "Importing…" : "Import staged candidate"}</button></form>
+      <p className="filter-help" id="source-help">Staged intended inventory only · Up to 10 MiB / 10,000 records · No automatic reconciliation.</p></>}
       {importError && <><ErrorNotice error={importError} title="No new import receipt confirmed" /><p className="quiet">If the request timed out or lost its connection, it may have been saved. Reload saved imports before retrying; identical replay returns the original receipt.</p></>}
-      {importResult && <div className={`notice import-result ${importResult.receipt.application_status}`} role="status"><h3>{importResult.replay ? "Identical replay — original receipt returned" : importResult.receipt.application_status === "partial" ? "Saved a partial import" : "Source import saved"}</h3><p><code>{importResult.receipt.source_id}</code> · {importResult.receipt.input_rows} input rows: {importResult.receipt.accepted_rows} accepted, {importResult.receipt.rejected_rows} rejected, {importResult.receipt.duplicate_rows} duplicate.</p><p>{importResult.replay ? "No new ingestion sequence was created." : importResult.receipt.reconciliation ? "Import committed; the separate reconciliation result is shown below." : "No calculation was triggered. Compute reconciliation when the intended inputs are ready."}</p>{importResult.receipt.reconciliation && <p><strong>Reconciliation:</strong> {importResult.receipt.reconciliation.status} · {importResult.receipt.reconciliation.replay ? "reused saved run" : "new reconciliation attempt"}{importResult.receipt.reconciliation.run_id && <> · run <code>{importResult.receipt.reconciliation.run_id}</code></>}{importResult.receipt.reconciliation.audit_recorded === false && <> · audit record not confirmed</>}{importResult.receipt.reconciliation.error && <> · {importResult.receipt.reconciliation.error.message}</>}</p>}{importError && <p>This is the last confirmed receipt, from before the failed request.</p>}<button className="text-button" onClick={() => setReceiptId(importResult.receipt.id)}>Open this receipt</button></div>}
+      {importResult && <div className={`notice import-result ${importResult.receipt.application_status}`} role="status"><h3>{importResult.replay ? "Identical replay — original receipt returned" : "Staged candidate saved"}</h3><p><code>{importResult.receipt.source_id}</code> · {importResult.receipt.input_rows} input rows: {importResult.receipt.accepted_rows} accepted, {importResult.receipt.rejected_rows} rejected, {importResult.receipt.duplicate_rows} duplicate.</p><p>{importResult.replay ? "No new ingestion sequence was created." : "No calculation was triggered. The evidence operator manages global reconciliation."}</p>{importError && <p>This is the last confirmed receipt, from before the failed request.</p>}<button className="text-button" onClick={() => setReceiptId(importResult.receipt.id)}>Open this receipt</button></div>}
       <ImportHistory revision={importRevision} selectedId={receiptId} onSelect={setReceiptId} refresh={() => setImportRevision((value) => value + 1)} />
-      {receiptId && <ReceiptDetail key={receiptId} id={receiptId} scopes={scopes} onClose={() => setReceiptId(null)} />}
+      {receiptId && <ReceiptDetail key={receiptId} id={receiptId} scopes={scopes} onClose={() => setReceiptId(null)} onAssess={onAssess} />}
     </section>
     <SourceCatalog scopes={scopes} revision={importRevision} onSelect={setReceiptId} />
-    <section className="path-step" aria-labelledby="compute-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">2</span><div><h2 id="compute-heading">Compute and save reconciliation</h2><p className="quiet">The API saves a new run using the current intended ledger and selected source batches.</p></div></div>
-      <div className="compute-actions"><button disabled={runBusy !== null || importing} onClick={() => { void loadRun(); }}>{runBusy === "computing" ? "Computing and saving…" : "Compute reconciliation"}</button><span className="quiet">Explicit trigger · Saved evidence · No network changes</span></div>
-      {runBusy && <p role="status" className="loading-line">{runBusy === "computing" ? "Waiting for a saved calculation result…" : "Opening the saved calculation…"}{run && " The previous run remains below until this request succeeds."}</p>}
-      {runError && <><ErrorNotice error={runError} title="No new calculation result confirmed" /><p className="run-warning" role="status">{run ? "The previous saved run remains displayed below." : "No calculation result is displayed."} A request that timed out may have saved a run; reload saved runs to inspect it.</p></>}
-      {newImport && <p className="run-warning">A new import was saved. Existing runs remain unchanged; use Compute to include the currently selected source inputs.</p>}
+    <section className="path-step" aria-labelledby="compute-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">2</span><div><h2 id="compute-heading">Open a saved domain run</h2><p className="quiet">The evidence operator manages global reconciliation. This view reads permitted saved domain projections.</p></div></div>
+      {runBusy && <p role="status" className="loading-line">Opening the saved domain projection…{run && " The previous run remains below until this request succeeds."}</p>}
+      {runError && <><ErrorNotice error={runError} title="Saved domain run unavailable" /><p className="run-warning" role="status">{run ? "The previous saved run remains displayed below." : "No calculation result is displayed."} Reload the saved run list after resolving the request error.</p></>}
+      {newImport && <p className="run-warning">A staged candidate was saved. Existing runs remain unchanged until the evidence operator reconciles it.</p>}
       <RunHistory revision={runRevision} currentId={run?.id} busy={runBusy !== null || importing} onSelect={(id) => { void loadRun(id); }} refresh={() => setRunRevision((value) => value + 1)} />
-      {!run && !runBusy && <div className="empty-state"><h3>No saved result selected</h3><p>Compute reconciliation or open a saved run. The browser does not calculate findings or infer healthy state from an empty list.</p></div>}
+      {!run && !runBusy && <div className="empty-state"><h3>Awaiting saved evidence</h3><p>Open a permitted saved run when available. The browser does not calculate findings or infer healthy state from an empty list.</p></div>}
       {run && <RunResults key={run.id} run={run} scopes={scopes} />}
     </section>
   </div>;

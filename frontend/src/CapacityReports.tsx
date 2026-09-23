@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { request } from "./api";
+import { currentContext, downloadProtected, request } from "./api";
 import type { Page, Scope } from "./api";
 import type { Finding, RunSummary, SavedRun } from "./firstPathApi";
+import { loadStaticOccupancy } from "./workflowApi";
+import type { CurrentStaticOccupancy } from "./workflowApi";
 
 interface Metric {
   pool_id: string; scope_id: string; scope_name: string; family: 4 | 6; cidr: string; name: string; capacity: string;
@@ -13,7 +15,6 @@ interface Metric {
   limitations: string[];
 }
 interface CapacityRun extends SavedRun { calculations?: Metric[]; candidate_space?: unknown }
-interface Actor { id: string; name?: string; role: string; team: string }
 interface Preset { name: string; run_id: string; filters: Record<string, string>; columns: string[]; revision: string }
 interface Comparison { before_run_id: string; after_run_id: string; limitations: string[]; items: { subject: Finding["subject"]; rule_id: string; transition: string; before: Finding | null; after: Finding | null }[] }
 interface ReportSummary { anomalous: number; unknown: number; affectedScopes: number; pressurePools: number }
@@ -44,8 +45,7 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [runTotal, setRunTotal] = useState(0);
   const [run, setRun] = useState<CapacityRun | null>(null);
-  const [actors, setActors] = useState<Actor[]>([]);
-  const [actor, setActor] = useState("demo-requester");
+  const actor = currentContext().principal_id;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -57,6 +57,9 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   const [name, setName] = useState("Reconciliation review");
   const [reason, setReason] = useState("");
   const [selectedColumns, setSelectedColumns] = useState(columns);
+  const [occupancy, setOccupancy] = useState<CurrentStaticOccupancy | null>(null);
+  const [occupancyError, setOccupancyError] = useState("");
+  const [occupancyDomain, setOccupancyDomain] = useState("");
 
   async function loadRuns(append = false) {
     setBusy(true); setError("");
@@ -68,11 +71,37 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   }
   useEffect(() => {
     const controller = new AbortController();
-    Promise.all([request<Page<RunSummary>>("/api/runs?limit=50", controller.signal), request<Actor[]>("/api/actors", controller.signal), request<Preset | null>("/api/report-preset", controller.signal)])
-      .then(([page, identities, saved]) => { if (!controller.signal.aborted) { setRuns(page.items); setRunTotal(page.total); setActors(identities); setPreset(saved); } })
+    Promise.all([request<Page<RunSummary>>("/api/runs?limit=50", controller.signal), request<Preset | null>("/api/report-preset", controller.signal)])
+      .then(([page, saved]) => { if (!controller.signal.aborted) { setRuns(page.items); setRunTotal(page.total); setPreset(saved); } })
       .catch((error: unknown) => { if (!controller.signal.aborted) setError(error instanceof Error ? error.message : "Could not load reporting data."); });
     return () => controller.abort();
   }, []);
+  useEffect(() => {
+    let domain = "";
+    try { domain = currentContext().selected_domain ?? ""; } catch { domain = ""; }
+    if (!domain) { setOccupancy(null); setOccupancyDomain(""); return; }
+    if (occupancyDomain !== domain) {
+      setOccupancy(null);
+      setOccupancyDomain(domain);
+    }
+    const controller = new AbortController();
+    setOccupancyError("");
+    loadStaticOccupancy(controller.signal)
+      .then(current => {
+        if (controller.signal.aborted) return;
+        try {
+          if (currentContext().selected_domain !== domain) return;
+        } catch { return; }
+        setOccupancy(current);
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          setOccupancy(null);
+          setOccupancyError(`Current static occupancy is unknown. ${error instanceof Error ? error.message : "Could not load current occupancy."}`);
+        }
+      });
+    return () => controller.abort();
+  }, [occupancyDomain]);
   async function selectRun(id: string) {
     setBusy(true); setError(""); setNotice("");
     try { setRun(await request<CapacityRun>(`/api/runs/${id}`, new AbortController().signal)); }
@@ -108,21 +137,8 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 12000);
     try {
-      const response = await fetch(`/api/report-preset/export?revision=${preset.revision}`, {
-        signal: controller.signal, headers: { Accept: "text/csv" },
-      });
-      if (!response.ok) {
-        const body = response.headers.get("content-type")?.includes("application/json") ? await response.json() : null;
-        throw new Error(body?.error?.message ?? `Export failed (HTTP ${response.status}).`);
-      }
-      if (!response.headers.get("content-type")?.includes("text/csv") || response.headers.get("X-Preset-Revision") !== preset.revision) {
-        throw new Error("The export did not match the displayed preset. Reload the saved preset and retry.");
-      }
-      const url = URL.createObjectURL(await response.blob());
-      const link = document.createElement("a");
-      link.href = url; link.download = "ipam-findings.csv";
-      document.body.appendChild(link); link.click(); link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      await downloadProtected(`/api/report-preset/export?revision=${encodeURIComponent(preset.revision)}`,
+        "ipam-findings.csv", controller.signal, { name: "X-Preset-Revision", value: preset.revision });
       setNotice("CSV download requested for the displayed preset.");
     } catch (error) {
       setError(controller.signal.aborted ? "Export timed out after 12 seconds. Retry the displayed preset." : error instanceof Error ? error.message : "Could not download the saved preset.");
@@ -147,13 +163,27 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   return <section aria-labelledby="capacity-heading">
     <div className="page-heading"><div><p className="eyebrow">Saved calculations</p><h1 id="capacity-heading">Capacity and reports</h1><p className="intro">Inspect saved occupancy, compare two runs, and export the evidence you reviewed.</p></div><button className="secondary" disabled={busy} onClick={() => { void loadRuns(); }}>Reload run list</button></div>
     <div className="evidence-banner"><strong>Synthetic lease occupancy</strong><span>Hourly samples approximate the source history. Lease counts do not measure traffic, and candidate space is not proven reclaimable.</span></div>
+    <section className="inventory-panel" aria-labelledby="current-occupancy-heading"><h2 id="current-occupancy-heading">Current static IPv4 occupancy</h2>
+      <p className="quiet">Current ledger occupancy only — metric current_static_ipv4_occupancy in IPv4 addresses. Separate from the immutable saved DHCP runs below and their run time, p95, forecast and unknowns. Saved runs are never modified.</p>
+      {occupancyError && <p className="notice error" role="alert">{occupancyError}</p>}
+      {occupancy ? <dl className="facts"><dt>Pool / scope / domain</dt><dd><code>{occupancy.pool_id}</code> · <code>{occupancy.scope_id}</code> · {occupancy.domain} · IPv{occupancy.family}</dd>
+        <dt>As of (server UTC)</dt><dd>{occupancy.as_of}</dd>
+        <dt>Unit</dt><dd>{occupancy.unit}</dd>
+        <dt>Active allocations</dt><dd>{occupancy.components.active_allocations.count} {occupancy.components.active_allocations.unit}</dd>
+        <dt>Reserved holds (expired included)</dt><dd>{occupancy.components.reserved_holds.count} {occupancy.components.reserved_holds.unit}</dd>
+        <dt>Occupied total</dt><dd>{occupancy.components.occupied_total.count} {occupancy.components.occupied_total.unit}</dd>
+        <dt>Assignable capacity</dt><dd>{occupancy.components.assignable_capacity.count} {occupancy.components.assignable_capacity.unit}</dd>
+        <dt>Remaining assignable</dt><dd>{occupancy.components.remaining_assignable.count} {occupancy.components.remaining_assignable.unit}</dd>
+        <dt>Provenance</dt><dd>{occupancy.provenance.source} · {occupancy.provenance.capacity} · {occupancy.provenance.allocations} · {occupancy.provenance.reservations}</dd></dl>
+        : !occupancyError && <p role="status">Loading current occupancy…</p>}
+    </section>
     {error && <div className="notice error" role="alert"><p>{error}</p><p>Previously loaded results remain pinned to their displayed IDs and times.</p></div>}
     {notice && <p className="notice" role="status">{notice}</p>}
     <label className="report-run-select">Saved run<select disabled={busy} value={run?.id ?? ""} onChange={(event) => { if (event.target.value) void selectRun(event.target.value); }}><option value="">Select a saved run</option>{runs.map((item) => <option key={item.id} value={item.id}>{item.created_at} · {item.id}</option>)}</select></label>
     {runs.length < runTotal && <button className="text-button" disabled={busy} onClick={() => { void loadRuns(true); }}>Load older runs ({runs.length} of {runTotal})</button>}
-    {!runs.length && <p className="notice">No runs loaded. Import sources and compute a run in Reconciliation, then reload this list.</p>}
+    {!runs.length && <p className="notice">Awaiting evidence. No saved run is available for domain {currentContext().selected_domain}; the evidence operator manages global reconciliation.</p>}
     {run && <>
-      <dl className="facts run-identity"><dt>Pinned run</dt><dd><code>{run.id}</code></dd><dt>Saved at</dt><dd>{run.created_at}</dd><dt>Demo clock</dt><dd>{run.demo_clock_at}</dd><dt>Ledger revision</dt><dd>{run.ledger_version}</dd></dl>
+      <dl className="facts run-identity"><dt>Selected-domain projection</dt><dd>{currentContext().selected_domain}</dd><dt>Pinned run</dt><dd><code>{run.id}</code></dd><dt>Saved at</dt><dd>{run.created_at}</dd><dt>Demo clock</dt><dd>{run.demo_clock_at}</dd>{run.ledger_version !== undefined && <><dt>Ledger revision</dt><dd>{run.ledger_version}</dd></>}</dl>
       {reportSummary && <section className="inventory-panel report-summary" aria-labelledby="report-summary-heading"><h2 id="report-summary-heading">Saved-run summary</h2><p className="quiet">Selected run <code>{run.id}</code> · saved {run.created_at} · demo clock {run.demo_clock_at}</p><dl className="facts"><dt>Anomalous findings</dt><dd>{reportSummary.anomalous}</dd><dt>Unknown findings</dt><dd>{reportSummary.unknown}</dd><dt>Affected scopes</dt><dd>{reportSummary.affectedScopes}</dd><dt>Pressure pools</dt><dd>{reportSummary.pressurePools}</dd></dl><p className="quiet">Counts use this saved run and the selected scope, family, rule, severity and evidence-state filters. Pressure pools are unique saved pool_pressure subjects with anomalous evidence; this is not a traffic or reclaimability claim. No current exception state is included.</p></section>}
       <div className="filters"><label>Scope<select value={filters.scope_id} onChange={(event) => setFilters({ ...filters, scope_id: event.target.value })}><option value="">All scopes</option>{scopes.map((scope) => <option key={scope.id} value={scope.id}>{scope.name} · {scope.domain}</option>)}</select></label>
         <label>Address family<select value={filters.family} onChange={(event) => setFilters({ ...filters, family: event.target.value })}><option value="">IPv4 and IPv6</option><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
@@ -177,8 +207,8 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
         <History metric={metric} /><details><summary>Saved calculation and evidence</summary><pre className="json-value">{JSON.stringify(metric, null, 2)}</pre></details><ul>{metric.limitations.map((text, index) => <li key={index}>{text}</li>)}</ul>
       </article>)}
       {run.candidate_space !== undefined && <details className="inventory-panel"><summary>Addresses in candidate pools, by scope</summary><pre className="json-value">{JSON.stringify(run.candidate_space, null, 2)}</pre><p>This is candidate pool space, not released or proven recoverable addresses.</p></details>}
-      <p><a href={`/api/runs/${run.id}/export?${exportParams}`}>Export pinned findings and calculations (JSON)</a></p>
-      <form className="inventory-panel report-preset" onSubmit={(event) => { void savePreset(event); }}><h2>One report preset</h2><div className="filters"><label>Demo actor<select value={actor} onChange={(event) => setActor(event.target.value)}>{actors.map((item) => <option key={item.id} value={item.id}>{item.id} · {item.team}</option>)}</select></label><label>Name<input maxLength={200} required value={name} onChange={(event) => setName(event.target.value)} /></label><label>Reason<input maxLength={200} required value={reason} onChange={(event) => setReason(event.target.value)} /></label></div><fieldset><legend>CSV columns</legend><div className="column-options">{columns.map((column) => <label key={column}><input type="checkbox" checked={selectedColumns.includes(column)} onChange={(event) => setSelectedColumns(event.target.checked ? [...selectedColumns, column] : selectedColumns.filter((value) => value !== column))} />{column}</label>)}</div></fieldset><button disabled={busy || !selectedColumns.length}>Save current run and filters</button></form>
+      <p><button type="button" className="secondary" disabled={busy} onClick={() => { void downloadProtected(`/api/runs/${encodeURIComponent(run.id)}/export?${exportParams}`, "ipam-domain-findings.json", new AbortController().signal).catch(error => setError(error instanceof Error ? error.message : "Export failed.")); }}>Export pinned domain findings and calculations (JSON)</button></p>
+      <form className="inventory-panel report-preset" onSubmit={(event) => { void savePreset(event); }}><h2>One report preset</h2><div className="filters"><span>Principal: {actor}</span><label>Name<input maxLength={200} required value={name} onChange={(event) => setName(event.target.value)} /></label><label>Reason<input maxLength={200} required value={reason} onChange={(event) => setReason(event.target.value)} /></label></div><fieldset><legend>CSV columns</legend><div className="column-options">{columns.map((column) => <label key={column}><input type="checkbox" checked={selectedColumns.includes(column)} onChange={(event) => setSelectedColumns(event.target.checked ? [...selectedColumns, column] : selectedColumns.filter((value) => value !== column))} />{column}</label>)}</div></fieldset><button disabled={busy || !selectedColumns.length}>Save current run and filters</button></form>
     </>}
     {preset && <div className="notice"><strong>Saved preset: {preset.name}</strong><p>Pinned run <code>{preset.run_id}</code>; filters <code>{JSON.stringify(preset.filters)}</code></p><p>Columns: {preset.columns.join(", ")}</p><button disabled={busy} onClick={() => { void downloadPreset(); }}>Export displayed preset (CSV)</button> <button className="secondary" disabled={busy} onClick={() => { void reloadPreset(); }}>Reload saved preset</button></div>}
     <section className="path-step"><h2>Compare two runs</h2><div className="filters"><label>Earlier run<select value={before} onChange={(event) => setBefore(event.target.value)}><option value="">Select earlier run</option>{runs.map((item) => <option key={item.id} value={item.id}>{item.created_at} · {item.id}</option>)}</select></label><label>Later run<select value={after} onChange={(event) => setAfter(event.target.value)}><option value="">Select later run</option>{runs.map((item) => <option key={item.id} value={item.id}>{item.created_at} · {item.id}</option>)}</select></label><button disabled={busy || !before || !after || before === after} onClick={() => { void compare(); }}>Compare saved evidence</button></div>

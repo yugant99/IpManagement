@@ -1,0 +1,905 @@
+{
+  "base_sha": "e8bc0ed08a8b3734d5278578828c8eb58b9f5d52",
+  "packets": [
+    {
+      "task": "T003",
+      "status": "source_accepted_runtime_unverified",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "e8bc0ed08a8b3734d5278578828c8eb58b9f5d52",
+      "branch": "codex/bridge-t003-schema",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-terra/Ip_inventory",
+      "owner": "Terra in Codex",
+      "route": "gpt-5.6-terra",
+      "prerequisites": [
+        "T001"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/schema.sql",
+        "backend/ipam_demo/schema_v6.sql",
+        "backend/ipam_demo/store.py",
+        "backend/ipam_demo/seed.py"
+      ],
+      "assignment": "Implement Tier A assessments, reservation/release/notice, request reservation link, ticket intent/attempt/effect and scoped preset schema. Positive versions; ordinals 1..3; unique active reservations/correlations. Preserve IDs/FKs and quarantine legacy presets; no Tier B schema. Retain ticket route assignment versions and pinned attempt scenario/route per FABLE-DESIGN amendments at this exact base.",
+      "contracts": "data-model.md C-M C-L C-T",
+      "acceptance": "Explicit recognized upgrade and fresh initialization; no destructive reseed or history loss.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Source accepted after corrections and independent review; no migration/seed/runtime tests or assembled Tier A acceptance.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements.",
+      "reasoning": "high",
+      "worker": "/root/terra_schema",
+      "result_sha": "9c73fd8e76c092b4d8297ec4475160b71574de7e",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/69"
+    },
+    {
+      "task": "T002",
+      "status": "source_accepted",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "6b66f943b7c7783285bfd1f70859ede42380bf60",
+      "branch": "codex/bridge-t002-sources",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-scout/Ip_inventory",
+      "owner": "Grok 4.6 under Grok 4.7",
+      "route": "opencode-go/grok-4.6#medium",
+      "prerequisites": [
+        "T001"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/source-authority.md"
+      ],
+      "assignment": "Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint.",
+      "contracts": "C-M C-T C-O",
+      "acceptance": "Every gap has a requirement, owner role and evidence gate.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Documentary source accepted; no runtime/vendor/human/ledger promotion.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements.",
+      "result_sha": "ab005d8bf3b6c57e0a071707796d18514c278674",
+      "session": "ses_f350eb239ffeK1SvUzC4X8fQlY",
+      "correction_owner": "Codex gpt-5.6-sol replacing quota-blocked Grok4.6",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/68"
+    },
+    {
+      "task": "T007",
+      "status": "source_accepted_runtime_unverified",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "aee0ade8bbeb6405aab4a6cf0c35079d76e6318e",
+      "branch": "codex/bridge-t007-access-review",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-luna/Ip_inventory",
+      "owner": "GPT-6 Sol independent reviewer",
+      "route": "Codex gpt-6-sol high",
+      "prerequisites": [
+        "T005",
+        "T006"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/access-review.md"
+      ],
+      "assignment": "Review all routes, clients, legacy data and errors against C-A before feature integration; record allowed/denied/projected/quarantined cases.",
+      "contracts": "C-A",
+      "acceptance": "No unresolved source/design access findings; runtime still requires T025.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Bounded independent source review closed after owner corrections. No runtime validation or main merge; T025 remains open.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Main Lead releases exact route, prerequisite candidate and lease; stop on quota/payment requirements.",
+      "worker": "/root/sol6_access_review",
+      "result_sha": "833c2c8676b205c97476ab71f4e3b2cff0a2c608",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/74"
+    },
+    {
+      "task": "T020",
+      "status": "historical_prepared_only_superseded_by_user_agent_reassignment",
+      "stage": "Stage 1 (post-meeting bridge)",
+      "base_sha": "ab005d8bf3b6c57e0a071707796d18514c278674",
+      "branch": "codex/bridge-t020-matrix",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-spencer/Ip_inventory",
+      "owner": "Spencer under Luna coordination",
+      "route": "human",
+      "prerequisites": [
+        "T002"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/integration-matrix.md"
+      ],
+      "assignment": "Day1 two-hour finish: inventory every integration RFP row, detailed selected local API/assessment/ticket contracts, mode/authority/owner/evidence/unknown vendor fields.",
+      "contracts": "C-A C-M C-L C-T C-O",
+      "acceptance": "All integration clauses classified; no guessed endpoint or simulated-as-live entry.",
+      "retain": "Retain exact candidate/config/schema/target, source or sanitized observed records proving the stated gate, failure cases and limitations. Source review is documentary; future runtime evidence requires authorization.",
+      "prohibited": "Every unleased path; global status/ledger; private source/credentials; infrastructure/customer/public operations; Tier B; unapproved model or extra-spend route; no tests for documentary slices.",
+      "nonclaims": "Future assignment, not performed by this planning task; no inferred runtime, human, corporate or production acceptance.",
+      "escalation": "Immediately surface authority/history/contract/ownership risk; otherwise 45 minutes without a defensible path. Terra replaces blocked implementation leaf with Sol; Grok 4.7 reviews integration, Main Lead decides scope.",
+      "handoff": "READY FOR PROJECT-LEAD REVIEW \u2014 Stage N (lead assigns N): task ID, exact SHA/PR, owned diff, evidence/gaps/non-claims and draft next prompt.",
+      "dispatch_gate": "Do not dispatch; current T020 agent source and ownership are in next_wave/operator_preparation_amendment"
+    }
+  ],
+  "route_decision": "Main Lead6 Astra owns coordination. User explicitly selected opencode-go/muse-spark-1.3-contributor#high, which authored complete T024 after live preflight. DeepSeek V4.1 Flash high is the recorded fallback with no overlapping active lease. GPT-6 Luna high independently verifies T025; GPT-6 Sol high independently reviews source/shared invariants and T027. Preserve original correction ownership. Opus unavailable, no dispatch/resume/timed retry. No private training inputs, purchases or Tier B release.",
+  "next_wave": [
+    {
+      "task": "T004",
+      "base_sha": "9c73fd8e76c092b4d8297ec4475160b71574de7e",
+      "branch": "codex/bridge-t004-access",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-access/Ip_inventory",
+      "route": "Codex gpt-5.6-terra high",
+      "status": "source_accepted_runtime_unverified",
+      "prerequisites": [
+        "T003 source acceptance"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/access.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "acceptance": "Default-deny trusted context, fail-closed invalid authority and stopped/reload revocation source contract; exact interface for T005/T006. No routes/runtime acceptance yet.",
+      "prohibited": "Unleased app/schema/UI/packaging/status files, real credentials, tests/runtime in this source slice, external spending/deployment, Fable/autodelegation.",
+      "result_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
+      "review_route": "Codex gpt-6-sol high",
+      "correction_route": "Codex gpt-6-luna high",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/71"
+    },
+    {
+      "task": "T019",
+      "base_sha": "ab005d8bf3b6c57e0a071707796d18514c278674",
+      "branch": "codex/bridge-t019-qualification",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-qualification/Ip_inventory",
+      "route": "Codex gpt-5.6-sol high",
+      "status": "source_accepted",
+      "prerequisites": [
+        "T002 source acceptance"
+      ],
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/gaps-and-qualification.md"
+      ],
+      "acceptance": "Each exclusion has owner/evidence boundary/future gate; numeric cohorts remain assumptions. Source-only document.",
+      "prohibited": "Every other path, external research/credentials, tests/runtime, human or commercial claims, ledger changes.",
+      "result_sha": "4034c765fce8a68f8cd73195c73f9a3bdd185d24",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/70"
+    },
+    {
+      "task": "T005",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
+      "wire_contract_sha": "fcd11a1bd9b78be2779e4b6896d8af1c3dc8cf04",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t005-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/faf2/Ip_inventory",
+      "thread_id": "01a0cb1e-a711-70a3-a74d-5651989a0355",
+      "prerequisites": [
+        "T004 source acceptance"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/inventory.py",
+        "backend/ipam_demo/reports.py",
+        "backend/ipam_demo/imports.py",
+        "backend/ipam_demo/source_catalog.py",
+        "backend/ipam_demo/scheduler.py",
+        "backend/ipam_demo/workflow.py",
+        "backend/ipam_demo/feed_adapter.py",
+        "backend/ipam_demo/inventory_commands.py"
+      ],
+      "acceptance": "Every route has allow/deny/projection classification and no global data leak.",
+      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge.",
+      "result_sha": "c4b367b3e51028ea70327ce9c62b9fb4598491e7",
+      "review_route": "Codex gpt-6-sol high",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/73",
+      "t025_correction": {
+        "owner_thread_id": "01a0cb1e-a711-70a3-a74d-5651989a0355",
+        "route": "Codex gpt-6-luna high retained author; pinned visible",
+        "base_sha": "0c20a7ba82c9802d20223d164efdc830e9ab1eac",
+        "branch": "codex/bridge-t005-t025-lock-correction",
+        "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t005-t025-lock-correction/Ip_inventory",
+        "owned_paths": [
+          "backend/ipam_demo/app.py",
+          "backend/ipam_demo/scheduler.py"
+        ],
+        "status": "source_closed_integrated_affected_runtime_observed_pass",
+        "finding": "Request database read transaction outlives separate scheduler writer; T025 timeout/STORE_BUSY, exact unknown key retained",
+        "boundary": "No journal/isolation/timeout workaround, no author runtime; Sol source review and separate Luna affected exact-candidate rerun required",
+        "result_sha": "7975307e4210083ba7ea6d34e6b80c652c15002c",
+        "pull_request": "https://github.com/yugant99/IpManagement/pull/103",
+        "source_integration_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+        "runtime_observation": "Independent Luna reports candidate4 acquisition201, same-key replay200/no new cycle, changed-reason409, coordinator reconciliation201, ordinary-domain global denial403 and stale pins409. Full T025 still pending."
+      }
+    },
+    {
+      "task": "T006",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "c7a3bed6dfec31bd07abc613f52b64f1304a1349",
+      "wire_contract_sha": "fcd11a1bd9b78be2779e4b6896d8af1c3dc8cf04",
+      "route": "Codex gpt-6-sol high",
+      "branch": "codex/bridge-t006-ui",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/1632/Ip_inventory",
+      "thread_id": "01a0cb1f-4086-7e40-a613-3fe2255ff4ec",
+      "prerequisites": [
+        "T004 source acceptance"
+      ],
+      "owned_paths": [
+        "frontend/src/api.ts",
+        "frontend/src/firstPathApi.ts",
+        "frontend/src/workflowApi.ts",
+        "frontend/src/inventoryCommandsApi.ts",
+        "frontend/src/correctionApi.ts",
+        "frontend/src/scheduleApi.ts",
+        "frontend/src/App.tsx",
+        "frontend/src/FirstPath.tsx",
+        "frontend/src/Schedule.tsx",
+        "frontend/src/CapacityReports.tsx",
+        "frontend/src/Corrections.tsx",
+        "frontend/src/InventoryEditor.tsx",
+        "frontend/src/Workflow.tsx"
+      ],
+      "acceptance": "No token in URL/localStorage/logs; browser uses trusted context everywhere. No prior-context data/retry disclosure or blind resubmission on identity/domain change.",
+      "prohibited": "Unleased paths; application tests/build/runtime; real configuration/credentials/data; cloud/customer/public operations; extra model spend; autonomous delegation; self-acceptance or merge.",
+      "result_sha": "671dae8d2c74f1a426c9f29c3c1d8997d3096ad8",
+      "supplemental_review_route": "opencode-go/muse-spark-1.3-contributor#xhigh",
+      "supplemental_review_status": "provider_privacy_refusal_then_user_paused_opencode",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/72"
+    },
+    {
+      "task": "T008",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "833c2c8676b205c97476ab71f4e3b2cff0a2c608",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t008-assessment",
+      "client_thread_id": "client-new-thread:e08f5d45-2795-4b8f-9972-1fbf34ae1b81",
+      "prerequisites": [
+        "T007 source acceptance"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/migration_compare.py"
+      ],
+      "acceptance": "Immutable scoped comparison with reconciled counts, conflict precedence and independent exact-current sign-off; no active-state promotion.",
+      "prohibited": "Unleased paths, tests/build/runtime/application imports/DB/config, OpenCode/other model calls, autonomous delegation, main merge or self-acceptance.",
+      "thread_id": "01a0cb4a-4b2c-7451-b2dc-8ae0508a8448",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/cf7c/Ip_inventory",
+      "result_sha": "776f32a3eaff2be9a5bd9d09a8f5dab62e4f5509",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/75",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "review_report": "specs/001-postmeeting-bridge/delivery/migration-source-review.md"
+    },
+    {
+      "task": "T009",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "36dbfb90f3178c07ed9c7d0a55b54370a563bf7f",
+      "wire_contract_sha": "37c3706d33a7416f0ef88cc6addfc3ffd9d160d8",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t009-migration-api",
+      "thread_id": "01a0cb5e-f055-7751-b79c-a60c9662a0c5",
+      "candidate_sha": "5a0fcf82112e0c7ae3a161fa11f70921c16f4096",
+      "result_sha": "daede1905304c5d5bd363ff230b5f6371763eb49",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/76",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/eb8d/Ip_inventory",
+      "prerequisites": [
+        "T008 source acceptance"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "acceptance": "Frozen scoped migration create/list/detail/signoff/export and exact receipt readback, current authority and transaction guards, no cutover.",
+      "prohibited": "Unleased paths; application tests/build/import/runtime/DB/config; OpenCode or other model calls; autonomous delegation; main merge or self-acceptance."
+    },
+    {
+      "task": "T010",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "36dbfb90f3178c07ed9c7d0a55b54370a563bf7f",
+      "wire_contract_sha": "37c3706d33a7416f0ef88cc6addfc3ffd9d160d8",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t010-migration-ui",
+      "thread_id": "01a0cb5f-6dcf-7080-90ea-fffcc1743645",
+      "candidate_sha": "d58ef6466b4e98fc1208cb8cd87632d759240eb3",
+      "result_sha": "4b0b7d71bff38014539d1ff3c5a06c6c06631db2",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/77",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/e121/Ip_inventory",
+      "prerequisites": [
+        "T008 source acceptance",
+        "T006 source acceptance"
+      ],
+      "owned_paths": [
+        "frontend/src/MigrationCompare.tsx",
+        "frontend/src/FirstPath.tsx",
+        "frontend/src/firstPathApi.ts",
+        "frontend/src/App.tsx"
+      ],
+      "acceptance": "Receipt and comparison accounting, active-only/conflict/refusal/stale/sign-off views, exact recovery and protected export using the frozen API, no activation.",
+      "prohibited": "Unleased paths; tests/build/typecheck/lint/import/runtime/DB/config; OpenCode or other model calls; autonomous delegation; main merge or self-acceptance.",
+      "t025_correction": {
+        "owner_thread_id": "01a0cb5f-6dcf-7080-90ea-fffcc1743645",
+        "route": "Codex gpt-6-luna high original T010 author, separate from verifier",
+        "base_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
+        "branch": "codex/bridge-t010-t025-correction",
+        "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t010-t025-correction/Ip_inventory",
+        "owned_paths": [
+          "frontend/src/firstPathApi.ts",
+          "frontend/src/MigrationCompare.tsx"
+        ],
+        "status": "source_closed_integrated_affected_build_passed",
+        "finding": "T025 compiled-UI TypeScript failure; minimal root-cause type-import correction only",
+        "result_sha": "220c4a25469961542f640418a0e5503c3f9d48e4",
+        "pull_request": "https://github.com/yugant99/IpManagement/pull/101",
+        "source_integration_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
+        "evidence": "Candidate2 full locked npm build log retained by independent verifier; does not pass all T025."
+      }
+    },
+    {
+      "task": "T011",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "3add18986096e8fd9bc6ac509db28fc08b6bf2a6",
+      "route": "Codex gpt-6-luna high",
+      "branch": "codex/bridge-t011-reservations",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/7802/Ip_inventory",
+      "client_thread_id": "client-new-thread:25614e1f-3e34-42fc-b63d-1d8b6808ae45",
+      "thread_id": "01a0cca1-3873-79a0-ad54-e3f2ae0f25fb",
+      "result_sha": "3fcdb49d955c39cf08f0a0d6f9483384e43163b1",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/78",
+      "review_report": "specs/001-postmeeting-bridge/delivery/lifecycle-source-review.md",
+      "prerequisites": [
+        "T009 source acceptance",
+        "Lead C-L service and reservation version clarification"
+      ],
+      "owned_paths": [
+        "backend/ipam_demo/lifecycle.py",
+        "backend/ipam_demo/workflow.py"
+      ],
+      "acceptance": "Exact designated local IPv4 hold, extension, atomic matching conversion and independent unused release with retained history and current authorization; no double hold or implicit expiry reclaim.",
+      "prohibited": "Unleased paths; tests/build/import/runtime/DB/config; Claude/Fable/Opus/OpenCode or other model calls; nested agents; T012/T013/further implementation; main merge or self-acceptance."
+    },
+    {
+      "task": "T012",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
+      "branch": "codex/bridge-t012-reservation-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t012-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f332f5dceffef5rsc94kEc2YA3",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/reservation-ticket-wire.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prerequisites": [
+        "T011 source acceptance",
+        "Shared wire freeze and source-base pin",
+        "Exact route and usage preflight"
+      ],
+      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes.",
+      "result_sha": "0e8fb4b3168261328d7832781453dfb14f40e8d3",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/82",
+      "review_report": "specs/001-postmeeting-bridge/delivery/reservation-ticket-source-review.md",
+      "integration_sha": "6599ae493edcb897a407d90570b68efd5affcea2"
+    },
+    {
+      "task": "T013",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
+      "branch": "codex/bridge-t013-ticket-core",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t013-opus/Ip_inventory",
+      "route": "Claude Code claude-opus-5-5 high",
+      "provider_session_id": "98b4bcd2-0c2a-4315-9c14-3d7e372cb911",
+      "owned_paths": [
+        "backend/ipam_demo/ticket_handoff.py",
+        "backend/ipam_demo/workflow.py"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/reservation-ticket-wire.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prerequisites": [
+        "T011 source acceptance",
+        "Shared wire freeze and source-base pin",
+        "Exact route and usage preflight"
+      ],
+      "prohibited": "No tests/builds/imports/runtime/DB/network/private documents/credentials/untracked outputs; no unleased edits or autonomous delegation. Lead publishes owned changes.",
+      "result_sha": "a5ce063f2e350fe854c9e10a0d35cd439dd042e2",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/83",
+      "review_report": "specs/001-postmeeting-bridge/delivery/reservation-ticket-source-review.md",
+      "integration_sha": "ede6cb6511c71011e6295fd46bf9d7c400a7db39"
+    },
+    {
+      "task": "T014",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "fb3723a5de9f20179adfc869a61558585c200865",
+      "branch": "codex/bridge-t014-ticket-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t014-api/Ip_inventory",
+      "route": "Codex gpt-6-luna high",
+      "worker": "/root/t014_ticket_api",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "prerequisites": [
+        "T012",
+        "T013"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/ticket-api-wire.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/runtime/DB/private data/untracked outputs/external model calls/delegation; no unleased edits, self-acceptance or main merge.",
+      "result_sha": "1b00a66ee1fc9fe9340ad27ec2b3a41b29156ac8",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/86",
+      "integration_sha": "ede6cb6511c71011e6295fd46bf9d7c400a7db39",
+      "review_report": "specs/001-postmeeting-bridge/delivery/ticket-api-source-review.md"
+    },
+    {
+      "task": "T016",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "fb3723a5de9f20179adfc869a61558585c200865",
+      "branch": "codex/bridge-t016-reservation-notices",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016-notices/Ip_inventory",
+      "route": "Codex gpt-6-luna high",
+      "worker": "/root/t016_reservation_notices",
+      "owned_paths": [
+        "backend/ipam_demo/lifecycle.py",
+        "backend/ipam_demo/workflow.py"
+      ],
+      "prerequisites": [
+        "T013"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/lifecycle.md",
+      "review_route": "Codex gpt-6-sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/runtime/DB/private data/untracked outputs/external model calls/delegation; no unleased edits, self-acceptance or main merge.",
+      "result_sha": "1be8bbdf4a0ed11bc82c75da7a89f2deadaeaf74",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/85",
+      "integration_sha": "c5121d4d85c6972fe5ae39315a5a413a96a07599",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-source-review.md",
+      "acceptance_gap": "Legacy Operator-only semantics superseded by source-reviewed T016A/T016B/T017A/T018 configured recipient amendment; runtime remains T025."
+    },
+    {
+      "task": "T015",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "branch": "codex/bridge-t015-workflow-ui",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t015-muse/Ip_inventory",
+      "provider_session_id": "ses_f32fa18a3ffeyQNRKi43do4bPA",
+      "owned_paths": [
+        "frontend/src/Workflow.tsx",
+        "frontend/src/workflowApi.ts"
+      ],
+      "prerequisites": [
+        "T014"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/workflow-ui-wire.md",
+      "review_route": "Codex GPT-6 Sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git.",
+      "result_sha": "adb7fc0a9d57544d6fd7c2d7db0edb4853c69a72",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/88",
+      "review_report": "specs/001-postmeeting-bridge/delivery/workflow-ui-source-review.md",
+      "integration_sha": "04b03378c0779a3363920c0777466b59cab10131"
+    },
+    {
+      "task": "T017",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865",
+      "route": "Claude Code claude-opus-5-5 high",
+      "branch": "codex/bridge-t017-notice-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t017-opus/Ip_inventory",
+      "provider_session_id": "695fa2f2-0540-45b1-9bd4-0a708a6e8137",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "prerequisites": [
+        "T014",
+        "T016"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-api-wire.md",
+      "review_route": "Codex GPT-6 Sol high independent worker",
+      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git.",
+      "result_sha": "f7e3c986d165f1f88a5d02d07a44a12d26f1461a",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/87",
+      "integration_sha": "11e6728317d9c2da5296975f3f2f1bbce516e785",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-api-source-review.md"
+    },
+    {
+      "task": "T016A",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "b24e50728c9dcd071a4f69534e9110c6d3e58348",
+      "branch": "codex/bridge-t016a-recipient-foundation",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016a-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32eda1cbffeAumu1uotbBxqdf",
+      "owned_paths": [
+        "backend/ipam_demo/access.py",
+        "backend/ipam_demo/store.py",
+        "backend/ipam_demo/schema_v7.sql"
+      ],
+      "prerequisites": [
+        "T017",
+        "Explicit user recipient policy and lead/Sol wire freeze"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No frozen schema6 edit, unleased source, tests/build/typecheck/import/DB/runtime/shell/network/private or untracked content, extra agents/models/spend. Lead publishes.",
+      "result_sha": "8cd51d583a75cb991bccf215590ba1b2f7efca24",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/89",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md",
+      "integration_sha": "04b03378c0779a3363920c0777466b59cab10131"
+    },
+    {
+      "task": "T016B",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "b52c0f9bf2290b66a1f7d9ae554b39a3d85a29b7",
+      "branch": "codex/bridge-t016b-recipient-lifecycle",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016b-luna/Ip_inventory",
+      "route": "Codex gpt-6-luna high",
+      "worker": "/root/t016_reservation_notices",
+      "owned_paths": [
+        "backend/ipam_demo/lifecycle.py",
+        "backend/ipam_demo/workflow.py"
+      ],
+      "prerequisites": [
+        "T016A source acceptance"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/build/typecheck/lint/import/DB/SQL/runtime, private/untracked data, external model/delegation, unleased edits, selfacceptance/main merge. Existing T016 author retained; new isolated feature worktree.",
+      "result_sha": "678cb8c118fc1baf0afeca0cbf775b2fe844e0eb",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/90",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md",
+      "integration_sha": "efb85125d02f713af8d7cebaa10e16a8b1a671ee"
+    },
+    {
+      "task": "T017A",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "efb85125d02f713af8d7cebaa10e16a8b1a671ee",
+      "branch": "codex/bridge-t017a-recipient-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t017a-opus/Ip_inventory",
+      "route": "Claude Code claude-opus-5-5 high",
+      "provider_session_id": "bffb72a3-8d3c-46ce-b337-910448c85ff1",
+      "retained_author_session": "695fa2f2-0540-45b1-9bd4-0a708a6e8137",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "prerequisites": [
+        "T016B source acceptance"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/builds/import/typecheck/lint/DB/SQL/runtime/shell/Git/network/private/untracked documents/extra agents/models/spend or unleased edits. Source tools only; lead publishes.",
+      "result_sha": "cae954c67b72ec7456244c7cb68a2db2ccd6a224",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/91",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md",
+      "integration_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33"
+    },
+    {
+      "task": "T018",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
+      "branch": "codex/bridge-t018-notice-ui",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t018-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32c9e849ffe2Nu5nShr2wEUgI",
+      "owned_paths": [
+        "frontend/src/Workflow.tsx",
+        "frontend/src/workflowApi.ts",
+        "frontend/src/CapacityReports.tsx"
+      ],
+      "prerequisites": [
+        "T015",
+        "T017A"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-ui-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes.",
+      "result_sha": "6173efa8e1d09e89cb35e44ffc99aa589bcaea63",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/93",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-ui-source-review.md",
+      "integration_sha": "a2b567b670129671f85498729753c4d577d4768e"
+    },
+    {
+      "task": "T023",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
+      "branch": "codex/bridge-t023-state-recovery",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t023-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32c9e72dffeg9BzrsFy7Djgbm",
+      "owned_paths": [
+        "backend/ipam_demo/state_ops.py",
+        "backend/ipam_demo/__main__.py"
+      ],
+      "prerequisites": [
+        "T003",
+        "T017A"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/state-recovery-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes.",
+      "result_sha": "adb2dc18fe747d4ff97a90f1a21bcdc4382f9fea",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/92",
+      "review_report": "specs/001-postmeeting-bridge/delivery/state-recovery-source-review.md",
+      "integration_sha": "a711d1ee84ba3d8959f18471bc2acf930c3ce7a5"
+    },
+    {
+      "task": "T020",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "b8f294fc19b635dcf3c784125fd804d8a1a2616b",
+      "branch": "codex/bridge-t020-agent-matrix",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t020-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32b85484ffe3rzKZMmJ8uKzG3",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/integration-matrix.md"
+      ],
+      "prerequisites": [
+        "T002 source acceptance",
+        "Explicit user release of unstarted Spencer preparation"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "prohibited": "No tests/build/import/typecheck/lint/DB/SQL/runtime/private/untracked/credentials/network/shell/Git/extra agents/models/purchases; source tools, lead publishes.",
+      "initial_result_sha": "4c55eb7101263654fc6803978dce7e670933de70",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/94",
+      "result_sha": "1123146ce60ac3636d9a38af8be90467c1df90bf",
+      "review_report": "specs/001-postmeeting-bridge/delivery/integration-matrix-source-review.md",
+      "integration_sha": "ce52b1f9b0fe527c8a84c3e80f0eed92e0f46907"
+    },
+    {
+      "task": "T021",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98",
+      "branch": "codex/bridge-t021-offline-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t021-opus/Ip_inventory",
+      "route": "Claude Code claude-opus-5-5 high",
+      "provider_session_id": "43675db1-2332-459d-9376-98a210e19298",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/offline-api.md"
+      ],
+      "prerequisites": [
+        "T009",
+        "T014",
+        "T017A",
+        "T020"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes.",
+      "result_sha": "3007bf33dd3481f1b85723b0a1c4971036b5f089",
+      "pr_url": "https://github.com/yugant99/IpManagement/pull/96",
+      "review_report": "specs/001-postmeeting-bridge/delivery/offline-api-source-review.md",
+      "integration_sha": "e6b76edaa9ae5b82a0c409fec151bf52168036bc"
+    },
+    {
+      "task": "T022",
+      "status": "source_accepted_runtime_unverified",
+      "base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98",
+      "branch": "codex/bridge-t022-recipient-pack",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t022-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32aa15acffeOiX7v983vArcrf",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/recipient-validation.md",
+        "specs/001-postmeeting-bridge/delivery/configuration-example.json"
+      ],
+      "prerequisites": [
+        "T010",
+        "T015",
+        "T017A",
+        "T020"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes.",
+      "result_sha": "c231663ef9a9747c83288523da9ede93977bef42",
+      "pr_url": "https://github.com/yugant99/IpManagement/pull/95",
+      "review_report": "specs/001-postmeeting-bridge/delivery/recipient-preparation-source-review.md",
+      "integration_sha": "6e0a036339005d3c1101017374a6b36e1957a3a5"
+    },
+    {
+      "task": "T024",
+      "status": "source_accepted_runtime_unverified",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "base_sha": "4ee3a583d3ee36bef4197f6babae52c8eea48d3a",
+      "required_source_assembly": "e6b76edaa9ae5b82a0c409fec151bf52168036bc",
+      "branch": "codex/bridge-t024-spark-operator",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t024-spark/Ip_inventory",
+      "provider_session_id": "ses_f30868e2affe2hAM4rI4a7dKuR",
+      "owned_paths": [
+        "scripts/ops/acquire.sh",
+        "scripts/ops/health.sh",
+        "scripts/ops/README.md",
+        "specs/001-postmeeting-bridge/delivery/operator-handoff.md",
+        "Dockerfile",
+        "compose.yaml",
+        "docs/RUNNING.md",
+        "scripts/ops/start.sh",
+        "scripts/ops/backup.sh"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "release_condition": "Dispatched after live Spark Contributor high preflight; independent Sol full review before source integration",
+      "pickup": "docs/handoffs/main-lead-6.0.md",
+      "nonclaims": "Source accepted; T025 has partial and negative runtime observations, not a passing gate. No main/portable/human acceptance.",
+      "preferred_route": "opencode-go/muse-spark-1.3-contributor#high",
+      "fallback_reason": "Latest user explicitly corrected routing to Spark Contributor. Prior DeepSeek session interrupted before any edits; retained isolated worktree is clean. DeepSeek remains standby fallback only.",
+      "result_sha": "7e50122ac6c7bc837bd89db6b9029035065b1b57",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/99",
+      "source_integration_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
+      "review_record": "specs/001-postmeeting-bridge/delivery/operator-package-source-review.md",
+      "t025_correction": {
+        "finding": "Malformed curl config boolean options put HTTP headers into JSON response body",
+        "author": "same Spark Contributor session and lease",
+        "result_sha": "f8d381adb3a604251b5486ecfa10148bb1491f81",
+        "pull_request": "https://github.com/yugant99/IpManagement/pull/102",
+        "status": "source_closed_integrated_basic_wrapper_runtime_observed_pass",
+        "owned_paths": [
+          "scripts/ops/acquire.sh",
+          "scripts/ops/health.sh"
+        ],
+        "source_integration_sha": "0c20a7ba82c9802d20223d164efdc830e9ab1eac",
+        "reviewer_thread_id": "01a0cf9a-ce88-7f90-8556-1fa4b131bf26",
+        "runtime_observation": "Candidate4 liveness/all-six protected readiness and acquisition status/header/body triples pass; remaining wrapper security/negative matrix and full T025 still pending."
+      }
+    },
+    {
+      "task": "T025",
+      "status": "accepted_bounded_local_synthetic",
+      "route": "Codex gpt-6-luna high",
+      "worker": "Visible Codex task01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f",
+      "base_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
+      "branch": "codex/bridge-t025-luna",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-luna/Ip_inventory",
+      "owned_paths": [
+        "specs/001-postmeeting-bridge/delivery/independent-evidence.md",
+        "specs/001-postmeeting-bridge/delivery/evidence/t025/"
+      ],
+      "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
+      "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
+      "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker",
+      "current_blocker": "None for the accepted bounded local synthetic technical criteria; T028 acceptance-record review and main merge remain next.",
+      "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
+      "current_candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+      "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory",
+      "observed_progress": "Candidate4 acquisition/replay/response-loss, scoped workflow and notices, true overlapping reservation requests, authenticated browser memory/reload/revocation, and populated stopped restore with all 32 table hashes equal plus separate readiness/business reads are retained. Initial preliminary recovery proof remains distinguished from final populated comparison.",
+      "evidence_pr": "https://github.com/yugant99/IpManagement/pull/104",
+      "evidence_checkpoint_sha": "2e204379691cba1b59686ba9d2bbbeb57bacebcd",
+      "evidence_final_sha": "75f213ea8934cb275a083724c1dc4d3ce79d2c42",
+      "final_review_sha": "1f2d64ab9200733b459d2584be07f35b204917ed",
+      "final_review_pr": "https://github.com/yugant99/IpManagement/pull/105"
+    }
+  ],
+  "muse_route": {
+    "authorization": "Current user-selected Spark Contributor high owns complete T024 and retained corrections; public tracked synthetic source only under unchanged existing training consent.",
+    "exact_route": "opencode-go/muse-spark-1.3-contributor#high",
+    "variant_verified": true,
+    "status": "T024_independently_source_closed_original_author_retained"
+  },
+  "opus_t008_advisory": {
+    "route": "claude-opus-5-5",
+    "effort": "high",
+    "session_id": "d999c245-03ec-4915-8675-6018dfc09185",
+    "candidate": "833c2c8676b205c97476ab71f4e3b2cff0a2c608",
+    "scope": "One tool-less read-only assessment authority/digest/signoff design response.",
+    "status": "completed_adjudicated_one_turn",
+    "authorization": "Latest user explicitly requested one bounded Opus5.5 task through existing Claude Code; Luna/Sol assignments remain intact.",
+    "evidence_root": "/tmp/ipam-opus-t008-review",
+    "report": "specs/001-postmeeting-bridge/delivery/opus-assessment-advisory.md"
+  },
+  "claude_current_policy": {
+    "status": "unavailable_user_hold",
+    "instruction": "Do not dispatch/resume Opus or automatically retry on a timer. Preserve original ownership; explicit bounded fallback only."
+  },
+  "current_handover_gate": {
+    "milestone": "T024 independently source-closed and integrated",
+    "status": "T025_in_progress_candidate4",
+    "action": "Visible Luna completes remaining recipient/ticket/concurrency/security and populated recovery evidence; source/runtime earlier failures retained; final SolT027 and T028 remain gated",
+    "hold": "No main merge before T028; portable/human remain separate; Tier B locked",
+    "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
+    "application_source_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+    "publication_branch": "codex/main-lead-6-bridge",
+    "receiver_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
+    "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
+    "next_shared_base_sha": null,
+    "source_assembly_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+    "pickup": "docs/handoffs/main-lead-6.0.md",
+    "completed_preparation_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98"
+  },
+  "lead_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
+  "latest_provider_preflight": {
+    "date": "2026-09-23",
+    "spark_free": "active/enabled catalog high; two synthetic deny-all-tool probes returned provider.auth HTTP403: OpenCode free tier can only be used from within OpenCode",
+    "deepseek": "exact opencode-go/deepseek-v4.1-flash#high synthetic deny-all-tool probe PREFLIGHT_OK",
+    "opencode_usage_percent": {
+      "rolling": 1,
+      "weekly": 43,
+      "monthly": 21
+    },
+    "opencode_credit": "disabled; balance0",
+    "data_use": "Current paid/free training controls enabled, unchanged. Public tracked synthetic source only. Free route has no numeric quota receipt; availability failed.",
+    "native_codex_weekly_used_percent": 65,
+    "native_routes": "gpt-6-sol high SOL_PREFLIGHT_OK; gpt-6-luna high LUNA_PREFLIGHT_OK",
+    "reserve": "20% reserve retained",
+    "evidence_root": "/tmp/ipam-lead6",
+    "opus": "unavailable per user; not probed/resumed; no timer",
+    "spark_contributor": "Exact opencode-go/muse-spark-1.3-contributor#high active/enabled; synthetic deny-all-tool probe PREFLIGHT_OK, session ses_f3087e62affewDLimZQvx4jNco",
+    "usage_snapshot_note": "Go usage refreshed after first full Spark source result; native usage refreshed before T025 release. Percentages are used, not remaining."
+  },
+  "recipient_policy_amendment": {
+    "authorization": "Explicit user selection: reviewed domain/scope Operator recipient; immutable notification-version binding; explicit in-app acknowledgement is receipt",
+    "wire": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+    "schema": "7 reserved for TierA; frozen6 unchanged; futureTierB actualnext>=8",
+    "owners": {
+      "T016A": "Muse1.3 high configuration/schema foundation",
+      "T016B": "retained Luna T016 lifecycle author",
+      "T017A": "retained Opus5.5 high T017 API author"
+    },
+    "status": "recipient_foundation_core_API_UI_source_accepted_runtime_unverified",
+    "reviewer": "Independent GPT-6 Sol high",
+    "gate": "T025/T028 unchanged; no runtime before complete prerequisite candidate"
+  },
+  "operator_preparation_amendment": {
+    "authorization": "2026-09-23 user explicitly directed agents to do unassigned Spencer preparation; tomorrow assignment left open",
+    "record": "specs/001-postmeeting-bridge/delivery/operator-preparation-ownership.md",
+    "owners": {
+      "T020": "Muse1.3 high",
+      "T021": "Opus5.5 high",
+      "T022": "Muse1.3 high",
+      "T024": "Muse1.3 high",
+      "T026": "Astra records actual human evidence or pending"
+    },
+    "reviewer": "Independent GPT-6 Sol high",
+    "user_stop_boundary": "Prior sleep hold lifted by explicit Main Lead 6.0 resume",
+    "t024_future_owned_paths": [
+      "scripts/ops/acquire.sh",
+      "scripts/ops/health.sh",
+      "scripts/ops/README.md",
+      "specs/001-postmeeting-bridge/delivery/operator-handoff.md",
+      "Dockerfile",
+      "compose.yaml",
+      "docs/RUNNING.md",
+      "scripts/ops/start.sh",
+      "scripts/ops/backup.sh"
+    ],
+    "t024_extra_path_limit": "RUNNING bridge readiness/auth/config text; start/backup readiness/actual-volume messages/comments only, no operational flow changes",
+    "t024_volume_decision": "Require explicit IPAM_DATA_VOLUME; record fresh disposable candidate volume; deliberate recorded reuse only",
+    "status": "T024_source_accepted_runtime_unverified"
+  },
+  "next_lead_transfer": {
+    "incoming_role": "Main Lead 6.0 / Astra",
+    "incoming_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
+    "outgoing_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
+    "status": "takeover_registered_T024_source_closed_T025_released",
+    "handoff": "docs/handoffs/main-lead-6.0.md",
+    "base_publication": "9cb0725e28985b944a1296ea6d1bde403491d465",
+    "amendment_branch": "codex/main-lead-6-handoff",
+    "new_worker_routes": [
+      "opencode-go/muse-spark-1.3-contributor#high",
+      "opencode-go/deepseek-v4.1-flash#high",
+      "Codex gpt-6-luna high",
+      "Codex gpt-6-sol high"
+    ],
+    "preflight_status": "User corrected preferred route to Spark Contributor; exact Go route/high probe passed. Free-route403 retained as historical only.",
+    "opus_status": "user says unavailable next couple hours; no dispatch/resume/timed autoretry",
+    "boundary": "T024 authorized; no application runtime before prerequisite-complete T025; T028 main gate unchanged"
+  },
+  "codex_worker_visibility": {
+    "instruction": "User requires all Sol/Luna Codex work in visible sidebar tasks; create or continue visible tasks, not hidden subagents. Current continuation tasks are pinned.",
+    "sol_reviewer_thread_id": "01a0cf9a-ce88-7f90-8556-1fa4b131bf26",
+    "luna_verifier_thread_id": "01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f",
+    "retained_t010_author_thread_id": "01a0cb5f-6dcf-7080-90ea-fffcc1743645",
+    "retired_hidden_workers": [
+      "/root/sol_t024_review",
+      "/root/luna_t025_verifier"
+    ],
+    "handoff": "/Users/yuganthareshsoni/Downloads/Ip_inventory-t025-artifacts/run-20260923-lead6/HANDOFF.md",
+    "ownership": "Visible Sol retains independent source/T027 review; visible Luna retains independent verifier evidence branch; no duplicate execution or implementation reassignment.",
+    "retained_t005_author_thread_id": "01a0cb1e-a711-70a3-a74d-5651989a0355"
+  },
+  "t028_adjudication": {
+    "state": "accepted_for_main_merge_pending_document_review_and_fresh_heads",
+    "application_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+    "evidence_sha": "75f213ea8934cb275a083724c1dc4d3ce79d2c42",
+    "review_sha": "1f2d64ab9200733b459d2584be07f35b204917ed",
+    "main_before": "04eba98cb8673406d1e5d38c5318fb963cc77ff7",
+    "main_pr": "https://github.com/yugant99/IpManagement/pull/98",
+    "human_rehearsal": "pending_not_run",
+    "recipient_portability": "unobserved",
+    "commercial_roles": "documentary_unassigned",
+    "questionnaire_promotion": false,
+    "tier_b": "locked"
+  }
+}

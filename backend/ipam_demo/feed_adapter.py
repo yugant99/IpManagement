@@ -44,6 +44,18 @@ _RICH_SCOPES = {
     _COASTAL: ("vrf-coastal", ["10.60.0.0/16", "2001:db8:60::/48"]),
     _CENTRAL: ("vrf-central", ["10.80.0.0/16", "2001:db8:80::/48"]),
 }
+
+# Frozen source/scope grants from fixtures/v1. Reviewed access configuration must
+# cover every registered pair and cannot invent a source or attach it elsewhere.
+REGISTERED_SOURCE_SCOPE_GRANTS = frozenset(
+    [("synthetic-inventory-rich", scope_id) for scope_id in _RICH_SCOPES]
+    + [("synthetic-inventory-policy", scope_id) for scope_id in _RICH_SCOPES]
+    + [(source_id, scope_id) for source_id, scope_id in (
+        ("synthetic-dhcp-north", _NORTH), ("synthetic-dhcp-coastal", _COASTAL),
+        ("synthetic-dhcp-central", _CENTRAL), ("synthetic-dhcp-lab", _LAB),
+        ("synthetic-routing-north", _NORTH), ("synthetic-routing-coastal", _COASTAL),
+        ("synthetic-routing-central", _CENTRAL), ("synthetic-routing-lab", _LAB))]
+)
 _NORTH_V4 = "41aca2b0-ec1d-4f64-8d21-c5af0ab0b001"
 _NORTH_V6 = "41aca2b0-ec1d-4f64-8d21-c5af0ab0b004"
 _COASTAL_V4 = "e18e837e-510f-5b09-a851-a51087a87489"

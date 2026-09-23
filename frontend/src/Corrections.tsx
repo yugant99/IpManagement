@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { ApiError, request } from "./api";
+import { ApiError, currentContext, downloadProtected, hasRole, request } from "./api";
 import type { Page } from "./api";
-import { computeRun } from "./firstPathApi";
 import type { Finding, RunSummary, SavedRun } from "./firstPathApi";
-import type { DemoActor } from "./workflowApi";
-import { createCorrection, decideCorrection, loadCorrection, loadCorrectionContext } from "./correctionApi";
+import { createCorrection, decideCorrection, findCorrectionByKey, loadCorrection, loadCorrectionContext } from "./correctionApi";
 import type { CorrectionContext, CorrectionDecision, CorrectionRequest, CreateCorrection, ResolutionState } from "./correctionApi";
 
 const PAGE_SIZE = 20;
-const ATTEMPT_KEY = "ipam.correction.attempt.v1";
+const LEGACY_ATTEMPT_KEY = "ipam.correction.attempt.v1";
+const RECOVERY_KEY = "ipam.correction.recovery.v2";
+const LEGACY_UNRESOLVED_KEY = "ipam.correction.legacy-unresolved";
 const CORRECTION_RULES = ["ghost_scope", "unregistered_managed_route"];
 type Attempt = { kind: "proposal"; payload: CreateCorrection } | { kind: "decision"; id: string; payload: CorrectionDecision };
+type RecoveryPointer = {
+  principal_id: string; domain: string; configuration_revision: number; configuration_digest: string;
+  kind: "proposal" | "approve" | "reject"; idempotency_key?: string; request_id?: string;
+};
 const resolutionLabels: Record<ResolutionState, string> = {
   not_approved: "No approved correction",
   pending_reconciliation: "Approved; reconciliation evidence pending",
@@ -26,27 +30,40 @@ function readableError(error: unknown) {
 }
 
 function ambiguous(error: unknown) {
-  return !(error instanceof ApiError) || ["REQUEST_TIMEOUT", "CONNECTION_FAILED", "INVALID_RESPONSE", "INTERNAL_ERROR"].includes(error.code);
+  return !(error instanceof ApiError) || ["REQUEST_TIMEOUT", "CONNECTION_FAILED", "INVALID_RESPONSE", "INTERNAL_ERROR", "SESSION_CHANGED"].includes(error.code);
 }
 
-function readAttempt(): { attempt: Attempt | null; error: string } {
+function readRecovery(): { pointer: RecoveryPointer | null; error: string } {
   try {
-    const raw = sessionStorage.getItem(ATTEMPT_KEY);
-    if (raw === null) return { attempt: null, error: "" };
-    const value = JSON.parse(raw) as Attempt;
-    if (!value || typeof value !== "object" || !value.payload || typeof value.payload !== "object") throw new Error("Unreadable saved operation.");
-    const payload = value.payload as unknown as Record<string, unknown>;
-    const fields = value.kind === "proposal"
-      ? ["actor_id", "idempotency_key", "scope_id", "source_run_id", "source_finding_id", "cidr", "owner", "purpose", "reason"]
-      : ["actor_id", "action", "reason"];
-    if (fields.some(field => typeof payload[field] !== "string" || !(payload[field] as string).trim())
-      || (value.kind === "proposal" && (!Number.isInteger(value.payload.expected_baseline_version) || value.payload.expected_baseline_version < 1))
-      || (value.kind === "decision" && (typeof value.id !== "string" || !value.id || !["approve", "reject"].includes(value.payload.action)))
-      || !["proposal", "decision"].includes(value.kind)) throw new Error("The saved operation has an invalid shape.");
-    return { attempt: value, error: "" };
+    if (sessionStorage.getItem(LEGACY_ATTEMPT_KEY) !== null) {
+      sessionStorage.removeItem(LEGACY_ATTEMPT_KEY);
+      sessionStorage.setItem(LEGACY_UNRESOLVED_KEY, "1");
+    }
+    if (sessionStorage.getItem(LEGACY_UNRESOLVED_KEY)) return { pointer: null, error: "An older unscoped correction retry payload was purged. Its original principal and outcome cannot be verified here. New correction writes are blocked until the operator resolves this ambiguity." };
+    const raw = sessionStorage.getItem(RECOVERY_KEY);
+    if (raw === null) return { pointer: null, error: "" };
+    const value = JSON.parse(raw) as RecoveryPointer;
+    if (!value || typeof value.principal_id !== "string" || typeof value.domain !== "string"
+      || !Number.isInteger(value.configuration_revision) || typeof value.configuration_digest !== "string"
+      || !["proposal", "approve", "reject"].includes(value.kind)
+      || (value.kind === "proposal" ? typeof value.idempotency_key !== "string" || !value.idempotency_key : typeof value.request_id !== "string" || !value.request_id)
+      || Object.keys(value).some(key => !["principal_id", "domain", "configuration_revision", "configuration_digest", "kind", "idempotency_key", "request_id"].includes(key))) {
+      sessionStorage.removeItem(RECOVERY_KEY);
+      sessionStorage.setItem(LEGACY_UNRESOLVED_KEY, "1");
+      throw new Error("An invalid recovery pointer was purged. Its operation remains unresolved.");
+    }
+    return { pointer: value, error: "" };
   } catch (error) {
-    return { attempt: null, error: `The saved correction retry could not be read. It has been preserved; new writes are blocked. ${readableError(error)}` };
+    return { pointer: null, error: `Correction recovery could not be read. New writes are blocked. ${readableError(error)}` };
   }
+}
+
+function pointerFor(attempt: Attempt): RecoveryPointer {
+  const context = currentContext();
+  return { principal_id: context.principal_id, domain: context.selected_domain!,
+    configuration_revision: context.configuration_revision, configuration_digest: context.configuration_digest,
+    kind: attempt.kind === "proposal" ? "proposal" : attempt.payload.action,
+    ...(attempt.kind === "proposal" ? { idempotency_key: attempt.payload.idempotency_key } : { request_id: attempt.id }) };
 }
 
 function PageButtons({ page, change, disabled, label }: { page: Page<unknown>; change: (offset: number) => void; disabled: boolean; label: string }) {
@@ -76,20 +93,21 @@ function FindingEvidence({ finding, title }: { finding: Finding; title: string }
 }
 
 export default function Corrections({ active = true }: { active?: boolean }) {
-  const [restored] = useState(readAttempt);
-  const [attempt, setAttempt] = useState<Attempt | null>(restored.attempt);
+  const [restored] = useState(readRecovery);
+  const [attempt, setAttempt] = useState<Attempt | null>(null);
+  const [pointer, setPointer] = useState<RecoveryPointer | null>(restored.pointer);
+  const [recoveryStatus, setRecoveryStatus] = useState("");
   const [storageError, setStorageError] = useState(restored.error);
-  const [actors, setActors] = useState<DemoActor[]>([]);
-  const [actorId, setActorId] = useState(restored.attempt?.payload.actor_id ?? "demo-requester");
+  const actorId = currentContext().principal_id;
   const [runs, setRuns] = useState<Page<RunSummary> | null>(null);
   const [runOffset, setRunOffset] = useState(0);
-  const [runId, setRunId] = useState(restored.attempt?.kind === "proposal" ? restored.attempt.payload.source_run_id : "");
+  const [runId, setRunId] = useState("");
   const [run, setRun] = useState<SavedRun | null>(null);
-  const [findingId, setFindingId] = useState(restored.attempt?.kind === "proposal" ? restored.attempt.payload.source_finding_id : "");
+  const [findingId, setFindingId] = useState("");
   const [context, setContext] = useState<CorrectionContext | null>(null);
   const [requests, setRequests] = useState<Page<CorrectionRequest> | null>(null);
   const [requestOffset, setRequestOffset] = useState(0);
-  const [selectedId, setSelectedId] = useState(restored.attempt?.kind === "decision" ? restored.attempt.id : "");
+  const [selectedId, setSelectedId] = useState("");
   const [selected, setSelected] = useState<CorrectionRequest | null>(null);
   const [cidr, setCidr] = useState("");
   const [owner, setOwner] = useState("");
@@ -102,6 +120,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const operation = useRef<AbortController | null>(null);
+  const priorAmbiguity = useRef(false);
   useEffect(() => () => operation.current?.abort(), []);
 
   useEffect(() => {
@@ -109,12 +128,11 @@ export default function Corrections({ active = true }: { active?: boolean }) {
     const controller = new AbortController();
     setLoading(true);
     Promise.all([
-      request<DemoActor[]>("/api/actors", controller.signal),
       request<Page<RunSummary>>(`/api/runs?limit=${PAGE_SIZE}&offset=${runOffset}`, controller.signal),
       request<Page<CorrectionRequest>>(`/api/correction-requests?limit=${PAGE_SIZE}&offset=${requestOffset}`, controller.signal),
-    ]).then(([people, savedRuns, items]) => {
+    ]).then(([savedRuns, items]) => {
       if (controller.signal.aborted) return;
-      setActors(people); setRuns(savedRuns); setRequests(items);
+      setRuns(savedRuns); setRequests(items);
       setRunId(previous => previous || savedRuns.items[0]?.id || "");
     }).catch((failure: unknown) => {
       if (!controller.signal.aborted) setError(`Refresh failed; previously displayed records may be stale. ${readableError(failure)}`);
@@ -152,37 +170,70 @@ export default function Corrections({ active = true }: { active?: boolean }) {
     return () => controller.abort();
   }, [active, selectedId, revision]);
 
+  useEffect(() => {
+    if (!active || !pointer || attempt || storageError) return;
+    const context = currentContext();
+    if (pointer.principal_id !== context.principal_id || pointer.domain !== context.selected_domain) {
+      setRecoveryStatus(`Unresolved ${pointer.kind} belongs to principal ${pointer.principal_id} in domain ${pointer.domain}. Authenticate that original context to read it back. No new correction will be submitted.`);
+      return;
+    }
+    const controller = new AbortController();
+    setRecoveryStatus("Checking the original correction outcome under this authenticated domain…");
+    const readback = pointer.kind === "proposal"
+      ? findCorrectionByKey(pointer.idempotency_key!, controller.signal).then(page => page.items.find(item => item.idempotency_key === pointer.idempotency_key) ?? null)
+      : loadCorrection(pointer.request_id!, controller.signal);
+    readback.then(saved => {
+      if (controller.signal.aborted) return;
+      const confirmed = !!saved && (pointer.kind === "proposal"
+        ? saved.actor_id === pointer.principal_id && saved.idempotency_key === pointer.idempotency_key
+        : saved.id === pointer.request_id && saved.decision_actor_id === pointer.principal_id && saved.state === (pointer.kind === "approve" ? "approved" : "rejected"));
+      if (!confirmed) {
+        setRecoveryStatus("The original operation remains unresolved. No matching principal, key/request ID and outcome was confirmed. Do not submit a replacement operation.");
+        return;
+      }
+      try {
+        sessionStorage.removeItem(RECOVERY_KEY);
+        if (sessionStorage.getItem(RECOVERY_KEY) !== null) throw new Error("Recovery pointer could not be cleared.");
+        priorAmbiguity.current = false;
+        setPointer(null); setSelectedId(saved!.id); setSelected(saved!);
+        setRecoveryStatus("Original correction outcome confirmed by authorized readback.");
+      } catch (failure) { setStorageError(`Readback confirmed the outcome, but recovery storage could not be cleared. ${readableError(failure)}`); }
+    }).catch(failure => {
+      if (!controller.signal.aborted) setRecoveryStatus(`Original correction remains unresolved. Authorized readback failed: ${readableError(failure)} No replacement will be submitted.`);
+    });
+    return () => controller.abort();
+  }, [active, pointer, attempt, storageError, revision]);
+
   function retain(value: Attempt) {
-    const saved = readAttempt();
+    const saved = readRecovery();
     if (saved.error) throw new Error(saved.error);
-    if (saved.attempt && JSON.stringify(saved.attempt) !== JSON.stringify(value)) throw new Error("A different operation is already saved in this tab. Reload its retry request first.");
-    const serialized = JSON.stringify(value);
-    sessionStorage.setItem(ATTEMPT_KEY, serialized);
-    if (sessionStorage.getItem(ATTEMPT_KEY) !== serialized) throw new Error("The exact retry request could not be saved.");
+    const next = pointerFor(value);
+    if (saved.pointer && JSON.stringify(saved.pointer) !== JSON.stringify(next)) throw new Error("A different correction operation remains unresolved. Read it back before another write.");
+    const serialized = JSON.stringify(next);
+    sessionStorage.setItem(RECOVERY_KEY, serialized);
+    if (sessionStorage.getItem(RECOVERY_KEY) !== serialized) throw new Error("The minimal recovery pointer could not be saved.");
+    setPointer(next);
     setAttempt(value);
   }
 
   function clearAttempt() {
     try {
-      sessionStorage.removeItem(ATTEMPT_KEY);
-      if (sessionStorage.getItem(ATTEMPT_KEY) !== null) throw new Error("The previous retry remains saved.");
+      sessionStorage.removeItem(RECOVERY_KEY);
+      if (sessionStorage.getItem(RECOVERY_KEY) !== null) throw new Error("The previous recovery pointer remains saved.");
+      priorAmbiguity.current = false;
+      setPointer(null);
       setAttempt(null);
     } catch (failure) {
-      setStorageError(`The response was received, but the saved retry could not be cleared. New writes are blocked. ${readableError(failure)}`);
+      setStorageError(`The response was received, but the recovery pointer could not be cleared. New writes are blocked. ${readableError(failure)}`);
     }
   }
 
-  function reloadRetry() {
-    const saved = readAttempt();
-    setStorageError(saved.error);
-    if (saved.attempt) { setAttempt(saved.attempt); setActorId(saved.attempt.payload.actor_id); }
-  }
-
   async function submit(value: Attempt) {
-    if (operation.current || storageError) return;
+    if (operation.current || storageError || (pointer && !attempt)) return;
+    if (!attempt && !pointer) priorAmbiguity.current = false;
     try { retain(value); }
     catch (failure) {
-      setAttempt(value); setStorageError(`No request was sent. A durable retry must be saved first. ${readableError(failure)}`); return;
+      setStorageError(`No request was sent. A minimal recovery pointer must be saved first. ${readableError(failure)}`); return;
     }
     const controller = new AbortController();
     operation.current = controller; setBusy(true); setError(""); setMessage("");
@@ -191,13 +242,24 @@ export default function Corrections({ active = true }: { active?: boolean }) {
         : await decideCorrection(value.id, value.payload, controller.signal);
       if (controller.signal.aborted) return;
       setSelectedId(saved.id); setSelected(saved); setRequestOffset(0); clearAttempt();
-      setMessage(`Correction ${saved.id} is ${saved.state}. Local inventory outcome: ${saved.local_outcome}. ${saved.state === "approved" ? "Reconcile and inspect evidence before claiming resolution." : "A pending or rejected proposal does not change inventory."}`);
+      setMessage(`Correction ${saved.id} is ${saved.state}. Local inventory outcome: ${saved.local_outcome}. ${saved.state === "approved" ? "Await the evidence operator's next saved run before claiming resolution." : "A pending or rejected proposal does not change inventory."}`);
       if (value.kind === "proposal") { setCidr(""); setOwner(""); setPurpose(""); setReason(""); }
       else setDecisionReason("");
     } catch (failure) {
       if (!controller.signal.aborted) {
-        setError(`${readableError(failure)} ${ambiguous(failure) ? "The response is uncertain. Retry preserves the exact operation." : "The server rejected this operation; review its reason and refresh before submitting again."}`);
-        if (!ambiguous(failure)) clearAttempt();
+        if (ambiguous(failure)) {
+          priorAmbiguity.current = true;
+          setError(`${readableError(failure)} The response is uncertain. Retry preserves the exact operation.`);
+        } else if (priorAmbiguity.current) {
+          setError(`${readableError(failure)} This refusal applies to the latest retry only. The earlier submission remains unresolved; read it back under the original principal before another write.`);
+          if (!(failure instanceof ApiError && ["AUTH_REQUIRED", "ACCESS_CONTEXT_STALE"].includes(failure.code))) {
+            setAttempt(null);
+            setRecoveryStatus("Checking the earlier uncertain submission by its original recovery pointer…");
+          }
+        } else {
+          setError(`${readableError(failure)} The server rejected this first submission; review its reason and refresh before submitting again.`);
+          clearAttempt();
+        }
       }
     } finally {
       operation.current = null;
@@ -207,57 +269,37 @@ export default function Corrections({ active = true }: { active?: boolean }) {
 
   function propose(event: FormEvent) {
     event.preventDefault();
-    if (!context || !actor?.permissions.includes("request") || attempt) return;
+    if (!context || !hasRole("Requester") || attempt || pointer || storageError) return;
     void submit({ kind: "proposal", payload: { actor_id: actorId, idempotency_key: crypto.randomUUID(),
       scope_id: context.scope.id, source_run_id: context.source_run_id, source_finding_id: context.source_finding.id,
       expected_baseline_version: context.baseline_version, cidr, owner, purpose, reason } });
   }
 
   function decide(action: CorrectionDecision["action"]) {
-    if (!selected || !mayDecide || attempt) return;
+    if (!selected || !mayDecide || attempt || pointer || storageError) return;
     void submit({ kind: "decision", id: selected.id, payload: { actor_id: actorId, action, reason: decisionReason } });
   }
 
-  async function reconcile() {
-    if (operation.current || attempt || storageError) return;
-    const controller = new AbortController();
-    operation.current = controller; setBusy(true); setError(""); setMessage("");
-    try {
-      const computed = await computeRun(controller.signal);
-      if (controller.signal.aborted) return;
-      setRunOffset(0);
-      setMessage(`Reconciliation saved run ${computed.id} at scenario time ${computed.demo_clock_at}. Review the linked correction result and every remaining discrepancy.`);
-    } catch (failure) {
-      if (!controller.signal.aborted) setError(`Reconciliation response was not confirmed. ${readableError(failure)} Refresh saved requests and runs before starting another reconciliation; a timed-out response may still have committed a run.`);
-    } finally {
-      operation.current = null;
-      if (!controller.signal.aborted) { setBusy(false); setRevision(value => value + 1); }
-    }
-  }
-
-  const actor = actors.find(item => item.id === actorId);
-  const mayDecide = !!actor?.permissions.includes("approve") && selected?.actor_id !== actorId;
+  const mayDecide = hasRole("Approver") && selected?.actor_id !== actorId;
   const availableFindings = run?.findings.filter(finding => CORRECTION_RULES.includes(finding.rule_id) && finding.evidence_state === "anomalous") ?? [];
   const related = context && run ? run.findings.filter(finding => CORRECTION_RULES.includes(finding.rule_id)
     && finding.subject.id === context.source_finding.subject.id && finding.id !== context.source_finding.id) : [];
-  const locked = busy || !!attempt || !!storageError;
+  const locked = busy || !!attempt || !!pointer || !!storageError;
 
   return <section aria-labelledby="corrections-heading">
     <div className="page-heading"><div><p className="eyebrow">Current workflow · reviewed intended inventory</p><h1 id="corrections-heading">Inventory corrections</h1>
-      <p className="intro">Propose missing registered space, obtain an independent decision, then reconcile and inspect the evidence.</p></div>
+      <p className="intro">Propose missing registered space, obtain an independent decision, then inspect later saved evidence.</p></div>
       <button type="button" className="secondary" disabled={busy || loading} onClick={() => { setError(""); setRevision(value => value + 1); }}>Refresh corrections</button></div>
     <div className="evidence-banner"><strong>Local synthetic workflow</strong><span>Approval registers a prefix in this application's inventory. It does not change DHCP, routers or any external system. Resolution requires a subsequent comparable finding.</span></div>
     <p className="quiet">Evidence is a loaded snapshot. Returning to this view refreshes it; use Refresh corrections to include runs acquired while this view stays open.</p>
     {error && <div className="notice error" role="alert">{error}</div>}
     {message && <div className="notice" role="status">{message}</div>}
-    {storageError && <div className="notice error" role="alert"><p>{storageError}</p><button type="button" className="secondary" disabled={busy} onClick={reloadRetry}>Reload saved retry</button></div>}
-    {attempt && <div className="notice" role="status"><h2>Exact {attempt.kind} retained</h2><p>A new operation is blocked until this request receives a confirmed response. Its actor, values and retry identity survive reloads in this tab.</p>
-      <details><summary>Retained request</summary><pre className="source-json">{JSON.stringify(attempt, null, 2)}</pre></details>
+    {storageError && <div className="notice error" role="alert"><p>{storageError}</p></div>}
+    {recoveryStatus && <div className={pointer ? "notice error" : "notice"} role="status"><p>{recoveryStatus}</p>{pointer && <button type="button" className="secondary" disabled={busy} onClick={() => { setRecoveryStatus(""); setRevision(value => value + 1); }}>Retry authorized readback</button>}</div>}
+    {attempt && <div className="notice" role="status"><h2>Exact {attempt.kind} retained in this session</h2><p>A new operation is blocked until this request receives a confirmed response. After reload, only its original-context recovery pointer remains; the protected payload is cleared.</p>
       <button type="button" disabled={busy || !!storageError} onClick={() => void submit(attempt)}>Retry exact {attempt.kind}</button></div>}
     {loading && <p role="status">Refreshing saved records…</p>}
-    <div className="filters"><label>Named demo actor<select value={actorId} disabled={locked} onChange={event => setActorId(event.target.value)}>
-      {actors.map(person => <option key={person.id} value={person.id}>{person.name} · {person.role} · {person.team}</option>)}
-    </select></label><p className="filter-help">The API enforces actor permissions and independent approval. This local identity switch is not a sign-in system.</p></div>
+    <p className="filter-help">Authenticated principal: {actorId}. Requester can propose; an independently authenticated Approver may decide.</p>
 
     <section className="inventory-panel" aria-labelledby="correction-source-heading"><h2 id="correction-source-heading">1. Review saved discrepancy evidence</h2>
       <label className="field-label">Saved run<select value={runId} disabled={locked} onChange={event => { setRunId(event.target.value); setFindingId(""); setContext(null); }}>
@@ -266,8 +308,8 @@ export default function Corrections({ active = true }: { active?: boolean }) {
         {runs?.items.map(item => <option key={item.id} value={item.id}>{item.created_at} · scenario {item.demo_clock_at} · {item.id}</option>)}
       </select></label>
       {runs && <PageButtons page={runs} change={setRunOffset} disabled={locked || loading} label="Saved run pages" />}
-      {runs?.total === 0 && <p>No saved run exists yet. Import synthetic evidence and compute a reconciliation in Source evidence.</p>}
-      {run && <><p className="quiet">Pinned scenario time {run.demo_clock_at}; saved ledger version {run.ledger_version}.</p>
+      {runs?.total === 0 && <p>Awaiting domain evidence. The evidence operator manages global reconciliation.</p>}
+      {run && <><p className="quiet">Pinned scenario time {run.demo_clock_at}{run.ledger_version !== undefined && `; saved ledger version ${run.ledger_version}`}.</p>
         <label className="field-label">Anomalous inventory omission<select value={findingId} disabled={locked} onChange={event => { setFindingId(event.target.value); setContext(null); }}>
           <option value="">Select a ghost or unregistered-route finding</option>{availableFindings.map(finding => <option key={finding.id} value={finding.id}>{finding.subject.scope_name} · {finding.subject.cidr} · {finding.rule_id}</option>)}
         </select></label>{!availableFindings.length && <p>This saved run has no anomalous ghost-scope or unregistered-route finding eligible for this workflow.</p>}</>}
@@ -281,7 +323,7 @@ export default function Corrections({ active = true }: { active?: boolean }) {
 
     <section className="inventory-panel" aria-labelledby="correction-proposal-heading"><h2 id="correction-proposal-heading">2. Propose a missing prefix</h2>
       <p>The proposal is a new top-level prefix inside the existing managed perimeter. Existing fixture bounds, intended routing policy and pools are unchanged.</p>
-      <form onSubmit={propose}><fieldset disabled={locked || !context || !actor?.permissions.includes("request")}><legend>Concrete prefix for independent review</legend>
+      <form onSubmit={propose}><fieldset disabled={locked || !context || !hasRole("Requester")}><legend>Concrete prefix for independent review</legend>
         <div className="filters"><label>Prefix CIDR<input required maxLength={80} value={cidr} onChange={event => setCidr(event.target.value)} placeholder="Enter the missing network and prefix length" /></label>
           <label>Intended owner<input required maxLength={120} value={owner} onChange={event => setOwner(event.target.value)} /></label>
           <label>Purpose<input required maxLength={500} value={purpose} onChange={event => setPurpose(event.target.value)} /></label>
@@ -305,23 +347,22 @@ export default function Corrections({ active = true }: { active?: boolean }) {
           <label className="field-label">Decision reason<input value={decisionReason} maxLength={500} disabled={locked} onChange={event => setDecisionReason(event.target.value)} /></label>
           <div className="compute-actions"><button type="button" disabled={locked || !mayDecide || !decisionReason.trim()} onClick={() => decide("approve")}>Approve registration</button>
             <button type="button" className="secondary" disabled={locked || !mayDecide || !decisionReason.trim()} onClick={() => decide("reject")}>Reject proposal</button></div>
-          {!mayDecide && <p className="filter-help">Select a different actor with approval permission.</p>}</>}
+          {!mayDecide && <p className="filter-help">An independently authenticated Approver must decide this proposal.</p>}</>}
         <FindingEvidence finding={selected.source_finding} title="Original evidence attached to the proposal" />
         {selected.result_finding ? <FindingEvidence finding={selected.result_finding} title="First result after approval — retained" />
           : <p>No comparable result is linked to this correction yet. Approval alone does not establish finding resolution.</p>}
         <p className="quiet">The first linked result is retained. The latest evidence below is evaluated separately and can change after another reconciliation.</p>
         <section className="detail-section"><h3>Latest saved post-approval evidence</h3>
           <p><strong>{resolutionLabels[selected.latest_resolution_state]}</strong></p>
-          {selected.latest_run_id && <p>Latest run <code>{selected.latest_run_id}</code> · <a href={`/api/runs/${encodeURIComponent(selected.latest_run_id)}/export`}>Inspect complete saved run (JSON)</a></p>}
+          {selected.latest_run_id && <p>Latest run <code>{selected.latest_run_id}</code> · <button type="button" className="text-button" onClick={() => { void downloadProtected(`/api/runs/${encodeURIComponent(selected.latest_run_id!)}/export`, "correction-domain-run.json", new AbortController().signal).catch(failure => setError(readableError(failure))); }}>Download permitted saved projection (JSON)</button></p>}
           {selected.latest_finding ? <FindingEvidence finding={selected.latest_finding} title="Finding in the latest saved run" />
             : <p>No comparable finding is available from the latest post-approval evidence. An absent, unknown or not-applicable result does not establish resolution; an older healthy finding is not substituted.</p>}
         </section>
       </div>}
     </section>
 
-    <section className="path-step" aria-labelledby="correction-outcome-heading"><h2 id="correction-outcome-heading">4. Reconcile actual inventory and inspect the outcome</h2>
-      <p>Reconciliation reads the stored inventory and source evidence. It saves a new run and links pending approved corrections to their first subsequent saved run, evaluated for comparability. It does not advance the synthetic clock.</p>
-      <button type="button" disabled={locked || selected?.state !== "approved"} onClick={() => void reconcile()}>Reconcile stored inventory</button>
+    <section className="path-step" aria-labelledby="correction-outcome-heading"><h2 id="correction-outcome-heading">4. Inspect later saved evidence</h2>
+      <p>The evidence operator manages global reconciliation. Refresh this domain view after a new saved run is available to inspect comparable findings.</p>
       <p className="quiet">A new prefix has no intended announcement policy. Its missing-route result can remain unknown even after a perimeter discrepancy becomes healthy. No pool or external provisioning is created.</p>
     </section>
   </section>;

@@ -1,5 +1,14 @@
 # Core SQLite state operations
 
+**Historical schema-5 reference.** The compatibility checks and observations below
+remain tied to their cited earlier commits; their words “current” and version lists
+do not describe the post-meeting bridge. Current schema is 7, with recognized 1–6
+migration support. Follow [the current operator runbook](RUNNING.md) and
+[the schema-7 recovery source contract](../specs/001-postmeeting-bridge/contracts/state-recovery-wire.md)
+for paired SQLite/`.recovery.json` handling, invalid-manifest refusal and separate
+configuration/readiness/business-state evidence. The bridge's T025 evidence is a
+separate gate; the historical passes below do not establish its recovery behavior.
+
 **Schema v5 compatibility; bounded local preservation checks passed.** These commands consume the shared schema/legacy policy published by Stage 4 at `7dc057c6b18b0b3f0c0425bb17d0b427c4908969`. The state algorithm remains unchanged. Core updated migrate help and ran three focused disposable-store checks at `d6197df8b7d78e1f1558f45c2c7c3e72c3121151`; see the [schema v5 handoff](handoffs/part-1-state-schema5.md) for provenance, observations and limits. This supplies core behavior for Spencer's packaging/runbook without changing his owned files or declaring `PART6_READY=yes`. Historical Stage 5 evidence remains separately recorded in its [observed results](evidence/stage-05/observed-results.md).
 
 Contribution: G27 core state correctness / RFP-018, and storage compatibility for the F1/F3/F5 changes. Local synthetic allocation/audit preservation is observed; measured recovery objectives, disaster recovery, cross-host portability and new approval/lifecycle business behavior are not established by these checks.

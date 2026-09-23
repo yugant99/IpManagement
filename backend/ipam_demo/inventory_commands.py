@@ -147,8 +147,7 @@ def _validate_position(connection, scope_id, network, parent, *, editing_id=None
             continue
         if row["id"] in ancestors and network != other and network.subnet_of(other):
             continue
-        raise AppError("PREFIX_OVERLAP", "This prefix overlaps inventory outside its declared ancestry.", 409,
-                       {"conflicting_prefix_id": row["id"], "conflicting_cidr": row["cidr"]})
+        raise AppError("PREFIX_OVERLAP", "This prefix overlaps inventory outside its declared ancestry.", 409)
 
 
 def _bump_ledger(connection, affected_prefix_ids, *, structural=False):
@@ -427,7 +426,6 @@ def decide_correction(connection, object_id, payload):
     prefix_id, baseline, registered = None, None, None
     now = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     if action == "approve":
-        require_actor(actor["id"], "inventory_edit")
         network = _correction_position(connection, proposed)
         prefix_id = str(uuid4())
         clock = connection.execute("SELECT demo_clock_at FROM app_meta WHERE singleton=1").fetchone()[0]

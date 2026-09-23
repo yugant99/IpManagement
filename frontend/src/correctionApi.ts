@@ -1,5 +1,5 @@
 import { ApiError, request } from "./api";
-import type { Scope } from "./api";
+import type { Page, Scope } from "./api";
 import type { Finding } from "./firstPathApi";
 import type { DemoActor } from "./workflowApi";
 
@@ -68,6 +68,10 @@ export function loadCorrectionContext(runId: string, findingId: string, signal: 
 
 export function loadCorrection(id: string, signal: AbortSignal) {
   return request<CorrectionRequest>(`/api/correction-requests/${encodeURIComponent(id)}`, signal);
+}
+
+export function findCorrectionByKey(key: string, signal: AbortSignal) {
+  return request<Page<CorrectionRequest>>(`/api/correction-requests?idempotency_key=${encodeURIComponent(key)}&limit=20`, signal);
 }
 
 function confirmed(value: CorrectionRequest): CorrectionRequest {

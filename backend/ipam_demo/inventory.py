@@ -42,6 +42,12 @@ def page(items: list, limit: int, offset: int) -> dict:
     return {"items": items[offset:offset + limit], "total": len(items), "limit": limit, "offset": offset}
 
 
+def scopes(connection, *, domain=None) -> list:
+    rows = connection.execute("SELECT * FROM scopes" + (" WHERE domain=?" if domain else "") + " ORDER BY name,id",
+                              (domain,) if domain else ())
+    return [scope_payload(row) for row in rows]
+
+
 def prefixes(connection, *, scope_id=None, family=None, owner=None, tag=None,
              domain=None, region=None, q=None) -> list:
     rows = connection.execute(
@@ -92,7 +98,7 @@ def pools(connection, *, scope_id=None, prefix_id=None, domain=None, region=None
             and (not region or row["region"].casefold() == region.casefold())]
 
 
-def allocations(connection, *, scope_id=None, prefix_id=None, pool_id=None, q=None) -> list:
+def allocations(connection, *, scope_id=None, prefix_id=None, pool_id=None, q=None, domain=None) -> list:
     query_network = None
     if q:
         try:
@@ -100,7 +106,9 @@ def allocations(connection, *, scope_id=None, prefix_id=None, pool_id=None, q=No
         except ValueError:
             pass
     items = []
-    for row in connection.execute("SELECT * FROM allocations ORDER BY scope_id, family, address_hex, id"):
+    query = ("SELECT a.* FROM allocations a JOIN scopes s ON s.id=a.scope_id "
+             + ("WHERE s.domain=? " if domain else "") + "ORDER BY a.scope_id,a.family,a.address_hex,a.id")
+    for row in connection.execute(query, (domain,) if domain else ()):
         if any(value and row[key] != value for key, value in
                (("scope_id", scope_id), ("prefix_id", prefix_id), ("pool_id", pool_id))):
             continue
@@ -115,12 +123,13 @@ def allocations(connection, *, scope_id=None, prefix_id=None, pool_id=None, q=No
     return items
 
 
-def prefix_detail(connection, object_id: str) -> dict:
+def prefix_detail(connection, object_id: str, *, domain=None) -> dict:
     row = connection.execute(
-        "SELECT p.*, s.name AS scope_name FROM prefixes p JOIN scopes s ON s.id=p.scope_id WHERE p.id=?",
-        (object_id,),
+        "SELECT p.*, s.name AS scope_name, s.domain FROM prefixes p JOIN scopes s ON s.id=p.scope_id "
+        "WHERE p.id=?" + (" AND s.domain=?" if domain else ""),
+        (object_id, domain) if domain else (object_id,),
     ).fetchone()
     if row is None:
         raise AppError("NOT_FOUND", "No prefix exists with that ID.", status=404)
-    return {**prefix_payload(row), "pools": pools(connection, prefix_id=object_id),
-            "allocations": allocations(connection, prefix_id=object_id)}
+    return {**prefix_payload(row), "pools": pools(connection, prefix_id=object_id, domain=domain),
+            "allocations": allocations(connection, prefix_id=object_id, domain=domain)}
