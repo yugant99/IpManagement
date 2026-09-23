@@ -3,23 +3,25 @@ import type { FormEvent } from "react";
 import { ApiError, currentContext, downloadProtected, hasRole, request } from "./api";
 import type { Page } from "./api";
 import {
-  actOnException, acknowledgeHandoff, attemptHandoff, createAllocation, createReservation,
-  decideAllocation, decideRelease, extendReservation, findAllocationByKey, listHandoffs,
-  listReleaseRequests, loadAllocationRequest, loadHandoff, loadReleaseRequest,
-  loadReservation, loadWorkflow, proposeRelease, readHandoffOperation, readReservationOperation,
+  actOnException, acknowledgeHandoff, acknowledgeNotice, attemptHandoff, createAllocation, createReservation,
+  decideAllocation, decideRelease, evaluateNotices, extendReservation, findAllocationByKey, listHandoffs,
+  listNotices, listReleaseRequests, loadAllocationRequest, loadHandoff, loadNotice, loadNoticeVersion,
+  loadReleaseRequest, loadReservation, loadStaticOccupancy, loadWorkflow, proposeRelease, readHandoffOperation, readReservationOperation,
   readbackHandoff, reassignHandoff,
 } from "./workflowApi";
-import type { AllocationDecision, AllocationRequest, AuditEvent, CreateAllocation, ExceptionAction,
-  ExceptionFinding, ExceptionRecord, ReleaseRequest, ReservationDetail, ReservationOperationReadback,
+import type { AllocationDecision, AllocationRequest, AuditEvent, CreateAllocation, CurrentStaticOccupancy, ExceptionAction,
+  ExceptionFinding, ExceptionRecord, ReleaseRequest, ReservationDetail, ReservationNotice, ReservationNoticeEvaluation,
+  ReservationNoticeNotification, ReservationNoticeNotificationVersion, ReservationOperationReadback,
   ReservationSummary, TicketHandoffDetail, TicketHandoffOriginalOperation, TicketHandoffSummary, TicketOperationAction, WorkflowStatus } from "./workflowApi";
 
 const PAGE_SIZE = 20;
 const RECOVERY_KEY = "ipam.workflow-t015.recovery.v1";
 type WriteAction = "reservation.create" | "reservation.extend" | "reservation.release.propose"
   | "reservation.release.decision" | "allocation.create" | "allocation.decision"
-  | "ticket.attempt" | "ticket.reassign" | "ticket.readback" | "ticket.acknowledge";
+  | "ticket.attempt" | "ticket.reassign" | "ticket.readback" | "ticket.acknowledge"
+  | "notice.acknowledge";
 type Attempt = { action: WriteAction; key: string; targetId?: string; secondaryId?: string;
-  expected?: "approved" | "rejected"; payload: Record<string, unknown> };
+  noticeVersion?: number; expected?: "approved" | "rejected"; payload: Record<string, unknown> };
 type RecoveryPointer = {
   principal_id: string;
   domain: string;
@@ -29,11 +31,12 @@ type RecoveryPointer = {
   idempotency_key?: string;
   target_id?: string;
   secondary_id?: string;
+  notification_version?: number;
   expected?: "approved" | "rejected";
 };
 const WRITE_ACTIONS: WriteAction[] = ["reservation.create", "reservation.extend", "reservation.release.propose",
   "reservation.release.decision", "allocation.create", "allocation.decision",
-  "ticket.attempt", "ticket.reassign", "ticket.readback", "ticket.acknowledge"];
+  "ticket.attempt", "ticket.reassign", "ticket.readback", "ticket.acknowledge", "notice.acknowledge"];
 const SCENARIOS = ["success", "definitive_failure", "committed_response_lost", "no_effect_response_lost"] as const;
 
 function readableError(error: unknown): string {
@@ -58,14 +61,19 @@ function readRecovery(): { pointer: RecoveryPointer | null; error: string } {
     const needsKey: WriteAction[] = ["reservation.create", "reservation.extend", "reservation.release.propose",
       "reservation.release.decision", "allocation.create", "ticket.attempt", "ticket.reassign", "ticket.readback", "ticket.acknowledge"];
     const needsTarget: WriteAction[] = ["reservation.extend", "reservation.release.propose",
-      "reservation.release.decision", "allocation.decision", "ticket.attempt", "ticket.reassign", "ticket.readback", "ticket.acknowledge"];
+      "reservation.release.decision", "allocation.decision", "ticket.attempt", "ticket.reassign", "ticket.readback", "ticket.acknowledge",
+      "notice.acknowledge"];
     if (!value || typeof value.principal_id !== "string" || !value.principal_id
       || typeof value.domain !== "string" || !value.domain
       || !Number.isInteger(value.configuration_revision) || value.configuration_revision < 1
       || typeof value.configuration_digest !== "string" || !value.configuration_digest
       || !WRITE_ACTIONS.includes(value.action)
       || (needsKey.includes(value.action) && (typeof value.idempotency_key !== "string" || !value.idempotency_key || value.idempotency_key.length > 200))
+      || (value.action === "notice.acknowledge" && value.idempotency_key !== undefined)
       || (needsTarget.includes(value.action) && (typeof value.target_id !== "string" || !value.target_id))
+      || (value.action === "notice.acknowledge" && (typeof value.secondary_id !== "string" || !value.secondary_id))
+      || (value.action === "notice.acknowledge" && (!Number.isInteger(value.notification_version) || (value.notification_version as number) < 1))
+      || (value.action !== "notice.acknowledge" && value.notification_version !== undefined)
       || (value.action === "reservation.release.decision" && (typeof value.secondary_id !== "string" || !value.secondary_id))
       || (value.action === "allocation.decision" && value.expected !== "approved" && value.expected !== "rejected")
       || (value.action !== "allocation.decision" && value.expected !== undefined)
@@ -73,7 +81,7 @@ function readRecovery(): { pointer: RecoveryPointer | null; error: string } {
       || (value.target_id !== undefined && (typeof value.target_id !== "string" || !value.target_id))
       || (value.secondary_id !== undefined && (typeof value.secondary_id !== "string" || !value.secondary_id))
       || Object.keys(value).some(key => !["principal_id", "domain", "configuration_revision", "configuration_digest",
-        "action", "idempotency_key", "target_id", "secondary_id", "expected"].includes(key))) {
+        "action", "idempotency_key", "target_id", "secondary_id", "notification_version", "expected"].includes(key))) {
       throw new Error("The saved workflow recovery pointer is invalid; its outcome cannot be confirmed.");
     }
     return { pointer: value, error: "" };
@@ -87,6 +95,7 @@ function samePointer(left: RecoveryPointer, right: RecoveryPointer) {
     && left.configuration_revision === right.configuration_revision && left.configuration_digest === right.configuration_digest
     && left.action === right.action && left.idempotency_key === right.idempotency_key
     && left.target_id === right.target_id && left.secondary_id === right.secondary_id
+    && left.notification_version === right.notification_version
     && left.expected === right.expected;
 }
 
@@ -98,6 +107,7 @@ function pointerFor(value: Attempt): RecoveryPointer {
   if (value.key) pointer.idempotency_key = value.key;
   if (value.targetId) pointer.target_id = value.targetId;
   if (value.secondaryId) pointer.secondary_id = value.secondaryId;
+  if (value.noticeVersion !== undefined) pointer.notification_version = value.noticeVersion;
   if (value.expected) pointer.expected = value.expected;
   return pointer;
 }
@@ -193,6 +203,17 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const [reassignReason, setReassignReason] = useState("");
   const [lastTicketOp, setLastTicketOp] = useState("");
   const [ticketOriginal, setTicketOriginal] = useState<TicketHandoffOriginalOperation | null>(null);
+  const [notices, setNotices] = useState<Page<ReservationNotice> | null>(null);
+  const [noticeOffset, setNoticeOffset] = useState(0);
+  const [noticeReservationFilter, setNoticeReservationFilter] = useState("");
+  const [appliedNoticeReservation, setAppliedNoticeReservation] = useState("");
+  const [selectedNoticeId, setSelectedNoticeId] = useState("");
+  const [noticeDetail, setNoticeDetail] = useState<ReservationNotice | null>(null);
+  const [evaluateResult, setEvaluateResult] = useState<ReservationNoticeEvaluation | null>(null);
+  const [ackReason, setAckReason] = useState("");
+  const [recoveredNoticeVersion, setRecoveredNoticeVersion] = useState<ReservationNoticeNotificationVersion | null>(null);
+  const [occupancy, setOccupancy] = useState<CurrentStaticOccupancy | null>(null);
+  const [occupancyError, setOccupancyError] = useState("");
   const [selectedException, setSelectedException] = useState<ExceptionRecord | null>(null);
   const [exceptionOpenRevision, setExceptionOpenRevision] = useState(0);
   const [exceptionReason, setExceptionReason] = useState("");
@@ -296,6 +317,47 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   }, [active, revision, handoffOffset, appliedHandoffSource]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (!active) return;
+    const controller = new AbortController();
+    listNotices(PAGE_SIZE, noticeOffset, appliedNoticeReservation || null, controller.signal)
+      .then(items => {
+        if (controller.signal.aborted) return;
+        setNotices(items);
+      })
+      .catch((failure: unknown) => { if (!controller.signal.aborted) setError(`Reservation notices failed to load. ${readableError(failure)}`); });
+    return () => controller.abort();
+  }, [active, revision, noticeOffset, appliedNoticeReservation]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!active || !selectedNoticeId) { setNoticeDetail(null); return; }
+    const controller = new AbortController();
+    setNoticeDetail(null);
+    loadNotice(selectedNoticeId, controller.signal)
+      .then(detail => {
+        if (controller.signal.aborted) return;
+        setNoticeDetail(detail);
+        history(detail.reservation_id);
+      })
+      .catch((failure: unknown) => { if (!controller.signal.aborted) setError(`Reservation notice detail failed to load. ${readableError(failure)}`); });
+    return () => controller.abort();
+  }, [active, selectedNoticeId, revision]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!active) return;
+    const controller = new AbortController();
+    setOccupancyError("");
+    loadStaticOccupancy(controller.signal)
+      .then(current => { if (!controller.signal.aborted) setOccupancy(current); })
+      .catch((failure: unknown) => {
+        if (!controller.signal.aborted) {
+          setOccupancy(null);
+          setOccupancyError(`Current static occupancy is unknown. ${readableError(failure)}`);
+        }
+      });
+    return () => controller.abort();
+  }, [active, revision]);
+
+  useEffect(() => {
     if (!active || !selectedHandoffId) { setHandoffDetail(null); return; }
     const controller = new AbortController();
     setHandoffDetail(null);
@@ -337,6 +399,14 @@ export default function Workflow({ active = true }: { active?: boolean }) {
         setResOpReadback(null);
         setLastTicketOp("");
         setTicketOriginal(null);
+        setNotices(null);
+        setSelectedNoticeId("");
+        setNoticeDetail(null);
+        setEvaluateResult(null);
+        setAckReason("");
+        setRecoveredNoticeVersion(null);
+        setOccupancy(null);
+        setOccupancyError("");
         if (pointer) {
           setRecoveryStatus(`The access context changed. In-memory payloads were cleared and the saved ${pointer.action} pointer is quarantined. Reauthenticate the original principal ${pointer.principal_id} in domain ${pointer.domain} to read it back. It cannot be resent as this identity.`);
         }
@@ -416,6 +486,26 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             setReleaseOffset(0);
           }
           setRecoveryStatus("The original reservation operation was confirmed by authorized readback. Current state is shown separately.");
+          setRevision(value => value + 1);
+        } else if (pointer.action === "notice.acknowledge") {
+          const recovered = await loadNoticeVersion(pointer.target_id!, pointer.notification_version!, controller.signal);
+          if (controller.signal.aborted) return;
+          const ownReceipt = recovered.acknowledged_by === pointer.principal_id
+            && recovered.acknowledgement_kind === "recipient_in_app"
+            && recovered.in_app_receipt === true
+            && recovered.delivery_status === "acknowledged"
+            && recovered.reservation_id === pointer.secondary_id;
+          if (!ownReceipt) {
+            setRecoveryStatus("Authorized exact-version readback did not confirm your own receipt on the original version. It remains unknown and replacement writes are blocked; no silent replacement will be sent.");
+            return;
+          }
+          setRecoveredNoticeVersion(recovered);
+          confirmPointerClear();
+          priorAmbiguity.current = false;
+          setSelectedNoticeId(recovered.notice_id);
+          setNoticeOffset(0);
+          history(recovered.reservation_id);
+          setRecoveryStatus("The original notice receipt was confirmed by authorized exact-version readback. Current notice state is shown separately and may differ after renewal.");
           setRevision(value => value + 1);
         } else {
           const result = await readHandoffOperation(pointer.action as TicketOperationAction, pointer.idempotency_key!, controller.signal);
@@ -596,6 +686,14 @@ export default function Workflow({ active = true }: { active?: boolean }) {
         setLastTicketOp("Original acknowledgement event recorded in simulated mode.");
         setMessage("Simulated recipient acknowledgement recorded. It approves no IPAM change and resolves no finding.");
         history(mutated.handoff.source_request_id);
+      } else if (value.action === "notice.acknowledge") {
+        const acknowledged = await acknowledgeNotice(value.secondaryId!, value.targetId!,
+          value.payload as unknown as Parameters<typeof acknowledgeNotice>[2], controller.signal);
+        if (controller.signal.aborted) return;
+        setNoticeDetail(acknowledged); setSelectedNoticeId(acknowledged.id); clearAttempt();
+        setAckReason("");
+        setMessage("Recipient acknowledgement recorded in-app. The hold stays reserved and the condition stays open until extension, conversion or an approved release resolves it. This is not external delivery.");
+        history(acknowledged.reservation_id);
       } else {
         const mutated = await reassignHandoff(value.targetId!, value.payload as unknown as Parameters<typeof reassignHandoff>[1], controller.signal);
         if (controller.signal.aborted) return;
@@ -784,6 +882,128 @@ export default function Workflow({ active = true }: { active?: boolean }) {
     }, handoffDetail.id);
   }
 
+  async function submitEvaluate() {
+    if (busy || attempt || pointer || storageError || operation.current) return;
+    if (!hasRole("Operator")) {
+      setError("An Operator must authenticate to run an explicit notice evaluation. No request was sent.");
+      return;
+    }
+    const controller = new AbortController();
+    operation.current = controller;
+    setBusy(true); setError(""); setMessage(""); setEvaluateResult(null);
+    try {
+      const result = await evaluateNotices(actorId, controller.signal);
+      if (controller.signal.aborted) return;
+      setEvaluateResult(result);
+      setNoticeOffset(0);
+      setMessage(`Evaluation at ${result.evaluated_at}: ${result.created_count} created, ${result.renewed_count} renewed, ${result.alarm_upgrade_count} alarm upgrades. GET never changes state; this explicit evaluation is the only writer.`);
+      setRevision(value => value + 1);
+    } catch (failure) {
+      if (!controller.signal.aborted) {
+        setError(`${readableError(failure)} The evaluation outcome is unknown until an authorized notice-list readback. A later manual evaluation is a new evaluation, not proof of this response.`);
+      }
+    } finally {
+      operation.current = null;
+      if (!controller.signal.aborted) setBusy(false);
+    }
+  }
+
+  function submitNoticeAcknowledge() {
+    if (!noticeDetail || busy || attempt || pointer || storageError) return;
+    if (!noticeDetail.is_current_recipient || !hasRole("Operator")) {
+      setError("Only the current bound recipient, authenticated as Operator, may acknowledge this version. No request was sent.");
+      return;
+    }
+    if (noticeDetail.state === "resolved") {
+      setError("A resolved notice cannot be acknowledged. Resolution never means delivery. No request was sent.");
+      return;
+    }
+    if (noticeDetail.current_notification === null || noticeDetail.current_notification.routing_status !== "assigned"
+      || noticeDetail.current_notification.delivery_status === "acknowledged") {
+      setError("This version is not eligible for acknowledgement. No request was sent.");
+      return;
+    }
+    if (!ackReason.trim()) {
+      setError("Enter an explicit acknowledgement reason for the current exact version. No request was sent.");
+      return;
+    }
+    const current = noticeDetail.current_notification;
+    void submit({ action: "notice.acknowledge", key: "", targetId: noticeDetail.id,
+      secondaryId: noticeDetail.reservation_id, noticeVersion: current.notification_version,
+      payload: { actor_id: actorId, expected_notification_version: current.notification_version,
+        reason: ackReason.trim() } });
+  }
+
+  async function checkNoticeReceipt() {
+    if (!pointer || pointer.action !== "notice.acknowledge" || !pointer.target_id
+      || pointer.notification_version === undefined || !pointer.secondary_id
+      || operation.current || busy || storageError) return;
+    let context: ReturnType<typeof currentContext>;
+    try { context = currentContext(); }
+    catch (failure) { setError(readableError(failure)); return; }
+    if (pointer.principal_id !== context.principal_id || pointer.domain !== context.selected_domain) {
+      setRecoveryStatus(`The saved notice acknowledgement belongs to ${pointer.principal_id} in domain ${pointer.domain}. Reauthenticate that original context before reading it back.`);
+      return;
+    }
+    const controller = new AbortController();
+    operation.current = controller;
+    setBusy(true); setError(""); setMessage("");
+    try {
+      const recovered = await loadNoticeVersion(pointer.target_id, pointer.notification_version, controller.signal);
+      if (controller.signal.aborted) return;
+      const ownReceipt = recovered.acknowledged_by === pointer.principal_id
+        && recovered.acknowledgement_kind === "recipient_in_app"
+        && recovered.in_app_receipt === true
+        && recovered.delivery_status === "acknowledged"
+        && recovered.reservation_id === pointer.secondary_id;
+      if (!ownReceipt) {
+        setRecoveryStatus("Authorized exact-version readback did not confirm your own receipt on the original version and parent. It remains unknown and replacement writes are blocked; the exact retry payload is retained and no silent replacement will be sent.");
+        return;
+      }
+      setRecoveredNoticeVersion(recovered);
+      confirmPointerClear();
+      priorAmbiguity.current = false;
+      setSelectedNoticeId(recovered.notice_id);
+      setNoticeOffset(0);
+      history(recovered.reservation_id);
+      setRecoveryStatus("The original notice receipt was confirmed by authorized exact-version readback. Current notice state is shown separately and may differ after renewal.");
+      setRevision(value => value + 1);
+    } catch (failure) {
+      if (!controller.signal.aborted) {
+        setRecoveryStatus(`Authorized exact-version readback failed. The earlier acknowledgement remains unresolved and replacement writes are blocked; the exact retry payload is retained. ${readableError(failure)}`);
+      }
+    } finally {
+      operation.current = null;
+      if (!controller.signal.aborted) setBusy(false);
+    }
+  }
+
+  function noticeDeliveryLabel(detail: ReservationNotice, actorId: string): string {
+    const current = detail.current_notification;
+    const resolution = detail.state === "resolved"
+      ? "resolved — retained history only; resolution never means delivery. "
+      : "";
+    if (current === null) return `${resolution}current binding unknown — missing child`;
+    if (current.delivery_status === "acknowledged") {
+      return current.acknowledged_by === actorId
+        ? `${resolution}acknowledged — your own in-app receipt on this version`
+        : `${resolution}acknowledged — in-app receipt recorded; recipient identity redacted for this principal`;
+    }
+    if (current.delivery_status === "awaiting_receipt") return `${resolution}awaiting receipt — bound recipient has not acknowledged`;
+    if (current.delivery_status === "unassigned") return `${resolution}unassigned — no reviewed recipient mapping`;
+    if (current.delivery_status === "recipient_unavailable") return `${resolution}recipient unavailable — configured recipient ineligible or route changed`;
+    return `${resolution}legacy unbound — old operator acknowledgement only, never recipient receipt`;
+  }
+
+  function notificationLabel(item: ReservationNoticeNotification): string {
+    if (item.routing_status === "assigned" && item.delivery_status === "acknowledged") return "acknowledged";
+    if (item.routing_status === "assigned" && item.delivery_status === "awaiting_receipt") return "awaiting receipt";
+    if (item.routing_status === "assigned") return "recipient unavailable";
+    if (item.routing_status === "unassigned") return "unassigned";
+    if (item.routing_status === "unroutable") return "recipient unavailable";
+    return "legacy unbound";
+  }
+
   async function checkAttemptReceipt() {
     if (!pointer || pointer.action !== "ticket.attempt" || !pointer.idempotency_key
       || operation.current || busy || storageError) return;
@@ -852,6 +1072,12 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const mayReserve = hasRole("Operator");
   const mayDecideRelease = hasRole("Approver") && selectedRelease?.requester_id !== actorId;
   const mayAttemptTicket = hasRole("Operator");
+  const mayEvaluateNotice = hasRole("Operator");
+  const mayAcknowledgeNotice = noticeDetail !== null && noticeDetail.is_current_recipient
+    && noticeDetail.state !== "resolved" && noticeDetail.current_notification !== null
+    && noticeDetail.current_notification.routing_status === "assigned"
+    && noticeDetail.current_notification.delivery_status !== "acknowledged"
+    && hasRole("Operator");
   const locked = busy || !!attempt || !!pointer || !!storageError;
   const trackingResolved = requestHandoffChecked && requestHandoffFor === selectedRequest?.id;
   const trackedRequest = trackingResolved && requestHandoff !== null;
@@ -876,7 +1102,8 @@ export default function Workflow({ active = true }: { active?: boolean }) {
     {attempt && <div className="notice" role="status"><h2>Exact {attempt.action} retained in this session</h2>
       <p>The original key and target remain for exact retry or exact-key readback. Only the minimal recovery pointer is stored in this tab; no token, reason, service reference or receipt is stored. No new key or identity substitution will be used.</p>
       <button type="button" disabled={busy || !!storageError} onClick={() => void submit(attempt)}>Retry exact operation</button>
-      {attempt.action === "ticket.attempt" && <button type="button" className="secondary" disabled={busy || !!storageError} onClick={() => void checkAttemptReceipt()}>Check saved attempt receipt (exact key)</button>}</div>}
+      {attempt.action === "ticket.attempt" && <button type="button" className="secondary" disabled={busy || !!storageError} onClick={() => void checkAttemptReceipt()}>Check saved attempt receipt (exact key)</button>}
+      {attempt.action === "notice.acknowledge" && <span className="quiet"> The exact notice, version, reservation and reason are retained in memory only. The stored pointer carries the original principal, domain, configuration, notice, version and reservation — no token, reason or receipt.</span>}</div>}
     {exceptionAttempt && <div className="notice" role="status"><p>The response for exception <code>{exceptionAttempt.id}</code> is unconfirmed. Retry retains action <strong>{exceptionAttempt.payload.action}</strong>, actor <code>{exceptionAttempt.payload.actor_id}</code>, reviewed version {exceptionAttempt.payload.version}, reason and recipient. An intervening update may require a fresh review.</p>
       <button disabled={busy} onClick={() => void exceptionAction(exceptionAttempt.payload.action)}>Retry exact exception action</button></div>}
     {loading && <p role="status">Loading saved workflow records…</p>}
@@ -1072,6 +1299,78 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           </fieldset>
           {!mayAttemptTicket && <p>An Operator must authenticate for manual ticket actions.</p>}
         </div>}
+      </section>
+
+      <section className="inventory-panel" aria-labelledby="notices-heading"><div className="section-heading"><h2 id="notices-heading">Reservation notices · recipient receipt</h2></div>
+        <p className="quiet">A notice is a local reservation lifecycle record, not a saved-run finding or proof of owner delivery. Acknowledgement never frees a hold or resolves its condition. Owner signoff is always false; a configured recipient is not a proven business owner.</p>
+        <div className="pagination">
+          <button disabled={locked || !mayEvaluateNotice} onClick={() => void submitEvaluate()}>Run explicit notice evaluation</button>
+          {!mayEvaluateNotice && <span className="quiet">An Operator must authenticate for explicit evaluation.</span>}
+        </div>
+        <p className="quiet">Explicit manual evaluation only. GET never changes state; there is no background scheduler or automatic POST retry. A failed evaluation stays unknown until an authorized notice-list readback; a later evaluation is a new evaluation, not proof of the earlier response.</p>
+        {evaluateResult && <div className="notice" role="status"><p>Evaluated at {evaluateResult.evaluated_at}: {evaluateResult.created_count} created · {evaluateResult.renewed_count} renewed · {evaluateResult.alarm_upgrade_count} alarm upgrades.</p></div>}
+        <form onSubmit={event => { event.preventDefault(); setNoticeOffset(0); setAppliedNoticeReservation(noticeReservationFilter.trim()); }}>
+          <label>Filter by reservation ID (optional)<input value={noticeReservationFilter} disabled={locked} onChange={event => setNoticeReservationFilter(event.target.value)} placeholder="Reservation ID" /></label>
+          <button className="secondary" disabled={locked} type="submit">Apply reservation filter</button>
+        </form>
+        {notices && <><div className="table-scroll"><table><thead><tr><th>Episode / level</th><th>State / receipt</th><th>Version</th><th>Review</th></tr></thead><tbody>
+          {notices.items.map(item => <tr key={item.id} data-selected={selectedNoticeId === item.id}><td>Episode {item.episode_number} · {item.alert_level}<div className="quiet">hold <code>{item.reservation_id}</code></div></td>
+            <td>{item.state} · {item.delivery_status ?? "unknown"}</td>
+            <td>v{item.notification_version} · {item.notification_history_coverage.replaceAll("_", " ")}</td>
+            <td><button className="secondary" disabled={locked} onClick={() => { setSelectedNoticeId(item.id); setAckReason(""); setRecoveredNoticeVersion(null); }}>Open notice</button></td></tr>)}
+        </tbody></table></div>{!notices.total && <p>No reservation notices in this view. Run an explicit evaluation after a hold passes its expiry.</p>}<PageButtons page={notices} change={setNoticeOffset} />
+        {selectedNoticeId && !notices.items.some(item => item.id === selectedNoticeId) && <p className="quiet">The selected notice is outside this list page or filter; the selection is retained and its current detail loads independently below, or is reported unknown if unavailable. A recovered original receipt, if any, is historical only and never substitutes for current state.</p>}</>}
+        {pointer?.action === "notice.acknowledge" && <div className="notice error" role="status"><p>Unresolved acknowledgement for notice <code>{pointer.target_id}</code> version {pointer.notification_version} in reservation <code>{pointer.secondary_id}</code>. It belongs to {pointer.principal_id} in domain {pointer.domain}. A missing, denied or mismatched receipt stays unknown and blocks replacement; no silent replacement will be sent.</p>
+          <button type="button" className="secondary" disabled={busy || !!storageError} onClick={() => void checkNoticeReceipt()}>Confirm original receipt (exact version)</button></div>}
+        {recoveredNoticeVersion && <div className="notice" role="status"><h3>Recovered original receipt · version {recoveredNoticeVersion.notification_version}</h3>
+          <dl className="facts"><dt>Notice</dt><dd><code>{recoveredNoticeVersion.notice_id}</code> · reservation <code>{recoveredNoticeVersion.reservation_id}</code> · episode {recoveredNoticeVersion.episode_number}</dd>
+            <dt>Receipt</dt><dd>{recoveredNoticeVersion.acknowledged_by ?? "redacted"} · {recoveredNoticeVersion.acknowledged_at ?? "unknown time"} · {recoveredNoticeVersion.acknowledgement_reason ?? "redacted"}</dd>
+            <dt>Kind</dt><dd>{recoveredNoticeVersion.acknowledgement_kind ?? "none"} · in-app receipt {String(recoveredNoticeVersion.in_app_receipt)}</dd></dl>
+          <p className="quiet">This recovered receipt is historical and separate from the mutable current notice and version above. Cleared only on this confirmed receipt.</p></div>}
+        {noticeDetail && <div className="notice"><h3>Notice episode {noticeDetail.episode_number} · {noticeDetail.alert_level} · {noticeDetail.state}</h3>
+          <p><code>{noticeDetail.id}</code> · hold <code>{noticeDetail.reservation_id}</code> · version {noticeDetail.notification_version}</p>
+          <dl className="facts"><dt>First due (server)</dt><dd>{noticeDetail.first_due_at}</dd>
+            <dt>Owner reference</dt><dd>{noticeDetail.owner_reference}</dd>
+            <dt>Policy revision</dt><dd>{noticeDetail.policy_revision}</dd>
+            <dt>Receipt</dt><dd>{noticeDeliveryLabel(noticeDetail, actorId)}</dd>
+            <dt>Current recipient</dt><dd>{noticeDetail.is_current_recipient ? "you are the current bound recipient" : "you are not the current recipient"}</dd>
+            <dt>Acknowledgement kind</dt><dd>{noticeDetail.acknowledgement_kind ?? "none"}</dd>
+            <dt>Owner signoff</dt><dd>{String(noticeDetail.owner_signoff)} — never implied by acknowledgement</dd>
+            <dt>In-app receipt</dt><dd>{String(noticeDetail.in_app_receipt)}</dd>
+            <dt>Acknowledgement current</dt><dd>{String(noticeDetail.acknowledgement_current)}</dd>
+            <dt>History coverage</dt><dd>{noticeDetail.notification_history_coverage.replaceAll("_", " ")}</dd>
+            {noticeDetail.resolved_at && <><dt>Resolved</dt><dd>{noticeDetail.resolved_at} · {noticeDetail.resolution_reason ?? "unknown reason"}</dd></>}
+            {noticeDetail.acknowledged_at && <><dt>Acknowledged</dt><dd>{noticeDetail.acknowledged_at} · {noticeDetail.acknowledged_by ?? "redacted for this principal"} · {noticeDetail.acknowledgement_reason ?? "redacted for this principal"}</dd></>}</dl>
+          {noticeDetail.current_notification && <details><summary>Current notification version {noticeDetail.current_notification.notification_version} · {notificationLabel(noticeDetail.current_notification)}</summary>
+            <dl className="facts"><dt>Route</dt><dd>{noticeDetail.current_notification.routing_status}{noticeDetail.current_notification.routing_reason ? ` · ${noticeDetail.current_notification.routing_reason}` : ""}</dd>
+              <dt>Recipient</dt><dd>{noticeDetail.current_notification.recipient_id ?? "redacted or unbound"}</dd>
+              <dt>Issued</dt><dd>{noticeDetail.current_notification.issued_at ?? "legacy — no issue time retained"}</dd>
+              <dt>Configuration</dt><dd>{noticeDetail.current_notification.configuration_revision ?? "legacy"} · {noticeDetail.current_notification.configuration_digest ?? "legacy"}</dd></dl></details>}
+          {noticeDetail.notification_history.length > 0 && <details><summary>Notification history ({noticeDetail.notification_history.length}) — immutable per-version bindings</summary>
+            <ul className="plain-list">{noticeDetail.notification_history.map(item => <li key={`${item.notice_id}-${item.notification_version}`}>v{item.notification_version} · {item.routing_status} · {notificationLabel(item)}{item.acknowledged_at ? ` · ${item.acknowledged_at}` : ""}</li>)}</ul>
+            <p className="quiet">A legacy operator acknowledgement is history only, never recipient receipt or delivery proof. Redacted recipient, actor and reason fields stay null for other principals.</p></details>}
+          {noticeDetail.state === "resolved" && <p className="quiet">Resolved episodes retain history while acknowledgement_current is false. Resolution never means delivery or acknowledgement.</p>}
+          {mayAcknowledgeNotice ? <>
+            <label>Acknowledgement reason for exact version {noticeDetail.current_notification?.notification_version}<input value={ackReason} maxLength={2000} disabled={locked} onChange={event => setAckReason(event.target.value)} /></label>
+            <div className="pagination"><button disabled={locked || !ackReason.trim()} onClick={submitNoticeAcknowledge}>Acknowledge exact version as current recipient</button></div>
+            <p className="quiet">The minimal pointer (original principal, domain, configuration, notice, version and reservation) is stored before sending; the reason stays in memory only. Acknowledgement never frees the hold.</p>
+          </> : <p className="quiet">{noticeDetail.is_current_recipient ? "Acknowledgement needs an Operator role, an eligible assigned version and an explicit reason." : "Acknowledgement is offered only to the server-declared current recipient on an eligible version. A different principal cannot acknowledge for the recipient; evaluate to bind the current recipient first."}</p>}
+        </div>}
+      </section>
+
+      <section className="inventory-panel" aria-labelledby="occupancy-heading"><div className="section-heading"><h2 id="occupancy-heading">Current static IPv4 occupancy</h2><button className="secondary" disabled={busy} onClick={refresh}>Reload occupancy</button></div>
+        <p className="quiet">Current ledger occupancy only — metric current_static_ipv4_occupancy in IPv4 addresses. Separate from immutable saved DHCP runs, their run time, p95, forecast and unknowns. Saved runs are never modified.</p>
+        {occupancyError && <p className="notice error" role="alert">{occupancyError}</p>}
+        {occupancy ? <dl className="facts"><dt>Pool / scope / domain</dt><dd><code>{occupancy.pool_id}</code> · <code>{occupancy.scope_id}</code> · {occupancy.domain} · IPv{occupancy.family}</dd>
+          <dt>As of (server UTC)</dt><dd>{occupancy.as_of}</dd>
+          <dt>Unit</dt><dd>{occupancy.unit}</dd>
+          <dt>Active allocations</dt><dd>{occupancy.components.active_allocations.count} {occupancy.components.active_allocations.unit}</dd>
+          <dt>Reserved holds (expired included)</dt><dd>{occupancy.components.reserved_holds.count} {occupancy.components.reserved_holds.unit}</dd>
+          <dt>Occupied total</dt><dd>{occupancy.components.occupied_total.count} {occupancy.components.occupied_total.unit}</dd>
+          <dt>Assignable capacity</dt><dd>{occupancy.components.assignable_capacity.count} {occupancy.components.assignable_capacity.unit}</dd>
+          <dt>Remaining assignable</dt><dd>{occupancy.components.remaining_assignable.count} {occupancy.components.remaining_assignable.unit}</dd>
+          <dt>Provenance</dt><dd>{occupancy.provenance.source} · {occupancy.provenance.capacity} · {occupancy.provenance.allocations} · {occupancy.provenance.reservations}</dd></dl>
+          : !occupancyError && <p role="status">Loading current occupancy…</p>}
       </section>
 
       <section className="inventory-panel" aria-labelledby="exceptions-heading"><div className="section-heading"><h2 id="exceptions-heading">In-app exception queue</h2></div>

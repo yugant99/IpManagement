@@ -577,3 +577,326 @@ export function actOnException(id: string, payload: ExceptionAction, signal: Abo
   return request<ExceptionRecord & { replay: boolean }>(`/api/exceptions/${id}`, signal, false,
     { method: "POST", body: JSON.stringify(payload) });
 }
+
+export type NoticeAlertLevel = "alert" | "alarm";
+export type NoticeState = "open" | "acknowledged" | "resolved";
+export type NoticeRoutingStatus = "assigned" | "unassigned" | "unroutable" | "legacy_unbound";
+export type NoticeDeliveryStatus = "awaiting_receipt" | "unassigned" | "recipient_unavailable" | "legacy_unbound" | "acknowledged";
+export type NoticeAcknowledgementKind = "recipient_in_app" | "legacy_operator" | null;
+export type NoticeCoverage = "complete" | "partial" | "partial_legacy" | "missing_child";
+export type NoticeResolutionReason = "reservation_extended" | "reservation_converted" | "approved_local_release" | null;
+
+export interface AssignedNoticeNotification {
+  notice_id: string;
+  notification_version: number;
+  recipient_id: string | null;
+  configuration_revision: number;
+  configuration_digest: string;
+  routing_status: "assigned";
+  routing_reason: null;
+  issued_at: string;
+  acknowledged_by: string | null;
+  acknowledged_at: string | null;
+  acknowledgement_reason: string | null;
+  delivery_status: "awaiting_receipt" | "recipient_unavailable" | "acknowledged";
+  is_current_recipient: boolean;
+  acknowledgement_kind: "recipient_in_app" | null;
+  owner_signoff: false;
+  in_app_receipt: boolean;
+}
+
+export interface UnassignedNoticeNotification {
+  notice_id: string;
+  notification_version: number;
+  recipient_id: null;
+  configuration_revision: number;
+  configuration_digest: string;
+  routing_status: "unassigned";
+  routing_reason: "missing_mapping";
+  issued_at: string;
+  acknowledged_by: null;
+  acknowledged_at: null;
+  acknowledgement_reason: null;
+  delivery_status: "unassigned";
+  is_current_recipient: false;
+  acknowledgement_kind: null;
+  owner_signoff: false;
+  in_app_receipt: false;
+}
+
+export interface UnroutableNoticeNotification {
+  notice_id: string;
+  notification_version: number;
+  recipient_id: string | null;
+  configuration_revision: number;
+  configuration_digest: string;
+  routing_status: "unroutable";
+  routing_reason: "unknown_principal" | "disabled" | "expired" | "not_operator" | "wrong_domain";
+  issued_at: string;
+  acknowledged_by: null;
+  acknowledged_at: null;
+  acknowledgement_reason: null;
+  delivery_status: "recipient_unavailable";
+  is_current_recipient: false;
+  acknowledgement_kind: null;
+  owner_signoff: false;
+  in_app_receipt: false;
+}
+
+export interface LegacyNoticeNotification {
+  notice_id: string;
+  notification_version: number;
+  recipient_id: null;
+  configuration_revision: null;
+  configuration_digest: null;
+  routing_status: "legacy_unbound";
+  routing_reason: "legacy_unbound";
+  issued_at: null;
+  acknowledged_by: string | null;
+  acknowledged_at: string | null;
+  acknowledgement_reason: string | null;
+  delivery_status: "legacy_unbound";
+  is_current_recipient: false;
+  acknowledgement_kind: "legacy_operator" | null;
+  owner_signoff: false;
+  in_app_receipt: false;
+}
+
+export type ReservationNoticeNotification =
+  | AssignedNoticeNotification
+  | UnassignedNoticeNotification
+  | UnroutableNoticeNotification
+  | LegacyNoticeNotification;
+
+export interface ReservationNotice {
+  id: string;
+  reservation_id: string;
+  episode_number: number;
+  policy_revision: string;
+  first_due_at: string;
+  alert_level: NoticeAlertLevel;
+  owner_reference: string;
+  state: NoticeState;
+  acknowledgement_version: number;
+  notification_version: number;
+  acknowledged_at: string | null;
+  acknowledged_by: string | null;
+  acknowledgement_reason: string | null;
+  acknowledgement_current: boolean;
+  current_notification: ReservationNoticeNotification | null;
+  notification_history: ReservationNoticeNotification[];
+  notification_history_coverage: NoticeCoverage;
+  delivery_status: NoticeDeliveryStatus | null;
+  is_current_recipient: boolean;
+  acknowledgement_kind: NoticeAcknowledgementKind;
+  owner_signoff: false;
+  in_app_receipt: boolean;
+  resolved_at: string | null;
+  resolution_reason: NoticeResolutionReason;
+  synthetic: true;
+}
+
+export type ReservationNoticeNotificationVersion =
+  | (AssignedNoticeNotification & { reservation_id: string; episode_number: number })
+  | (UnassignedNoticeNotification & { reservation_id: string; episode_number: number })
+  | (UnroutableNoticeNotification & { reservation_id: string; episode_number: number })
+  | (LegacyNoticeNotification & { reservation_id: string; episode_number: number });
+
+export interface ReservationNoticeEvaluation {
+  evaluated_at: string;
+  created_count: number;
+  renewed_count: number;
+  alarm_upgrade_count: number;
+  notices: ReservationNotice[];
+  synthetic: true;
+}
+
+export interface StaticOccupancyCount {
+  count: number;
+  unit: "IPv4 addresses";
+}
+
+export interface StaticReservedHolds extends StaticOccupancyCount {
+  includes_expired: true;
+}
+
+export interface CurrentStaticOccupancy {
+  metric: "current_static_ipv4_occupancy";
+  pool_id: string;
+  scope_id: string;
+  domain: string;
+  family: 4;
+  unit: "IPv4 addresses";
+  as_of: string;
+  components: {
+    active_allocations: StaticOccupancyCount;
+    reserved_holds: StaticReservedHolds;
+    occupied_total: StaticOccupancyCount;
+    assignable_capacity: StaticOccupancyCount;
+    remaining_assignable: StaticOccupancyCount;
+  };
+  provenance: {
+    source: "current local intended ledger";
+    capacity: string;
+    allocations: string;
+    reservations: string;
+    saved_runs_modified: false;
+    synthetic: true;
+  };
+  synthetic: true;
+}
+
+export interface AcknowledgeNotice {
+  actor_id: string;
+  expected_notification_version: number;
+  reason: string;
+}
+
+function confirmedNotification(value: ReservationNoticeNotification, noticeId: string): ReservationNoticeNotification {
+  if (!value || value.notice_id !== noticeId || !Number.isInteger(value.notification_version)
+    || value.notification_version < 1 || value.owner_signoff !== false) {
+    throw new ApiError("The notice notification did not match its version. Retry the same read.", "INVALID_RESPONSE");
+  }
+  if (value.routing_status === "assigned") {
+    if (value.routing_reason !== null || typeof value.is_current_recipient !== "boolean"
+      || typeof value.in_app_receipt !== "boolean") {
+      throw new ApiError("The assigned notice binding is inconsistent. Retry the same read.", "INVALID_RESPONSE");
+    }
+  } else if (value.routing_status === "unassigned") {
+    if (value.routing_reason !== "missing_mapping" || value.delivery_status !== "unassigned"
+      || value.is_current_recipient !== false || value.in_app_receipt !== false) {
+      throw new ApiError("The unassigned notice binding is inconsistent. Retry the same read.", "INVALID_RESPONSE");
+    }
+  } else if (value.routing_status === "unroutable") {
+    if (!["unknown_principal", "disabled", "expired", "not_operator", "wrong_domain"].includes(value.routing_reason ?? "")
+      || value.delivery_status !== "recipient_unavailable" || value.is_current_recipient !== false) {
+      throw new ApiError("The unroutable notice binding is inconsistent. Retry the same read.", "INVALID_RESPONSE");
+    }
+  } else if (value.routing_status === "legacy_unbound") {
+    if (value.routing_reason !== "legacy_unbound" || value.delivery_status !== "legacy_unbound"
+      || value.in_app_receipt !== false) {
+      throw new ApiError("The legacy notice binding is inconsistent. Retry the same read.", "INVALID_RESPONSE");
+    }
+  } else {
+    throw new ApiError("The notice notification has an unknown route. Retry the same read.", "INVALID_RESPONSE");
+  }
+  return value;
+}
+
+function confirmedNotice(value: ReservationNotice): ReservationNotice {
+  if (!value || typeof value.id !== "string" || !value.id || typeof value.reservation_id !== "string"
+    || !value.reservation_id || !Number.isInteger(value.episode_number) || value.episode_number < 1
+    || !["alert", "alarm"].includes(value.alert_level) || !["open", "acknowledged", "resolved"].includes(value.state)
+    || !Number.isInteger(value.notification_version) || value.notification_version < 1
+    || !Number.isInteger(value.acknowledgement_version) || value.acknowledgement_version < 1
+    || typeof value.acknowledgement_current !== "boolean" || typeof value.is_current_recipient !== "boolean"
+    || typeof value.in_app_receipt !== "boolean" || value.owner_signoff !== false || value.synthetic !== true
+    || !Array.isArray(value.notification_history)
+    || !["complete", "partial", "partial_legacy", "missing_child"].includes(value.notification_history_coverage)) {
+    throw new ApiError("The reservation notice response is incomplete. Retry the same read.", "INVALID_RESPONSE");
+  }
+  for (const item of value.notification_history) {
+    confirmedNotification(item, value.id);
+  }
+  if (value.current_notification === null) {
+    if (value.notification_history_coverage !== "missing_child" || value.delivery_status !== null) {
+      throw new ApiError("The notice is missing its current binding. Retry the same read.", "INVALID_RESPONSE");
+    }
+  } else {
+    const current = confirmedNotification(value.current_notification, value.id);
+    if (current.notification_version !== value.notification_version
+      || current.delivery_status !== value.delivery_status
+      || current.is_current_recipient !== value.is_current_recipient
+      || current.acknowledgement_kind !== value.acknowledgement_kind
+      || current.in_app_receipt !== value.in_app_receipt) {
+      throw new ApiError("The notice receipt summary disagrees with its current binding. Retry the same read.", "INVALID_RESPONSE");
+    }
+  }
+  return value;
+}
+
+function confirmedEvaluation(value: ReservationNoticeEvaluation): ReservationNoticeEvaluation {
+  if (!value || typeof value.evaluated_at !== "string" || !value.evaluated_at
+    || !Number.isInteger(value.created_count) || value.created_count < 0
+    || !Number.isInteger(value.renewed_count) || value.renewed_count < 0
+    || !Number.isInteger(value.alarm_upgrade_count) || value.alarm_upgrade_count < 0
+    || value.alarm_upgrade_count > value.renewed_count || !Array.isArray(value.notices)
+    || value.synthetic !== true) {
+    throw new ApiError("The notice evaluation response is incomplete. Retry the explicit evaluation.", "INVALID_RESPONSE");
+  }
+  return { ...value, notices: value.notices.map(confirmedNotice) };
+}
+
+function confirmedOccupancy(value: CurrentStaticOccupancy): CurrentStaticOccupancy {
+  const counts = (item: unknown): item is StaticOccupancyCount =>
+    !!item && typeof (item as StaticOccupancyCount).count === "number"
+    && Number.isInteger((item as StaticOccupancyCount).count)
+    && (item as StaticOccupancyCount).unit === "IPv4 addresses";
+  if (!value || value.metric !== "current_static_ipv4_occupancy" || typeof value.pool_id !== "string"
+    || typeof value.scope_id !== "string" || typeof value.domain !== "string" || value.family !== 4
+    || value.unit !== "IPv4 addresses" || typeof value.as_of !== "string" || value.synthetic !== true
+    || !value.components || !counts(value.components.active_allocations)
+    || !counts(value.components.reserved_holds)
+    || value.components.reserved_holds.includes_expired !== true
+    || !counts(value.components.occupied_total) || !counts(value.components.assignable_capacity)
+    || !counts(value.components.remaining_assignable) || !value.provenance
+    || value.provenance.source !== "current local intended ledger"
+    || value.provenance.saved_runs_modified !== false || value.provenance.synthetic !== true) {
+    throw new ApiError("The current occupancy response is incomplete. Retry the same read.", "INVALID_RESPONSE");
+  }
+  return value;
+}
+
+export function listNotices(limit: number, offset: number, reservationId: string | null, signal: AbortSignal) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (reservationId) params.set("reservation_id", reservationId);
+  return request<{ items: ReservationNotice[]; total: number; limit: number; offset: number }>(
+    `/api/reservation-notices?${params}`, signal).then(page => ({
+    ...page, items: page.items.map(confirmedNotice),
+  }));
+}
+
+export function loadNotice(id: string, signal: AbortSignal) {
+  return request<ReservationNotice>(`/api/reservation-notices/${encodeURIComponent(id)}`, signal)
+    .then(confirmedNotice);
+}
+
+export function loadNoticeVersion(id: string, version: number, signal: AbortSignal) {
+  if (!Number.isInteger(version) || version < 1) {
+    throw new ApiError("A positive notification version is required for exact recovery.", "INVALID_RESPONSE");
+  }
+  return request<ReservationNoticeNotificationVersion>(
+    `/api/reservation-notices/${encodeURIComponent(id)}/notifications/${version}`, signal)
+    .then(value => {
+      if (value.notice_id !== id || value.notification_version !== version
+        || typeof value.reservation_id !== "string" || !Number.isInteger(value.episode_number)) {
+        throw new ApiError("The recovered notification belongs to a different version. It remains unresolved.", "INVALID_RESPONSE");
+      }
+      confirmedNotification(value, id);
+      return value;
+    });
+}
+
+export async function evaluateNotices(actorId: string, signal: AbortSignal) {
+  const result = confirmedEvaluation(await request<ReservationNoticeEvaluation>(
+    "/api/reservations/evaluate", signal, false,
+    { method: "POST", body: JSON.stringify({ actor_id: actorId }) }));
+  return result;
+}
+
+export async function acknowledgeNotice(reservationId: string, noticeId: string, payload: AcknowledgeNotice, signal: AbortSignal) {
+  const result = confirmedNotice(await request<ReservationNotice>(
+    `/api/reservations/${encodeURIComponent(reservationId)}/notice`, signal, false,
+    { method: "POST", body: JSON.stringify({ ...payload, notice_id: noticeId }) }));
+  if (result.id !== noticeId || result.reservation_id !== reservationId
+    || result.current_notification === null || !result.current_notification.in_app_receipt
+    || result.current_notification.notification_version !== payload.expected_notification_version
+    || result.current_notification.acknowledged_by !== payload.actor_id) {
+    throw new ApiError("The acknowledgement response did not confirm your own receipt on the exact version. The exact retry is retained.", "INVALID_RESPONSE");
+  }
+  return result;
+}
+
+export function loadStaticOccupancy(signal: AbortSignal) {
+  return request<CurrentStaticOccupancy>("/api/current-static-occupancy", signal).then(confirmedOccupancy);
+}
