@@ -152,12 +152,17 @@ def _pool(connection, object_id=STATIC_POOL_ID):
     return pool, ranges, exclusions
 
 
-def _eligibility(connection, pool, ranges, exclusions, candidate, clock):
+def _eligibility(connection, pool, ranges, exclusions, candidate, clock, *, reservation_id=None):
     address = ip_address(candidate)
     if address.version != 4 or not any(a <= int(address) <= b for a, b in ranges):
         raise AppError("CANDIDATE_OUTSIDE_POOL", "The exact candidate is outside the pool's assignable ranges.", 409)
     if any(a <= int(address) <= b for a, b in exclusions):
         raise AppError("CANDIDATE_EXCLUDED", "The exact candidate is excluded by pool policy.", 409)
+    held = connection.execute(
+        "SELECT id FROM reservations WHERE scope_id=? AND family=4 AND address=? AND state='reserved'",
+        (pool["scope_id"], candidate)).fetchone()
+    if held and held["id"] != reservation_id:
+        raise AppError("CANDIDATE_RESERVED", "The exact candidate is held by an active reservation.", 409)
     allocation = connection.execute(
         "SELECT id FROM allocations WHERE scope_id=? AND family=4 AND address=?", (pool["scope_id"], candidate)
     ).fetchone()
@@ -169,6 +174,43 @@ def _eligibility(connection, pool, ranges, exclusions, candidate, clock):
         raise AppError("CANDIDATE_OBSERVED", "Current eligible DHCP evidence contradicts allocation of this candidate.",
                        409, {"evidence": "eligible_dhcp_observation"})
     return evidence.get("unknown_reasons", [])
+
+
+def _require_scope_domain(connection, scope_id):
+    context = _access_context.get()
+    if (context is None or context.selected_domain is None or context.selected_domain not in context.domains
+            or context.is_evidence_coordinator):
+        raise AppError("FORBIDDEN", "Select a permitted domain before accessing domain data.", 403)
+    row = connection.execute("SELECT domain FROM scopes WHERE id=?", (scope_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    access.require_domain_access(context, row["domain"])
+
+
+def _require_pool_domain(connection, pool_id):
+    context = _access_context.get()
+    if (context is None or context.selected_domain is None or context.selected_domain not in context.domains
+            or context.is_evidence_coordinator):
+        raise AppError("FORBIDDEN", "Select a permitted domain before accessing domain data.", 403)
+    row = connection.execute(
+        "SELECT s.domain FROM pools p JOIN scopes s ON s.id=p.scope_id WHERE p.id=?", (pool_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    access.require_domain_access(context, row["domain"])
+
+
+def _matching_reservation(connection, reservation_id, pool, normalized):
+    row = connection.execute(
+        "SELECT r.* FROM reservations r WHERE r.id=?", (reservation_id,)).fetchone()
+    if row is None:
+        raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+    _require_scope_domain(connection, row["scope_id"])
+    if (row["state"] != "reserved" or row["scope_id"] != pool["scope_id"] or row["pool_id"] != pool["id"]
+            or row["family"] != 4 or row["address"] != normalized["candidate"]
+            or row["owner_reference"] != normalized["owner"]
+            or row["service_reference"] != normalized["service_reference"]):
+        raise AppError("RESERVATION_MISMATCH", "The current reservation does not match this allocation request.", 409)
+    return row
 
 
 def workflow_status(connection):
@@ -205,13 +247,25 @@ def list_requests(connection):
 
 def create_request(connection, payload):
     _payload(payload, ("actor_id", "idempotency_key", "pool_id", "candidate", "pool_version", "baseline_version",
-                       "owner", "purpose", "reason", "supersedes_request_id"))
+                       "owner", "purpose", "reason", "supersedes_request_id", "reservation_id",
+                       "service_reference", "reservation_version"))
     actor = require_actor(payload.get("actor_id"), "request")
     normalized = {key: _text(payload.get(key), key, 200 if key != "reason" else 500)
                   for key in ("idempotency_key", "pool_id", "candidate", "owner", "purpose", "reason")}
     normalized["actor_id"] = actor["id"]
     for key in ("pool_version", "baseline_version"):
         normalized[key] = _version(payload.get(key), key)
+    reservation_id = payload.get("reservation_id")
+    if reservation_id is not None:
+        try:
+            reservation_id = str(UUID(reservation_id))
+        except (ValueError, TypeError, AttributeError) as exc:
+            raise AppError("INVALID_INPUT", "reservation_id must be a UUID.", 422, {"field": "reservation_id"}) from exc
+        normalized["reservation_id"] = reservation_id
+        normalized["service_reference"] = _text(payload.get("service_reference"), "service_reference", 200)
+        normalized["reservation_version"] = _version(payload.get("reservation_version"), "reservation_version")
+    elif any(key in payload for key in ("service_reference", "reservation_version")):
+        raise AppError("INVALID_INPUT", "service_reference and reservation_version require reservation_id.", 422)
     try:
         address = ip_address(normalized["candidate"])
         if address.version != 4:
@@ -225,6 +279,7 @@ def create_request(connection, payload):
     old = connection.execute("SELECT * FROM allocation_requests WHERE actor_id=? AND idempotency_key=?",
                              (actor["id"], normalized["idempotency_key"])).fetchone()
     if old:
+        _require_scope_domain(connection, old["scope_id"])
         if old["payload_hash"] != digest:
             raise AppError("IDEMPOTENCY_CONFLICT", "This creation key already identifies a different payload.", 409)
         return _request_payload(old), True
@@ -232,24 +287,31 @@ def create_request(connection, payload):
         previous = get_request(connection, normalized["supersedes_request_id"])
         if previous["actor_id"] != actor["id"]:
             raise AppError("FORBIDDEN", "A renewed review may supersede only your own request.", 403)
+    _require_pool_domain(connection, normalized["pool_id"])
     pool, ranges, exclusions = _pool(connection, normalized["pool_id"])
+    if reservation_id:
+        reservation = _matching_reservation(connection, reservation_id, pool, normalized)
+        if reservation["version"] != normalized["reservation_version"]:
+            raise AppError("STALE_RESERVATION", "The reservation changed; refresh it before requesting conversion.", 409)
     meta = connection.execute("SELECT baseline_version,demo_clock_at FROM app_meta WHERE singleton=1").fetchone()
     if (pool["pool_version"] != normalized["pool_version"]
             or meta["baseline_version"] != normalized["baseline_version"]):
         raise AppError("STALE_REVIEW", "Pool or intended-ledger version changed. Refresh and create a new review.", 409)
-    limitations = _eligibility(connection, pool, ranges, exclusions, normalized["candidate"], meta["demo_clock_at"])
+    limitations = _eligibility(connection, pool, ranges, exclusions, normalized["candidate"], meta["demo_clock_at"],
+                               reservation_id=reservation_id)
     object_id, created_at = str(uuid4()), _now()
     connection.execute(
         "INSERT INTO allocation_requests(id,actor_id,idempotency_key,payload_hash,payload_json,pool_id,scope_id,"
-        "candidate,pool_version,baseline_version,state,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        "candidate,pool_version,baseline_version,state,created_at,reservation_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (object_id, actor["id"], normalized["idempotency_key"], digest, _json(normalized), pool["id"], pool["scope_id"],
-         normalized["candidate"], pool["pool_version"], meta["baseline_version"], "pending", created_at))
+         normalized["candidate"], pool["pool_version"], meta["baseline_version"], "pending", created_at, reservation_id))
     audit_event(connection, actor_id=actor["id"], action="allocation.request", outcome="succeeded",
                 reason=normalized["reason"], request_id=object_id, subject_id=object_id, scope_id=pool["scope_id"],
                 pool_id=pool["id"], address=normalized["candidate"],
                 details={"before": None, "after": {"state": "pending"}, "pool_version": pool["pool_version"],
                          "baseline_version": meta["baseline_version"], "limitations": limitations,
-                         "authority": "local_static_ledger", "reserved": False})
+                         "authority": "local_static_ledger", "reserved": bool(reservation_id),
+                         "reservation_id": reservation_id})
     return get_request(connection, object_id), False
 
 
@@ -267,6 +329,7 @@ def decide_request(connection, object_id, payload):
     row = connection.execute("SELECT * FROM allocation_requests WHERE id=?", (object_id,)).fetchone()
     if row is None:
         raise AppError("NOT_FOUND", "No allocation request exists with that ID.", 404)
+    _require_scope_domain(connection, row["scope_id"])
     if row["actor_id"] == actor["id"]:
         raise AppError("SELF_APPROVAL_FORBIDDEN", "A request needs a different permitted decision actor.", 403)
     if row["state"] != "pending":
@@ -277,14 +340,28 @@ def decide_request(connection, object_id, payload):
     before = {"state": "pending", "pool_version": row["pool_version"], "baseline_version": row["baseline_version"]}
     allocation_id, downstream, limitations = None, "not_requested", []
     after = {"state": "rejected"}
+    reservation = None
+    before_reservation = after_reservation = None
     if action == "approve":
+        _require_pool_domain(connection, row["pool_id"])
         pool, ranges, exclusions = _pool(connection, row["pool_id"])
         meta = connection.execute("SELECT baseline_version,demo_clock_at FROM app_meta WHERE singleton=1").fetchone()
         if pool["pool_version"] != row["pool_version"] or meta["baseline_version"] != row["baseline_version"]:
             raise AppError("STALE_REVIEW", "Reviewed pool or intended-ledger version changed; no address was allocated.", 409,
                            {"reviewed_pool_version": row["pool_version"], "current_pool_version": pool["pool_version"],
                             "reviewed_baseline_version": row["baseline_version"], "current_baseline_version": meta["baseline_version"]})
-        limitations = _eligibility(connection, pool, ranges, exclusions, row["candidate"], meta["demo_clock_at"])
+        stored_payload = stored["payload"]
+        if row["reservation_id"] is not None:
+            if (stored_payload.get("reservation_id") != row["reservation_id"]
+                    or "service_reference" not in stored_payload or "reservation_version" not in stored_payload):
+                raise AppError("RESERVATION_MISMATCH", "The saved allocation request has incomplete reservation identity.", 409)
+            reservation = _matching_reservation(connection, row["reservation_id"], pool, stored_payload)
+            if reservation["version"] != stored_payload["reservation_version"]:
+                raise AppError("STALE_RESERVATION", "The reservation changed; renewed review is required.", 409)
+        elif any(key in stored_payload for key in ("service_reference", "reservation_version")):
+            raise AppError("RESERVATION_MISMATCH", "The saved allocation request has incomplete reservation identity.", 409)
+        limitations = _eligibility(connection, pool, ranges, exclusions, row["candidate"], meta["demo_clock_at"],
+                                   reservation_id=row["reservation_id"])
         allocation_id = str(uuid4())
         origin = {"source_id": "local-demo-workflow", "source_run_id": object_id, "source_record_id": allocation_id,
                   "observed_at": meta["demo_clock_at"], "ingested_at": _now(), "synthetic": True}
@@ -293,6 +370,22 @@ def decide_request(connection, object_id, payload):
             "VALUES (?,?,?,?,?,?,?,?,?,?)", (allocation_id, pool["scope_id"], pool["prefix_id"], pool["id"], 4,
             row["candidate"], f"{int(ip_address(row['candidate'])):032x}", stored["payload"]["owner"],
             stored["payload"]["purpose"], _json(origin)))
+        if reservation is not None:
+            before_reservation = {key: reservation[key] for key in ("state", "version", "expires_at", "converted_allocation_id")}
+            next_version = reservation["version"] + 1
+            updated = connection.execute(
+                "UPDATE reservations SET state='converted',version=?,converted_allocation_id=? "
+                "WHERE id=? AND state='reserved' AND version=?",
+                (next_version, allocation_id, reservation["id"], reservation["version"]))
+            if updated.rowcount != 1:
+                raise AppError("STALE_RESERVATION", "The reservation changed during allocation approval.", 409)
+            after_reservation = {"state": "converted", "version": next_version,
+                                 "expires_at": reservation["expires_at"], "converted_allocation_id": allocation_id}
+            connection.execute(
+                "INSERT INTO reservation_history(id,reservation_id,version,action,actor_id,occurred_at,reason,before_json,after_json) "
+                "VALUES (?,?,?,?,?,?,?,?,?)",
+                (str(uuid4()), reservation["id"], next_version, "converted", actor["id"], _now(), reason,
+                 _json(before_reservation), _json(after_reservation)))
         connection.execute("UPDATE pools SET pool_version=pool_version+1 WHERE id=?", (pool["id"],))
         connection.execute("UPDATE app_meta SET baseline_version=baseline_version+1 WHERE singleton=1")
         downstream = "simulated_failure" if simulation else "simulated_success"
@@ -305,6 +398,12 @@ def decide_request(connection, object_id, payload):
     audit_event(connection, actor_id=actor["id"], action=f"allocation.{action}", outcome="succeeded", reason=reason,
                 request_id=object_id, subject_id=object_id, scope_id=row["scope_id"], pool_id=row["pool_id"],
                 address=row["candidate"], details={"before": before, "after": after, "limitations": limitations})
+    if action == "approve" and reservation is not None:
+        audit_event(connection, actor_id=actor["id"], action="reservation.convert", outcome="succeeded", reason=reason,
+                    request_id=object_id, subject_id=reservation["id"], scope_id=row["scope_id"], pool_id=row["pool_id"],
+                    address=row["candidate"], details={"before": before_reservation, "after": after_reservation,
+                                                      "allocation_id": allocation_id,
+                                                      "authority": "local_static_ledger"})
     return get_request(connection, object_id), False
 
 
