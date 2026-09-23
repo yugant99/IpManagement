@@ -267,12 +267,36 @@ def _error_code(text):
 
 
 def _resolution(row):
+    """Stored resolution of one event; missing/null is valid for older readback and acknowledgement receipts."""
     try:
         value = json.loads(row["receipt_result_json"])
-    except (TypeError, ValueError):
+    except (TypeError, ValueError) as exc:
+        raise _integrity() from exc
+    if not isinstance(value, dict):
+        raise _integrity()
+    resolution = value.get("resolution")
+    if resolution is None:
         return None
-    resolution = value.get("resolution") if isinstance(value, dict) else None
-    return resolution if resolution in _RESOLUTIONS else None
+    if not isinstance(resolution, str) or resolution not in _RESOLUTIONS:
+        raise _integrity()
+    return resolution
+
+
+def _current_resolution(intent, attempts, events):
+    """Only the resolution explaining the current failed state; each event keeps its own historical reason."""
+    if intent["state"] != "failed":
+        return None
+    latest = attempts[-1] if attempts else None
+    if latest is not None and (latest["result"] != "failed" or latest["reason"] != "readback_definitive_absence"):
+        return None
+    for row in reversed(events):
+        code = _resolution(row)
+        if latest is not None and code == "uncertain_attempt_absent" and row["attempt_id"] == latest["id"]:
+            return code
+        if (latest is None and code in ("zero_attempt_source_rejected", "zero_attempt_reservation_released")
+                and row["attempt_id"] is None):
+            return code
+    return None
 
 
 def _event_projection(row, principal_id):
@@ -301,10 +325,11 @@ def _projection(connection, intent, context, configuration, *, detail):
         raise _integrity()
     attempts = _attempts(connection, intent["id"])
     effect = _effect(connection, intent["id"])
-    events = connection.execute(_EVENT_SELECT + "WHERE e.intent_id=? ORDER BY e.occurred_at,e.id",
+    # Append-only table: insertion order is causal order; millisecond timestamps and UUIDs can tie or invert.
+    events = connection.execute(_EVENT_SELECT + "WHERE e.intent_id=? ORDER BY e.rowid",
                                 (intent["id"],)).fetchall()
     latest = attempts[-1] if attempts else None
-    resolution = next((code for code in map(_resolution, reversed(events)) if code is not None), None)
+    resolution = _current_resolution(intent, attempts, events)
     item = {"id": intent["id"], "domain": intent["domain"], "source_request_id": intent["source_request_id"],
             "source_request_state": intent["request_state"], "action": intent["action"],
             "correlation": intent["correlation"], "business_payload_digest": intent["business_payload_digest"],
@@ -743,6 +768,9 @@ def readback_handoff(connection, intent_id, payload, *, context, configuration):
         outcome, error = "error", inconsistent
     else:
         outcome = "definitive_absence"
+    if outcome == "definitive_absence" and not attempts and intent["state"] in ("delivered", "unknown"):
+        # Delivered or unknown requires an attempt; record nothing rather than a false absence.
+        raise _integrity()
     now, state, resolution = workflow._now(), intent["state"], None
     if outcome == "found":
         if subject["result"] != "delivered" or subject["observed_ticket_id"] != effect["synthetic_ticket_id"]:
