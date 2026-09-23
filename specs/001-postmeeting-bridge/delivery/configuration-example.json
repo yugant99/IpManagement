@@ -1,0 +1,94 @@
+{
+  "revision": 1,
+  "effective_at": "2026-09-01T00:00:00.000Z",
+  "policy_revision": "EXAMPLE-POLICY-REV-REPLACE-BEFORE-USE",
+  "connector_mode": "simulated",
+  "reviewer_references": [
+    "EXAMPLE-UNREVIEWED-REPLACE-WITH-ACTUAL-REVIEW-REFERENCE"
+  ],
+  "principals": [
+    {
+      "id": "example-domain-operator",
+      "token_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "token_bits": 256,
+      "enabled": false,
+      "expires_at": "2027-01-01T00:00:00.000Z",
+      "roles": ["operator"],
+      "domains": ["demo-core"]
+    },
+    {
+      "id": "example-notice-recipient",
+      "token_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "token_bits": 256,
+      "enabled": false,
+      "expires_at": "2027-01-01T00:00:00.000Z",
+      "roles": ["operator"],
+      "domains": ["demo-core"]
+    },
+    {
+      "id": "example-independent-approver",
+      "token_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "token_bits": 256,
+      "enabled": false,
+      "expires_at": "2027-01-01T00:00:00.000Z",
+      "roles": ["approver"],
+      "domains": ["demo-core"]
+    },
+    {
+      "id": "example-evidence-coordinator",
+      "token_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "token_bits": 256,
+      "enabled": false,
+      "expires_at": "2027-01-01T00:00:00.000Z",
+      "roles": [],
+      "domains": []
+    }
+  ],
+  "evidence_coordinator": {
+    "principal_id": "example-evidence-coordinator",
+    "grants": [
+      {"source_id": "synthetic-inventory-rich", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001"},
+      {"source_id": "synthetic-inventory-rich", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002"},
+      {"source_id": "synthetic-inventory-rich", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891"},
+      {"source_id": "synthetic-inventory-rich", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c"},
+      {"source_id": "synthetic-inventory-policy", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001"},
+      {"source_id": "synthetic-inventory-policy", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002"},
+      {"source_id": "synthetic-inventory-policy", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891"},
+      {"source_id": "synthetic-inventory-policy", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c"},
+      {"source_id": "synthetic-dhcp-north", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001"},
+      {"source_id": "synthetic-dhcp-coastal", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891"},
+      {"source_id": "synthetic-dhcp-central", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c"},
+      {"source_id": "synthetic-dhcp-lab", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002"},
+      {"source_id": "synthetic-routing-north", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001"},
+      {"source_id": "synthetic-routing-coastal", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891"},
+      {"source_id": "synthetic-routing-central", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c"},
+      {"source_id": "synthetic-routing-lab", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002"}
+    ]
+  },
+  "source_mappings": [
+    {"source_id": "synthetic-inventory-rich", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001", "domain": "demo-core"},
+    {"source_id": "synthetic-inventory-rich", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002", "domain": "demo-lab"},
+    {"source_id": "synthetic-inventory-rich", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891", "domain": "demo-core"},
+    {"source_id": "synthetic-inventory-rich", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c", "domain": "demo-core"},
+    {"source_id": "synthetic-inventory-policy", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001", "domain": "demo-core"},
+    {"source_id": "synthetic-inventory-policy", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002", "domain": "demo-lab"},
+    {"source_id": "synthetic-inventory-policy", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891", "domain": "demo-core"},
+    {"source_id": "synthetic-inventory-policy", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c", "domain": "demo-core"},
+    {"source_id": "synthetic-dhcp-north", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001", "domain": "demo-core"},
+    {"source_id": "synthetic-dhcp-coastal", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891", "domain": "demo-core"},
+    {"source_id": "synthetic-dhcp-central", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c", "domain": "demo-core"},
+    {"source_id": "synthetic-dhcp-lab", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002", "domain": "demo-lab"},
+    {"source_id": "synthetic-routing-north", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001", "domain": "demo-core"},
+    {"source_id": "synthetic-routing-coastal", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891", "domain": "demo-core"},
+    {"source_id": "synthetic-routing-central", "scope_id": "2c4a5913-e80c-53e9-9ba1-fd6c87ec6f4c", "domain": "demo-core"},
+    {"source_id": "synthetic-routing-lab", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a002", "domain": "demo-lab"}
+  ],
+  "routes": [
+    {"domain": "demo-core", "action": "allocation.request", "revision": "EXAMPLE-ROUTE-REV-0-REPLACE", "team": "EXAMPLE-TEAM-REPLACE"},
+    {"domain": "demo-lab", "action": "allocation.request", "revision": "EXAMPLE-ROUTE-REV-0-REPLACE", "team": "EXAMPLE-TEAM-REPLACE"}
+  ],
+  "notice_recipients": [
+    {"domain": "demo-core", "scope_id": "7d2075a0-6fd4-4d58-a26c-1e7d8cb0a001", "principal_id": "example-notice-recipient"},
+    {"domain": "demo-core", "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891", "principal_id": "example-unknown-principal-NOT-PROVISIONED"}
+  ]
+}
