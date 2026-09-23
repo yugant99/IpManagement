@@ -417,7 +417,7 @@
     },
     {
       "task": "T015",
-      "status": "source_review_pending",
+      "status": "source_review_corrections_in_progress",
       "base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865",
       "route": "opencode-go/muse-spark-1.3-contributor#high",
       "branch": "codex/bridge-t015-workflow-ui",
@@ -434,7 +434,8 @@
       "review_route": "Codex GPT-6 Sol high independent worker",
       "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git.",
       "result_sha": "06f9a15080fce5b860d5d5cd58c5de1d41f95432",
-      "pull_request": "https://github.com/yugant99/IpManagement/pull/88"
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/88",
+      "review_report": "specs/001-postmeeting-bridge/delivery/workflow-ui-source-review.md"
     },
     {
       "task": "T017",
