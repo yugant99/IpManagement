@@ -4,6 +4,16 @@ Prepared 2026-09-22 from the specification tasks, routing, roadmap, quickstart a
 
 ## Current decision
 
+**Execution update, 2026-09-22:** Route discovery is no longer on the immediate
+critical path. OpenCode is paused; all further Claude/Fable/Opus use is stopped by
+the user after the one completed advisory. Codex GPT-6 Luna implements and GPT-6
+Sol independently reviews/escalates, with Astra lead. Access through T007 and
+migration core T008 are source accepted; T009 API/T010 UI run on disjoint leases.
+T011 is still dependency-held. The original model-hour estimates below are
+planning history, not measured throughput or a revised completion promise.
+Human T020/T022/T024/T026 remain unacknowledged, and their hours cannot be supplied
+by model work. T025 runtime has not begun; Tier B remains held and reserve protected.
+
 **Retain three days as a timebox, not a completion commitment.** The latest user clarification supplies approximately **8 total human hours for Spencer**, with review Wednesday night September 23 or Thursday September 24. Exact daily availability and review duration are not specified. A general VM target comes later and must not block immediate preparation; no VM provisioning is authorized.
 
 Route recheck is in progress: the user identifies Terra through OpenCode, Fable through Claude Code CLI, and Sol through Codex. Earlier discovery found Go-listed Luna/Grok 4.7/Grok 4.6/DeepSeek but no Terra there. That earlier listing is not proof that Terra is absent from all configured routes. Inclusion/overage remains to be established by the lead; availability of a listed model does not establish additional-spend authorization. For any lane whose required route/authority remains unconfirmed, **0 dispatchable hours are counted until that lane is resolved**. This does not prevent lead adoption, documentation preparation or exact dispatch manifests under existing authorization.

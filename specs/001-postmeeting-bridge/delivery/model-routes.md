@@ -129,3 +129,13 @@ response, error log and progress are retained under /tmp/ipam-opus-t008-review.
 No autonomous second call, extra-usage activation or model substitution is authorized.
 
 The single Opus response completed successfully in71.333 seconds. Its bounded advice and lead disposition are in [opus-assessment-advisory.md](opus-assessment-advisory.md); no further call is queued.
+
+### Current user stop: no Claude usage
+
+The user subsequently stopped Claude usage and prohibited further Claude assignments.
+This supersedes all earlier optional Fable/Opus routing, including future T027 calls.
+The one Opus execution above had already completed; there is no running or queued
+task-related Claude inference. Process inspection found only the unrelated Chrome
+native-host bridge, which was left untouched. Do not invoke Claude/Fable/Opus again
+without a new explicit user instruction. Do not assign new tasks during this stop
+request. Previously dispatched Codex work is unchanged; OpenCode remains paused.

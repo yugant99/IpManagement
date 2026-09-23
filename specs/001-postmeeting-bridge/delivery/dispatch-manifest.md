@@ -212,3 +212,28 @@ calls. Source-only implementation and source review, no tests/build/import/servi
 database/browser execution. Coherent commits and push at handoff; draft PRs target
 the shared migration integration base. Independent Sol review follows the exact
 assembly. T011 waits for T009 source closure; T025 and human gates remain distinct.
+
+Both setups are complete and running source implementation. The actual shared base is
+`36dbfb90f3178c07ed9c7d0a55b54370a563bf7f`, including frozen interface publication
+`37c3706d33a7416f0ef88cc6addfc3ffd9d160d8`. Shared worktree:
+`/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-migration/Ip_inventory`.
+T009 task `01a0cb5e-f055-7751-b79c-a60c9662a0c5` uses
+`/Users/yuganthareshsoni/.codex/worktrees/eb8d/Ip_inventory`.
+T010 task `01a0cb5f-6dcf-7080-90ea-fffcc1743645` uses
+`/Users/yuganthareshsoni/.codex/worktrees/e121/Ip_inventory`.
+Each reported its dedicated branch at the exact shared base. The machine registry
+contains the current leases; no parent or historical author may edit them concurrently.
+
+### T009 source closure and T011 release
+
+T009 is source accepted at `daede1905304c5d5bd363ff230b5f6371763eb49`, draft PR76,
+after independent Sol closure of the receipt-integrity correction. T010 remains
+in progress. Prepare `codex/bridge-lifecycle-integration` from exact T009 plus this
+lead publication. Do not advance the frozen migration PR base or main.
+T011 receives only backend/ipam_demo/lifecycle.py and backend/ipam_demo/workflow.py,
+in its own GPT-6 Luna task/branch/worktree. The final C-L clarification requires
+explicit service_reference and reservation_version when reservation_id is supplied,
+preserving old unreserved normalization/replay. Cross-table holds, atomic conversion,
+independent unused release, history and version bumps are its bounded deliverable.
+No API/UI/schema edits or execution; T012/T013 remain dependency-held until source
+review. Sol remains independent reviewer; Claude/OpenCode remain stopped/paused.

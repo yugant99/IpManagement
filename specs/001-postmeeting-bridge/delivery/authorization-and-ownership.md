@@ -1,7 +1,7 @@
 # T001 — Main Lead 4.0 authorization and ownership
 
 Date: 2026-09-22. Lead task `01a0cade-506f-7442-97da-0cc09b4f9929`, GPT-6 Astra.
-**Current state: bounded specification adopted; T005/T006 source candidates are in independent T007 review. Latest user instruction pauses all OpenCode work and selects Codex GPT-6 Luna implementation and GPT-6 Sol review/escalation, with Astra lead. Earlier route decisions below are history.**
+**Current state: bounded specification adopted; T005/T006/T007 and T008 are source accepted, with T009 API and T010 UI in separate Codex GPT-6 Luna implementation tasks. GPT-6 Sol owns independent review/escalation and Astra remains lead. OpenCode is paused. The completed one-shot Opus advisory is historical; the latest user stopped all further Claude/Fable/Opus use and then authorized continued Codex work. Earlier route decisions below are history. Runtime and human gates remain open.**
 
 ## Exact source and lead decision
 
