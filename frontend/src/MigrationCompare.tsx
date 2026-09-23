@@ -370,7 +370,7 @@ export default function MigrationCompare({ active = true, initialSourceBatchId =
 
   function signoff(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (detail?.status !== "ready" || !maySign || busy || attempt || pointer || storageError || !signoffReason.trim()) return;
+    if (detail?.status !== "ready" || detail.data.id !== selectedId || !maySign || busy || attempt || pointer || storageError || !signoffReason.trim()) return;
     const assessment = detail.data;
     if (assessment.created_by_current_principal !== false || !assessment.current || assessment.state === "signed"
       || assessment.rejected_count !== 0 || assessment.duplicate_count !== 0 || assessment.conflicting_count !== 0
@@ -388,7 +388,7 @@ export default function MigrationCompare({ active = true, initialSourceBatchId =
   }
 
   function exportAssessment() {
-    if (detail?.status !== "ready") return;
+    if (detail?.status !== "ready" || detail.data.id !== selectedId) return;
     download.current?.abort();
     const controller = new AbortController();
     download.current = controller;
@@ -400,7 +400,7 @@ export default function MigrationCompare({ active = true, initialSourceBatchId =
   if (pinnedReceipt && eligibleReceipt(pinnedReceipt) && !eligible.some(item => item.id === pinnedReceipt.id)) eligible.unshift(pinnedReceipt);
   const selectedAssessment = assessments.status === "ready" ? assessments.data.items.find(item => item.id === selectedId) : undefined;
   const locked = busy || !!attempt || !!pointer || !!storageError;
-  const canSign = detail?.status === "ready" && maySign && detail.data.created_by_current_principal === false
+  const canSign = detail?.status === "ready" && detail.data.id === selectedId && maySign && detail.data.created_by_current_principal === false
     && detail.data.current && detail.data.state !== "signed" && detail.data.rejected_count === 0
     && detail.data.duplicate_count === 0 && detail.data.conflicting_count === 0
     && detail.data.input_count === detail.data.accepted_count + detail.data.rejected_count + detail.data.duplicate_count
@@ -445,7 +445,7 @@ export default function MigrationCompare({ active = true, initialSourceBatchId =
       {assessments.status === "ready" && <>
         {!assessments.data.items.length && <p>No saved assessments are available in this domain.</p>}
         {!!assessments.data.items.length && <div className="table-scroll" tabIndex={0} role="region" aria-label="Saved migration assessments"><table><caption className="sr-only">Assessment list scoped to the selected domain.</caption><thead><tr><th scope="col">Created / source</th><th scope="col">Receipt rows</th><th scope="col">Comparison rows</th><th scope="col">State</th><th scope="col">Currency</th></tr></thead><tbody>{assessments.data.items.map(item => <tr key={item.id} data-selected={selectedId === item.id}>
-          <td><button type="button" className="prefix-link" onClick={() => { setSelectedId(item.id); setActiveOnlyAcknowledged(false); setError(""); }}>{item.created_at}</button><div className="table-secondary"><code>{item.id}</code></div><div className="table-secondary">Source batch <code>{item.source_batch_id}</code></div></td>
+          <td><button type="button" className="prefix-link" onClick={() => { if (item.id !== selectedId) setDetail({ status: "loading" }); setSelectedId(item.id); setActiveOnlyAcknowledged(false); setError(""); }}>{item.created_at}</button><div className="table-secondary"><code>{item.id}</code></div><div className="table-secondary">Source batch <code>{item.source_batch_id}</code></div></td>
           <td>{item.input_count} input · {item.accepted_count} accepted · {item.rejected_count} rejected · {item.duplicate_count} duplicate</td>
           <td>{item.added_count} added · {item.changed_count} changed · {item.unchanged_count} unchanged · {item.conflicting_count} conflict</td>
           <td>{item.state} · {item.active_only_count} active-only</td><td>{item.current ? "Current" : `Stale${item.staleness_reasons.length ? ` · ${item.staleness_reasons.length} reason(s)` : ""}`}</td>
@@ -458,9 +458,9 @@ export default function MigrationCompare({ active = true, initialSourceBatchId =
     </section>
 
     {selectedId && <section className="detail-section" aria-busy={detail?.status === "loading"}>
-      {detail?.status === "loading" && <p role="status">Loading assessment detail…</p>}
+      {(detail?.status === "loading" || (detail?.status === "ready" && detail.data.id !== selectedId)) && <p role="status">Loading assessment detail…</p>}
       {detail?.status === "error" && <div className="notice error" role="alert"><p>{detail.error.message}</p><button type="button" className="secondary" onClick={() => setRevision(value => value + 1)}>Retry assessment detail</button></div>}
-      {detail?.status === "ready" && <>
+      {detail?.status === "ready" && detail.data.id === selectedId && <>
         <AssessmentDetailView assessment={detail.data} onExport={exportAssessment} />
         {outcome?.assessment_id === detail.data.id && <div className="notice" role="status"><h3>{outcome.replayed ? "Historical operation receipt replayed" : "Operation receipt"}</h3><p>{outcome.action} · assessment <code>{outcome.assessment_id}</code>. This receipt records the original outcome; the current/stale assessment state is shown above.</p></div>}
         {outcome?.assessment_id === detail.data.id && outcome.original_signoff && <div className="notice" role="status"><h3>Original sign-off receipt (historical)</h3><p>Assessment <code>{outcome.original_signoff.assessment_id}</code> · signer <code>{outcome.original_signoff.signer_id}</code> · signed <time>{outcome.original_signoff.signed_at}</time> · version {outcome.original_signoff.signed_version} · digest <code>{outcome.original_signoff.assessment_digest}</code>.</p><p>This historical receipt does not override current staleness.</p></div>}
