@@ -11,14 +11,15 @@ import {
 } from "./workflowApi";
 import type { AllocationDecision, AllocationRequest, AuditEvent, CreateAllocation, ExceptionAction,
   ExceptionFinding, ExceptionRecord, ReleaseRequest, ReservationDetail, ReservationOperationReadback,
-  ReservationSummary, TicketHandoffDetail, TicketHandoffSummary, TicketOperationAction, WorkflowStatus } from "./workflowApi";
+  ReservationSummary, TicketHandoffDetail, TicketHandoffOriginalOperation, TicketHandoffSummary, TicketOperationAction, WorkflowStatus } from "./workflowApi";
 
 const PAGE_SIZE = 20;
 const RECOVERY_KEY = "ipam.workflow-t015.recovery.v1";
 type WriteAction = "reservation.create" | "reservation.extend" | "reservation.release.propose"
   | "reservation.release.decision" | "allocation.create" | "allocation.decision"
   | "ticket.attempt" | "ticket.reassign" | "ticket.readback" | "ticket.acknowledge";
-type Attempt = { action: WriteAction; key: string; targetId?: string; secondaryId?: string; payload: Record<string, unknown> };
+type Attempt = { action: WriteAction; key: string; targetId?: string; secondaryId?: string;
+  expected?: "approved" | "rejected"; payload: Record<string, unknown> };
 type RecoveryPointer = {
   principal_id: string;
   domain: string;
@@ -28,6 +29,7 @@ type RecoveryPointer = {
   idempotency_key?: string;
   target_id?: string;
   secondary_id?: string;
+  expected?: "approved" | "rejected";
 };
 const WRITE_ACTIONS: WriteAction[] = ["reservation.create", "reservation.extend", "reservation.release.propose",
   "reservation.release.decision", "allocation.create", "allocation.decision",
@@ -65,11 +67,13 @@ function readRecovery(): { pointer: RecoveryPointer | null; error: string } {
       || (needsKey.includes(value.action) && (typeof value.idempotency_key !== "string" || !value.idempotency_key || value.idempotency_key.length > 200))
       || (needsTarget.includes(value.action) && (typeof value.target_id !== "string" || !value.target_id))
       || (value.action === "reservation.release.decision" && (typeof value.secondary_id !== "string" || !value.secondary_id))
+      || (value.action === "allocation.decision" && value.expected !== "approved" && value.expected !== "rejected")
+      || (value.action !== "allocation.decision" && value.expected !== undefined)
       || (value.idempotency_key !== undefined && (typeof value.idempotency_key !== "string" || !value.idempotency_key))
       || (value.target_id !== undefined && (typeof value.target_id !== "string" || !value.target_id))
       || (value.secondary_id !== undefined && (typeof value.secondary_id !== "string" || !value.secondary_id))
       || Object.keys(value).some(key => !["principal_id", "domain", "configuration_revision", "configuration_digest",
-        "action", "idempotency_key", "target_id", "secondary_id"].includes(key))) {
+        "action", "idempotency_key", "target_id", "secondary_id", "expected"].includes(key))) {
       throw new Error("The saved workflow recovery pointer is invalid; its outcome cannot be confirmed.");
     }
     return { pointer: value, error: "" };
@@ -82,7 +86,8 @@ function samePointer(left: RecoveryPointer, right: RecoveryPointer) {
   return left.principal_id === right.principal_id && left.domain === right.domain
     && left.configuration_revision === right.configuration_revision && left.configuration_digest === right.configuration_digest
     && left.action === right.action && left.idempotency_key === right.idempotency_key
-    && left.target_id === right.target_id && left.secondary_id === right.secondary_id;
+    && left.target_id === right.target_id && left.secondary_id === right.secondary_id
+    && left.expected === right.expected;
 }
 
 function pointerFor(value: Attempt): RecoveryPointer {
@@ -93,6 +98,7 @@ function pointerFor(value: Attempt): RecoveryPointer {
   if (value.key) pointer.idempotency_key = value.key;
   if (value.targetId) pointer.target_id = value.targetId;
   if (value.secondaryId) pointer.secondary_id = value.secondaryId;
+  if (value.expected) pointer.expected = value.expected;
   return pointer;
 }
 
@@ -157,6 +163,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const [selectedRequest, setSelectedRequest] = useState<AllocationRequest | null>(null);
   const [requestHandoff, setRequestHandoff] = useState<TicketHandoffSummary | null>(null);
   const [requestHandoffChecked, setRequestHandoffChecked] = useState(false);
+  const [requestHandoffFor, setRequestHandoffFor] = useState("");
   const [decisionReason, setDecisionReason] = useState("");
   const [simulateFailure, setSimulateFailure] = useState(false);
   const [reservations, setReservations] = useState<Page<ReservationSummary> | null>(null);
@@ -185,6 +192,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const [attemptScenario, setAttemptScenario] = useState<(typeof SCENARIOS)[number]>("success");
   const [reassignReason, setReassignReason] = useState("");
   const [lastTicketOp, setLastTicketOp] = useState("");
+  const [ticketOriginal, setTicketOriginal] = useState<TicketHandoffOriginalOperation | null>(null);
   const [selectedException, setSelectedException] = useState<ExceptionRecord | null>(null);
   const [exceptionOpenRevision, setExceptionOpenRevision] = useState(0);
   const [exceptionReason, setExceptionReason] = useState("");
@@ -302,16 +310,18 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   }, [active, selectedHandoffId, revision]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!active || !selectedRequest) { setRequestHandoff(null); setRequestHandoffChecked(false); return; }
+    if (!active || !selectedRequest) { setRequestHandoff(null); setRequestHandoffChecked(false); setRequestHandoffFor(""); return; }
+    const lookupId = selectedRequest.id;
     const controller = new AbortController();
-    setRequestHandoff(null); setRequestHandoffChecked(false);
-    listHandoffs(1, 0, selectedRequest.id, controller.signal)
+    setRequestHandoff(null); setRequestHandoffChecked(false); setRequestHandoffFor("");
+    listHandoffs(1, 0, lookupId, controller.signal)
       .then(items => {
         if (controller.signal.aborted) return;
         setRequestHandoff(items.items[0] ?? null);
         setRequestHandoffChecked(true);
+        setRequestHandoffFor(lookupId);
       })
-      .catch(() => { if (!controller.signal.aborted) setRequestHandoffChecked(false); });
+      .catch(() => { if (!controller.signal.aborted) { setRequestHandoff(null); setRequestHandoffChecked(false); setRequestHandoffFor(""); } });
     return () => controller.abort();
   }, [active, selectedRequest?.id, revision]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -326,6 +336,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
         setAttempt(null);
         setResOpReadback(null);
         setLastTicketOp("");
+        setTicketOriginal(null);
         if (pointer) {
           setRecoveryStatus(`The access context changed. In-memory payloads were cleared and the saved ${pointer.action} pointer is quarantined. Reauthenticate the original principal ${pointer.principal_id} in domain ${pointer.domain} to read it back. It cannot be resent as this identity.`);
         }
@@ -357,20 +368,20 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           }
           confirmPointerClear();
           priorAmbiguity.current = false;
-          setSelectedRequest(saved); setRequestOffset(0); history(saved.id);
+          selectRequest(saved); setRequestOffset(0); history(saved.id);
           setRecoveryStatus("The original allocation request was confirmed by authorized readback.");
           setRevision(value => value + 1);
         } else if (pointer.action === "allocation.decision") {
           const saved = await loadAllocationRequest(pointer.target_id!, controller.signal);
           if (controller.signal.aborted) return;
-          const terminal = saved.state === "approved" || saved.state === "rejected";
+          const terminal = saved.state === pointer.expected;
           if (!terminal || saved.id !== pointer.target_id || saved.decision_actor_id !== pointer.principal_id) {
-            setRecoveryStatus("The original decision remains unresolved. No matching terminal decision by this principal was confirmed. Do not submit a replacement decision.");
+            setRecoveryStatus("The original decision remains unresolved. No matching terminal decision by this principal for the intended action was confirmed. Do not submit a replacement decision.");
             return;
           }
           confirmPointerClear();
           priorAmbiguity.current = false;
-          setSelectedRequest(saved); history(saved.id);
+          selectRequest(saved); history(saved.id);
           setRecoveryStatus("The original allocation decision was confirmed by authorized readback.");
           setRevision(value => value + 1);
         } else if (pointer.action.startsWith("reservation.")) {
@@ -386,7 +397,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           const matches = pointer.action === "reservation.release.propose"
             ? outcome.reservation_id === pointer.target_id
             : pointer.action === "reservation.release.decision"
-              ? outcome.id === pointer.secondary_id
+              ? outcome.id === pointer.secondary_id && outcome.reservation_id === pointer.target_id
               : outcome.id === pointer.target_id || pointer.action === "reservation.create";
           if (!matches || result.action !== pointer.action) {
             setRecoveryStatus("Authorized readback returned an outcome that does not match the saved key and target. It remains unresolved; no replacement will be sent.");
@@ -417,18 +428,38 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           const expected = pointer.action === "ticket.attempt" ? "reserve"
             : pointer.action === "ticket.reassign" ? "reassign"
             : pointer.action === "ticket.readback" ? "readback" : "acknowledge";
-          if (phase !== expected || result.action !== pointer.action) {
-            setRecoveryStatus("Authorized readback returned an operation that does not match the saved action and key. It remains unresolved; no replacement will be sent.");
+          const current = result.current_handoff;
+          const shapeOk = phase === expected && result.action === pointer.action
+            && current.id === pointer.target_id
+            && (phase === "reserve"
+              ? result.original_operation.attempt !== null && result.original_operation.attempt !== undefined
+                && Number.isInteger(result.original_operation.attempt.ordinal)
+                && current.attempts.some(item => item.id === result.original_operation!.attempt!.id
+                  && item.ordinal === result.original_operation!.attempt!.ordinal
+                  && item.synthetic_scenario === result.original_operation!.attempt!.synthetic_scenario)
+              : phase === "reassign"
+                ? result.original_operation.assignment !== null && result.original_operation.assignment !== undefined
+                  && Number.isInteger(result.original_operation.assignment.assignment_version)
+                  && current.route_history.some(item => item.assignment_version === result.original_operation!.assignment!.assignment_version
+                    && item.team === result.original_operation!.assignment!.team)
+                : result.original_operation.event !== null && result.original_operation.event !== undefined
+                  && typeof result.original_operation.event.id === "string"
+                  && current.events.some(item => item.id === result.original_operation!.event!.id
+                    && item.event_type === result.original_operation!.event!.event_type
+                    && item.outcome === result.original_operation!.event!.outcome));
+          if (!shapeOk) {
+            setRecoveryStatus("Authorized readback returned an operation that does not match the saved action, key, target and canonical shape. It remains unresolved; no replacement will be sent.");
             return;
           }
           confirmPointerClear();
           priorAmbiguity.current = false;
-          setSelectedHandoffId(result.current_handoff.id);
-          setHandoffDetail(result.current_handoff);
+          setSelectedHandoffId(current.id);
+          setHandoffDetail(current);
+          setTicketOriginal(result.original_operation);
           if (pointer.action === "ticket.attempt" && result.original_operation.attempt) {
             const ordinal = result.original_operation.attempt.ordinal;
             setLastTicketOp(`Original attempt receipt confirms reserved ordinal ${ordinal}. This proves the ordinal only.`);
-            setRecoveryStatus(`The original attempt receipt confirms reserved ordinal ${ordinal}. Current handoff state is ${result.current_handoff.state}; an unknown current state needs a separate manual readback with the current version, correlation and digest.`);
+            setRecoveryStatus(`The original attempt receipt confirms reserved ordinal ${ordinal}. Current handoff state is ${current.state}; an unknown current state needs a separate manual readback with the current version, correlation and digest.`);
           } else {
             setRecoveryStatus("The original ticket operation was confirmed by authorized readback. Current handoff state is shown separately.");
           }
@@ -482,6 +513,14 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   function refresh() { setError(""); setRevision(value => value + 1); }
   function history(id: string) { setAuditSubject(id); setAuditOffset(0); }
 
+  function selectRequest(item: AllocationRequest | null) {
+    setSelectedRequest(item);
+    setRequestHandoff(null);
+    setRequestHandoffChecked(false);
+    setRequestHandoffFor("");
+    setDecisionReason("");
+  }
+
   async function submit(value: Attempt) {
     if (operation.current || storageError || (pointer && !attempt)) return;
     try { retain(value); }
@@ -521,7 +560,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       } else if (value.action === "allocation.create") {
         const created = await createAllocation(value.payload as unknown as CreateAllocation, controller.signal);
         if (controller.signal.aborted) return;
-        setSelectedRequest(created); setRequestOffset(0); clearAttempt();
+        selectRequest(created); setRequestOffset(0); clearAttempt();
         setMessage(`Request ${created.id} is ${created.state}. Creation does not reserve the address.`);
         setCandidate(""); setOwner(""); setPurpose(""); setReason(""); setSupersedes("");
         setLinkReservation(false); setLinkReservationId(""); setLinkServiceRef(""); setLinkReservationVersion("");
@@ -529,7 +568,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       } else if (value.action === "allocation.decision") {
         const decided = await decideAllocation(value.targetId!, value.payload as unknown as AllocationDecision, controller.signal);
         if (controller.signal.aborted) return;
-        setSelectedRequest(decided); clearAttempt();
+        selectRequest(decided); clearAttempt();
         setMessage(`Request ${decided.state}. Local outcome: ${decided.local_outcome}. External provisioning: ${decided.downstream_status ?? "not requested"}.`);
         setDecisionReason("");
         history(decided.id);
@@ -650,10 +689,11 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   function decide(action: "approve" | "reject") {
     if (!selectedRequest || busy || attempt || pointer || storageError) return;
     const key = crypto.randomUUID();
-    const tracked = requestHandoffChecked && requestHandoff !== null;
+    const tracked = trackingResolved && requestHandoff !== null;
     const payload: Record<string, unknown> = { actor_id: actorId, action, reason: decisionReason };
     if (!tracked) payload.simulate_failure = action === "approve" && simulateFailure;
-    void submit({ action: "allocation.decision", key, targetId: selectedRequest.id, payload });
+    void submit({ action: "allocation.decision", key, targetId: selectedRequest.id,
+      expected: action === "approve" ? "approved" : "rejected", payload });
   }
 
   function submitExtend() {
@@ -761,7 +801,11 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       const result = await readHandoffOperation("ticket.attempt", pointer.idempotency_key, controller.signal);
       if (controller.signal.aborted) return;
       if (!result.found || !result.original_operation?.attempt || !result.current_handoff
-        || result.original_operation.phase !== "reserve") {
+        || result.original_operation.phase !== "reserve" || result.action !== "ticket.attempt"
+        || result.current_handoff.id !== pointer.target_id
+        || !Number.isInteger(result.original_operation.attempt.ordinal)
+        || !result.current_handoff.attempts.some(item => item.id === result.original_operation!.attempt!.id
+          && item.ordinal === result.original_operation!.attempt!.ordinal)) {
         setRecoveryStatus("No saved attempt receipt was found for this exact key. The attempt may still commit; it remains unresolved and replacement writes are blocked. A missing receipt never authorizes a new key.");
         return;
       }
@@ -769,6 +813,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       clearAttempt();
       setSelectedHandoffId(result.current_handoff.id);
       setHandoffDetail(result.current_handoff);
+      setTicketOriginal(result.original_operation);
       setLastTicketOp(`Original attempt receipt confirms reserved ordinal ${ordinal}. This proves the ordinal only.`);
       setRecoveryStatus(`The saved attempt receipt confirms reserved ordinal ${ordinal}. Current handoff state is ${result.current_handoff.state}; an unknown current state needs a separate manual readback with the current version, correlation and digest.`);
       setRevision(value => value + 1);
@@ -808,7 +853,8 @@ export default function Workflow({ active = true }: { active?: boolean }) {
   const mayDecideRelease = hasRole("Approver") && selectedRelease?.requester_id !== actorId;
   const mayAttemptTicket = hasRole("Operator");
   const locked = busy || !!attempt || !!pointer || !!storageError;
-  const trackedRequest = requestHandoffChecked && requestHandoff !== null;
+  const trackingResolved = requestHandoffChecked && requestHandoffFor === selectedRequest?.id;
+  const trackedRequest = trackingResolved && requestHandoff !== null;
   const exceptionHeading = useRef<HTMLHeadingElement | null>(null);
   useEffect(() => {
     if (!selectedException) return;
@@ -820,7 +866,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
     <div className="page-heading"><div><p className="eyebrow">Current workflow · saved evidence boundary</p><h1 id="workflow-heading">Allocation and review</h1>
       <p className="intro">Reserve an exact IPv4 hold, request its conversion, obtain independent decisions, and track the separate simulated ticket handoff.</p></div>
       <button className="secondary" disabled={loading || busy} onClick={refresh}>Refresh workflow</button></div>
-    <div className="evidence-banner"><strong>Synthetic workflow</strong><span>Local allocations are real database changes. External provisioning is simulated. Queue actions leave calculated findings unchanged.</span></div>
+    <div className="evidence-banner"><strong>Synthetic workflow</strong><span>The local ledger is real: reservations and allocations are database changes. Ticket handoff is simulated. External provisioning is unsupported and not requested; any stored legacy simulated status is historical only. Queue actions leave calculated findings unchanged.</span></div>
     <p className="quiet">The queue shows evidence from its last refresh. Returning to this view refreshes it; use Refresh workflow to include runs acquired while this view stays open.</p>
     {error && <div className="notice" role="alert"><strong>Action or refresh failed</strong><p>{error}</p></div>}
     {message && <div className="notice" role="status">{message}</div>}
@@ -862,8 +908,16 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <td>{item.owner_reference} · {item.service_reference}</td><td>{item.expires_at}</td>
             <td><button className="secondary" disabled={locked} onClick={() => { setSelectedReservationId(item.id); setReleaseOffset(0); setExtendReason(""); setProposeReason(""); setResOpReadback(null); }}>Open hold</button></td></tr>)}
         </tbody></table></div>{!reservations.total && <p>No reservation holds have been stored.</p>}<PageButtons page={reservations} change={setReservationOffset} /></>}
-        {resOpReadback?.found && <div className="notice" role="status"><h3>Original operation receipt</h3>
-          <p>Action {resOpReadback.action}. The receipt proves the original outcome only; current reservation and release state are shown separately below.</p></div>}
+        {resOpReadback?.found && resOpReadback.original_outcome && <div className="notice" role="status"><h3>Original operation receipt · {resOpReadback.action}</h3>
+          {"reservation_version" in resOpReadback.original_outcome
+            ? <dl className="facts"><dt>Original proposal</dt><dd><code>{resOpReadback.original_outcome.id}</code> · hold <code>{resOpReadback.original_outcome.reservation_id}</code> at version {resOpReadback.original_outcome.reservation_version}</dd>
+              <dt>Original outcome</dt><dd>{resOpReadback.original_outcome.state}{resOpReadback.original_outcome.decided_at ? ` · decided ${resOpReadback.original_outcome.decided_at}` : ""}</dd>
+              {resOpReadback.original_outcome.decision_reason && <><dt>Original decision reason</dt><dd>{resOpReadback.original_outcome.decision_reason}</dd></>}</dl>
+            : <dl className="facts"><dt>Original hold</dt><dd><code>{resOpReadback.original_outcome.id}</code> · {resOpReadback.original_outcome.address} · version {resOpReadback.original_outcome.version}</dd>
+              <dt>Original outcome</dt><dd>{resOpReadback.original_outcome.state} · expires {resOpReadback.original_outcome.expires_at}</dd></dl>}
+          {resOpReadback.current_reservation && <p>Current hold: {resOpReadback.current_reservation.address} · {resOpReadback.current_reservation.state} · version {resOpReadback.current_reservation.version} · expires {resOpReadback.current_reservation.expires_at}.</p>}
+          {resOpReadback.current_release_request && <p>Current proposal: {resOpReadback.current_release_request.state} · hold version {resOpReadback.current_release_request.reservation_version}.</p>}
+          <p className="quiet">The receipt proves the original outcome only; current values above may differ.</p></div>}
         {reservationDetail && <div className="notice"><h3>Hold {reservationDetail.address} · {reservationDetail.state}</h3>
           <p><code>{reservationDetail.id}</code> · version {reservationDetail.version}</p>
           <p>Owner reference: {reservationDetail.owner_reference}. Service reference: {reservationDetail.service_reference}. Reason: {reservationDetail.reason}</p>
@@ -929,8 +983,8 @@ export default function Workflow({ active = true }: { active?: boolean }) {
 
       <section className="inventory-panel" aria-labelledby="requests-heading"><div className="section-heading"><h2 id="requests-heading">Saved allocation requests</h2></div>
         {requests && <><div className="table-scroll"><table><thead><tr><th>Candidate</th><th>State</th><th>Requested by</th><th>Reviewed versions</th><th>Review</th></tr></thead><tbody>
-          {requests.items.map(item => <tr key={item.id}><td><code>{item.candidate}</code></td><td>{item.state}</td><td>{status.actors.find(value => value.id === item.actor_id)?.name ?? item.actor_id}</td>
-            <td>Pool {item.pool_version} / ledger {item.baseline_version}</td><td><button className="secondary" disabled={locked} onClick={() => { setSelectedRequest(item); setDecisionReason(""); history(item.id); }}>Open request</button></td></tr>)}
+          {requests.items.map(item => <tr key={item.id}><td><code>{item.candidate}</code></td><td>{item.state}</td><td>{status.actors.find(value => value.id === item.actor_id)?.name ?? item.actor_id ?? "Another principal (identity hidden)"}</td>
+            <td>Pool {item.pool_version} / ledger {item.baseline_version}</td><td><button className="secondary" disabled={locked} onClick={() => { selectRequest(item); history(item.id); }}>Open request</button></td></tr>)}
         </tbody></table></div>{!requests.total && <p>No allocation requests have been stored.</p>}<PageButtons page={requests} change={setRequestOffset} /></>}
         {selectedRequest && <div className="notice"><h3>Review {selectedRequest.candidate}</h3><p><code>{selectedRequest.id}</code> · {selectedRequest.state}</p>
           <p>Owner: {selectedRequest.payload.owner}. Purpose: {selectedRequest.payload.purpose}. Request reason: {selectedRequest.payload.reason}</p>
@@ -938,12 +992,13 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           {selectedRequest.reservation_id && <p>Linked hold <code>{selectedRequest.reservation_id}</code> · service {selectedRequest.payload.service_reference} · hold version {selectedRequest.payload.reservation_version}.</p>}
           {selectedRequest.allocation_id && <p>Allocation ID: <code>{selectedRequest.allocation_id}</code></p>}
           {selectedRequest.decision_reason && <p>Decision reason: {selectedRequest.decision_reason}</p>}
-          <p>Ticket handoff: {requestHandoffChecked ? requestHandoff ? <><strong>{requestHandoff.state}</strong> · correlation <code>{requestHandoff.correlation}</code> · attempts {requestHandoff.attempts_used}/{requestHandoff.attempt_limit}</> : "Not tracked by ticketing (legacy request)" : "Checking ticket tracking…"}</p>
+          <p>Ticket tracking: {trackingResolved ? requestHandoff ? <><strong>{requestHandoff.state}</strong> · correlation <code>{requestHandoff.correlation}</code> · attempts {requestHandoff.attempts_used}/{requestHandoff.attempt_limit}</> : "Confirmed absent — legacy request, not tracked by ticketing" : "Unknown — resolving ticket tracking…"}</p>
+          {!trackingResolved && selectedRequest.state === "pending" && <p className="notice">Ticket tracking is unknown for this request, so decisions are unavailable until tracking resolves to a handoff or a confirmed absence. No tracked-versus-legacy guess will be used. <button type="button" className="secondary" disabled={locked} onClick={() => setRevision(value => value + 1)}>Retry ticket tracking lookup</button></p>}
           {trackedRequest && <p className="quiet">Tracked requests use the separate simulated ticket handoff. The local decision never simulates delivery or provisioning; provisioning is not requested and unsupported.</p>}
-          {(selectedRequest.state === "pending" || attempt?.action === "allocation.decision") && <>
+          {((selectedRequest.state === "pending" && trackingResolved) || attempt?.action === "allocation.decision") && <>
             {!mayDecide && attempt?.action !== "allocation.decision" && <p>A different actor with approval permission must decide this request.</p>}
             <label>Decision reason<input value={decisionReason} maxLength={500} disabled={locked} onChange={event => setDecisionReason(event.target.value)} /></label>
-            {!trackedRequest && <label><input type="checkbox" checked={simulateFailure} disabled={locked} onChange={event => setSimulateFailure(event.target.checked)} /> Simulate downstream provisioning failure after a local approval (legacy requests only)</label>}
+            {trackingResolved && !trackedRequest && <label><input type="checkbox" checked={simulateFailure} disabled={locked} onChange={event => setSimulateFailure(event.target.checked)} /> Simulate downstream provisioning failure after a local approval (legacy requests only; stored as a historical legacy status)</label>}
             {attempt?.action === "allocation.decision" ? <><p>Decision response is uncertain. Retry preserves the exact decision; it cannot allocate twice.</p><button disabled={busy} onClick={() => void submit(attempt)}>Retry exact decision</button></> :
               <div className="pagination"><button disabled={locked || !mayDecide || !decisionReason.trim()} onClick={() => void decide("approve")}>Approve exact candidate</button>
                 <button className="secondary" disabled={locked || !mayDecide || !decisionReason.trim()} onClick={() => void decide("reject")}>Reject request</button></div>}
@@ -965,7 +1020,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           {handoffs.items.map(item => <tr key={item.id} data-selected={selectedHandoffId === item.id}><td><code>{item.correlation}</code><div className="quiet">{item.source_request_state}</div></td>
             <td>{item.state}{item.readback_required ? " · readback required" : ""}</td>
             <td>{item.attempts_used}/{item.attempt_limit} manual</td><td>{item.route.team ?? "routing blocked"}</td>
-            <td><button className="secondary" disabled={locked} onClick={() => { setSelectedHandoffId(item.id); setAttemptScenario("success"); setReassignReason(""); setLastTicketOp(""); }}>Open handoff</button></td></tr>)}
+            <td><button className="secondary" disabled={locked} onClick={() => { setSelectedHandoffId(item.id); setAttemptScenario("success"); setReassignReason(""); setLastTicketOp(""); setTicketOriginal(null); }}>Open handoff</button></td></tr>)}
         </tbody></table></div>{!handoffs.total && <p>No ticket handoffs are tracked in this view. A legacy request without a handoff is not a failed delivery.</p>}<PageButtons page={handoffs} change={setHandoffOffset} /></>}
         {handoffDetail && <div className="notice"><h3>Handoff {handoffDetail.state} · {handoffDetail.attempts_used}/{handoffDetail.attempt_limit} manual attempts</h3>
           <p><code>{handoffDetail.id}</code> · version {handoffDetail.version}</p>
@@ -976,6 +1031,20 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <dt>Provisioning</dt><dd>not requested · unsupported in Tier A</dd>
             <dt>Recipient acknowledgement</dt><dd>{handoffDetail.recipient_acknowledged ? "Simulated acknowledgement recorded" : "No simulated acknowledgement"}</dd></dl>
           {lastTicketOp && <p role="status">{lastTicketOp} Current state above may differ from that original operation.</p>}
+          {ticketOriginal && <details><summary>Original ticket operation ({ticketOriginal.phase}) — historical, separate from current state</summary>
+            {ticketOriginal.phase === "reserve" && ticketOriginal.attempt && <dl className="facts"><dt>Reserved ordinal</dt><dd>{ticketOriginal.attempt.ordinal}</dd>
+              <dt>Scenario</dt><dd>{ticketOriginal.attempt.synthetic_scenario}</dd>
+              <dt>Route assignment version</dt><dd>{ticketOriginal.attempt.route_assignment_version}</dd>
+              <dt>Reserved at</dt><dd>{ticketOriginal.attempt.started_at}</dd></dl>}
+            {ticketOriginal.phase === "reassign" && ticketOriginal.assignment && <dl className="facts"><dt>Assigned team</dt><dd>{ticketOriginal.assignment.team ?? "unassigned"}</dd>
+              <dt>Assignment version</dt><dd>{ticketOriginal.assignment.assignment_version}</dd>
+              <dt>Route revision</dt><dd>{ticketOriginal.assignment.route_revision} · config {ticketOriginal.assignment.configuration_revision}</dd>
+              <dt>Assigned</dt><dd>{ticketOriginal.assignment.assigned_at}{ticketOriginal.assignment.reason ? ` · ${ticketOriginal.assignment.reason}` : ""}</dd></dl>}
+            {(ticketOriginal.phase === "readback" || ticketOriginal.phase === "acknowledge") && ticketOriginal.event && <dl className="facts"><dt>Event</dt><dd>{ticketOriginal.event.event_type} · {ticketOriginal.event.outcome}</dd>
+              {ticketOriginal.event.resolution && <><dt>Resolution</dt><dd>{ticketOriginal.event.resolution}</dd></>}
+              {ticketOriginal.event.returned_ticket_id && <><dt>Ticket</dt><dd>{ticketOriginal.event.returned_ticket_id}</dd></>}
+              <dt>Recorded</dt><dd>{ticketOriginal.event.occurred_at}</dd></dl>}
+          </details>}
           {handoffDetail.attempt_allowed === false && handoffDetail.attempt_block_reason && <p>New attempts blocked: {handoffDetail.attempt_block_reason}. Authorized readback and history remain available.</p>}
           {handoffDetail.readback_required && <p>A manual readback with the current version, correlation and digest is required.</p>}
           {handoffDetail.attempts.length > 0 && <details><summary>Manual attempts ({handoffDetail.attempts.length})</summary>

@@ -36,7 +36,7 @@ export interface CreateAllocation {
 
 export interface AllocationRequest {
   id: string;
-  actor_id: string;
+  actor_id: string | null;
   idempotency_key: string;
   scope_id: string;
   pool_id: string;
@@ -386,7 +386,7 @@ export function loadWorkflow(signal: AbortSignal) {
 function confirmedAllocation(value: AllocationRequest): AllocationRequest {
   if (!value || typeof value.id !== "string" || !value.id || !["pending", "approved", "rejected"].includes(value.state)
     || !value.payload || !["allocated", "unchanged"].includes(value.local_outcome)
-    || typeof value.actor_id !== "string") {
+    || (value.actor_id !== null && typeof value.actor_id !== "string")) {
     throw new ApiError("The allocation response did not confirm a saved request. Retry the same operation.", "INVALID_RESPONSE");
   }
   return value;
