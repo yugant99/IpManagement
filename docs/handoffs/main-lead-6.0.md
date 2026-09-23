@@ -2,9 +2,7 @@
 
 The user requested a new lead and handover prompt, with a revised worker pool.
 Outgoing lead: Astra / Main Lead 5.0, task `01a0ccc7-6219-73c1-bd3b-1521bb71a837`.
-**Incoming actual task ID: not registered yet.** The receiving task must register
-its own actual ID in the lead/oversight/status records; do not copy the outgoing ID
-or invent a receiver. Astra remains lead; the pool below is for delegated work.
+**Incoming actual task ID: `01a0cf70-c4e0-7ed2-b50b-834609e6d909`**, registered on 2026-09-23 from the active environment and app registry. The user authorized takeover and resumption of T024. Earlier outgoing publication holds below are historical; the nine-path lease and gates remain controlling. Astra remains lead; the pool below is for delegated work.
 No new task or worker was created by this handoff publication.
 
 ## Next mergeable point
@@ -135,3 +133,13 @@ Keep his old prepared worktree untouched. Retained Luna T014/T016 authors own th
 fixes; preserve independent user tasks, including “Fix 3D agent UI with DeepSeek”.
 No deployment, customer access, new infrastructure, questionnaire-row promotion or
 Tier B release is implied. **Tier B remains locked.**
+
+## Registered takeover and live preflight — 2026-09-23
+
+Lead branch `codex/main-lead-6-bridge` starts at exact PR97 amendment `ddc644aabeda40e85d416b6a27b4652f2a7d543e`, containing reviewed assembly `e6b76edaa9ae5b82a0c409fec151bf52168036bc`. Fresh Git/PR state matches the outgoing checkpoint; main remains `04eba98cb8673406d1e5d38c5318fb963cc77ff7`. The retained OpenCode T012/T015/T016A/T018/T020/T022/T023 sessions report succeeded/idle. Independent user tasks and original worktrees are untouched.
+
+Spark Free exact route/high variant is catalogued active/enabled, but two minimal synthetic probes (ordinary and standalone OpenCode CLI) returned `provider.auth` HTTP403, “OpenCode's free tier can only be used from within OpenCode”. No attempted bypass, route substitution or account change. **Recorded fallback: DeepSeek V4.1 Flash high owns complete T024**, in a new isolated worktree from the registered publication base. This follows the user's explicit fallback authority, preserves the nine-path lease and does not split the feature. Spark has no dispatched T024 author.
+
+DeepSeek exact `opencode-go/deepseek-v4.1-flash#high` returned `PREFLIGHT_OK`; native `gpt-6-sol` high and `gpt-6-luna` high returned their synthetic probe replies. Go console: rolling 0%, weekly42%, monthly21% used; credits disabled, balance0. Codex weekly49% used. The20% reserve survives. Current free/paid training controls are enabled and unchanged; only tracked public synthetic source may reach OpenCode. Raw provider evidence is local under `/tmp/ipam-lead6`.
+
+Sol worker `/root/sol_t024_review` remains independent for full source/shared-invariant review and final T027. Separate Luna `/root/luna_t025_verifier` remains gated until prerequisite-complete T025. T025 is unrun. No application checks, deployment, customer access, human acknowledgement or Tier B release is claimed.
