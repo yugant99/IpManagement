@@ -42,9 +42,14 @@ with a clear message otherwise; the container's exclusive
 
 The coordinator sends no `X-IPAM-Domain` header and no `actor_id` (the
 server derives the actor from the trusted bearer). Coordinator and
-domain-Operator credentials are separately provisioned files; neither
-token ever appears in argv, URLs, logs, Compose environment, images,
-snapshots or browser storage.
+domain-Operator credentials are separately provisioned files with
+enforced owner-only mode and exact 64-hex representation (at most one
+trailing newline; internal whitespace refused); neither token ever
+appears in shell variables, argv, URLs, logs, Compose environment,
+images, snapshots or browser storage, and both wrappers disable
+inherited shell tracing on entry. Success needs the exact
+status/header/body evidence triple (201/false/false or 200/true/true);
+anything inconsistent exits unknown without claiming a cycle.
 
 ## Snapshot storage (paired SQLite + sidecar)
 
@@ -55,10 +60,13 @@ which binds the closed snapshot bytes (SHA-256, size, schema) to the
 observed configuration identity — never the configuration itself or any
 credential. Transfer and keep the PAIR together (one
 `snapshots.sh export`/`import` run per file, matching names, checksums
-checked on both); a restore without its sidecar is classified
-`unverified` legacy/data-rescue, while a present sidecar classifies as
-`like_for_like` or `changed_configuration`. Neither classification is
-readiness: run `health.sh --readiness` separately. Full handoff:
+checked on both). Restore treats the sidecar exactly per the frozen
+wire: absent sidecar permits only explicit legacy/data-rescue
+(`unverified`); a present malformed, unsafe or hash/size/schema-mismatched
+manifest REFUSES before replacement; a present valid sidecar classifies
+`like_for_like`, `changed_configuration` or `unverified` (either config
+identity unknown). Neither classification is readiness: run
+`health.sh --readiness` separately. Full handoff:
 [`operator-handoff.md`](../../specs/001-postmeeting-bridge/delivery/operator-handoff.md).
 To retrieve snapshots outside the volume, use `scripts/ops/snapshots.sh export <name>
 <host-path>`; the reverse is `... import <host-path> [<name>]`. These

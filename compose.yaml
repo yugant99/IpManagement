@@ -5,8 +5,10 @@
 #   - Persistent SQLite lives under IPAM_DATA_DIR (mounted at /data).
 #   - Published port binds to loopback only; no public exposure.
 #   - Explicit seed. The service never seeds/resets on its own.
-#   - Restart policy fires only on actual process exit, never on the
-#     503 not-ready reply Docker reports as "unhealthy".
+#   - Restart policy fires only on actual process exit. Docker health
+#     observes anonymous /healthz liveness only, so a protected-readiness
+#     503 on /api/readiness never marks the container unhealthy and never
+#     drives a restart.
 #   - No token ever appears in Compose environment, images or logs. The
 #     reviewed access configuration is mounted read-only from a separately
 #     provisioned host file; the data volume name is explicit per candidate.

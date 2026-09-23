@@ -84,11 +84,14 @@ client keeps its token in memory only.
 
 Each file holds exactly 64 lowercase hexadecimal characters
 (`secrets.token_hex(32)`, 256-bit, stored server-side as SHA-256 with
-`token_bits: 256`). Both wrappers require a regular file (symlinks
-refused), validate the exact shape before any network use, restrict
-delivery to a 0600 curl config file, contact loopback only with proxies
-off and redirects never followed, and never echo credential material.
-Group/world-readable files draw a warning; restrict them (`chmod 600`).
+`token_bits: 256`), with at most one terminal newline. Both wrappers
+enforce a regular non-symlink file, bounded size and owner-only mode
+(any group/other permission bit refuses — no warning-only path), reject
+internal whitespace instead of stripping it, and deliver the bearer
+through a 0600 curl config file written directly by the validating
+reader — the token never enters a shell variable, and inherited
+`bash -x/-v` tracing is disabled on entry (caller debugging of the
+wrappers is unsupported).
 A `401` means the token is unknown, disabled, expired or revoked: clear
 the session and all protected views, abort in-flight requests, and never
 retry with the old token. A `409 ACCESS_CONTEXT_STALE`, or pins that no
@@ -112,9 +115,14 @@ scripts/ops/acquire.sh --token-file <coordinator-token-file> \
    explicit pins, and NO `X-IPAM-Domain` header and NO `actor_id` (the
    server derives the actor from the trusted bearer, so no mismatch is
    possible).
-3. `201` with `X-Acquisition-Replay: false` is a fresh acquisition;
-   `200` with `X-Acquisition-Replay: true` is the original replay — no
-   new cycle advanced. Record run/cycle/operation IDs from the body.
+3. `201` with `X-Acquisition-Replay: false` AND body `replay: false`
+   is a fresh acquisition; `200` with `X-Acquisition-Replay: true` AND
+   body `replay: true` is the original replay — no new cycle advanced.
+   The script validates the exact status/header/body triple and exits 0
+   only on full agreement. A missing, malformed or contradictory triple
+   exits 6 as UNKNOWN/inconsistent: the original key and reason are
+   preserved, no new cycle is claimed, and nothing is retried
+   automatically. Record run/cycle/operation IDs from the body.
 
 No automatic write retry and no replacement key. A transport failure
 leaves the outcome UNKNOWN: keep the SAME key and reason, and only after
@@ -172,14 +180,16 @@ configuration files or secrets.
 operator transfers the pair manually: export `<name>.sqlite3` and
 `<name>.sqlite3.recovery.json` under matching names, verify both
 checksums, and import both before `restore.sh <name>.sqlite3 --confirm`.
-A restore with a present, valid sidecar classifies
-`like_for_like` (saved revision+digest equal current) or
-`changed_configuration` (both known, unequal — record the difference,
-apply normal staleness and reauthorization). A restore without a usable
-sidecar is `unverified` legacy/data-rescue: recognized data can still be
-rescued, with separate readiness required. No classification is
-readiness and none is business acceptance; a backup success alone
-establishes neither.
+Restore then treats the sidecar exactly per the frozen wire:
+absent sidecar permits only explicit legacy/data-rescue with
+`configuration_recovery=unverified`; a present malformed, unsafe or
+hash/size/schema-mismatched manifest REFUSES before active replacement;
+a present valid sidecar classifies `like_for_like` (saved
+revision+digest equal current), `changed_configuration` (both known,
+unequal — record the difference, apply normal staleness and
+reauthorization) or `unverified` (saved or current identity unknown).
+No classification is readiness and none is business acceptance; a backup
+success alone establishes neither.
 
 ## 7. Separate gates after restore
 
@@ -237,7 +247,9 @@ acknowledgement.
 |---|---|
 | `IPAM_DATA_VOLUME` / `IPAM_ACCESS_CONFIG` unset | Compose refuses to start (fail closed) |
 | Six readiness booleans not all true | Blocks operation claims; reasons stay allowlisted |
-| Snapshot sidecar absent/mismatched | Legacy/data-rescue path only (`unverified`), or refusal before replacement |
+| Snapshot sidecar absent | Legacy/data-rescue path only (`unverified`), or refusal before replacement |
+| Snapshot sidecar present but malformed/unsafe/mismatched | Restore REFUSES before active replacement; never `unverified` |
+| Snapshot sidecar present and valid, saved or current config unknown | `unverified`; separate readiness required |
 | Business-state comparison absent | Blocks T025 PASSING and technical acceptance |
 | Actual human acknowledgement pending | Limits the human-handoff claim to the technical package only |
 | Image digest / host versions / enabled-config identity PENDING | Blocks exact-candidate claims; source pins are not observations |

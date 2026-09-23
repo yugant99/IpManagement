@@ -96,9 +96,11 @@ scripts/ops/acquire.sh --token-file <coordinator-token-file> \
 ```
 
 On a fresh store this acquires cycle 1, imports the nine source
-envelopes and saves the reconciliation run. A `201` (fresh) or `200`
-(replay of the original operation) is success; a transport failure
-leaves the outcome unknown and keeps the same key. Do not enable the
+envelopes and saves the reconciliation run. Success needs the exact
+evidence triple (`201` + replay header false + body false for fresh,
+`200` + true + true for the original replay); a transport failure — or
+a missing/malformed/contradictory triple — leaves the outcome unknown
+and keeps the same key. Do not enable the
 timer. Do not pass a coordinator token on the command line or in the
 environment of unrelated commands; the script reads it from the
 protected file only.
@@ -144,8 +146,10 @@ closed key set and provisioning procedure are in the T022 recipient
 pack; the shape-only disabled example must never be enabled as shipped.
 
 Two credentials are provisioned as separate protected files (exactly 64
-lowercase hex characters each; `chmod 600`; never in argv, URLs, logs,
-Compose environment, images, snapshots or browser storage):
+lowercase hex characters each with at most one trailing newline;
+owner-only mode enforced by the wrappers, internal whitespace refused;
+never in shell variables, argv, URLs, logs, Compose environment, images,
+snapshots or browser storage; wrapper shell tracing disabled on entry):
 
 - Coordinator token file — evidence coordinator principal, no domain.
   Used only by `scripts/ops/acquire.sh` (bootstrap without domain, then
