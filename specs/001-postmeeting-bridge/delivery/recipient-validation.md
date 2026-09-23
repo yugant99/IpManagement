@@ -54,9 +54,10 @@ nothing below invents them:
 | Schema version at observation | PENDING (expect 7; 8+ reserved for Tier B) |
 | Evidence bundle hash | PENDING |
 
-Actual executable readiness, target observations and the real Compose plugin
-version are pending T025. T024 records the Compose version from its actual
-packaging run; this template records no version.
+Actual executable readiness and target observations are pending T025. T024 is
+source/package preparation only — no execution is authorized before T025 — so
+observed versions (including any Compose plugin version) belong to that later
+authorized gate, not to T024; this template records no version.
 
 ## 2. Target declaration — one Linux amd64 target, presently UNAVAILABLE
 
@@ -70,7 +71,11 @@ packaging run; this template records no version.
 
 Do not invent a host, recipient or acknowledgement to fill this table. Until an
 actual tracked `current-target-evidence` record exists, the target is
-UNAVAILABLE and every downstream gate in §9 blocks visibly.
+UNAVAILABLE: that blocks target-specific observed runtime, portable and human
+claims (§9), but it does not block later authorized T024 source/docs
+implementation, which needs no host selection merely to write source. Per the
+user's explicit instruction, work STOPS before T024 and resumes tomorrow; no
+target is selected and no actual observation exists.
 
 ## 3. Recipient prerequisites (all must hold before any observation)
 
@@ -252,9 +257,11 @@ Conventions: `_______` = fill at observation time on the pinned candidate.
 
 ### 6.2 Immutable assessment comparison, conflict and active-only accounting
 
-4. Create the assessment (`POST /api/migration-assessments`, exact five-field
-   body); record assessment ID _______ and immutable digest
-   (`ipam.assessment_digest.v1`, `sha256:` + hex) _______.
+4. Create the assessment (`POST /api/migration-assessments`) with the four
+   required fields `source_batch_id`, `expected_baseline_version`,
+   `idempotency_key`, `reason`; `supersedes_id` and `supersedes_reason` are
+   optional and only together. Record assessment ID _______ and immutable
+   digest (`ipam.assessment_digest.v1`, `sha256:` + hex) _______.
 5. Verify accepted-class accounting (T025: _______):
    `accepted = added + changed + unchanged + conflicting`, with conflicts taking
    precedence (a changed owner conflicting with a current approved assignment is
@@ -320,11 +327,33 @@ team only). Attempt/readback/ack/reassign observations (T025: _______).
   recipient/eligibility, or legacy renewal — one version bump per evaluate;
   GET never reroutes; unrelated config changes with the same eligible
   principal do not renew.
-- Ack: current mapped principal must equal the bound recipient, currently
-  enabled, unexpired, selected-domain Operator, exact notice/version, eligible
-  state — else 409 until explicit evaluate renews. Same version/actor/reason
-  replay returns the original receipt without a new write. Resolution never
-  means delivery or acknowledgement; receipt history is immutable.
+- Ack (`POST /api/reservations/{reservation_id}/notice`; body requires
+  `notice_id`, `expected_notification_version` and `reason`, with optional
+  `actor_id` matching the authenticated principal) distinguishes response
+  classes per `app.py:1175-1199` and
+  `lifecycle.acknowledge_reservation_notice`: missing or invalid credential
+  fails at authentication (401) before the leaf; a foreign or unclassifiable
+  target is a non-disclosing 404 (including a malformed `notice_id` or one
+  bound to another reservation); an authenticated principal that is neither
+  the bound nor the current recipient is refused 403 (`FORBIDDEN — only the
+  bound notice recipient may acknowledge this version`); a missing child
+  binding returns 409 `NOTICE_BINDING_MISSING`; a changed route where the
+  caller is bound-but-no-longer-current or current-but-not-yet-bound returns
+  409 `NOTICE_ROUTE_CHANGED`; a resolved notice returns 409 `NOTICE_RESOLVED`;
+  a superseded version returns 409 `STALE_NOTICE`; any other ineligible state
+  returns 409 `NOTICE_INELIGIBLE`; a version already carrying a different
+  receipt returns 409 `NOTICE_ALREADY_ACKNOWLEDGED`. Same version/actor/reason
+  replay returns the original receipt without a new write. Manual-evaluation
+  renewal advice applies only to the specifically recoverable evaluation
+  cases — `NOTICE_BINDING_MISSING` (evaluate first to create the child
+  binding) and `NOTICE_ROUTE_CHANGED` (evaluate to bind the current eligible
+  recipient) — never to 401/403/404, resolved, already-acknowledged or stale
+  outcomes, which each keep their own disposition. After renewal, authorized
+  exact-version `GET …/notifications/{version}` receipt readback proves the
+  original own receipt only if that exact original immutable receipt is
+  present; a missing record proves no absence of an in-flight write.
+  Resolution never means delivery or acknowledgement; receipt history is
+  immutable.
 - **Configured per-version in-app receipt (`acknowledgement_kind =
   recipient_in_app`, `owner_signoff = false`) is not an actual human handoff.**
   The business owner is never inferred from `owner_reference`; the actual
@@ -351,10 +380,14 @@ team only). Attempt/readback/ack/reassign observations (T025: _______).
   business acceptance. A restore under a different governing configuration is
   changed-configuration recovery: record the difference, apply normal staleness
   and reauthorization.
-- **A snapshot is the SQLite database only.** Never assume it contains code,
-  UI, feed assets, configuration, principals, token digests or other secrets.
-  The manifest serializes observed config identity (revision/digest/policy) —
-  never the configuration itself, recipient identities or credentials.
+- **A snapshot is the SQLite database only.** Snapshots preserve historical
+  actor and recipient principal IDs, receipts and audits as stored rows.
+  Excluded is the separately provisioned current access-configuration
+  principal directory and all token-digest/token material — plus code, UI,
+  feed assets, configuration files and other secrets, which are never assumed
+  to be snapshot contents. The manifest serializes observed config identity
+  (revision/digest/policy) — never the configuration itself, recipient
+  identities or credentials.
 - Missing assets, invalid schema or failed readiness remain **blocking** and
   are never quietly re-seeded. Missing/invalid current configuration does not
   prevent rescuing recognized data (marked `unverified`, separate readiness
@@ -382,10 +415,11 @@ Agent reproduction of the steps is preparation, not receipt.
 
 | Missing state | Disposition |
 |---|---|
-| Target (§2) UNAVAILABLE/UNSELECTED | Blocks all observation claims; T024/T025 cannot be tied to a host |
+| Target (§2) UNAVAILABLE/UNSELECTED | Blocks target-specific observed runtime, portable and human claims; does not block later authorized T024 source/docs preparation (currently STOPPED per user instruction until tomorrow); T025 observations additionally need a selected target |
 | Image/UI/feed/config/schema/evidence hashes (§1) PENDING | Blocks exact-candidate claims; source pins are not observations |
 | Six readiness booleans not all true (§4) | Blocks operation claims; failure reasons stay allowlisted |
-| Business comparison or human ack absent (§4/§8) | Blocks portable/human acceptance; limits the claim to the technical package |
+| Required technical restore / business-state comparison (§4/§7) absent | Blocks T025 and technical acceptance: the selected-domain comparison of retained candidate/configuration against business-state evidence is a required gate alongside the six booleans |
+| Actual human rehearsal / acknowledgement (§8) pending | Limits the human-handoff claim to the technical package only; alone it does not block a technically validated merge (MAIN_MERGE_POLICY.md) |
 | Snapshot sidecar absent/mismatched (§7) | Legacy/data-rescue path only (`unverified`), or refusal before replacement |
 
 There is **no reseed fallback**: a missing asset, invalid schema or failed
@@ -394,10 +428,20 @@ and re-attempted only through their supported, authorized path.
 
 ## 10. Later tasks and non-claims
 
-- **T024** (Muse, after reviewed T021/T022/T023): operator/package
-  implementation on the existing six task-graph paths — wrappers, handoff doc,
-  Dockerfile/Compose liveness and config wiring, pinned assets, stopped
-  recovery, dependencies/licenses, actual Compose plugin version.
+- **T024** (Muse, after reviewed T021/T022/T023 — user-directed STOP before
+  start, resume tomorrow; a hold, not a permanent prohibition): operator/
+  package source preparation on the task-graph package/ops paths plus the
+  narrow lead-settled lease expansion for stale docs/logs —
+  `docs/RUNNING.md` for bridge auth/readiness/config text and
+  `scripts/ops/start.sh` / `scripts/ops/backup.sh` for readiness/actual-volume
+  comments and messages only. The exact leased file list lives in the latest
+  lead-owned `delivery/operator-preparation-ownership.md` and the T024 pickup,
+  which control over any file count stated here; those lead docs and all T024
+  files are outside this task's lease. Future Compose requires an explicit
+  `IPAM_DATA_VOLUME` (new disposable recorded candidate volume; deliberate
+  reuse only as recorded). No execution runs under T024, so T024 records
+  declared/packaged references only; observed versions belong to the later
+  authorized T025 gate. Do not start T024 in this task.
 - **T025** (Luna, independent): exact-candidate observations filling every
   `_______`/PENDING field above — success/denial/stale/replay/concurrency/
   unknown/aging plus stopped recovery — only after explicit validation
@@ -422,8 +466,9 @@ T010/T015/T017A source prerequisites accepted as stated. Runtime behavior of
 every cited path is unverified.
 
 **Remaining gates:** Sol independent source review of this pack → Lead
-acceptance → T024 packaging → T025 observations → T026 actual human evidence or
-pending disposition → T027 review → T028 merge decision. Tier B stays locked.
+acceptance → (user-directed STOP; T024 packaging resumes tomorrow) → T025
+observations → T026 actual human evidence or pending disposition → T027
+review → T028 merge decision. Tier B stays locked.
 
 ---
 
