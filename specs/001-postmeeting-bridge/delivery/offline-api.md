@@ -1189,4 +1189,4 @@ READY FOR PROJECT-LEAD REVIEW — Stage T021: complete source-only offline API r
 review `delivery/offline-api.md` at the T021 commit against the pinned `app.py`, `models.py`, `access.py`,
 `lifecycle.py`, `workflow.py`, `ticket_handoff.py`, `migration_compare.py` and `scheduler.py` for route, field, status,
 role and replay accuracy. Check that no example claims to be observed, that no secrets or digests are invented, that no alias or vendor endpoint appears, that
-`downstream_status` and `provisioning_status` are separate, and that notices and exceptions are separate. Then release T024 once T022 is also reviewed."
+`downstream_status` and `provisioning_status` are separate, and that notices and exceptions are separate. Once T022 is also reviewed, record T024-ready and STOP before implementation; release T024 only when the user resumes tomorrow."
