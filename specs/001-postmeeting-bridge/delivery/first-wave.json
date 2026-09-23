@@ -531,7 +531,49 @@
       "prohibited": "No tests/builds/import/typecheck/lint/DB/SQL/runtime/shell/Git/network/private/untracked documents/extra agents/models/spend or unleased edits. Source tools only; lead publishes.",
       "result_sha": "cae954c67b72ec7456244c7cb68a2db2ccd6a224",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/91",
-      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md"
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md",
+      "integration_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33"
+    },
+    {
+      "task": "T018",
+      "status": "implementation_dispatched",
+      "base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
+      "branch": "codex/bridge-t018-notice-ui",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t018-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32c9e849ffe2Nu5nShr2wEUgI",
+      "owned_paths": [
+        "frontend/src/Workflow.tsx",
+        "frontend/src/workflowApi.ts",
+        "frontend/src/CapacityReports.tsx"
+      ],
+      "prerequisites": [
+        "T015",
+        "T017A"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-ui-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes."
+    },
+    {
+      "task": "T023",
+      "status": "implementation_dispatched",
+      "base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
+      "branch": "codex/bridge-t023-state-recovery",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t023-muse/Ip_inventory",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "provider_session_id": "ses_f32c9e72dffeg9BzrsFy7Djgbm",
+      "owned_paths": [
+        "backend/ipam_demo/state_ops.py",
+        "backend/ipam_demo/__main__.py"
+      ],
+      "prerequisites": [
+        "T003",
+        "T017A"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/state-recovery-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/build/import/typecheck/lint/SQL/DB/application/browserruntime/shell/Git/network/private/untrackedcontent/additionalmodels/agents/spend/TierB/unleasededits. Lead publishes."
     }
   ],
   "muse_route": {
@@ -557,15 +599,15 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T017A_recipient_API_implementation",
+    "status": "T018_and_T023_full_features_dispatched",
     "action": "Main Lead5 continues critical path with full Muse T015 and Opus T017 after exact common base pin",
-    "hold": "T017A API wiring pending for reviewed recipient leaf; T025 prerequisites and Spencer work remain outstanding",
+    "hold": "T025 awaits T018/T021/T022/T023/T024 and dependencies; Spencer T020 matrix remains outstanding",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "efb85125d02f713af8d7cebaa10e16a8b1a671ee",
+    "application_source_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
-    "next_shared_base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865"
+    "next_shared_base_sha": "5c2181c33ad8c841cc0cd0fb5a09b1cf495cbe33"
   },
   "lead_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
   "latest_provider_preflight": {
