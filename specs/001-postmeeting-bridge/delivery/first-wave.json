@@ -737,7 +737,7 @@
     },
     {
       "task": "T025",
-      "status": "in_progress_candidate4_released",
+      "status": "in_progress_candidate4_evidence_checkpoint",
       "route": "Codex gpt-6-luna high",
       "worker": "Visible Codex task01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f",
       "base_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
@@ -750,11 +750,13 @@
       "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
       "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
       "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker",
-      "current_blocker": "No newly reported unresolved code correction at this checkpoint. Full required criterion matrix, populated recovery/business comparison and final review remain unfinished; partial runtime successes are not T025 PASS.",
+      "current_blocker": "No newly reported unresolved code correction. Remaining required technical observations and complete criterion/artifact mapping are open; T025 and final review are not complete.",
       "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
       "current_candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
       "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory",
-      "observed_progress": "Verifier reports successful candidate4 acquisition/replay/reason conflict/global-run/domain denial/stale pins and controlled response-loss recovery; migration/reservation/notice cases progressing. Preliminary storage restore was explicitly not the final populated business recovery proof."
+      "observed_progress": "Candidate4 acquisition/replay/response-loss, scoped workflow and notices, true overlapping reservation requests, authenticated browser memory/reload/revocation, and populated stopped restore with all 32 table hashes equal plus separate readiness/business reads are retained. Initial preliminary recovery proof remains distinguished from final populated comparison.",
+      "evidence_pr": "https://github.com/yugant99/IpManagement/pull/104",
+      "evidence_checkpoint_sha": "2e204379691cba1b59686ba9d2bbbeb57bacebcd"
     }
   ],
   "muse_route": {
