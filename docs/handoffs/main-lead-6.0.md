@@ -1,5 +1,9 @@
 # Main Lead 6.0 — transfer from the T024-ready source checkpoint
 
+**Visible Codex workers:** Per the user, all Sol/Luna work must appear in the sidebar. Pinned Sol review/T027 task: `01a0cf9a-ce88-7f90-8556-1fa4b131bf26`; pinned separate Luna verifier: `01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f`. Earlier hidden workers completed safe handoffs and do not continue in parallel. Retained T010 original-author task remains `01a0cb5f-6dcf-7080-90ea-fffcc1743645`.
+
+**T025 progress:** Candidate68 full UI build failed; retained T010 author corrected the missing Page type import at220c4a2, independently source-closed and integratedPR101 at996d0a8. Candidate2 full locked UI build passed. Protected wrapper bootstrap then exposed invalid curl-config flags; Spark correctionf8d381a (PR102) awaits independent review/assembly/affected rerun. Complete T025 remains unpassed; main is unchanged. Verifier evidence and safe process/artifact handoff remain in the recorded local T025 artifact directory.
+
 **Current checkpoint:** T024 full source independently closed at Spark `7e50122ac6c7bc837bd89db6b9029035065b1b57`, source-integrated via PR99/100 at `68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8`. [Review and correction record](../../specs/001-postmeeting-bridge/delivery/operator-package-source-review.md). Separate Luna T025 is released on that exact assembly in `codex/bridge-t025-luna`, disposable native local synthetic target only. Release is not runtime acceptance. Main is unchanged; T028 gates and all nonclaims below remain controlling. Earlier unstarted/dispatch/route snapshots below are historical.
 
 The user requested a new lead and handover prompt, with a revised worker pool.

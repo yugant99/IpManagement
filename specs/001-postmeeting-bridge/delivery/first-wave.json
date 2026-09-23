@@ -302,8 +302,12 @@
           "frontend/src/firstPathApi.ts",
           "frontend/src/MigrationCompare.tsx"
         ],
-        "status": "source_correction_dispatched_no_author_runtime",
-        "finding": "T025 compiled-UI TypeScript failure; minimal root-cause type-import correction only"
+        "status": "source_closed_integrated_affected_build_passed",
+        "finding": "T025 compiled-UI TypeScript failure; minimal root-cause type-import correction only",
+        "result_sha": "220c4a25469961542f640418a0e5503c3f9d48e4",
+        "pull_request": "https://github.com/yugant99/IpManagement/pull/101",
+        "source_integration_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
+        "evidence": "Candidate2 full locked npm build log retained by independent verifier; does not pass all T025."
       }
     },
     {
@@ -691,19 +695,30 @@
       "review_route": "Independent GPT-6 Sol high",
       "release_condition": "Dispatched after live Spark Contributor high preflight; independent Sol full review before source integration",
       "pickup": "docs/handoffs/main-lead-6.0.md",
-      "nonclaims": "Independent source closure only; T025 has not yet produced evidence; no main/portable/human acceptance",
+      "nonclaims": "Source accepted; T025 has partial and negative runtime observations, not a passing gate. No main/portable/human acceptance.",
       "preferred_route": "opencode-go/muse-spark-1.3-contributor#high",
       "fallback_reason": "Latest user explicitly corrected routing to Spark Contributor. Prior DeepSeek session interrupted before any edits; retained isolated worktree is clean. DeepSeek remains standby fallback only.",
       "result_sha": "7e50122ac6c7bc837bd89db6b9029035065b1b57",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/99",
       "source_integration_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
-      "review_record": "specs/001-postmeeting-bridge/delivery/operator-package-source-review.md"
+      "review_record": "specs/001-postmeeting-bridge/delivery/operator-package-source-review.md",
+      "t025_correction": {
+        "finding": "Malformed curl config boolean options put HTTP headers into JSON response body",
+        "author": "same Spark Contributor session and lease",
+        "result_sha": "f8d381adb3a604251b5486ecfa10148bb1491f81",
+        "pull_request": "https://github.com/yugant99/IpManagement/pull/102",
+        "status": "independent_source_review_pending",
+        "owned_paths": [
+          "scripts/ops/acquire.sh",
+          "scripts/ops/health.sh"
+        ]
+      }
     },
     {
       "task": "T025",
-      "status": "in_progress_UI_build_blocked",
+      "status": "in_progress_wrapper_runtime_blocked",
       "route": "Codex gpt-6-luna high",
-      "worker": "/root/luna_t025_verifier",
+      "worker": "Visible Codex task01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f",
       "base_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
       "branch": "codex/bridge-t025-luna",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-luna/Ip_inventory",
@@ -714,7 +729,8 @@
       "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
       "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
       "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker",
-      "current_blocker": "Independent committed-lock UI build failed: firstPathApi.ts missing Page type import cascades to MigrationAssessmentPage property/implicit-any errors; retained T010 author correcting source, no runtime acceptance."
+      "current_blocker": "Original UI build failed; retained T010 type fix was independently source-closed/integrated and candidate2 full locked build passed. Operator curl-config options still caused bootstrap JSON failure; Spark correction f8d381a pending source review/assembly/affected rerun.",
+      "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488"
     }
   ],
   "muse_route": {
@@ -740,8 +756,8 @@
   },
   "current_handover_gate": {
     "milestone": "T024 independently source-closed and integrated",
-    "status": "T025_in_progress_UI_build_blocked",
-    "action": "Retained T010 author corrects compile failure; independent Sol reviews; separate Luna continues authorized API/state evidence and later affected rerun",
+    "status": "T025_in_progress_wrapper_runtime_blocked",
+    "action": "Visible Sol source-reviews Spark wrapper correction; visible Luna continues complete required evidence on newly pinned candidate; T028 stays gated",
     "hold": "No main merge before T028; portable/human remain separate; Tier B locked",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
@@ -830,5 +846,17 @@
     "preflight_status": "User corrected preferred route to Spark Contributor; exact Go route/high probe passed. Free-route403 retained as historical only.",
     "opus_status": "user says unavailable next couple hours; no dispatch/resume/timed autoretry",
     "boundary": "T024 authorized; no application runtime before prerequisite-complete T025; T028 main gate unchanged"
+  },
+  "codex_worker_visibility": {
+    "instruction": "User requires all Sol/Luna Codex work in visible sidebar tasks; create or continue visible tasks, not hidden subagents. Current continuation tasks are pinned.",
+    "sol_reviewer_thread_id": "01a0cf9a-ce88-7f90-8556-1fa4b131bf26",
+    "luna_verifier_thread_id": "01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f",
+    "retained_t010_author_thread_id": "01a0cb5f-6dcf-7080-90ea-fffcc1743645",
+    "retired_hidden_workers": [
+      "/root/sol_t024_review",
+      "/root/luna_t025_verifier"
+    ],
+    "handoff": "/Users/yuganthareshsoni/Downloads/Ip_inventory-t025-artifacts/run-20260923-lead6/HANDOFF.md",
+    "ownership": "Visible Sol retains independent source/T027 review; visible Luna retains independent verifier evidence branch; no duplicate execution or implementation reassignment."
   }
 }

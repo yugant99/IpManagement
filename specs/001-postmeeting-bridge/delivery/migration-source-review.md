@@ -98,3 +98,9 @@ Main Lead accepts T010 source only. The resumed task is
 for assigned fixes. No build/typecheck/test/browser/runtime occurred. API/UI source
 compatibility does not establish observed integrated behavior. The final handover
 assembly must preserve both accepted heads; T025 remains the runtime gate.
+
+## T010 correction during independent T025
+
+The first committed-lock UI build of candidate `68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8` failed: `MigrationAssessmentPage` extended `Page` without importing it, cascading into missing pagination members and implicit-any callbacks. Retained original Luna author task `01a0cb5f-6dcf-7080-90ea-fffcc1743645` corrected only the type import in `firstPathApi.ts` at **`220c4a25469961542f640418a0e5503c3f9d48e4`**. Independent Sol confirmed the exported shared type and consumers, and closed the source delta without running checks. PR101 integrated at **`996d0a8cadeb1d399eb780862055ccdc19211488`**.
+
+Separate Luna verifier observed the full locked candidate2 `npm ci` and `npm run build` pass, with retained logs at the local T025 artifact root. The earlier failed build remains negative evidence; a separately emitted candidate1 Vite-only bundle was provisional and never establishes a passing full build. Complete business/UI/readiness/recovery T025 evidence is still pending. This correction and build result do not establish main, portable or human acceptance.
