@@ -1,5 +1,12 @@
 # Current project handoff
 
+**Explicit main merge gate —2026-09-22:** Follow [MAIN_MERGE_POLICY.md](MAIN_MERGE_POLICY.md).
+The lead merges at T028 after complete technical Tier A, exact-candidate T025 pass,
+closed blocking reviews and recorded gate dispositions. Pending human rehearsal
+limits human-handoff claims; it does not alone block a validated technical-package
+merge. Current PR79 remains draft because technical implementation/evidence is
+incomplete. No merge, application execution or new task dispatch in this update.
+
 **Latest bridge update —2026-09-22:** T009/T010/T011 are source accepted after
 independent Sol reviews and owner corrections. T011 final is
 `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; assembled application source is

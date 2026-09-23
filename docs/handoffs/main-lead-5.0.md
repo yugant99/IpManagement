@@ -13,6 +13,14 @@ are undispatched. This is the user-requested stopping point and completed handov
 
 ## Pickup and evidence boundary
 
+**Main merge trigger:** Follow [MAIN_MERGE_POLICY.md](../MAIN_MERGE_POLICY.md).
+Merge the complete technical Tier A candidate at T028 after T025 passes on that
+candidate, blocking independent reviews close, and T026/T027/business dispositions
+are recorded. A pending human rehearsal limits claims but does not alone block a
+validated technical-package merge. Perform the merge at that checkpoint; do not
+leave a qualifying PR in draft indefinitely. Current T011 source-only PR79 has
+not reached that gate.
+
 - Canonical repository: `/Users/yuganthareshsoni/Downloads/Ip_inventory`,
   `yugant99/IpManagement`. Preserve its untracked `audit/` and `outputs/`.
 - Main remains `04eba98cb8673406d1e5d38c5318fb963cc77ff7`. No bridge PR was merged to main.
@@ -121,7 +129,9 @@ or `codex/bridge-lifecycle-integration` (`3add18986096e8fd9bc6ac509db28fc08b6bf2
   independent. Unknown never means success; no ticket receipt grants network or
   provisioning authority. Preserve correlation/digest and three-attempt budget.
 - Source/schema work is not migration or backup/restore evidence. T023/T024 still
-  owe schema-6 state/config/package integration. No main merge of incomplete Tier A.
+  owe schema-6 state/config/package integration. No main merge of incomplete
+  technical Tier A; the exact gate is docs/MAIN_MERGE_POLICY.md, not completion of
+  human training.
 - Separate ledgers: workbook **36/21/8/46**; accepted repository **39/18/10/44**;
   meeting labels **92/0/12/7**, each denominator111. No row promotions in this phase.
   Historical native/Linux evidence retains its old exact candidate; the disposable
@@ -162,7 +172,12 @@ Do not substitute routes, buy capacity, repeat setup or call Claude.
 
 Keep this source-only until the already authorized bounded T025 disposable
 synthetic acceptance gate has its prerequisites. No routine tests/build/runtime,
-user-store mutation, main merge, deployment, customer access or new infrastructure.
+user-store mutation, deployment, customer access or new infrastructure.
+Follow docs/MAIN_MERGE_POLICY.md: complete technical Tier A, exact-candidate T025
+pass, closed blocking reviews and T028 lead adjudication of all gate dispositions.
+Then merge promptly through the PR. A truthfully pending human rehearsal limits
+human-handoff claims, not that technical merge. Use authorized GPT-6 Sol for T027
+final review; no Claude invocation. No main merge before these gates pass.
 Preserve the source/runtime/portable/human evidence distinctions and all three
 111-row ledgers. Keep Spencer's human gates honest and Tier B locked.
 

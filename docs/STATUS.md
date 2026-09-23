@@ -1,5 +1,12 @@
 # Current project status
 
+**Explicit main merge gate —2026-09-22:** [Main merge rule](MAIN_MERGE_POLICY.md).
+Current bridge remains unmerged until complete technical Tier A, independent
+exact-candidate T025 pass, closed blocking reviews and T028 acceptance with recorded
+T026/T027/business dispositions. Pending human rehearsal alone does not block a
+validated technical-package merge; it limits human-handoff claims. Lead merges at
+that checkpoint. This documentary clarification runs no checks or implementation.
+
 **Latest bridge update —2026-09-22:** T009/T010/T011 are source accepted after
 independent Sol reviews and owner corrections. T011 final is
 `3fcdb49d955c39cf08f0a0d6f9483384e43163b1`; assembled application source is
