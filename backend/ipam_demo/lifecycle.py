@@ -114,7 +114,10 @@ def evaluate_reservation_notices(connection):
     created = upgraded = 0
     for reservation in reservations:
         try:
-            expires = datetime.fromisoformat(reservation["expires_at"].replace("Z", "+00:00")).astimezone(timezone.utc)
+            expires = datetime.fromisoformat(reservation["expires_at"].replace("Z", "+00:00"))
+            if expires.tzinfo is None:
+                raise ValueError("expiry must include a UTC offset")
+            expires = expires.astimezone(timezone.utc)
         except (TypeError, ValueError, AttributeError) as exc:
             raise AppError("RESERVATION_NOTICE_DATA_INVALID", "A reservation expiry is invalid; evaluation stopped.", 500) from exc
         if instant < expires:
