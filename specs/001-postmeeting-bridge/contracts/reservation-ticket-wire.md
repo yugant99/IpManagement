@@ -157,7 +157,7 @@ human or production acceptance. Tier B remains locked.
 
 Sol's review of T012 `c5b59cb4a47e07a87b594f13bee0ca7316c0d965` found that
 list/detail alone cannot recover a lost create/proposal response after a reload
-clears the payload. Add GET `/api/reservation-operations/{idempotency_key}` with
+clears the payload. Add GET `/api/reservation-operations` with idempotency_key query parameter and
 action query enum reservation.create, reservation.extend,
 reservation.release.decision, reservation.release.propose. Proposal lookup also
 requires reservation_id. The first three use existing tier_a_operation_receipts;
@@ -215,3 +215,8 @@ T014 also scopes the saved target before mutation dispatch. Workflow presentatio
 says local approval affects only the local ledger, ticket delivery is separately
 simulated and provisioning is unsupported/not requested. Legacy stored statuses
 retain their historical meaning. Source base and file ownership remain unchanged.
+
+Exact-key transport clarification: recovery keys use query parameters, not a
+single URL path segment. Existing accepted keys may contain slashes or other
+reserved path characters; do not restrict or change historical mutation key hashes.
+Apply the existing key normalization and 200-character bound to recovery lookup.
