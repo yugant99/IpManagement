@@ -220,7 +220,10 @@ def workflow_status(connection):
             "demo_clock_at": meta["demo_clock_at"], "synthetic": True,
             "limitations": ["The local static ledger is authoritative only inside this demo.",
                             "Pending requests do not reserve addresses. Approval rechecks the exact candidate and versions.",
-                            "External provisioning is simulated."]}
+                            "Local approval changes only the local ledger.",
+                            "Ticket delivery is a separate simulated handoff.",
+                            "External provisioning is unsupported and not requested; stored legacy "
+                            "downstream status remains historical."]}
 
 
 def _request_payload(row):

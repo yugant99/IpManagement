@@ -50,6 +50,14 @@ _INTENT_SELECT = (
     "r.state AS reservation_state, s.domain AS scope_domain FROM ticket_intents ti "
     "JOIN allocation_requests ar ON ar.id=ti.source_request_id JOIN scopes s ON s.id=ar.scope_id "
     "LEFT JOIN reservations r ON r.id=ar.reservation_id ")
+# Each event's own operation receipt durably carries its sanitized resolution code.
+_EVENT_SELECT = (
+    "SELECT e.*, o.result_json AS receipt_result_json FROM ticket_handoff_events e "
+    "JOIN tier_a_operation_receipts o ON o.id=e.operation_receipt_id ")
+# Readback resolutions. Zero-attempt closure applies only to a terminal source; it
+# creates no attempt or ticket ID and neither frees a hold nor cancels a request.
+_RESOLUTIONS = frozenset({"uncertain_attempt_absent", "zero_attempt_source_rejected",
+                          "zero_attempt_reservation_released"})
 
 
 def _now():
@@ -175,7 +183,7 @@ def _replayed_intent(connection, receipt, context, digest):
 
 
 def _receipt_event(connection, receipt, intent_id):
-    row = connection.execute("SELECT * FROM ticket_handoff_events WHERE operation_receipt_id=? AND intent_id=?",
+    row = connection.execute(_EVENT_SELECT + "WHERE e.operation_receipt_id=? AND e.intent_id=?",
                              (receipt["id"], intent_id)).fetchone()
     if row is None:
         raise _integrity()
@@ -213,8 +221,7 @@ def _attempt_block(intent, configuration, attempts, effect, assignment):
         return "readback_required"
     if len(attempts) >= ATTEMPT_LIMIT:
         return "attempt_budget_exhausted"
-    if intent["state"] == "routing_blocked":
-        return "routing_blocked"
+    # A routing_blocked intent has no assigned team; _gate reports it after terminal-source reasons.
     return _gate(intent, configuration, assignment)
 
 
@@ -259,8 +266,18 @@ def _error_code(text):
     return value["code"] if isinstance(value, dict) and isinstance(value.get("code"), str) else "lookup_error"
 
 
+def _resolution(row):
+    try:
+        value = json.loads(row["receipt_result_json"])
+    except (TypeError, ValueError):
+        return None
+    resolution = value.get("resolution") if isinstance(value, dict) else None
+    return resolution if resolution in _RESOLUTIONS else None
+
+
 def _event_projection(row, principal_id):
     return {"id": row["id"], "event_type": row["event_type"], "outcome": row["outcome"],
+            "resolution": _resolution(row),
             "attempt_id": row["attempt_id"], "effect_id": row["effect_id"],
             "returned_ticket_id": row["returned_ticket_id"],
             "error_code": _error_code(row["sanitized_error_json"]) if row["outcome"] == "error" else None,
@@ -284,9 +301,10 @@ def _projection(connection, intent, context, configuration, *, detail):
         raise _integrity()
     attempts = _attempts(connection, intent["id"])
     effect = _effect(connection, intent["id"])
-    events = connection.execute("SELECT * FROM ticket_handoff_events WHERE intent_id=? ORDER BY occurred_at,id",
+    events = connection.execute(_EVENT_SELECT + "WHERE e.intent_id=? ORDER BY e.occurred_at,e.id",
                                 (intent["id"],)).fetchall()
     latest = attempts[-1] if attempts else None
+    resolution = next((code for code in map(_resolution, reversed(events)) if code is not None), None)
     item = {"id": intent["id"], "domain": intent["domain"], "source_request_id": intent["source_request_id"],
             "source_request_state": intent["request_state"], "action": intent["action"],
             "correlation": intent["correlation"], "business_payload_digest": intent["business_payload_digest"],
@@ -300,6 +318,7 @@ def _projection(connection, intent, context, configuration, *, detail):
             "observation_budget_seconds": int(OBSERVATION_BUDGET.total_seconds()),
             "latest_attempt": _attempt_projection(latest, effect) if latest is not None else None,
             "readback_required": latest is not None and latest["result"] in ("pending", "unknown"),
+            "resolution_reason": resolution,
             "recipient_acknowledged": any(row["event_type"] == "recipient_acknowledgement" for row in events),
             "provisioning_status": "not_requested", "label": _LABEL, "simulated": True, "synthetic": True,
             "availability_evaluated": configuration is not None,
@@ -446,8 +465,8 @@ def list_handoffs(connection, *, context, configuration=None, source_request_id=
 
 def reassign_handoff(connection, intent_id, payload, *, context, configuration):
     """Select the current reviewed team for a zero-attempt pending/routing_blocked intent."""
-    workflow._payload(payload, ("actor_id", "expected_version", "idempotency_key", "reason"))
     _authorize(context, configuration, "operator", mutation=True)
+    workflow._payload(payload, ("actor_id", "expected_version", "idempotency_key", "reason"))
     access.require_actor_match(context, payload.get("actor_id"))
     object_id = _uuid(intent_id)
     intent = _intent(connection, object_id, context)
@@ -507,8 +526,8 @@ def reserve_attempt(connection, intent_id, payload, *, context, configuration):
 
     No effect happens here. A reserved attempt consumes its ordinal forever.
     """
-    workflow._payload(payload, ("actor_id", "expected_version", "idempotency_key", "synthetic_scenario"))
     _authorize(context, configuration, "operator", mutation=True)
+    workflow._payload(payload, ("actor_id", "expected_version", "idempotency_key", "synthetic_scenario"))
     access.require_actor_match(context, payload.get("actor_id"))
     object_id = _uuid(intent_id)
     intent = _intent(connection, object_id, context)
@@ -567,8 +586,8 @@ def reserve_attempt(connection, intent_id, payload, *, context, configuration):
 
 
 def _phase_target(connection, attempt_id, payload, context, configuration):
-    workflow._payload(payload, ("actor_id", "idempotency_key"))
     _authorize(context, configuration, "operator", mutation=True)
+    workflow._payload(payload, ("actor_id", "idempotency_key"))
     access.require_actor_match(context, payload.get("actor_id"))
     object_id = _uuid(attempt_id)
     attempt = _attempt(connection, object_id)
@@ -669,7 +688,7 @@ def _insert_event(connection, event_id, receipt_id, intent, context, event_type,
          attempt["route_assignment_version"] if attempt is not None else None,
          attempt["synthetic_scenario"] if attempt is not None else None,
          effect_id, ticket_id, workflow._json(error) if error is not None else None, mode, workflow._now()))
-    return connection.execute("SELECT * FROM ticket_handoff_events WHERE id=?", (event_id,)).fetchone()
+    return connection.execute(_EVENT_SELECT + "WHERE e.id=?", (event_id,)).fetchone()
 
 
 def readback_handoff(connection, intent_id, payload, *, context, configuration):
@@ -677,12 +696,15 @@ def readback_handoff(connection, intent_id, payload, *, context, configuration):
 
     Found attaches the actual persisted ticket ID. Definitive absence closes an
     uncertain or crashed attempt as failed, permitting another attempt within the
-    budget. Error changes no outcome. Zero-attempt readback never claims success.
-    Available while disabled, after route changes and for rejected/released sources.
+    budget. Zero-attempt absence closes the intent as failed only when its source
+    request is rejected or its linked reservation released; an active source keeps
+    pending/routing_blocked. Error changes no outcome. Readback never claims success
+    without a found effect, and is available while disabled, after route changes and
+    for rejected/released sources.
     """
+    _authorize(context, configuration, "operator", mutation=True)
     workflow._payload(payload, ("actor_id", "expected_version", "idempotency_key", "correlation",
                                 "business_payload_digest"))
-    _authorize(context, configuration, "operator", mutation=True)
     access.require_actor_match(context, payload.get("actor_id"))
     object_id = _uuid(intent_id)
     intent = _intent(connection, object_id, context)
@@ -721,7 +743,7 @@ def readback_handoff(connection, intent_id, payload, *, context, configuration):
         outcome, error = "error", inconsistent
     else:
         outcome = "definitive_absence"
-    now, state = workflow._now(), intent["state"]
+    now, state, resolution = workflow._now(), intent["state"], None
     if outcome == "found":
         if subject["result"] != "delivered" or subject["observed_ticket_id"] != effect["synthetic_ticket_id"]:
             connection.execute(
@@ -733,18 +755,27 @@ def readback_handoff(connection, intent_id, payload, *, context, configuration):
         connection.execute(
             "UPDATE ticket_attempts SET result='failed',reason='readback_definitive_absence',"
             "ended_at=COALESCE(ended_at,?) WHERE id=?", (now, subject["id"]))
-        state = "failed"
+        state, resolution = "failed", "uncertain_attempt_absent"
+    elif outcome == "definitive_absence" and not attempts and intent["state"] in ("pending", "routing_blocked"):
+        # A terminal source can never be attempted, so close it explicitly as failed.
+        # An active source keeps pending/routing_blocked and its zero-attempt reassignment.
+        if intent["request_state"] == "rejected":
+            state, resolution = "failed", "zero_attempt_source_rejected"
+        elif intent["reservation_state"] == "released":
+            state, resolution = "failed", "zero_attempt_reservation_released"
     event_id = str(uuid4())
     receipt_id = _save_receipt(connection, context, "ticket.readback", normalized["idempotency_key"], digest,
                                "ticket_intent", object_id,
-                               {"intent_id": object_id, "event_id": event_id, "outcome": outcome})
+                               {"intent_id": object_id, "event_id": event_id, "outcome": outcome,
+                                "resolution": resolution})
     found = outcome == "found"
     event = _insert_event(connection, event_id, receipt_id, intent, context, "readback", outcome, subject,
                           effect_id=effect["id"] if found else None,
                           ticket_id=effect["synthetic_ticket_id"] if found else None, error=error)
     _bump(connection, intent, state)
     _audit(connection, context, intent, "ticket.readback", "Simulated ticket readback recorded.",
-           {"event_id": event_id, "outcome": outcome, "attempt_id": subject["id"] if subject is not None else None,
+           {"event_id": event_id, "outcome": outcome, "resolution": resolution,
+            "attempt_id": subject["id"] if subject is not None else None,
             "before": {"state": intent["state"], "version": intent["version"]},
             "after": {"state": state, "version": intent["version"] + 1}})
     return _result(connection, context, configuration, object_id,
@@ -754,16 +785,18 @@ def readback_handoff(connection, intent_id, payload, *, context, configuration):
 def acknowledge_handoff(connection, intent_id, payload, *, context, configuration):
     """Record an explicitly simulated recipient acknowledgement of the actual delivered effect.
 
-    This neither approves IPAM changes nor alters the local decision.
+    Reconciles an existing committed effect, so it remains available while the
+    connector is disabled; it creates no effect and changes no route. This neither
+    approves IPAM changes nor alters the local decision.
     """
+    _authorize(context, configuration, "operator", mutation=True)
     workflow._payload(payload, ("actor_id", "expected_version", "idempotency_key", "correlation",
                                 "business_payload_digest", "effect_id", "ticket_id", "acknowledgement_mode"))
-    if payload.get("acknowledgement_mode") != "simulated":
-        raise AppError("INVALID_INPUT", "acknowledgement_mode must be simulated.", 422, {"field": "acknowledgement_mode"})
-    _authorize(context, configuration, "operator", mutation=True)
     access.require_actor_match(context, payload.get("actor_id"))
     object_id = _uuid(intent_id)
     intent = _intent(connection, object_id, context)
+    if payload.get("acknowledgement_mode") != "simulated":
+        raise AppError("INVALID_INPUT", "acknowledgement_mode must be simulated.", 422, {"field": "acknowledgement_mode"})
     try:
         effect_id = str(UUID(str(payload.get("effect_id"))))
     except (TypeError, ValueError, AttributeError) as exc:
@@ -786,8 +819,6 @@ def acknowledge_handoff(connection, intent_id, payload, *, context, configuratio
     if intent["version"] != normalized["expected_version"]:
         raise _stale()
     _require_identity(intent, payload)
-    if configuration.connector_mode != "simulated":
-        raise _block_error("connector_disabled")
     if intent["state"] != "delivered":
         raise AppError("HANDOFF_NOT_DELIVERED", "Only a delivered simulated ticket can be acknowledged.", 409)
     effect = connection.execute(
