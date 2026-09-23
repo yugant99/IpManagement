@@ -1,0 +1,24 @@
+{
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "browser": {
+    "browser": "fresh headless Chrome context, isolated temporary profile, numeric loopback only",
+    "ui_asset_source": "candidate2 full build output, exact JS/CSS hashes are in manifest",
+    "selected_domain": "demo-core",
+    "inventory_list": "loaded",
+    "stored_prefix_detail": "loaded; selected synthetic 10.80.0.0/20 record",
+    "saved_run_export": {"loaded": true, "download_bytes": 2359059, "filename": "ipam-domain-findings.json"},
+    "memory_boundary": {"local_storage_keys": 0, "session_storage_keys": 0, "bearer_value_present": false},
+    "reload": {"signed_out": true, "password_field_blank": true},
+    "revocation": {"disposable_principal_disabled_in_config_revision": 9, "protected_request_invalidated_ui": true, "signed_out": true, "password_field_blank": true, "bearer_value_present_in_storage": false},
+    "separate_saved_dhcp_view": {"saved_run_selected": true, "configured_capacity_label": "assignable addresses", "history_label": "Saved hourly lease occupancy", "samples": "720 / 720 eligible", "incomplete_or_stale_source": "displayed Unknown, not zero", "limitation_label": "Synthetic lease occupancy is not traffic"}
+  },
+  "unknown_evidence": {
+    "input": "incomplete synthetic Central DHCP interval, zero records, declared_complete=false",
+    "import_http": 201,
+    "effective_complete": false,
+    "saved_run_http": 201,
+    "overview": {"unknown": 12, "anomalous": 7, "healthy": 100, "not_applicable": 54, "total": 173},
+    "previously_anomalous_findings_transitioned_to_unknown": 4,
+    "previously_anomalous_findings_marked_healthy": 0
+  }
+}

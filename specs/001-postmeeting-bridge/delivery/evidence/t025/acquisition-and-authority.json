@@ -1,0 +1,19 @@
+{
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "operational_configuration": {"revision": 1, "schema": 7, "connector_mode": "simulated", "selected_domain_for_operator_flows": "demo-core"},
+  "acquisition": {
+    "fresh": {"http": 201, "replay_header": false, "body_replay": false, "cycle_index": 1},
+    "exact_replay": {"http": 200, "replay_header": true, "body_replay": true, "cycle_advanced": false},
+    "changed_reason_same_key": {"http": 409, "error": "IDEMPOTENCY_CONFLICT", "cycle_advanced": false},
+    "response_lost_then_same_key": {"client_outcome": "unknown", "exact_replay": {"http": 200, "replay_header": true, "body_replay": true}, "cycle_advanced_exactly_once": true}
+  },
+  "authorization_and_pins": {
+    "operator_global_schedule_read": 403,
+    "operator_global_manual_run": 403,
+    "operator_global_acquisition": 403,
+    "coordinator_domain_selection": 403,
+    "stale_configuration_revision_digest": {"http": 409, "error": "ACCESS_CONTEXT_STALE"},
+    "manual_coordinator_run": {"http": 201, "run_detail_readback": 200, "full_bytes_read": 3160523, "calculations": 8, "findings": 173}
+  },
+  "limits": {"acquisition_timeout_seconds": 30, "transport_loss_is_unknown": true, "automatic_retry": false}
+}

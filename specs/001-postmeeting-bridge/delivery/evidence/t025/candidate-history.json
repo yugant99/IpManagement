@@ -1,0 +1,94 @@
+{
+  "candidate4_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "build_and_ui_continuity": {
+    "candidate1": {
+      "full_npm_build": "failed in TypeScript before Vite; provisional Vite-only assets do not count as a valid full build",
+      "failure_record": "private HANDOFF.md describes the failed build; complete transcript was not persisted as an artifact"
+    },
+    "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
+    "candidate2_full_build": "npm ci and npm run build succeeded end-to-end",
+    "candidate2_compiled_asset_hashes": {
+      "index_html": "fc23ff84d158290e4b30f817d6e4d31ddb140a1c7a0d55fba8e1d8dd0573056e",
+      "javascript": "8cdf68e36116b5c75907a0eaae823910c937f922dccf7d5d6d029a580412e556",
+      "css": "0aec5841eb47ceee868f55dc66d79e5b67eec82cfb3a84151d60ae8404157a1a"
+    },
+    "candidate4_ui_runtime": "served byte-pinned candidate2 assets; authenticated list/detail/export observed against candidate4 API"
+  },
+  "candidate_failures_and_corrections": [
+    {
+      "candidate": "candidate3",
+      "failure": "wrapper POST /api/schedule/run timed out after 30.006 seconds with zero response bytes; outcome remained unknown; original deadlock process/data retained",
+      "candidate4_correction": "coordinator_preflight and removal of route-lifetime database dependency on manual run routes",
+      "candidate4_observation": "manual coordinator run returned 201; full 3,160,523-byte run retrieved separately with 8 calculations and 173 findings"
+    },
+    {
+      "case": "manual-run initial capture",
+      "failure": "client-side capture was capped at 2 MiB",
+      "correction": "retrieved exact persisted run through detail endpoint; full artifact hash pinned in private manifest"
+    },
+    {
+      "case": "UI disposable credential harness",
+      "failure": "first generated token was not the application's required 64-lowercase-hex bearer shape",
+      "correction": "used a fresh 256-bit hexadecimal token in protected file, then observed sign-in and revocation"
+    },
+    {
+      "case": "migration/import synthetic clock",
+      "failure": "first fixture used a clock that did not match the candidate clone",
+      "correction": "reran with clone's exact demo clock and retained both attempt artifacts"
+    },
+    {
+      "case": "ticket setup",
+      "failure": "initial fixture supplied service_reference without reservation_id and got 422",
+      "correction": "reran corrected independent synthetic setup; no result was treated as ticket behavior"
+    },
+    {
+      "case": "release-linked guard harness setup",
+      "failure": "initial release cases supplied a mismatched service_reference and returned RESERVATION_MISMATCH; a stale pending-review attempt returned STALE_REVIEW",
+      "correction": "used a fresh unused address, exact matching owner/service references, current pool/baseline versions, and an independently submitted approval",
+      "corrected_observation": "pending and unknown linked intents both returned EXTERNAL_EFFECT_UNRESOLVED; both holds remained reserved; approved unused unlinked release restored capacity"
+    },
+    {
+      "case": "first stopped-recovery timing launch",
+      "failure": "service launch omitted the tracked synthetic-feed fixture path and then exposed incompatible system FastAPI/Pydantic versions; restore itself succeeded but readiness was not reached",
+      "correction": "synced exact candidate locked dependencies before the timing window and used the installed tracked fixture package; this failed attempt is excluded from recovery timing",
+      "corrected_observation": "restore, six-of-six readiness, and authenticated selected-domain read completed in 1.931 seconds on the disposable clone"
+    }
+  ],
+  "source_lineage": {
+    "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
+    "candidate4_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+    "candidate2_is_ancestor_of_candidate4": true,
+    "frontend_tree_id_candidate2": "6f66b9899276bd55fe0f62a8521945725bc6ead5",
+    "frontend_tree_id_candidate4": "6f66b9899276bd55fe0f62a8521945725bc6ead5",
+    "frontend_tree_identical": true,
+    "frontend_package_lock_blob_candidate2": "dbbecd811d7145e89f80aac002e17f870b5ecde6",
+    "frontend_package_lock_blob_candidate4": "dbbecd811d7145e89f80aac002e17f870b5ecde6",
+    "uv_lock_blob_candidate2": "56671dad30939e0e1df3fdf0e44105316f15a3d1",
+    "uv_lock_blob_candidate4": "56671dad30939e0e1df3fdf0e44105316f15a3d1",
+    "pyproject_blob_candidate2": "931397380ed4f4cfa46e1c7737b0bcb5706faad8",
+    "pyproject_blob_candidate4": "931397380ed4f4cfa46e1c7737b0bcb5706faad8",
+    "build_basis": "candidate2 npm ci plus full npm run build succeeded; candidate4 served the byte-pinned compiled candidate2 UI against its API"
+  },
+  "curl_bootstrap_failure_and_correction": {
+    "failure_candidate": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
+    "reproduced_on_candidate2_before_correction": false,
+    "symptom": "protected curl config used -silent; curl parsed the clustered short option with -i/--include, prepending response headers to JSON and breaking bootstrap parsing despite HTTP 200",
+    "failure_evidence": "private HANDOFF.md and logs/direct3.body; original complete full-build log not retained",
+    "correction_author": "Spark",
+    "correction_commit": "f8d381adb3a604251b5486ecfa10148bb1491f81",
+    "correction_merge": "0c20a7b, PR #102",
+    "files_changed": [
+      "scripts/ops/health.sh",
+      "scripts/ops/acquire.sh"
+    ],
+    "correction": "use long option names in protected curl configs, e.g. silent/show-error",
+    "candidate4_contains_correction": true,
+    "candidate4_wrapper_matrix": "actual-service and mock-loopback cases summarized in wrapper-security.json; claims remain limited to listed cases",
+    "candidate2_source_still_contained_bug": true,
+    "runtime_scope": "The HTTP 200/header-contaminated-body reproduction was on candidate1 runtime. Candidate2 was not started for this wrapper probe; its source retained the same -silent config until PR #102. Candidate4 contains Spark correction."
+  },
+  "private_artifacts_for_source_lineage": [
+    "HANDOFF.md",
+    "logs/direct3.body"
+  ]
+}

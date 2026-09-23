@@ -1,0 +1,813 @@
+{
+  "schema": "ipam.t025.artifact-manifest.v1",
+  "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+  "status": "in_progress_pending_lead_review",
+  "source_checkout": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory",
+  "evidence_branch": "codex/bridge-t025-luna",
+  "evidence_commit": "final packet commit containing this manifest; identify exact SHA from the leased branch head (not embedded because that would self-reference)",
+  "run_root_label": "run-20260923-lead6",
+  "private_artifact_paths_are_relative_to_run_root": true,
+  "private_artifacts": [
+    {
+      "path": "HANDOFF.md",
+      "sha256": "8e5892049160fef0239c4ee86b9ece6ca62cedb0c832f55313a44271c5f2ce1a",
+      "bytes": 10341,
+      "criteria": [
+        "candidate history; candidate1 failure and environment notes"
+      ]
+    },
+    {
+      "path": "logs/npm-ci-candidate2.log",
+      "sha256": "03015e1a64dedf2740855cc53cf632f110cb8a038d544dcd500503fdb6888984",
+      "bytes": 143,
+      "criteria": [
+        "candidate2 build; dependency installation"
+      ]
+    },
+    {
+      "path": "logs/ui-build-candidate2.log",
+      "sha256": "e3ced95a000a7e87133bd2e8cd9f1069487384ba96631b980705b8752051074e",
+      "bytes": 977,
+      "criteria": [
+        "candidate2 full UI build"
+      ]
+    },
+    {
+      "path": "candidate3/logs/wrapper-acquire-first.out",
+      "sha256": "bea506560be23f6d421ffbf777764ed07893bf4af937cfa7b2a90e7f30035d87",
+      "bytes": 762,
+      "criteria": [
+        "candidate3 schedule timeout; unknown outcome retained"
+      ]
+    },
+    {
+      "path": "candidate3/logs/wrapper-acquire-replay.out",
+      "sha256": "a21391f75cb26a36e705ed1ff20a0841bf45fd4be292d01abd7927643d73b379",
+      "bytes": 763,
+      "criteria": [
+        "candidate3 follow-up acquisition result"
+      ]
+    },
+    {
+      "path": "candidate3-isolated/logs/api-matrix.jsonl",
+      "sha256": "645a72b8d2e5ef86a763325fb1bc542537b867b35907bb3dcde07ce3f838f966",
+      "bytes": 5040,
+      "criteria": [
+        "candidate3 authorization controls"
+      ]
+    },
+    {
+      "path": "candidate4/logs/acquire-first.out",
+      "sha256": "cdc5d36647ff182c43578916e664b547954618eb5b45cdad1fa9be30867cd8e0",
+      "bytes": 1154,
+      "criteria": [
+        "fresh acquisition triple"
+      ]
+    },
+    {
+      "path": "candidate4/logs/acquire-replay.out",
+      "sha256": "fb9e487bf1cb57a19366f711f39114240aca1333201c673909f77d14d30c10bd",
+      "bytes": 1138,
+      "criteria": [
+        "exact acquisition replay triple"
+      ]
+    },
+    {
+      "path": "candidate4/logs/acquire-changed-reason.out",
+      "sha256": "a86887a1aa79695e1d5ef40e389493622657e7a27d4fbce93afdd9bbd6b7d902",
+      "bytes": 1085,
+      "criteria": [
+        "changed-reason conflict"
+      ]
+    },
+    {
+      "path": "candidate4/logs/acquire-transport-replay.json",
+      "sha256": "ac1e3b34cf691ecb6ed12c9d447c1fab685daa044dcf27f2fcd84ffa93bbcb92",
+      "bytes": 670,
+      "criteria": [
+        "transport-loss replay"
+      ]
+    },
+    {
+      "path": "candidate4/logs/coordinator-matrix.jsonl",
+      "sha256": "ad3cfe09ea45c68bcaf0ac67d4211173fb88fc002662675752da5aec210a27b9",
+      "bytes": 3229,
+      "criteria": [
+        "global authority and stale config pins"
+      ]
+    },
+    {
+      "path": "candidate4/logs/manual-run-readback.json",
+      "sha256": "f72babc08043fa3b181202852b861845132d4fc5f097df1b140921ae466a96d9",
+      "bytes": 3160523,
+      "criteria": [
+        "manual run complete detail recovery after initial 2 MiB capture cap"
+      ]
+    },
+    {
+      "path": "candidate4/logs/reservation-cases.jsonl",
+      "sha256": "20ee06e7c7e787a9b2ef7c2c760096f2986421da5ba75a516827a873f2785f95",
+      "bytes": 9341,
+      "criteria": [
+        "reservation capacity, replay, conflict, foreign denial and race"
+      ]
+    },
+    {
+      "path": "candidate4/logs/reservation-race-timed.json",
+      "sha256": "925e0ac83531527e7318d00648ed57e157e123f12e08a0e10ad49884cdc2c9d2",
+      "bytes": 946,
+      "criteria": [
+        "barrier-started actual reservation race"
+      ]
+    },
+    {
+      "path": "candidate4/logs/allocation-release.jsonl",
+      "sha256": "0cb931b6a59bf7f082108342a8282b8fe5e59505fcbbfe897bf91b336c598298",
+      "bytes": 11165,
+      "criteria": [
+        "allocation conversion, self-approval and release preservation"
+      ]
+    },
+    {
+      "path": "candidate4/logs/ticket-cases.jsonl",
+      "sha256": "bee4115bd34788f346e5671824b0a5370396159ff196f7c1524b1b3ff8d252ce",
+      "bytes": 7900,
+      "criteria": [
+        "ticket success, replay, conflict and foreign detail"
+      ]
+    },
+    {
+      "path": "candidate4/logs/ticket-remaining.jsonl",
+      "sha256": "e0602a2751454efb6dac758e6daabc11eb279fac4a27cdb289805c06c243090c",
+      "bytes": 52467,
+      "criteria": [
+        "ticket response loss, effect readback, definitive absence and attempt cap"
+      ]
+    },
+    {
+      "path": "candidate4/logs/ticket-disabled-cases.jsonl",
+      "sha256": "8fda3e0fdb0a7d1d3eb6782e2d69caaf1f4082d7a4bddd4edf7787c7cfe9309f",
+      "bytes": 6912,
+      "criteria": [
+        "disabled connector refusal and readback"
+      ]
+    },
+    {
+      "path": "candidate4/logs/ticket-remaining-setup-error.jsonl",
+      "sha256": "873ef907fc2f16eedcbc207f56cd0251c288a8348036285d6356850c48d60356",
+      "bytes": 354,
+      "criteria": [
+        "ticket setup failure retained; harness corrected"
+      ]
+    },
+    {
+      "path": "candidate4/logs/notice-cases.jsonl",
+      "sha256": "bccc55f405bdb7ae7b5c9de2662ee03a707ff56cc47bb41af796f18e868737bc",
+      "bytes": 96826,
+      "criteria": [
+        "notice lifecycle, route change, legacy renewal, disabled and expired recipient"
+      ]
+    },
+    {
+      "path": "candidate4/notice-combined/logs/notice-combined-cases.jsonl",
+      "sha256": "9707aeb4f62fb8913311debcac93d396a7dd0047aaacea65122f0b63ef713385",
+      "bytes": 17971,
+      "criteria": [
+        "combined alarm/route-change, own receipt, replay, changed reason, GET no reroute"
+      ]
+    },
+    {
+      "path": "candidate4/notice-combined/logs/unrelated-config-no-renewal.json",
+      "sha256": "cef2a1788465065244ed42aed35b33bc3318ebaa1d6a2e6dd0fa7276f4bf588f",
+      "bytes": 3139,
+      "criteria": [
+        "unrelated config does not renew current notice"
+      ]
+    },
+    {
+      "path": "candidate4/logs/domain-boundary-cases.jsonl",
+      "sha256": "1164af85760decb891fb3a4a2b5d1229c2b676073710c49b50b3f1e37c48fec8",
+      "bytes": 1943,
+      "criteria": [
+        "global callback denial, cross-domain replay no leakage, foreign detail/export"
+      ]
+    },
+    {
+      "path": "candidate4/logs/migration-import-cases-clock-aligned.jsonl",
+      "sha256": "77546a915acb80012bdc7ba23434758091ffbfd499c9d0431baf42980daae7b3",
+      "bytes": 3899,
+      "criteria": [
+        "intended candidate staging, replay/conflict, duplicate/mixed refusal and active-state compare"
+      ]
+    },
+    {
+      "path": "candidate4/logs/migration-import-cases-clock-mismatch.jsonl",
+      "sha256": "e3e9476c23b569ec2731325c114c144c0fe25162a4cf6a1d906db043147288cd",
+      "bytes": 2755,
+      "criteria": [
+        "initial clock mismatch retained; harness correction basis"
+      ]
+    },
+    {
+      "path": "candidate4/logs/migration-assessment.jsonl",
+      "sha256": "a626d9ea7c4bbe189af6342100d6ab9e62c0a3f4cbb3c0c9c3f23261f8934d5c",
+      "bytes": 377144,
+      "criteria": [
+        "assessment equations, digest, active-only, signoff, stale refusal and foreign export"
+      ]
+    },
+    {
+      "path": "candidate4/logs/migration-invalid-bounds.json",
+      "sha256": "1d57880441b83495a4039018ea2408ce6342a04d3f3b59f4a3c9972c3479b3f5",
+      "bytes": 778,
+      "criteria": [
+        "malformed staged candidate and 10001-row observation import limit"
+      ]
+    },
+    {
+      "path": "candidate4/logs/migration-byte-bound.json",
+      "sha256": "451f4a3527e92d88de1d8fdf00926bf80ffbd0e4dcd8c4d297500307b495d6df",
+      "bytes": 638,
+      "criteria": [
+        "generic raw import byte cap; >10 MiB refusal"
+      ]
+    },
+    {
+      "path": "candidate4/logs/schema-v6-migration-fixture.json",
+      "sha256": "1ad84eb0540fc52a0a0625a886554f5f00ad3c8fe8a4a402ba4fb5d70098da72",
+      "bytes": 305,
+      "criteria": [
+        "known schema-6 synthetic migration fixture"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-refusal/refusal-probes.json",
+      "sha256": "b18a21dc224335d172c2e8e8a421a465938d26b45bb4147a0cd32d76e85b986c",
+      "bytes": 3371,
+      "criteria": [
+        "unsupported, sidecar and busy-backup refusal plus malformed migration"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-refusal/refusal-codes.json",
+      "sha256": "2e1a339324165abffc12e8dd60fbdf781e8f20c032b1628c231b3fe957845167",
+      "bytes": 219,
+      "criteria": [
+        "exact unsupported-schema and non-standalone refusal codes"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-refusal/busy-restore.json",
+      "sha256": "677028400eb8b85f5bb5aff85b7d6b782e5ab458e30d686bdeba84ecd6dedb89",
+      "bytes": 125,
+      "criteria": [
+        "busy restore refusal preserves target"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-refusal/corrupt-refusal.json",
+      "sha256": "6a9f266cbdb0c36ab7efb9726c771f70379b7e11feede02f69ec6a1a41b329fa",
+      "bytes": 160,
+      "criteria": [
+        "truncated corrupt snapshot refusal preserves target"
+      ]
+    },
+    {
+      "path": "candidate4/logs/populated-before-restore.json",
+      "sha256": "3ac823e501408393ef481f5441883e01a0ed2d7e35429c28cfeb119e2cfa0704",
+      "bytes": 3517,
+      "criteria": [
+        "populated pre-restore state summary"
+      ]
+    },
+    {
+      "path": "candidate4/logs/populated-after-restore.json",
+      "sha256": "3ac823e501408393ef481f5441883e01a0ed2d7e35429c28cfeb119e2cfa0704",
+      "bytes": 3517,
+      "criteria": [
+        "populated post-restore state summary"
+      ]
+    },
+    {
+      "path": "candidate4/logs/business-state-before-restore.json",
+      "sha256": "e3fcbb2c3ec69f374231eebb6128c4b92ceeb499076dcfe741ba9b9cb6948196",
+      "bytes": 3487,
+      "criteria": [
+        "business state compare before restore"
+      ]
+    },
+    {
+      "path": "candidate4/logs/business-state-after-restore.json",
+      "sha256": "e3fcbb2c3ec69f374231eebb6128c4b92ceeb499076dcfe741ba9b9cb6948196",
+      "bytes": 3487,
+      "criteria": [
+        "business state compare after restore"
+      ]
+    },
+    {
+      "path": "candidate4/logs/recovery-changed.json",
+      "sha256": "c9ec9f7fdae08700511ea08e50e4aa97e18d7c22c75ff254641e22565c17f01e",
+      "bytes": 1577,
+      "criteria": [
+        "changed configuration restore classification"
+      ]
+    },
+    {
+      "path": "candidate4/logs/recovery-unavailable.json",
+      "sha256": "bc4a611a8ccd930067df1e1bf4a327716e44757c27c462063cad1ba0633ef883",
+      "bytes": 1484,
+      "criteria": [
+        "unavailable configuration restore classification"
+      ]
+    },
+    {
+      "path": "candidate4/logs/recovery-legacy_absent_manifest.json",
+      "sha256": "60e71243ed38285848844390056a6bd51782b383713310b87822435647a07a15",
+      "bytes": 1537,
+      "criteria": [
+        "legacy absent-manifest classification"
+      ]
+    },
+    {
+      "path": "candidate4/logs/recovery-manifest_mismatch.json",
+      "sha256": "d263d46d98043c1eca8b5d7c1bada5360eb65adfb1e6086a47d8e7846c918786",
+      "bytes": 825,
+      "criteria": [
+        "snapshot-manifest mismatch refusal"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-injected/injected-failure-results.json",
+      "sha256": "5be8dd81be843171142e6d2f4c21755b505fc3df3836d16f6c1b61d501ad679c",
+      "bytes": 7211,
+      "criteria": [
+        "publication, fsync, cleanup and active replace failures"
+      ]
+    },
+    {
+      "path": "candidate4/logs/wrapper-negative-matrix.json",
+      "sha256": "ba6fd35d4efa5a3b7de3043f997b5aa6f13ace2882d65c6faf46891b441d22e1",
+      "bytes": 2135,
+      "criteria": [
+        "actual-service wrapper negative cases; health_bad_mode_before_network is a non-loopback URL refusal before token-mode validation"
+      ]
+    },
+    {
+      "path": "candidate4/logs/wrapper-security-probe.json",
+      "sha256": "72f54686cd6f64aaea7d29f8014dd878436f908aa3cdc8bce0cd88d7c4c1c2cb",
+      "bytes": 1724,
+      "criteria": [
+        "loopback wrapper security probes"
+      ]
+    },
+    {
+      "path": "candidate4/logs/wrapper_security_probe.py",
+      "sha256": "181984fc7d6527cf01dbf48860651052165386fa3a9c00bab3edf3c117942607",
+      "bytes": 6512,
+      "criteria": [
+        "reproducible loopback mock wrapper harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/migration_invalid_bounds_probe.py",
+      "sha256": "9a15b30240a4a3ba0dc774ecafe04c6ba93e9d2eb041154b50b1a74407f538ef",
+      "bytes": 3823,
+      "criteria": [
+        "reproducible invalid CIDR and observation row-limit harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/migration_byte_bound_probe.py",
+      "sha256": "10a3d4263db78e4d1ad12600a7e49cb1fe9a9972f798f458ce5a1e9b0833c99c",
+      "bytes": 2136,
+      "criteria": [
+        "reproducible generic byte-limit harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/reservation_race_timed.py",
+      "sha256": "fb178ae249a2adf5352340d6a536cb3730a58a5c803b157dce5df6e21c23609b",
+      "bytes": 3349,
+      "criteria": [
+        "reproducible barrier-started concurrency harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/ticket_remaining.py",
+      "sha256": "2893b2895552bf34846858f3ce2570e26e4244dcb142e5c7aed1d59cad994e9a",
+      "bytes": 6906,
+      "criteria": [
+        "reproducible ticket response-loss and cap harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/notice_combined_cases.py",
+      "sha256": "4e229668cdaec52b598123b4b459aafd454b625de9c7372a4bfe675d848c677f",
+      "bytes": 3290,
+      "criteria": [
+        "reproducible combined notice route/alarm harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/injected_recovery_failures.py",
+      "sha256": "49c24c0abd8b57115905027e83ff209babb45ee5fb391355211355474a0bf26a",
+      "bytes": 5936,
+      "criteria": [
+        "reproducible recovery fault injection harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/recovery_refusal_codes.py",
+      "sha256": "38db40a5c762b280f34a09c1e449e6af93a13d40105a795211159ec3af4108b6",
+      "bytes": 1278,
+      "criteria": [
+        "reproducible unsupported/nonstandalone recovery code probe"
+      ]
+    },
+    {
+      "path": "candidate4/browser/browser-ui-evidence.json",
+      "sha256": "22432f62b239b99378f25c5c71124ca07df55013d6a9610ffe0105cfe6d6bcdc",
+      "bytes": 748,
+      "criteria": [
+        "authenticated UI reload and revocation observations"
+      ]
+    },
+    {
+      "path": "candidate4/browser/authenticated-detail-evidence.json",
+      "sha256": "eb408e7510d81d6918b1117ed719bbf6278160e33f4c11bcf971a5a0eea502ab",
+      "bytes": 991,
+      "criteria": [
+        "authenticated fully loaded prefix detail and storage observation"
+      ]
+    },
+    {
+      "path": "candidate4/browser/saved-dhcp-ui-evidence.json",
+      "sha256": "a3b2b64eba5f9c8dd3ef5acfa3167c439f0450eaaba03a2b8681dcc50688a027",
+      "bytes": 17667,
+      "criteria": [
+        "rendered saved DHCP occupancy/unit/time/completeness view"
+      ]
+    },
+    {
+      "path": "candidate4/browser/unknown-evidence-and-units.json",
+      "sha256": "f9be7d8448d5d98bc82d26fb72826504986584a71097b52a03e577f9667a94df",
+      "bytes": 4180,
+      "criteria": [
+        "incomplete DHCP unknown-state saved run and prior-state comparison"
+      ]
+    },
+    {
+      "path": "candidate4/browser/ui-revocation.js",
+      "sha256": "0b9c32a6ccef65cdc6f52b8f1aa1419969d67bc4e5f0420d3220782eeac59ff5",
+      "bytes": 4037,
+      "criteria": [
+        "reproducible isolated-browser authentication/revocation harness"
+      ]
+    },
+    {
+      "path": "candidate4/browser/detail-ui.js",
+      "sha256": "b17667f6ccfe94630397ebabbf3e5466b60018d94abcb29d08b0f3b504e6af20",
+      "bytes": 1622,
+      "criteria": [
+        "reproducible selected-domain detail harness"
+      ]
+    },
+    {
+      "path": "candidate4/browser/saved-dhcp-ui.js",
+      "sha256": "f2dd1e76d48f06c99da888d53e0708445bcb234c730d367e44c720b2ff9a2da6",
+      "bytes": 1493,
+      "criteria": [
+        "reproducible saved DHCP UI harness"
+      ]
+    },
+    {
+      "path": "candidate4/browser/unknown-evidence-probe.py",
+      "sha256": "ff17f848490dada23b1b4e4029cb3d1e6a855ac61a1ae54674623979b1b31382",
+      "bytes": 4097,
+      "criteria": [
+        "reproducible incomplete-DHCP coordinator probe"
+      ]
+    },
+    {
+      "path": "candidate4/logs/release_completion_probe.py",
+      "sha256": "e425f2b221f943ab17ba085f6bb4887ba71c3aed7ed46d056bdc5b4cc80210be",
+      "bytes": 7895,
+      "criteria": [
+        "unused unlinked release and capacity restoration harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/release-completion.json",
+      "sha256": "cbd8cfcda557497c12e161c16482882049e44bc59fd0b05ffd4c5d4fe8121be7",
+      "bytes": 2287,
+      "criteria": [
+        "successful independent unused unlinked release and capacity compare; includes setup attempts"
+      ]
+    },
+    {
+      "path": "candidate4/logs/release_linked_refusal_probe.py",
+      "sha256": "3fef6d39c9a71422764b7624eb0b1e602a8f21fab9ce932729b5bc51dbb1bb98",
+      "bytes": 6647,
+      "criteria": [
+        "linked pending/unknown release guard harness"
+      ]
+    },
+    {
+      "path": "candidate4/logs/release-linked-refusal-corrected.json",
+      "sha256": "4e872f82d7e11ae019de4aed07f3be0f756141d0c476aac345d23b5e946637a9",
+      "bytes": 1057,
+      "criteria": [
+        "unknown linked intent exact refusal; initial pending stale attempt retained"
+      ]
+    },
+    {
+      "path": "candidate4/logs/release-guard-final.json",
+      "sha256": "16a898c8493f0e7776aff12b1bc76ebb3dfa871644c07d21fe66026aacf481c2",
+      "bytes": 1759,
+      "criteria": [
+        "corrected pending linked approval refusal, unknown guard and approved release summary"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-timed/service.log",
+      "sha256": "bb571e1c2e85bd0b5d34eef0ce2f2bd61bbe0fcf3cb7c50244229b518c708902",
+      "bytes": 993,
+      "criteria": [
+        "excluded recovery timing attempt: feed module import path omitted"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-timed2/service.log",
+      "sha256": "2656b09d393497498b0df5f402d19f25bd707fcb196109c25a70d81460f86a10",
+      "bytes": 2540,
+      "criteria": [
+        "excluded recovery timing attempt: system dependency versions incompatible"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-timed3/timed-recovery.json",
+      "sha256": "3d5e993064cf276c2ba93a7a7401058d2546fc85b28b80fe71c74a57144df098",
+      "bytes": 3511,
+      "criteria": [
+        "successful bounded stopped restore, readiness and business read timing"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-timed3/restore.stdout.json",
+      "sha256": "bf04555ed4221fbea063b67a61b7c9208e7d2ceb9998db3dd8f955e8701964df",
+      "bytes": 1584,
+      "criteria": [
+        "stopped restore result for timed synthetic clone"
+      ]
+    },
+    {
+      "path": "candidate4/recovery-timed3/service.log",
+      "sha256": "da84ce7bc66345589f23487bcdb476837c788c88706f03bf99632ada305a6864",
+      "bytes": 855,
+      "criteria": [
+        "timed recovery service startup/readiness record"
+      ]
+    },
+    {
+      "path": "logs/direct3.body",
+      "sha256": "a5cce217888a81b7cb868db6c866821b75a957cfb1ccd9beeffb9fa1e2d3fe1c",
+      "bytes": 636,
+      "criteria": [
+        "candidate1/candidate2 protected curl bootstrap reproduced HTTP 200 with headers contaminating JSON body"
+      ]
+    },
+    {
+      "path": "candidate4/logs/health-wrapper-bad-mode.json",
+      "sha256": "9a739dba9839d64b7b6d39cf13d162b047230dff36fdfc5750473fa5cc5366c1",
+      "bytes": 300,
+      "criteria": [
+        "actual-service health wrapper valid-loopback bad token-mode refusal; failure occurred during token-file validation before service contact"
+      ]
+    }
+  ],
+  "configuration_bindings": [
+    {
+      "path": "access-config-r1.json",
+      "sha256": "d57f5f74aaf0e88a45c31d337287631c6d6db3797d10237605d5e4b707cae7a5",
+      "revision": 1,
+      "connector_mode": "simulated",
+      "role": "initial reviewed synthetic authority"
+    },
+    {
+      "path": "candidate4/logs/access-config-r7-connector-disabled.json",
+      "sha256": "12e43b14d032bb6b6b354832dcdeb4c33fbd9b9015f847f0da1dbaf1b19ddd8e",
+      "revision": 7,
+      "connector_mode": "disabled",
+      "role": "candidate4 main/recovery and ticket-disabled configuration"
+    },
+    {
+      "path": "candidate4/browser/access-config-r8-browser.json",
+      "sha256": "a36765167556426662bd09dbcd863d1d72374fe408f818895fcabc76793181cc",
+      "revision": 8,
+      "connector_mode": "disabled",
+      "role": "ephemeral browser principal enabled"
+    },
+    {
+      "path": "candidate4/browser/access-config-r9-revoked.json",
+      "sha256": "81cb8b170d0f4b3a7df9bdcd5f37eb25b297e49cab60b73a1763ad3cf4fe5ae2",
+      "revision": 9,
+      "connector_mode": "disabled",
+      "role": "ephemeral browser principal disabled for revocation"
+    },
+    {
+      "path": "candidate4/browser/access-config-r12-detail.json",
+      "sha256": "da94e91f196a8749601438a959bf9cb89258af8c1562a24313e35ac145581e45",
+      "revision": 12,
+      "connector_mode": "disabled",
+      "role": "separate disposable detail/saved-run UI principal"
+    }
+  ],
+  "schema_binding": {
+    "current_schema_version": 7,
+    "full_restore_tables_compared": 32,
+    "all_equal": true,
+    "malformed_v6_ack_migration_atomic_refusal": true,
+    "snapshot": {
+      "path": "candidate4/snapshots/t025-c4-populated.sqlite3",
+      "sha256": "57e78e21138adde51f78f1a9582e5a7df74493e8ede88ff5e5a47b925acd7343",
+      "bytes": 19972096,
+      "schema_version": 7,
+      "manifest": {
+        "path": "candidate4/snapshots/t025-c4-populated.sqlite3.recovery.json",
+        "sha256": "65a6abcb8ce8abca1dbf84c22f6da0eae39c818e1749157fb90d9e10d75b3bee"
+      }
+    }
+  },
+  "compiled_ui_assets": [
+    {
+      "path": "ui/candidate2-dist/index.html",
+      "sha256": "fc23ff84d158290e4b30f817d6e4d31ddb140a1c7a0d55fba8e1d8dd0573056e",
+      "bytes": 566,
+      "role": "candidate2 compiled app entry"
+    },
+    {
+      "path": "ui/candidate2-dist/assets/index-B5fmFEe2.js",
+      "sha256": "8cdf68e36116b5c75907a0eaae823910c937f922dccf7d5d6d029a580412e556",
+      "bytes": 474443,
+      "role": "candidate2 compiled JS served during candidate4 UI"
+    },
+    {
+      "path": "ui/candidate2-dist/assets/index-D_yo_Wvy.css",
+      "sha256": "0aec5841eb47ceee868f55dc66d79e5b67eec82cfb3a84151d60ae8404157a1a",
+      "bytes": 19125,
+      "role": "candidate2 compiled CSS served during candidate4 UI"
+    }
+  ],
+  "host_tools": {
+    "os": "macOS 14.5; Darwin 23.5.0 arm64",
+    "candidate_python": "3.12.8",
+    "system_python": "3.14.2 (not used for candidate service)",
+    "candidate2_build_node": "22.12.0; npm 10.9.0",
+    "browser_driver_node": "23.11.0",
+    "playwright": "1.62.1",
+    "browser": "Google Chrome 153.0.8010.53",
+    "timed_recovery_python": "3.12.10 using repository uv.lock; uv sync --locked before timing"
+  },
+  "commands_and_harnesses": [
+    {
+      "command_shape": "python-env-candidate4/bin/python -m ipam_demo serve --host 127.0.0.1 --port 18765",
+      "purpose": "candidate4 main synthetic API/UI service; environment IPAM_DATA_DIR and IPAM_ACCESS_CONFIG resolve to candidate4 private run root"
+    },
+    {
+      "command_shape": "python-env-candidate4/bin/python candidate4/logs/<named-harness>.py",
+      "purpose": "reservation, migration bounds, unknown evidence, state refusal and fault injection probes; no bearer passed in argv"
+    },
+    {
+      "command_shape": "NODE_PATH=<bundled-runtime>/node/node_modules node candidate4/browser/<named-ui-harness>.js",
+      "purpose": "fresh headless Playwright context with explicit installed Chrome binary; token read from protected file into process memory only"
+    },
+    {
+      "command_shape": "python-env-candidate4/bin/python -m ipam_demo backup|restore|migrate <explicit args>",
+      "purpose": "stopped-service synthetic recovery/schema probes; exact snapshots/clones listed above"
+    },
+    {
+      "command_shape": "uv sync --locked before measurement; .venv/bin/python -m ipam_demo restore --input <populated-snapshot> --confirm; then .venv/bin/python -m ipam_demo serve --host 127.0.0.1 --port 18773",
+      "purpose": "timed stopped recovery on a disposable clone; IPAM_DATA_DIR points to the clone, IPAM_ACCESS_CONFIG to reviewed synthetic config, IPAM_STATIC_DIR to pinned candidate2 bundle; locked fixture package installed from exact source checkout"
+    }
+  ],
+  "runtime_boundary": {
+    "private_observation_window_utc_approx": "2026-09-23 19:13\u201320:28 UTC",
+    "services": {
+      "candidate3_preserved": "127.0.0.1:18763",
+      "candidate3_isolated": "127.0.0.1:18764",
+      "candidate4_main": "127.0.0.1:18765",
+      "notice_combined_clone": "127.0.0.1:18766",
+      "browser_clone": "127.0.0.1:18767",
+      "recovery_timed_clone": "127.0.0.1:18773"
+    },
+    "external_data": "none; disposable synthetic fixtures only",
+    "writes": "candidate4 disposable data/clones and leased sanitized evidence files only",
+    "state_lock_wait_seconds": 3,
+    "snapshot_copy_budget_seconds": 30,
+    "acquisition_wrapper_timeout_seconds": 30,
+    "ticket_observation_deadline_seconds": 5,
+    "fifo_refusal_observed_ms": 43,
+    "human_portability_or_production_claim": false
+  },
+  "known_artifact_gaps": [
+    "This manifest excludes itself from its hash list; hashes of other tracked sanitized artifacts are listed in git_artifacts.",
+    "Candidate1 complete TypeScript failure was not retained as a standalone raw transcript; private HANDOFF.md records the outcome."
+  ],
+  "git_artifacts": [
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/acquisition-and-authority.json",
+      "sha256": "1a2ca267d0080e51b9bd2d7bf5576da3d926a824b8ade0c6934580d877e0328a",
+      "bytes": 1244
+    },
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/browser-and-unknown.json",
+      "sha256": "4c6a58ceb6701d090ce118f3ffb73eabbdb3e524ee753140b5ac5637c87c0c3c",
+      "bytes": 1667
+    },
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/candidate-history.json",
+      "sha256": "f200bd175af6395c992be96cd5271031020e2186660823bff6840c4a87e43a2e",
+      "bytes": 6172
+    },
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/checkpoint.json",
+      "sha256": "73a3a26daba6ef4bb21729f0716d02345e51ceb7e2d440957cb7e9e2de3ee0e4",
+      "bytes": 5405
+    },
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/lifecycle-operations.json",
+      "sha256": "f407528ff532384c02760c40f108e549f6c47cc60c59c667590aed8f2a45c24a",
+      "bytes": 3812
+    },
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/migration-recovery.json",
+      "sha256": "2bc253eb95c8b8da09b16b3eae21ca3b0388e90d32080d4c7939fdeb0b8fdb3b",
+      "bytes": 6246
+    },
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/notice-lifecycle.json",
+      "sha256": "8e0c5d99b23f85c13b6c8f855df3d6da275fd310c1099a080176a2f2f60d3762",
+      "bytes": 1465
+    },
+    {
+      "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/wrapper-security.json",
+      "sha256": "b280ea399e891c76aa5a2ea6c0c6f6d290520dd89013e10e0ee1c2fb2e1bbaff",
+      "bytes": 1522
+    }
+  ],
+  "synthetic_fixture_binding": {
+    "candidate_source_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+    "tracked_module_path": "fixtures/evolving/ipam_synthetic_feed/__init__.py",
+    "module_sha256": "6554aa7f69b7b53ddaad7adb653f3bda47f8ca30c7cda6ed1054ce43e0aeb680",
+    "provenance": "tracked candidate fixture package installed from the exact source checkout with uv sync --locked",
+    "harness_substitution": "none in the corrected timed recovery sequence; private helper scripts supplied probe requests but did not replace the feed"
+  },
+  "recovery_execution": {
+    "scope": "owned disposable synthetic clone",
+    "snapshot_age_at_restore_seconds": 3382.714,
+    "restore_seconds": 1.191,
+    "readiness_seconds_after_restore": 0.737,
+    "first_business_read_seconds_from_restore_start": 1.931,
+    "post_snapshot_writes_replaced_in_clone": {
+      "reservations": 4,
+      "allocation_requests": 3,
+      "ticket_intents": 3,
+      "reservation_history": 5,
+      "allocations": 0
+    },
+    "provisioning_boundary": "candidate source and fixture package, uv-locked Python dependencies, candidate2 UI assets, reviewed synthetic configuration, and host runtime were provisioned before timing; all excluded from reported incident duration",
+    "incident_boundary": "monotonic start immediately before stopped restore through first authenticated selected-domain business read",
+    "launch_environment": {
+      "working_directory": "exact candidate4 source checkout",
+      "python_executable": ".venv/bin/python",
+      "PYTHONPATH": "not overridden; installed exact-candidate package supplied tracked fixture module",
+      "IPAM_DATA_DIR": "candidate4/recovery-timed3/data",
+      "IPAM_ACCESS_CONFIG": "access-config-r1.json; body excluded",
+      "IPAM_STATIC_DIR": "ui/candidate2-dist",
+      "service_port": 18773
+    }
+  },
+  "candidate_lineage": {
+    "candidate2": "996d0a8cadeb1d399eb780862055ccdc19211488",
+    "candidate4": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+    "candidate2_ancestor_of_candidate4": true,
+    "frontend_tree_same": true,
+    "frontend_tree_id": "6f66b9899276bd55fe0f62a8521945725bc6ead5",
+    "frontend_package_lock_blob": "dbbecd811d7145e89f80aac002e17f870b5ecde6",
+    "uv_lock_blob": "56671dad30939e0e1df3fdf0e44105316f15a3d1",
+    "pyproject_blob": "931397380ed4f4cfa46e1c7737b0bcb5706faad8",
+    "candidate2_build": "npm ci and full npm run build succeeded; pinned assets later served by candidate4"
+  },
+  "curl_bootstrap_correction": {
+    "failure": "candidate1 wrapper bootstrap saw HTTP 200 but curl -silent enabled --include via short-option clustering, contaminating JSON body",
+    "corrective_commit": "f8d381adb3a604251b5486ecfa10148bb1491f81",
+    "corrective_merge": "0c20a7b (PR #102)",
+    "changed_paths": [
+      "scripts/ops/health.sh",
+      "scripts/ops/acquire.sh"
+    ],
+    "candidate4_includes_fix": true,
+    "evidence": "private HANDOFF.md; logs/direct3.body; candidate4 wrapper-security.json",
+    "runtime_scope": "Candidate1 runtime reproduced the HTTP 200/header-contaminated body; candidate2 source still contained the issue but was not started for this wrapper probe; candidate4 contains the merged Spark correction."
+  }
+}
