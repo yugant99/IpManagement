@@ -673,7 +673,7 @@
     "milestone": "T011 source implementation and independent review closure",
     "status": "T021_T022_full_preparation_dispatched",
     "action": "Full T021 offline API to Opus and T022 recipient preparation to Muse on one pinned reviewed base",
-    "hold": "T025 awaits reviewed T021/T022/T024 and exact complete candidate",
+    "hold": "Finish T021/T022 source closure, notify at T024-ready, then STOP before T024 until user resumes tomorrow; no T025 execution",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "a2b567b670129671f85498729753c4d577d4768e",
     "publication_branch": "codex/bridge-ticket-integration",
@@ -724,6 +724,20 @@
       "T024": "Muse1.3 high",
       "T026": "Astra records actual human evidence or pending"
     },
-    "reviewer": "Independent GPT-6 Sol high"
+    "reviewer": "Independent GPT-6 Sol high",
+    "user_stop_boundary": "T024 ready only; do not dispatch/implement T024 or run T025 until user resumes",
+    "t024_future_owned_paths": [
+      "scripts/ops/acquire.sh",
+      "scripts/ops/health.sh",
+      "scripts/ops/README.md",
+      "specs/001-postmeeting-bridge/delivery/operator-handoff.md",
+      "Dockerfile",
+      "compose.yaml",
+      "docs/RUNNING.md",
+      "scripts/ops/start.sh",
+      "scripts/ops/backup.sh"
+    ],
+    "t024_extra_path_limit": "RUNNING bridge readiness/auth/config text; start/backup readiness/actual-volume messages/comments only, no operational flow changes",
+    "t024_volume_decision": "Require explicit IPAM_DATA_VOLUME; record fresh disposable candidate volume; deliberate recorded reuse only"
   }
 }
