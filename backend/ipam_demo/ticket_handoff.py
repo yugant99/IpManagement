@@ -533,14 +533,18 @@ def reassign_handoff(connection, intent_id, payload, *, context, configuration):
         (version, object_id, intent["version"], intent["current_route_assignment_version"]))
     if changed.rowcount != 1:
         raise _stale()
+    receipt_id = _save_receipt(connection, context, "ticket.reassign", normalized["idempotency_key"], digest,
+                               "ticket_intent", object_id, {"intent_id": object_id, "assignment_version": version})
+    # The assignment row has no receipt column; this succeeded audit is the canonical
+    # link from the exact receipt to the exact assignment it created.
     _audit(connection, context, intent, "ticket.reassign", normalized["reason"],
-           {"before": {"state": intent["state"], "route_assignment_version": current["assignment_version"],
+           {"operation_receipt_id": receipt_id,
+            "before": {"state": intent["state"], "version": intent["version"],
+                       "route_assignment_version": current["assignment_version"],
                        "route_revision": current["route_revision"], "team": current["team"]},
-            "after": {"state": "pending", "route_assignment_version": version,
+            "after": {"state": "pending", "version": intent["version"] + 1, "route_assignment_version": version,
                       "configuration_revision": str(configuration.revision),
-                      "route_revision": route.revision, "team": route.team}})
-    _save_receipt(connection, context, "ticket.reassign", normalized["idempotency_key"], digest, "ticket_intent",
-                  object_id, {"intent_id": object_id, "assignment_version": version})
+                      "route_revision": route.revision, "team": route.team, "assigned_at": now}})
     assignment = _assignment(connection, object_id, version)
     return _result(connection, context, configuration, object_id,
                    {"phase": "reassign", "assignment": _assignment_projection(assignment, context.principal_id)}), False
