@@ -22,10 +22,11 @@ from . import (__version__, feed_adapter, inventory, inventory_commands, lifecyc
 from . import access
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
-from .models import (Allocation, MigrationAssessmentCreateRequest, MigrationAssessmentDetail,
+from .models import (Allocation, CurrentStaticOccupancy, MigrationAssessmentCreateRequest, MigrationAssessmentDetail,
                      MigrationAssessmentMutation, MigrationAssessmentPage,
                      MigrationAssessmentSignoffRequest, MigrationOperationReadback,
                      Page, Pool, Prefix, PrefixDetail, ReservationDetail, ReservationHistoryEntry,
+                     ReservationNotice, ReservationNoticeEvaluation,
                      ReservationOperationReadback, ReservationReleaseRequest, ReservationSummary, Scope,
                      TicketHandoffDetail, TicketHandoffMutation, TicketHandoffOperationReadback,
                      TicketHandoffSummary)
@@ -1088,6 +1089,101 @@ def create_app() -> FastAPI:
         projected = project_reservation(result, request.state.access_context.principal_id)
         return JSONResponse(projected, status_code=200 if replay else 201,
                             headers={"X-Request-Replay": str(replay).lower()})
+
+    def notice_integrity_error():
+        return AppError("RESERVATION_NOTICE_INTEGRITY", "The reservation notice record is inconsistent.", 409)
+
+    def project_notice(value):
+        try:
+            return ReservationNotice.model_validate(value).model_dump()
+        except ValidationError as exc:
+            raise notice_integrity_error() from exc
+
+    def static_pool_scope(connection, request):
+        # Authorize the designated pool's canonical scope before any lifecycle payload or audit scope.
+        row = connection.execute("SELECT scope_id FROM pools WHERE id=?", (workflow.STATIC_POOL_ID,)).fetchone()
+        require_domain(request, connection, row["scope_id"] if row else None)
+        return row["scope_id"]
+
+    def notice_scope(connection, request, notice_id):
+        row = connection.execute(
+            "SELECT n.reservation_id,r.scope_id,r.pool_id FROM reservation_notices n "
+            "JOIN reservations r ON r.id=n.reservation_id WHERE n.id=?", (notice_id,)).fetchone()
+        if row is None or row["pool_id"] != workflow.STATIC_POOL_ID:
+            raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+        require_domain(request, connection, row["scope_id"])
+        return row
+
+    @app.get("/api/reservation-notices", response_model=Page[ReservationNotice])
+    def list_reservation_notices(request: Request, reservation_id: UUID | None = None,
+                                 limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+        ordinary_domain(request)
+        supplied = str(reservation_id) if reservation_id else None
+        if supplied is not None:
+            require_domain(request, connection, reservation_scope_id(connection, supplied))
+        items = [project_notice(item) for item in lifecycle.list_reservation_notices(connection)
+                 if supplied is None or item.get("reservation_id") == supplied]
+        return inventory.page(items, limit, offset)
+
+    @app.get("/api/reservation-notices/{object_id}", response_model=ReservationNotice)
+    def get_reservation_notice(object_id: UUID, request: Request, connection=Depends(database)):
+        ordinary_domain(request)
+        notice_scope(connection, request, str(object_id))
+        return project_notice(lifecycle.get_reservation_notice(connection, str(object_id)))
+
+    @app.post("/api/reservations/evaluate")
+    def evaluate_reservation_notices(request: Request, payload: dict):
+        def evaluate(connection):
+            require_local_role(request, "operator")
+            static_pool_scope(connection, request)
+            workflow.require_actor(payload.get("actor_id"), "inventory_edit")
+            # Server UTC and the current pool only: caller time, configuration or finding IDs are refused.
+            workflow._payload(payload, {"actor_id"})
+            result, replay = lifecycle.evaluate_reservation_notices(connection)
+            try:
+                return ReservationNoticeEvaluation.model_validate(result).model_dump(), replay
+            except ValidationError as exc:
+                raise notice_integrity_error() from exc
+        result, replay = audited_write(request, payload, "reservation.notice.evaluate", evaluate)
+        return JSONResponse(result, headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.post("/api/reservations/{object_id}/notice")
+    def acknowledge_reservation_notice(object_id: UUID, request: Request, payload: dict):
+        reservation_id = str(object_id)
+        def acknowledge(connection):
+            require_local_role(request, "operator")
+            require_domain(request, connection, reservation_scope_id(connection, reservation_id))
+            workflow.require_actor(payload.get("actor_id"), "inventory_edit")
+            notice_id = payload.get("notice_id")
+            if not isinstance(notice_id, str):
+                raise AppError("INVALID_INPUT", "notice_id must identify a reservation notice.", 422,
+                               {"field": "notice_id"})
+            try:
+                notice_id = str(UUID(notice_id))
+            except ValueError as exc:
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404) from exc
+            notice = notice_scope(connection, request, notice_id)
+            if notice["reservation_id"] != reservation_id:
+                raise AppError("NOT_FOUND", "The requested resource was not found.", 404)
+            # Only the routing field is removed; any other unknown field reaches the strict leaf and is refused.
+            forwarded = {key: value for key, value in payload.items() if key != "notice_id"}
+            result, replay = lifecycle.acknowledge_reservation_notice(connection, notice_id, forwarded)
+            projected = project_notice(result)
+            if projected["id"] != notice_id or projected["reservation_id"] != reservation_id:
+                raise notice_integrity_error()
+            return projected, replay
+        result, replay = audited_write(request, payload, "reservation.notice.acknowledge", acknowledge, reservation_id)
+        return JSONResponse(result, headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.get("/api/current-static-occupancy", response_model=CurrentStaticOccupancy)
+    def current_static_occupancy(request: Request, connection=Depends(database)):
+        ordinary_domain(request)
+        static_pool_scope(connection, request)
+        try:
+            return CurrentStaticOccupancy.model_validate(workflow.current_static_occupancy(connection)).model_dump()
+        except ValidationError as exc:
+            raise AppError("STATIC_OCCUPANCY_INTEGRITY", "The current static occupancy projection is inconsistent.",
+                           409) from exc
 
     @app.get("/api/reservations/{object_id}")
     def get_reservation(object_id: UUID, request: Request, connection=Depends(database)):
