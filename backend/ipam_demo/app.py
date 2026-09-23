@@ -16,14 +16,15 @@ from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import __version__, feed_adapter, inventory, inventory_commands, migration_compare, reconciliation, reports, source_catalog, workflow
+from . import __version__, feed_adapter, inventory, inventory_commands, lifecycle, migration_compare, reconciliation, reports, source_catalog, workflow
 from . import access
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
 from .models import (Allocation, MigrationAssessmentCreateRequest, MigrationAssessmentDetail,
                      MigrationAssessmentMutation, MigrationAssessmentPage,
                      MigrationAssessmentSignoffRequest, MigrationOperationReadback,
-                     Page, Pool, Prefix, PrefixDetail, Scope)
+                     Page, Pool, Prefix, PrefixDetail, ReservationDetail, ReservationReleaseRequest,
+                     ReservationSummary, Scope)
 from .scheduler import SyntheticScheduler
 from .store import (SCHEMA_VERSION, connect, data_directory,
                     exclusive_data_access, initialize_schema, require_initialized,
@@ -641,7 +642,7 @@ def create_app() -> FastAPI:
         result, replay = audited_write(request, payload, "allocation_request", lambda connection: (
             require_local_role(request, "requester"),
             require_domain(request, connection, request_scope(connection)),
-            workflow.create_request(connection, payload))[2])
+            workflow.create_request(connection, payload, configuration=request.state.access_configuration))[2])
         result = redact_foreign_actors(result, request.state.access_context.principal_id)
         return JSONResponse(result, status_code=200 if replay else 201, headers={"X-Request-Replay": str(replay).lower()})
 
@@ -660,6 +661,129 @@ def create_app() -> FastAPI:
         result, replay = audited_write(request, payload, "allocation_decision", decide, str(object_id))
         result = redact_foreign_actors(result, request.state.access_context.principal_id)
         return JSONResponse(result, headers={"X-Decision-Replay": str(replay).lower()})
+
+    RESERVATION_SUMMARY_KEYS = ("id", "scope_id", "prefix_id", "pool_id", "family", "address",
+                                "owner_reference", "service_reference", "reason", "created_at",
+                                "expires_at", "version", "policy_revision", "state",
+                                "converted_allocation_id", "released_at")
+    RELEASE_REQUEST_KEYS = ("id", "reservation_id", "reservation_version", "reason",
+                            "expected_pool_version", "expected_baseline_version", "state",
+                            "created_at", "decided_at", "decision_reason")
+
+    def project_reservation_history(entries, principal_id):
+        items = []
+        for entry in entries or []:
+            item = {key: entry.get(key) for key in ("id", "reservation_id", "version", "action",
+                                                    "occurred_at", "reason", "before", "after")}
+            item["actor_id"] = entry.get("actor_id")
+            items.append(ReservationHistoryEntry.model_validate(
+                redact_foreign_actors(item, principal_id)).model_dump())
+        return items
+
+    def project_reservation(value, principal_id, *, history=False):
+        item = {key: value.get(key) for key in RESERVATION_SUMMARY_KEYS}
+        creator = value.get("created_by")
+        item["created_by"] = creator if creator == principal_id else None
+        item["synthetic"] = True
+        if history:
+            item["history"] = project_reservation_history(value.get("history"), principal_id)
+            return ReservationDetail.model_validate(item).model_dump()
+        return ReservationSummary.model_validate(item).model_dump()
+
+    def project_release_request(value, principal_id):
+        item = {key: value.get(key) for key in RELEASE_REQUEST_KEYS}
+        for key in ("requester_id", "approver_id"):
+            actor = value.get(key)
+            item[key] = actor if actor == principal_id else None
+        item["synthetic"] = True
+        return ReservationReleaseRequest.model_validate(item).model_dump()
+
+    def reservation_scope_id(connection, reservation_id):
+        row = connection.execute("SELECT scope_id FROM reservations WHERE id=?", (reservation_id,)).fetchone()
+        return row["scope_id"] if row else None
+
+    @app.get("/api/reservations")
+    def list_reservations(request: Request, limit: Limit = 50, offset: Offset = 0, connection=Depends(database)):
+        ordinary_domain(request)
+        principal_id = request.state.access_context.principal_id
+        items = [project_reservation(item, principal_id) for item in lifecycle.list_reservations(connection)]
+        return inventory.page(items, limit, offset)
+
+    @app.post("/api/reservations", status_code=201)
+    def create_reservation(request: Request, payload: dict):
+        def create(connection):
+            require_local_role(request, "operator")
+            pool_id = payload.get("pool_id") if isinstance(payload, dict) else None
+            pool = connection.execute("SELECT scope_id FROM pools WHERE id=?", (pool_id,)).fetchone()
+            require_domain(request, connection, pool["scope_id"] if pool else None)
+            result, replay = lifecycle.create_reservation(connection, payload)
+            require_domain(request, connection, result.get("scope_id"))
+            return result, replay
+        result, replay = audited_write(request, payload, "reservation.create", create)
+        projected = project_reservation(result, request.state.access_context.principal_id)
+        return JSONResponse(projected, status_code=200 if replay else 201,
+                            headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.get("/api/reservations/{object_id}")
+    def get_reservation(object_id: UUID, request: Request, connection=Depends(database)):
+        item = lifecycle.get_reservation(connection, str(object_id))
+        require_domain(request, connection, item.get("scope_id"))
+        return project_reservation(item, request.state.access_context.principal_id, history=True)
+
+    @app.post("/api/reservations/{object_id}/extend")
+    def extend_reservation(object_id: UUID, request: Request, payload: dict):
+        def extend(connection):
+            require_local_role(request, "operator")
+            require_domain(request, connection, reservation_scope_id(connection, str(object_id)))
+            result, replay = lifecycle.extend_reservation(connection, str(object_id), payload)
+            require_domain(request, connection, result.get("scope_id"))
+            return result, replay
+        result, replay = audited_write(request, payload, "reservation.extend", extend, str(object_id))
+        projected = project_reservation(result, request.state.access_context.principal_id)
+        return JSONResponse(projected, headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.get("/api/reservations/{object_id}/release-requests")
+    def list_release_requests(object_id: UUID, request: Request, limit: Limit = 50, offset: Offset = 0,
+                              connection=Depends(database)):
+        ordinary_domain(request)
+        require_domain(request, connection, reservation_scope_id(connection, str(object_id)))
+        principal_id = request.state.access_context.principal_id
+        items = [project_release_request(item, principal_id)
+                 for item in lifecycle.list_release_requests(connection, str(object_id))]
+        return inventory.page(items, limit, offset)
+
+    @app.post("/api/reservations/{object_id}/release-requests", status_code=201)
+    def propose_release(object_id: UUID, request: Request, payload: dict):
+        def propose(connection):
+            require_local_role(request, "operator")
+            require_domain(request, connection, reservation_scope_id(connection, str(object_id)))
+            result, replay = lifecycle.create_release_request(connection, str(object_id), payload)
+            require_domain(request, connection, reservation_scope_id(connection, result.get("reservation_id")))
+            return result, replay
+        result, replay = audited_write(request, payload, "reservation.release.propose", propose, str(object_id))
+        projected = project_release_request(result, request.state.access_context.principal_id)
+        return JSONResponse(projected, status_code=200 if replay else 201,
+                            headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.get("/api/reservations/{object_id}/release-requests/{request_id}")
+    def get_release_request(object_id: UUID, request_id: UUID, request: Request, connection=Depends(database)):
+        ordinary_domain(request)
+        require_domain(request, connection, reservation_scope_id(connection, str(object_id)))
+        item = lifecycle.get_release_request(connection, str(object_id), str(request_id))
+        require_domain(request, connection, reservation_scope_id(connection, item.get("reservation_id")))
+        return project_release_request(item, request.state.access_context.principal_id)
+
+    @app.post("/api/reservations/{object_id}/release-requests/{request_id}/decision")
+    def decide_release(object_id: UUID, request_id: UUID, request: Request, payload: dict):
+        def decide(connection):
+            require_domain(request, connection, reservation_scope_id(connection, str(object_id)))
+            result, replay = lifecycle.decide_release_request(
+                connection, str(object_id), str(request_id), payload)
+            require_domain(request, connection, reservation_scope_id(connection, result.get("reservation_id")))
+            return result, replay
+        result, replay = audited_write(request, payload, "reservation.release.decision", decide, str(object_id))
+        projected = project_release_request(result, request.state.access_context.principal_id)
+        return JSONResponse(projected, headers={"X-Request-Replay": str(replay).lower()})
 
     @app.get("/api/audit")
     def audit(request: Request, request_id: UUID | None = None, subject_id: TextFilter = None, limit: Limit = 50,
