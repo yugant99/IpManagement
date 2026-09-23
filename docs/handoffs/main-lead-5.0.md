@@ -21,6 +21,18 @@ validated technical-package merge. Perform the merge at that checkpoint; do not
 leave a qualifying PR in draft indefinitely. Current T011 source-only PR79 has
 not reached that gate.
 
+**Next mergeable point — user follow-up, 2026-09-22:** Under the current policy,
+the next bridge-to-main merge is the T028 technical Tier A checkpoint, not T011.
+At takeover, make one bounded merge-readiness pass: refresh main/PR79, confirm the
+assembled dependency lineage, and list the remaining T012–T024 implementation,
+T025 exact-candidate runtime, independent-review and T028 disposition gates.
+Then continue the critical-path work; do not spend the next phase trying to
+merge a source-only candidate. If a coherent earlier vertical slice is proposed
+for main, first record its exact boundaries, compatibility/recovery risks and
+focused runtime evidence needed, then obtain an explicit amendment to the
+T028 policy and validation scope. Neither this note nor source review authorizes
+an earlier merge or early application checks.
+
 - Canonical repository: `/Users/yuganthareshsoni/Downloads/Ip_inventory`,
   `yugant99/IpManagement`. Preserve its untracked `audit/` and `outputs/`.
 - Main remains `04eba98cb8673406d1e5d38c5318fb963cc77ff7`. No bridge PR was merged to main.
@@ -100,12 +112,17 @@ or `codex/bridge-lifecycle-integration` (`3add18986096e8fd9bc6ac509db28fc08b6bf2
 
 ## Decisions to preserve
 
-- Current routes: Astra lead; GPT-6 Luna high implementation; GPT-6 Sol high
-  independent review and escalation. **OpenCode is paused. All Claude/Fable/Opus
-  use is stopped.** The one Opus 5.5 advisory completed before the stop request.
-  T027's old Fable assignment is superseded; preserve its review intent using the
-  authorized Codex route or a documented pending gate, without calling Claude.
-  Do not inspect or use the previously pasted credential or enable extra spend.
+- Default routes at handoff: Astra lead; GPT-6 Luna high implementation; GPT-6
+  Sol high independent review and escalation. The user's later 2026-09-22 update
+  permits considering OpenCode Muse 1.3 high and a bounded Opus 5.5 Claude Code
+  assignment, superseding the earlier blanket pause. These are available options,
+  not mandatory substitutions or authorization for extra spend. Check the exact
+  route/limits and give either model a small, isolated task with a retained output
+  before widening use. The user's Meta-training permission covers this synthetic
+  repository, not private customer documents, credentials or untracked outputs.
+  T027 still needs an actual exact-candidate independent review or a recorded
+  pending gate; the old design advisory does not satisfy it. Do not inspect or
+  use the previously pasted credential.
 - C-M final wire and lineage sections are normative. Assessment is immutable
   comparison with anchored content digest, separate active-only counts and
   independent exact-current sign-off; it never promotes inventory. T009 receipt
@@ -167,17 +184,22 @@ amendments control historical prose. Then continue T012 reservation API and T013
 simulated ticket core from a pinned shared base, with explicit disjoint leases.
 
 Use GPT-6 Luna for implementation and GPT-6 Sol for independent review/escalation;
-Astra remains lead. OpenCode is paused and all Claude/Fable/Opus use is stopped.
-Do not substitute routes, buy capacity, repeat setup or call Claude.
+Astra remains lead. The user's later update allows a bounded OpenCode Muse 1.3
+high pilot and a small Opus 5.5 Claude Code assignment if useful. Check the route,
+usage and data boundary first; do not treat either option as a mandatory change,
+buy capacity, repeat setup or pass private source material to a training route.
 
 Keep this source-only until the already authorized bounded T025 disposable
 synthetic acceptance gate has its prerequisites. No routine tests/build/runtime,
 user-store mutation, deployment, customer access or new infrastructure.
+First make the bounded merge-readiness pass in this handoff, then continue T012/T013.
 Follow docs/MAIN_MERGE_POLICY.md: complete technical Tier A, exact-candidate T025
 pass, closed blocking reviews and T028 lead adjudication of all gate dispositions.
 Then merge promptly through the PR. A truthfully pending human rehearsal limits
 human-handoff claims, not that technical merge. Use authorized GPT-6 Sol for T027
-final review; no Claude invocation. No main merge before these gates pass.
+final review; any small Opus advisory is additional, not a silent substitute for
+that gate. No main merge before these gates pass or an explicit earlier-merge
+policy amendment.
 Preserve the source/runtime/portable/human evidence distinctions and all three
 111-row ledgers. Keep Spencer's human gates honest and Tier B locked.
 
