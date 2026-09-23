@@ -196,12 +196,13 @@
           "backend/ipam_demo/app.py",
           "backend/ipam_demo/scheduler.py"
         ],
-        "status": "source_closed_integrated_affected_runtime_pending",
+        "status": "source_closed_integrated_affected_runtime_observed_pass",
         "finding": "Request database read transaction outlives separate scheduler writer; T025 timeout/STORE_BUSY, exact unknown key retained",
         "boundary": "No journal/isolation/timeout workaround, no author runtime; Sol source review and separate Luna affected exact-candidate rerun required",
         "result_sha": "7975307e4210083ba7ea6d34e6b80c652c15002c",
         "pull_request": "https://github.com/yugant99/IpManagement/pull/103",
-        "source_integration_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60"
+        "source_integration_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+        "runtime_observation": "Independent Luna reports candidate4 acquisition201, same-key replay200/no new cycle, changed-reason409, coordinator reconciliation201, ordinary-domain global denial403 and stale pins409. Full T025 still pending."
       }
     },
     {
@@ -724,13 +725,14 @@
         "author": "same Spark Contributor session and lease",
         "result_sha": "f8d381adb3a604251b5486ecfa10148bb1491f81",
         "pull_request": "https://github.com/yugant99/IpManagement/pull/102",
-        "status": "source_closed_integrated_affected_runtime_pending",
+        "status": "source_closed_integrated_basic_wrapper_runtime_observed_pass",
         "owned_paths": [
           "scripts/ops/acquire.sh",
           "scripts/ops/health.sh"
         ],
         "source_integration_sha": "0c20a7ba82c9802d20223d164efdc830e9ab1eac",
-        "reviewer_thread_id": "01a0cf9a-ce88-7f90-8556-1fa4b131bf26"
+        "reviewer_thread_id": "01a0cf9a-ce88-7f90-8556-1fa4b131bf26",
+        "runtime_observation": "Candidate4 liveness/all-six protected readiness and acquisition status/header/body triples pass; remaining wrapper security/negative matrix and full T025 still pending."
       }
     },
     {
@@ -748,10 +750,11 @@
       "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
       "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
       "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker",
-      "current_blocker": "Earlier UI/wrapper/acquisition failures preserved. Original-author corrections source-reviewed/integrated; affected candidate4 acquisition/global-run runtime and full remaining T025 evidence pending. No passing gate.",
+      "current_blocker": "No newly reported unresolved code correction at this checkpoint. Full required criterion matrix, populated recovery/business comparison and final review remain unfinished; partial runtime successes are not T025 PASS.",
       "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
       "current_candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
-      "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory"
+      "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory",
+      "observed_progress": "Verifier reports successful candidate4 acquisition/replay/reason conflict/global-run/domain denial/stale pins and controlled response-loss recovery; migration/reservation/notice cases progressing. Preliminary storage restore was explicitly not the final populated business recovery proof."
     }
   ],
   "muse_route": {
@@ -778,7 +781,7 @@
   "current_handover_gate": {
     "milestone": "T024 independently source-closed and integrated",
     "status": "T025_in_progress_candidate4",
-    "action": "Visible Luna reruns corrected coordinator transaction paths and completes required workflow/recovery evidence; Sol T027 and T028 remain gated",
+    "action": "Visible Luna completes remaining recipient/ticket/concurrency/security and populated recovery evidence; source/runtime earlier failures retained; final SolT027 and T028 remain gated",
     "hold": "No main merge before T028; portable/human remain separate; Tier B locked",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
@@ -802,7 +805,7 @@
     },
     "opencode_credit": "disabled; balance0",
     "data_use": "Current paid/free training controls enabled, unchanged. Public tracked synthetic source only. Free route has no numeric quota receipt; availability failed.",
-    "native_codex_weekly_used_percent": 62,
+    "native_codex_weekly_used_percent": 65,
     "native_routes": "gpt-6-sol high SOL_PREFLIGHT_OK; gpt-6-luna high LUNA_PREFLIGHT_OK",
     "reserve": "20% reserve retained",
     "evidence_root": "/tmp/ipam-lead6",
