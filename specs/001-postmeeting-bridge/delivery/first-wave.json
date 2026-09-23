@@ -608,7 +608,7 @@
     },
     {
       "task": "T021",
-      "status": "implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98",
       "branch": "codex/bridge-t021-offline-api",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t021-opus/Ip_inventory",
@@ -624,11 +624,15 @@
         "T020"
       ],
       "review_route": "Independent GPT-6 Sol high",
-      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes."
+      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes.",
+      "result_sha": "3007bf33dd3481f1b85723b0a1c4971036b5f089",
+      "pr_url": "https://github.com/yugant99/IpManagement/pull/96",
+      "review_report": "specs/001-postmeeting-bridge/delivery/offline-api-source-review.md",
+      "integration_sha": "e6b76edaa9ae5b82a0c409fec151bf52168036bc"
     },
     {
       "task": "T022",
-      "status": "implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98",
       "branch": "codex/bridge-t022-recipient-pack",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t022-muse/Ip_inventory",
@@ -645,7 +649,36 @@
         "T020"
       ],
       "review_route": "Independent GPT-6 Sol high",
-      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes."
+      "prohibited": "Source/docs only; no application checks/tests/builds/imports/DB/runtime/shell/Git/network/private/untracked/credentials/extra agents/models/capacity changes. Lead publishes.",
+      "result_sha": "c231663ef9a9747c83288523da9ede93977bef42",
+      "pr_url": "https://github.com/yugant99/IpManagement/pull/95",
+      "review_report": "specs/001-postmeeting-bridge/delivery/recipient-preparation-source-review.md",
+      "integration_sha": "6e0a036339005d3c1101017374a6b36e1957a3a5"
+    },
+    {
+      "task": "T024",
+      "status": "ready_user_hold_not_dispatched",
+      "route": "opencode-go/muse-spark-1.3-contributor#high",
+      "base_sha": null,
+      "required_source_assembly": "e6b76edaa9ae5b82a0c409fec151bf52168036bc",
+      "branch": null,
+      "worktree": null,
+      "provider_session_id": null,
+      "owned_paths": [
+        "scripts/ops/acquire.sh",
+        "scripts/ops/health.sh",
+        "scripts/ops/README.md",
+        "specs/001-postmeeting-bridge/delivery/operator-handoff.md",
+        "Dockerfile",
+        "compose.yaml",
+        "docs/RUNNING.md",
+        "scripts/ops/start.sh",
+        "scripts/ops/backup.sh"
+      ],
+      "review_route": "Independent GPT-6 Sol high",
+      "release_condition": "User resumes after stop-before-T024; refresh exact route/usage and pin one current publication base before dispatch",
+      "pickup": "docs/handoffs/main-lead-5-t024-pickup.md",
+      "nonclaims": "No T024 implementation or T025 runtime; source readiness only"
     }
   ],
   "muse_route": {
@@ -670,16 +703,19 @@
     "instruction": "Latest delegated user routing update supersedes T013-only limit. Exact claude-opus-5-5 high for retained T013 corrections and next full T017 implementation after reviewed prerequisites. Stop on quota/payment requirements; no purchase, credits or overage activation."
   },
   "current_handover_gate": {
-    "milestone": "T011 source implementation and independent review closure",
-    "status": "T021_T022_full_preparation_dispatched",
-    "action": "Full T021 offline API to Opus and T022 recipient preparation to Muse on one pinned reviewed base",
-    "hold": "Finish T021/T022 source closure, notify at T024-ready, then STOP before T024 until user resumes tomorrow; no T025 execution",
+    "milestone": "T024-ready after T021/T022/T023 independent source closure",
+    "status": "T024_ready_user_hold",
+    "action": "Notify user and stop before T024 until user resumes tomorrow",
+    "hold": "No T024 dispatch/implementation or T025 execution while user hold remains",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "a2b567b670129671f85498729753c4d577d4768e",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
-    "next_shared_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98"
+    "next_shared_base_sha": null,
+    "source_assembly_sha": "e6b76edaa9ae5b82a0c409fec151bf52168036bc",
+    "pickup": "docs/handoffs/main-lead-5-t024-pickup.md",
+    "completed_preparation_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98"
   },
   "lead_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
   "latest_provider_preflight": {
@@ -738,6 +774,7 @@
       "scripts/ops/backup.sh"
     ],
     "t024_extra_path_limit": "RUNNING bridge readiness/auth/config text; start/backup readiness/actual-volume messages/comments only, no operational flow changes",
-    "t024_volume_decision": "Require explicit IPAM_DATA_VOLUME; record fresh disposable candidate volume; deliberate recorded reuse only"
+    "t024_volume_decision": "Require explicit IPAM_DATA_VOLUME; record fresh disposable candidate volume; deliberate recorded reuse only",
+    "status": "T020_T021_T022_T023_source_closed_T024_ready_user_hold"
   }
 }

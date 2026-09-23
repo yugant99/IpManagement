@@ -69,3 +69,10 @@ No token belongs in Compose environment, images, CLI arguments, logs or snapshot
 Observed host/Compose/runtime versions belong to the later authorized T025 gate,
 not to T024 source preparation. An unavailable target does not prevent source work
 once resumed, but prevents target-specific runtime/portable claims.
+
+
+T021/T022 source closure is recorded in `offline-api-source-review.md` and
+`recipient-preparation-source-review.md`; T023 is already source-closed. The lead
+assembled all prerequisites at `e6b76edaa9ae5b82a0c409fec151bf52168036bc` and stopped
+at T024-ready. Exact resume record: `docs/handoffs/main-lead-5-t024-pickup.md`.
+T024 has no dispatched worker or implementation yet.

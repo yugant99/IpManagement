@@ -152,3 +152,15 @@ and no open review threads on PR79/84/92/93. Stacked PR85–91 are marked merged
 inclusion into the source integration branch, not main. T025 still awaits the
 complete prerequisite candidate; no application execution has occurred. T028,
 all evidence-class boundaries and the Tier B lock remain controlling.
+
+## T024-ready stop — latest user instruction, 2026-09-23
+
+T021/T022/T023 have independent source closure, assembled at `e6b76edaa9ae5b82a0c409fec151bf52168036bc`.
+T023 was completed alongside earlier source work; no runtime has been claimed.
+The user asked to be notified here and pick up T024 tomorrow. T024 has no dispatched
+worker, branch or implementation; stop before it. Current lead remains Astra task
+`01a0ccc7-6219-73c1-bd3b-1521bb71a837`. Read
+[the exact T024 pickup](main-lead-5-t024-pickup.md), including the future bounded
+nine-path lease, explicit volume choice, fresh route/usage preflight and unchanged
+T025/T028/Tier B boundaries. Spencer's unstarted preparation was reassigned to
+agents by the user; no tomorrow Spencer task or actual human receipt is invented.

@@ -141,11 +141,11 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
   Prerequisites: T002; owner: Muse 1.3 high in OpenCode; FR-004 FR-007 FR-009 FR-010 FR-011 FR-012 FR-021. Completion: All integration clauses classified; no guessed endpoint or simulated-as-live entry.
 
-- [ ] T021 [US4] Pin offline API to candidate with auth/domain/errors/reviewed versions/replay/raw-versus-projection/simulation examples; reuse authenticated interactive reference. Files: `specs/001-postmeeting-bridge/delivery/offline-api.md`.
+- [x] T021 [US4] Pin offline API to candidate with auth/domain/errors/reviewed versions/replay/raw-versus-projection/simulation examples; reuse authenticated interactive reference. Files: `specs/001-postmeeting-bridge/delivery/offline-api.md`.
 
   Prerequisites: T009 T014 T017A T020; owner: Opus 5.5 high in Claude Code; FR-009 FR-015 FR-019. Completion: Source-accurate examples distinguish illustrative from observed; no secret/vendor invention.
 
-- [ ] T022 [P] [US4] Day2 two-hour finish: one recipient prerequisites/config template, migration reconciliation/counts/signoff/cancel boundary, separate operational compensation, actual acknowledgement fields. Files: `specs/001-postmeeting-bridge/delivery/recipient-validation.md`, `specs/001-postmeeting-bridge/delivery/configuration-example.json`.
+- [x] T022 [P] [US4] Day2 two-hour finish: one recipient prerequisites/config template, migration reconciliation/counts/signoff/cancel boundary, separate operational compensation, actual acknowledgement fields. Files: `specs/001-postmeeting-bridge/delivery/recipient-validation.md`, `specs/001-postmeeting-bridge/delivery/configuration-example.json`.
 
   Prerequisites: T010 T015 T020 T017A; owner: Muse 1.3 high in OpenCode; FR-002 FR-014 FR-021. Completion: One Linux amd64 target declared or explicitly unavailable; no fabricated signoff/cutover.
 
@@ -262,3 +262,12 @@ partial/bridge incomplete instead of lowering the passing bar. Commit coherent c
 push after three or earlier for interruption/handoff. Lead coordinates merges/acceptance.
 
 Conditional schema edge: T035 adds T030 only if the allocated-release migration was selected first; its recorded predecessor/schema SHA must be accepted before any write. Otherwise DHCP independently takes the next reserved revision. T040 adds completed selected branch task IDs before review.
+
+## T024-ready checkpoint — user hold, 2026-09-23
+
+T021 `3007bf3`, T022 `c231663` and T023 `adb2dc1` have independent Sol source
+closure; complete source assembly `e6b76edaa9ae5b82a0c409fec151bf52168036bc`.
+T021/T022 checked markers mean documentary source completion, not observed API or
+recipient acceptance. T024 remains unchecked and unstarted, held until the user
+resumes tomorrow. T025 remains unrun. See
+[the exact pickup](../../docs/handoffs/main-lead-5-t024-pickup.md).
