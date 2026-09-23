@@ -169,15 +169,15 @@ Claude stop supersedes the old T027 Fable route below: GPT-6 Sol performs that f
 candidate/evidence review intent, with the actual route recorded. Do not invoke or
 mark Fable completed. Historical task-graph role labels do not override this update.
 
-- [ ] T025 Only after explicit validation permission, observe quickstart Tier A success/denial/stale/replay/concurrency/unknown/aging and stopped recovery at exact candidate; missing permission is not run and blocks runtime acceptance. Include domain denial of every global job/callback and no replay leakage; normalized-content duplicate control. Files: `specs/001-postmeeting-bridge/delivery/independent-evidence.md`.
+- [x] T025 Only after explicit validation permission, observe quickstart Tier A success/denial/stale/replay/concurrency/unknown/aging and stopped recovery at exact candidate; missing permission is not run and blocks runtime acceptance. Include domain denial of every global job/callback and no replay leakage; normalized-content duplicate control. Files: `specs/001-postmeeting-bridge/delivery/independent-evidence.md`.
 
   Prerequisites: T018 T019 T021 T022 T023 T024; owner: Luna independent verifier; FR-001 FR-002 FR-003 FR-004 FR-005 FR-006 FR-008 FR-009 FR-013 FR-015 FR-016 FR-019 FR-021. Completion: Every Tier A criterion has independent evidence or blocker; no reduced passing bar.
 
-- [ ] T026 Record later authorized guided human rehearsal role/candidate/target/steps/outcome/ack; if unavailable/unauthorized record pending and limit handoff to technical package. Files: `specs/001-postmeeting-bridge/delivery/human-rehearsal.md`.
+- [x] T026 Disposition recorded: human rehearsal **PENDING / NOT RUN**. Record later authorized guided human rehearsal role/candidate/target/steps/outcome/ack; if unavailable/unauthorized record pending and limit handoff to technical package. Files: `specs/001-postmeeting-bridge/delivery/human-rehearsal.md`.
 
   Prerequisites: T025; owner: Astra records actual human evidence or pending disposition; FR-020 FR-021. Completion: Human-handoff claim only with actual acknowledgement; agent reproduction not substitute.
 
-- [ ] T027 Final pre-acceptance GPT-6 Sol high review on the exact implementation candidate and retained T025 evidence for contradictions/history/authority/recovery/false claims and critical-path feasibility. Files: `specs/001-postmeeting-bridge/delivery/sol-final-review.md` (actual reviewer and visible task recorded; the historical Fable design advisory remains separate).
+- [x] T027 Final pre-acceptance GPT-6 Sol high review on the exact implementation candidate and retained T025 evidence for contradictions/history/authority/recovery/false claims and critical-path feasibility. Files: `specs/001-postmeeting-bridge/delivery/sol-final-review.md` (actual reviewer and visible task recorded; the historical Fable design advisory remains separate).
 
   Prerequisites: T024 T025; owner: independent GPT-6 Sol high in Codex, review to Main Lead; FR-001 FR-002 FR-003 FR-004 FR-005 FR-009 FR-016 FR-021. Completion: Actual exact-candidate/evidence review with lead adjudication and closure of blocking findings; no Fable completion is claimed. The separate post-spec/dispatch-lock design advisory (FABLE-DESIGN after T001) does not complete T027.
 
@@ -276,6 +276,8 @@ resumes tomorrow. T025 remains unrun. See
 
 The latest user takeover/resume supersedes the historical sleep hold above. T024
 was completed by Spark Contributor high and independently source reviewed. T025
-is in progress on frozen candidate `8eb3e231b7792fe8415455d2176e962b8f953d60`,
-including reviewed runtime-discovered author corrections. T025 has not passed;
-T027 and T028 remain gated. See the Main Lead6 transfer and first-wave registry.
+is accepted for the bounded local synthetic candidate `8eb3e231b7792fe8415455d2176e962b8f953d60`,
+including reviewed runtime-discovered author corrections. Sol T027 is closed and
+T026 records the permitted pending human disposition. T028 main merge is eligible
+after acceptance-record review and a fresh head check; no merge has yet occurred
+at this checkpoint. See the lead adjudication and Main Lead6 transfer.

@@ -1,9 +1,10 @@
 # Validation and handoff criteria — observations recorded separately
 
 This guide defines the required observations; its example commands are not evidence or
-permission to execute them. T025 is in progress under the user's scoped native disposable
-synthetic authorization. Actual candidate-bound results belong in
-`delivery/independent-evidence.md`, not in this checklist. T025 has not yet passed.
+permission to execute them. T025 was performed under the user's scoped native disposable
+synthetic authorization. Actual candidate-bound results are retained in
+`delivery/independent-evidence.md`; acceptance and limitations are recorded in
+`delivery/lead-adjudication.md`. This checklist itself is not a result.
 Package/recipient execution and human contact retain their separate authorization gates.
 
 ## Prerequisites and candidate

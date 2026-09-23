@@ -737,7 +737,7 @@
     },
     {
       "task": "T025",
-      "status": "in_progress_candidate4_evidence_checkpoint",
+      "status": "accepted_bounded_local_synthetic",
       "route": "Codex gpt-6-luna high",
       "worker": "Visible Codex task01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f",
       "base_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
@@ -750,13 +750,16 @@
       "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
       "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
       "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker",
-      "current_blocker": "No newly reported unresolved code correction. Remaining required technical observations and complete criterion/artifact mapping are open; T025 and final review are not complete.",
+      "current_blocker": "None for the accepted bounded local synthetic technical criteria; T028 acceptance-record review and main merge remain next.",
       "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
       "current_candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
       "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory",
       "observed_progress": "Candidate4 acquisition/replay/response-loss, scoped workflow and notices, true overlapping reservation requests, authenticated browser memory/reload/revocation, and populated stopped restore with all 32 table hashes equal plus separate readiness/business reads are retained. Initial preliminary recovery proof remains distinguished from final populated comparison.",
       "evidence_pr": "https://github.com/yugant99/IpManagement/pull/104",
-      "evidence_checkpoint_sha": "2e204379691cba1b59686ba9d2bbbeb57bacebcd"
+      "evidence_checkpoint_sha": "2e204379691cba1b59686ba9d2bbbeb57bacebcd",
+      "evidence_final_sha": "75f213ea8934cb275a083724c1dc4d3ce79d2c42",
+      "final_review_sha": "1f2d64ab9200733b459d2584be07f35b204917ed",
+      "final_review_pr": "https://github.com/yugant99/IpManagement/pull/105"
     }
   ],
   "muse_route": {
@@ -885,5 +888,18 @@
     "handoff": "/Users/yuganthareshsoni/Downloads/Ip_inventory-t025-artifacts/run-20260923-lead6/HANDOFF.md",
     "ownership": "Visible Sol retains independent source/T027 review; visible Luna retains independent verifier evidence branch; no duplicate execution or implementation reassignment.",
     "retained_t005_author_thread_id": "01a0cb1e-a711-70a3-a74d-5651989a0355"
+  },
+  "t028_adjudication": {
+    "state": "accepted_for_main_merge_pending_document_review_and_fresh_heads",
+    "application_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+    "evidence_sha": "75f213ea8934cb275a083724c1dc4d3ce79d2c42",
+    "review_sha": "1f2d64ab9200733b459d2584be07f35b204917ed",
+    "main_before": "04eba98cb8673406d1e5d38c5318fb963cc77ff7",
+    "main_pr": "https://github.com/yugant99/IpManagement/pull/98",
+    "human_rehearsal": "pending_not_run",
+    "recipient_portability": "unobserved",
+    "commercial_roles": "documentary_unassigned",
+    "questionnaire_promotion": false,
+    "tier_b": "locked"
   }
 }
