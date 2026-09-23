@@ -17,6 +17,8 @@ Vercel's current [Jev model page](https://vercel.com/ai-gateway/models/jev) iden
 
 The [Gateway pricing page](https://vercel.com/docs/ai-gateway/pricing) describes free credits, but this account's actual response requires a valid card before serving requests. No card was added, credit purchased or reset consumed. A card/account decision belongs to the user; this lane cannot clear it. If access changes, run only the same bounded synthetic pilot, inspect the typed distributions and compare against the human rubric before any routing automation. Jev's confidence would remain a judgment about supplied state, not proof of IPAM behavior.
 
+**Follow-up, 2026-09-23:** after the user reported adding card information, the original protected key still returned the same 403. A newly supplied credential was then placed in the protected local key file without echo and used for one bounded retry. AI Gateway returned **401 `GatewayAuthenticationError`: invalid API key or token**, after 379 ms; no typed answer or usage was returned, and the remaining cases were not sent. The unusable local copy was removed afterward. Vercel's [authentication guide](https://vercel.com/docs/ai-gateway/authentication-and-byok) directs local users to create a key under **AI Gateway → API Keys**. This follow-up does not establish that the card update failed: the new attempt failed at authentication before billing entitlement could be assessed.
+
 ## Sol adjudication while Jev is gated
 
 | Case | Sol conclusion from source and accepted evidence | Jev disposition |
