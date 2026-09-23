@@ -1,6 +1,28 @@
 # Active model routes —2026-09-22
 
-## Latest user-directed replacements
+## Current Main Lead5 routing
+
+Astra task `01a0ccc7-6219-73c1-bd3b-1521bb71a837` leads. Explicit takeover and
+the later delegated routing update supersede the provider pause below. Complete
+T012 used `opencode-go/muse-spark-1.3-contributor#high`; complete T013 used
+Claude Code `claude-opus-5-5` with high effort. T014/T016 were already assigned to
+native GPT-6 Luna high and retain their original correction owners.
+
+Next coherent assignments: full T015 workflow UI to Muse1.3 high and full T017
+notice API to Opus5.5 high after reviewed prerequisites. Give Muse the larger
+subsequent share (T018/T023 when graph and file leases permit). Native GPT-6 Sol
+high independently reviews before source integration; Luna remains later fallback
+and current author, not a replacement for the requested external implementations.
+
+Exact source-only tool permissions and isolated worktrees exclude private documents,
+credentials, untracked outputs and external directories. Existing Muse paid-training
+consent was already enabled at takeover; no setting was changed. Latest read-only
+usage: Go rolling0%/week40%/month20%; Claude session4%/week31%/Fable24%. Credits
+remain disabled or zero, auto-reload off; no purchase/reset. Retain20% reserve.
+See first-wave.json and main-lead-5.0-takeover.md for exact sessions/candidates.
+No application checks before gated T025, no Tier B or main merge before T028.
+
+## Earlier user-directed replacements (superseded for new dispatch)
 
 The latest user instruction pauses all OpenCode work while its limits reset. Continue
 development in Codex with **GPT-6 Luna** implementation and **GPT-6 Sol** independent

@@ -1,8 +1,12 @@
 # Main Lead 4.0 Tier A capacity preflight
 
+Current dispatch and measured provider usage are recorded in first-wave.json and
+model-routes.md under Main Lead5. The older provider pause/ownership below is
+history. No reforecast or new throughput promise is inferred from source completion.
+
 Prepared 2026-09-22 from the specification tasks, routing, roadmap, quickstart and operator contract. This is a read-only planning assessment; no application execution, test, provider call or implementation dispatch occurred.
 
-## Current decision
+## Historical forecast and decision (routing superseded)
 
 **Execution update, 2026-09-22:** Route discovery is no longer on the immediate
 critical path. OpenCode is paused; all further Claude/Fable/Opus use is stopped by
