@@ -851,7 +851,7 @@ def create_app() -> FastAPI:
         projected = project_release_request(result, request.state.access_context.principal_id)
         return JSONResponse(projected, headers={"X-Request-Replay": str(replay).lower()})
 
-    @app.get("/api/reservation-operations/{idempotency_key}")
+    @app.get("/api/reservation-operations")
     def reservation_operation_readback(
             request: Request, idempotency_key: str,
             action: Literal["reservation.create", "reservation.extend",
@@ -859,6 +859,7 @@ def create_app() -> FastAPI:
             reservation_id: UUID | None = None, connection=Depends(database)):
         domain = ordinary_domain(request)
         principal_id = request.state.access_context.principal_id
+        key = workflow._text(idempotency_key, "idempotency_key", 200)
         if action == "reservation.release.propose":
             if reservation_id is None:
                 raise AppError("INVALID_INPUT", "reservation_id is required to recover a release proposal.",
@@ -868,7 +869,7 @@ def create_app() -> FastAPI:
             row = connection.execute(
                 "SELECT * FROM reservation_release_requests "
                 "WHERE requester_id=? AND reservation_id=? AND idempotency_key=?",
-                (principal_id, supplied, idempotency_key)).fetchone()
+                (principal_id, supplied, key)).fetchone()
             if row is None:
                 return ReservationOperationReadback.model_validate(
                     {"found": False, "action": action, "original_outcome": None,
@@ -902,7 +903,7 @@ def create_app() -> FastAPI:
         row = connection.execute(
             "SELECT target_kind,target_id,result_json FROM tier_a_operation_receipts "
             "WHERE principal_id=? AND domain=? AND action=? AND idempotency_key=?",
-            (principal_id, domain, action, idempotency_key)).fetchone()
+            (principal_id, domain, action, key)).fetchone()
         if row is None:
             return ReservationOperationReadback.model_validate(
                 {"found": False, "action": action, "original_outcome": None,
