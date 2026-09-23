@@ -1,5 +1,5 @@
 import { request } from "./api";
-import type { Origin } from "./api";
+import type { Origin, Page } from "./api";
 
 export type EvidenceState = "anomalous" | "healthy" | "unknown" | "not_applicable";
 
