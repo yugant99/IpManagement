@@ -435,7 +435,8 @@
       "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git.",
       "result_sha": "adb7fc0a9d57544d6fd7c2d7db0edb4853c69a72",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/88",
-      "review_report": "specs/001-postmeeting-bridge/delivery/workflow-ui-source-review.md"
+      "review_report": "specs/001-postmeeting-bridge/delivery/workflow-ui-source-review.md",
+      "integration_sha": "04b03378c0779a3363920c0777466b59cab10131"
     },
     {
       "task": "T017",
@@ -463,7 +464,7 @@
     },
     {
       "task": "T016A",
-      "status": "source_correction_independent_review",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "b24e50728c9dcd071a4f69534e9110c6d3e58348",
       "branch": "codex/bridge-t016a-recipient-foundation",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016a-muse/Ip_inventory",
@@ -483,7 +484,8 @@
       "prohibited": "No frozen schema6 edit, unleased source, tests/build/typecheck/import/DB/runtime/shell/network/private or untracked content, extra agents/models/spend. Lead publishes.",
       "result_sha": "8cd51d583a75cb991bccf215590ba1b2f7efca24",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/89",
-      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md"
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md",
+      "integration_sha": "04b03378c0779a3363920c0777466b59cab10131"
     }
   ],
   "muse_route": {
@@ -509,11 +511,11 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T015_review_and_T016A_recipient_foundation",
+    "status": "T015_T016A_source_accepted_T016B_next",
     "action": "Main Lead5 continues critical path with full Muse T015 and Opus T017 after exact common base pin",
     "hold": "T025 remains prerequisite-gated; FR006 implementation/evidence and Spencer prerequisites open; recipient authority explicitly settled",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "11e6728317d9c2da5296975f3f2f1bbce516e785",
+    "application_source_sha": "04b03378c0779a3363920c0777466b59cab10131",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
@@ -547,7 +549,7 @@
       "T016B": "retained Luna T016 lifecycle author",
       "T017A": "retained Opus5.5 high T017 API author"
     },
-    "status": "T016A_dispatched_after_T017_source_acceptance",
+    "status": "T016A_source_accepted_T016B_next",
     "reviewer": "Independent GPT-6 Sol high",
     "gate": "T018/T023 now wait for T017A; T025/T028 unchanged, no runtime before prerequisites"
   }

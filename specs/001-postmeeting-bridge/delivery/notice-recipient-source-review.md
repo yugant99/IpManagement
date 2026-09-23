@@ -17,7 +17,8 @@ acknowledged state with an older acknowledgement version.
 
 Candidate8cd51d583a75cb991bccf215590ba1b2f7efca24 adds explicit non-null/integer
 constraints and the missing legacy state/version guard. Independent delta closure
-is pending. No source acceptance or migration execution is claimed at this point.
+closed with no remaining source blocker. Source integration suitability only;
+no migration/DB/runtime acceptance is claimed.
 The migration retains only actual known current and distinct older acknowledgement
 versions as legacy_unbound; all original source history stays unchanged.
 

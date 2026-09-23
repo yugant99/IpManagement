@@ -113,3 +113,18 @@ T015/T017 authors continue their pinned source assignments; no in-flight lease i
 reassigned. A separate full recipient-authority feature follows the reviewed T017
 base before notice UI/T023 finalization. Existing T016 author retains corrections
 to its reviewed operator-only source. No test/build/runtime gate is advanced.
+
+## Reviewed recipient foundation and workflow checkpoint — 2026-09-23
+
+T015 Muse full workflow UI source accepted at adb7fc0a9d57544d6fd7c2d7db0edb4853c69a72
+(PR88); T016A Muse recipient config/schema7 source accepted at
+8cd51d583a75cb991bccf215590ba1b2f7efca24 (PR89). Independent GPT-6 Sol high closed
+all recorded findings on exact candidates. Integrated application source: 04b03378c0779a3363920c0777466b59cab10131.
+
+The settled user policy now has a reviewed foundation; T016B recipient lifecycle
+and T017A strict API amendments follow before T018 and T023. Original Luna T016
+and Opus T017 authors retain ownership. Native Codex usage refreshed at26% weekly
+used (74% remaining); no reset/purchase. No application execution occurred.
+Spencer T020 worktree remains clean atab005d8bf3b6c57e0a071707796d18514c278674
+without the matrix; preserve T020/T022/T024/T026 ownership. PR79 remains draft,
+unchanged aaec3b625ff84554e93e3116d8102a3eb5c347e7. T025/T028 gates unchanged.

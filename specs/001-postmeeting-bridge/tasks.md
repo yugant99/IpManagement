@@ -118,7 +118,7 @@ The user selected configured domain/scope Operator recipients and explicit in-ap
 acknowledgement as receipt. See contracts/notice-recipient-wire.md. Schema7 is TierA;
 historical schema6 remains unchanged and no old Operator ack becomes a receipt.
 
-- [ ] T016A Implement complete reviewed recipient configuration and recognized schema7 notification history foundation. Files: `backend/ipam_demo/access.py`, `backend/ipam_demo/store.py`, `backend/ipam_demo/schema_v7.sql`. Prerequisites: T017 source acceptance; owner: Muse1.3 high in OpenCode. Independent Sol review, no application execution.
+- [x] T016A Implement complete reviewed recipient configuration and recognized schema7 notification history foundation. Files: `backend/ipam_demo/access.py`, `backend/ipam_demo/store.py`, `backend/ipam_demo/schema_v7.sql`. Prerequisites: T017 source acceptance; owner: Muse1.3 high in OpenCode. Independent Sol review, no application execution.
 - [ ] T016B Integrate immutable per-version binding, explicit evaluation renewal, recipient-only receipt and original-version readback into the notice lifecycle. Files: `backend/ipam_demo/lifecycle.py`, `backend/ipam_demo/workflow.py`. Prerequisites: T016A; owner: retained Luna T016 author. Independent Sol review; legacy facts and no-free-on-expiry preserved.
 - [ ] T017A Integrate reviewed configuration forwarding, strict current/history DTOs and scoped notification-version recovery endpoint. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`. Prerequisites: T016B; owner: retained Opus5.5 high T017 author. Independent Sol review; no external delivery claim.
 
