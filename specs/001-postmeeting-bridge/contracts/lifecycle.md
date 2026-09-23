@@ -102,3 +102,13 @@ lower T025/T028's passing bar. Satisfying it needs an explicitly settled trusted
 owner/recipient mapping and its scoped authorization contract, or a separately
 accepted requirement disposition. T016 must not invent an identity from a label
 or add unreviewed schema/configuration. Source completion alone promotes no row.
+
+### Subsequent explicit recipient-policy decision
+
+The user has chosen reviewed configuration with one Operator recipient per
+domain/scope, persisted per notice notification version. Only that recipient's
+explicit in-app acknowledgement counts as receipt. This is an authorized contract
+amendment awaiting its separate schema/config/core/API implementation and review;
+it does not retroactively convert existing Operator acknowledgements into owner
+receipts or waive FR006 evidence. Owner_reference stays descriptive. The earlier
+operator-only implementation remains accurately labeled until the amendment lands.

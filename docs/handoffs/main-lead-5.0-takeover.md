@@ -98,3 +98,18 @@ earlier allocation key correction. T014/T016 and revised T013 are assembled at
 checks. The next publication pins the common T015/T017 base and registers separate
 Muse UI / Opus API worktrees and exact provider sessions. T012/T013 original base
 b557137 remains immutable. Main and PR79 remain unchanged.
+
+## User FR006 authority decision
+
+The user explicitly selected: reviewed configuration assigns one Operator recipient
+per domain/scope, each notice notification version binds that recipient, and that
+recipient's explicit in-app acknowledgement counts as receipt. This supersedes the
+undecided authority gap, not the unimplemented/runtime-unverified acceptance state.
+Owner_reference remains descriptive; neither creator identity nor any other domain
+Operator becomes an owner by inference. Missing/invalid recipient stays visible.
+
+Astra and Sol are settling the minimum config/schema/history/API amendment. Active
+T015/T017 authors continue their pinned source assignments; no in-flight lease is
+reassigned. A separate full recipient-authority feature follows the reviewed T017
+base before notice UI/T023 finalization. Existing T016 author retains corrections
+to its reviewed operator-only source. No test/build/runtime gate is advanced.
