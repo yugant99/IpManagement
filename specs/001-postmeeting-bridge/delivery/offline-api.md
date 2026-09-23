@@ -825,7 +825,13 @@ original `idempotency_key`. Then, after re-establishing that same authorized con
 1. Call `GET /api/handoff-operations?action=ticket.attempt&idempotency_key=<original-key>` to find the
    reserved attempt.
 2. Call `GET /api/handoffs/{id}` for current state.
-3. Send an explicit readback. Do not send a new attempt key.
+3. Send a manual, explicit readback **only if uncertainty remains**: the current handoff's latest attempt
+   `result` is still `pending` or `unknown`, `readback_required` is `true`, or whether the effect exists is still
+   unresolved. If phase 3 already committed and the current state is definitive (the attempt is `delivered` or
+   `failed`, `readback_required: false`), take that current state as the resolution and make no further write. An
+   unnecessary readback would add another event and receipt and bump the intent `version`
+   (`ticket_handoff.py:866-880`). Keep the original immutable receipt (`original_operation`) separate from
+   `current_handoff`. Never retry automatically, and never send a new attempt key.
 
 A denied or failed recovery keeps the attempt unresolved. It is not proof of absence.
 
