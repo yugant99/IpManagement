@@ -3,6 +3,7 @@ import type { FormEvent, ReactNode } from "react";
 import { accessContext, ApiError, clearSession, installSession, loadScopes, onSessionInvalidated, request } from "./api";
 import type { AccessContext, Origin, Page, Prefix, PrefixDetail, ReadinessStatus, Scope } from "./api";
 import FirstPath from "./FirstPath";
+import MigrationCompare from "./MigrationCompare";
 import CapacityReports from "./CapacityReports";
 import InventoryEditor from "./InventoryEditor";
 import Workflow from "./Workflow";
@@ -167,7 +168,8 @@ function PrefixContents({ prefix, onSelect }: { prefix: PrefixDetail; onSelect: 
 }
 
 function ProtectedApp({ context }: { context: AccessContext }) {
-  const [view, setView] = useState<"inventory" | "first-path" | "planning" | "capacity" | "workflow" | "corrections" | "schedule">("inventory");
+  const [view, setView] = useState<"inventory" | "first-path" | "migration" | "planning" | "capacity" | "workflow" | "corrections" | "schedule">("inventory");
+  const [migrationSourceBatchId, setMigrationSourceBatchId] = useState("");
   const [bootstrap, setBootstrap] = useState<Bootstrap>({ status: "loading" });
   const [evidenceScopes, setEvidenceScopes] = useState<Scope[] | null>(null);
   const [revision, setRevision] = useState(0);
@@ -269,6 +271,7 @@ function ProtectedApp({ context }: { context: AccessContext }) {
           <div className="rail-group"><p className="rail-label">Decide</p>
             <button aria-current={view === "workflow" ? "page" : undefined} onClick={() => changeView("workflow")}><span className="rail-marker" aria-hidden="true" />Requests and exceptions</button>
             <button aria-current={view === "corrections" ? "page" : undefined} onClick={() => changeView("corrections")}><span className="rail-marker" aria-hidden="true" />Corrections</button>
+            <button aria-current={view === "migration" ? "page" : undefined} onClick={() => changeView("migration")}><span className="rail-marker" aria-hidden="true" />Migration assessment</button>
             <button aria-current={view === "planning" ? "page" : undefined} onClick={() => changeView("planning")}><span className="rail-marker" aria-hidden="true" />Prefix planning</button>
           </div>
           <div className="rail-group"><p className="rail-label">Observe</p>
@@ -321,7 +324,8 @@ function ProtectedApp({ context }: { context: AccessContext }) {
             </div>
           </div>
         )}
-        {evidenceScopes && <div hidden={view !== "first-path"}><FirstPath scopes={evidenceScopes} /></div>}
+        {evidenceScopes && <div hidden={view !== "first-path"}><FirstPath scopes={evidenceScopes} onAssess={(batchId) => { setMigrationSourceBatchId(batchId); changeView("migration"); }} /></div>}
+        {evidenceScopes && <div hidden={view !== "migration" || bootstrap.status !== "ready"}><MigrationCompare active={view === "migration" && bootstrap.status === "ready"} initialSourceBatchId={migrationSourceBatchId} /></div>}
         {/* Preserve unresolved workflow retries after initial readiness, including refresh failures. */}
         {evidenceScopes && <div hidden={view !== "workflow" || bootstrap.status !== "ready"}><Workflow active={view === "workflow" && bootstrap.status === "ready"} /></div>}
         {evidenceScopes && <div hidden={view !== "corrections" || bootstrap.status !== "ready"}><Corrections active={view === "corrections" && bootstrap.status === "ready"} /></div>}
