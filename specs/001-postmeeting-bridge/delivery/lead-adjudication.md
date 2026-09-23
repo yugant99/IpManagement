@@ -1,10 +1,12 @@
-# T028 lead adjudication — technical acceptance, main merge pending
+# T028 lead adjudication — completed technical merge
 
-**Decision, 2026-09-23:** Astra / Main Lead 6.0 accepts the complete bounded local
-synthetic Tier A technical candidate. T025 observations and independent Sol T027
-review have no remaining blocking finding. PR98 is eligible for the first bridge
-merge to main after bounded review of this acceptance record and refreshed Git/PR
-heads. This pre-merge record does not claim that the merge has already happened.
+**Decision, 2026-09-23:** Astra / Main Lead 6.0 accepted the complete bounded local
+synthetic Tier A technical candidate after independent T025 and Sol T027 closure.
+Sol separately closed source review of the exact acceptance-document delta
+`eb74d3e..b63d02c`. Refreshed main/PR heads were `04eba98` / `b63d02c`.
+PR98 then merged normally to main at `78ebf156778085b616b0068196f4f28a8661b360`,
+with those exact parents. The resulting application, fixture, script, package and
+lock paths match validated source `8eb3e23`; no application change followed evidence.
 
 | Identity | Exact record |
 |---|---|
@@ -14,7 +16,8 @@ heads. This pre-merge record does not claim that the merge has already happened.
 | Independent Sol T027 closure | `1f2d64ab9200733b459d2584be07f35b204917ed`, [PR105](https://github.com/yugant99/IpManagement/pull/105) |
 | Source/evidence/review integration | `eb74d3e65ea90b9f2352cb6460deae77ed1e3db5`; changes after the validated application SHA are documentation/evidence only |
 | Main before T028 | `04eba98cb8673406d1e5d38c5318fb963cc77ff7` |
-| Main merge vehicle | [PR98](https://github.com/yugant99/IpManagement/pull/98) |
+| Main merge vehicle | [PR98](https://github.com/yugant99/IpManagement/pull/98), MERGED |
+| First validated bridge merge | `78ebf156778085b616b0068196f4f28a8661b360` |
 
 ## Acceptance basis
 
@@ -74,11 +77,19 @@ their preserved historical wording does not reopen a closed technical finding.
 
 ## Integration and operations
 
-All 19 older open bridge checkpoint PR heads (67–83, 84 and 97) were verified as
-ancestors of the lead assembly. Refresh those heads and main immediately before
-merging. Preserve history with a normal PR98 merge; then reconcile included
-checkpoint PRs through that result, without separately merging source-only
-checkpoints. Retain worker branches/worktrees and original-owner correction history.
+All 19 older bridge checkpoint PR heads (67–83, 84 and 97) were verified as
+ancestors before integration and again before reconciliation. PR67/79 were resolved
+as merged through the main update; PR68–78, PR80–84 and PR97 were closed as included
+in PR98. None was independently merged as a source-only checkpoint. All original
+worker branches/worktrees and correction history remain available. Unrelated PR9
+was left open. The original Downloads checkout was not switched or edited; the lead
+worktree and remote main carry the accepted integration.
+
+Git ancestry and observed operation order identify the merge. GitHub returned a
+merge timestamp of `2026-09-23T17:48:31Z`; the host clock read
+`2026-09-23 20:51:51 UTC` shortly afterward. These clock sources disagree and are not
+used for cross-system elapsed-time claims. The recovery duration uses its recorded
+monotonic interval, independently of GitHub timestamps.
 
 Luna stopped six verified-owned T025 services and preserved the original candidate3
 failure store/logs before shutdown. The frozen packet was not changed. External
