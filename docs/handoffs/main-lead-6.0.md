@@ -2,7 +2,7 @@
 
 **Visible Codex workers:** Per the user, all Sol/Luna work must appear in the sidebar. Pinned Sol review/T027 task: `01a0cf9a-ce88-7f90-8556-1fa4b131bf26`; pinned separate Luna verifier: `01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f`. Earlier hidden workers completed safe handoffs and do not continue in parallel. Retained T010 original-author task remains `01a0cb5f-6dcf-7080-90ea-fffcc1743645`.
 
-**T025/T027 accepted:** Application `8eb3e231b7792fe8415455d2176e962b8f953d60`, final evidence `75f213ea8934cb275a083724c1dc4d3ce79d2c42` (PR104), independent Sol closure `1f2d64ab9200733b459d2584be07f35b204917ed` (PR105). No blocking source/evidence finding remains for the bounded local synthetic package. [T028 lead adjudication](../../specs/001-postmeeting-bridge/delivery/lead-adjudication.md) records acceptance and exact evidence boundaries. PR98 main merge is eligible after bounded review of this acceptance record and refreshed heads; main remains `04eba98` at this pre-merge checkpoint. Human rehearsal/recipient portability/business approvals remain pending or unproved; questionnaire unchanged and Tier B locked.
+**T028 completed:** [PR98](https://github.com/yugant99/IpManagement/pull/98) merged to main at `78ebf156778085b616b0068196f4f28a8661b360`. Validated application `8eb3e231b7792fe8415455d2176e962b8f953d60`, final T025 evidence `75f213ea8934cb275a083724c1dc4d3ce79d2c42` and Sol closure `1f2d64ab9200733b459d2584be07f35b204917ed` are included. [Lead adjudication](../../specs/001-postmeeting-bridge/delivery/lead-adjudication.md) records the exact result and limits. Human rehearsal/recipient portability/business approvals remain pending or unproved; questionnaire unchanged and Tier B locked.
 
 **Source checkpoint:** T024 full source independently closed at Spark `7e50122ac6c7bc837bd89db6b9029035065b1b57`, initially integrated via PR99/100 at `68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8`. Reviewed runtime-discovered corrections and current candidate are above. [Source review and correction record](../../specs/001-postmeeting-bridge/delivery/operator-package-source-review.md). Main is unchanged; T028 gates remain controlling. Earlier unstarted/dispatch/route snapshots below are historical.
 
@@ -11,15 +11,16 @@ Outgoing lead: Astra / Main Lead 5.0, task `01a0ccc7-6219-73c1-bd3b-1521bb71a837
 **Incoming actual task ID: `01a0cf70-c4e0-7ed2-b50b-834609e6d909`**, registered on 2026-09-23 from the active environment and app registry. The user authorized takeover and resumption of T024. Earlier outgoing publication holds below are historical; the nine-path lease and gates remain controlling. Astra remains lead; the pool below is for delegated work.
 No new task or worker was created by this handoff publication.
 
-## Next mergeable point
+## Completed merge and next authorized step
 
-**T028 remains the next bridge-to-main merge.** Required: complete technical Tier A,
-exact-candidate T025 evidence, closed blocking source/final reviews and recorded
-T026/T027/business dispositions. PR79 and PR84 are draft source checkpoints, not
-runtime-verified candidates ready for main. No earlier merge is authorized by this
-transfer. Read `docs/MAIN_MERGE_POLICY.md`; do not restart planning.
+**T028 is complete.** PR98 is the first bridge-to-main merge, after independent T025,
+closed Sol T027 and recorded T026/business dispositions. Included checkpoint PRs
+were reconciled through that merge, not separately merged as source-only candidates.
+The lead remains Main Lead6. No next implementation, Tier B, deployment or recipient
+rehearsal is automatically authorized. Retain original workers and the visible pinned
+Sol/Luna tasks for any follow-up; do not restart planning or invent human assignments.
 
-## Exact source and current state
+## Historical T024-ready handoff snapshot
 
 - Completed publication: `9cb0725e28985b944a1296ea6d1bde403491d465`,
   `codex/bridge-ticket-integration`, [PR84](https://github.com/yugant99/IpManagement/pull/84).

@@ -750,7 +750,7 @@
       "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
       "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
       "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker",
-      "current_blocker": "None for the accepted bounded local synthetic technical criteria; T028 acceptance-record review and main merge remain next.",
+      "current_blocker": "None for the accepted bounded local synthetic technical criteria; T028 completed through PR98. Human/recipient/business limits remain separately recorded.",
       "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
       "current_candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
       "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory",
@@ -784,19 +784,20 @@
     "instruction": "Do not dispatch/resume Opus or automatically retry on a timer. Preserve original ownership; explicit bounded fallback only."
   },
   "current_handover_gate": {
-    "milestone": "T024 independently source-closed and integrated",
-    "status": "T025_in_progress_candidate4",
-    "action": "Visible Luna completes remaining recipient/ticket/concurrency/security and populated recovery evidence; source/runtime earlier failures retained; final SolT027 and T028 remain gated",
-    "hold": "No main merge before T028; portable/human remain separate; Tier B locked",
+    "milestone": "T028 completed; technical bridge merged to main",
+    "status": "T028_complete",
+    "action": "Preserve bounded acceptance, original ownership and evidence; no next implementation automatically authorized",
+    "hold": "Human rehearsal/recipient portability/business approvals remain pending or unproved; Tier B locked",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
     "application_source_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
-    "publication_branch": "codex/main-lead-6-bridge",
+    "publication_branch": "main",
     "receiver_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
     "next_shared_base_sha": null,
     "source_assembly_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
     "pickup": "docs/handoffs/main-lead-6.0.md",
-    "completed_preparation_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98"
+    "completed_preparation_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98",
+    "main_merge_sha": "78ebf156778085b616b0068196f4f28a8661b360"
   },
   "lead_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
   "latest_provider_preflight": {
@@ -862,7 +863,7 @@
     "incoming_role": "Main Lead 6.0 / Astra",
     "incoming_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
     "outgoing_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
-    "status": "takeover_registered_T024_source_closed_T025_released",
+    "status": "takeover_registered_T024_T025_T027_T028_complete",
     "handoff": "docs/handoffs/main-lead-6.0.md",
     "base_publication": "9cb0725e28985b944a1296ea6d1bde403491d465",
     "amendment_branch": "codex/main-lead-6-handoff",
@@ -890,7 +891,7 @@
     "retained_t005_author_thread_id": "01a0cb1e-a711-70a3-a74d-5651989a0355"
   },
   "t028_adjudication": {
-    "state": "accepted_for_main_merge_pending_document_review_and_fresh_heads",
+    "state": "completed_merged_to_main",
     "application_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
     "evidence_sha": "75f213ea8934cb275a083724c1dc4d3ce79d2c42",
     "review_sha": "1f2d64ab9200733b459d2584be07f35b204917ed",
@@ -900,6 +901,37 @@
     "recipient_portability": "unobserved",
     "commercial_roles": "documentary_unassigned",
     "questionnaire_promotion": false,
-    "tier_b": "locked"
+    "tier_b": "locked",
+    "main_merge_sha": "78ebf156778085b616b0068196f4f28a8661b360",
+    "accepted_record_sha": "b63d02c57549cb9ad2f3f56371f14f6fcd148433",
+    "acceptance_record_review": "Independent Sol bounded source review closed eb74d3e..b63d02c in visible reviewer task",
+    "next_dispatch": "none; Tier B and recipient work require their own authorization"
+  },
+  "checkpoint_pr_reconciliation": {
+    "included_main_merge": "78ebf156778085b616b0068196f4f28a8661b360",
+    "auto_resolved_as_merged": [
+      67,
+      79
+    ],
+    "closed_as_included": [
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      80,
+      81,
+      82,
+      83,
+      84,
+      97
+    ],
+    "branches_and_worktrees": "retained; no independent source-checkpoint merge"
   }
 }

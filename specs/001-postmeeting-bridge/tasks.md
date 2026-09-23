@@ -181,7 +181,7 @@ mark Fable completed. Historical task-graph role labels do not override this upd
 
   Prerequisites: T024 T025; owner: independent GPT-6 Sol high in Codex, review to Main Lead; FR-001 FR-002 FR-003 FR-004 FR-005 FR-009 FR-016 FR-021. Completion: Actual exact-candidate/evidence review with lead adjudication and closure of blocking findings; no Fable completion is claimed. The separate post-spec/dispatch-lock design advisory (FABLE-DESIGN after T001) does not complete T027.
 
-- [ ] T028 Adjudicate evidence/Sol/human/business gates, accept only proved clauses, coordinate PR merges and authorized next stage prompt; incomplete Tier A remains partial. Files: `specs/001-postmeeting-bridge/delivery/lead-adjudication.md`, `docs/STATUS.md`, `docs/QUESTIONNAIRE_ROW_MAP.md`.
+- [x] T028 Completed through PR98 at `78ebf156778085b616b0068196f4f28a8661b360`. Adjudicate evidence/Sol/human/business gates, accept only proved clauses, coordinate PR merges and authorized next stage prompt; incomplete Tier A remains partial. Files: `specs/001-postmeeting-bridge/delivery/lead-adjudication.md`, `docs/STATUS.md`, `docs/QUESTIONNAIRE_ROW_MAP.md`.
 
   Prerequisites: T025 T026 T027; owner: Astra / Main Lead 6.0; FR-001 FR-020 FR-021. Completion: Lead alone changes canonical ledger/status; no hidden external gate or92-completed claim.
 
@@ -278,6 +278,5 @@ The latest user takeover/resume supersedes the historical sleep hold above. T024
 was completed by Spark Contributor high and independently source reviewed. T025
 is accepted for the bounded local synthetic candidate `8eb3e231b7792fe8415455d2176e962b8f953d60`,
 including reviewed runtime-discovered author corrections. Sol T027 is closed and
-T026 records the permitted pending human disposition. T028 main merge is eligible
-after acceptance-record review and a fresh head check; no merge has yet occurred
-at this checkpoint. See the lead adjudication and Main Lead6 transfer.
+T026 records the permitted pending human disposition. T028 merged the reviewed candidate through PR98 at
+`78ebf156778085b616b0068196f4f28a8661b360` after acceptance-record review and fresh head checks. See the lead adjudication and Main Lead6 transfer.

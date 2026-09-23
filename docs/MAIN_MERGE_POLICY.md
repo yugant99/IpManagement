@@ -55,9 +55,13 @@ human training or automatic questionnaire promotion. Those claims retain their
 own authority and evidence requirements. A genuinely missing permission or failed
 gate must be named with its owner and next action; it must not be silently waived.
 
-## Why the T011 checkpoint has not merged
+## Historical T011 hold — superseded by completed T028
 
-Main is `04eba98cb8673406d1e5d38c5318fb963cc77ff7`; draft PR79 contains the bridge
+T028 subsequently completed through PR98 at
+`78ebf156778085b616b0068196f4f28a8661b360`; see the [lead adjudication](../specs/001-postmeeting-bridge/delivery/lead-adjudication.md).
+The following records why the earlier T011 source-only checkpoint was held.
+
+At that checkpoint, main was `04eba98cb8673406d1e5d38c5318fb963cc77ff7`; draft PR79 contained the bridge
 source checkpoint. T002–T011 and T019 have recorded documentary/source acceptance.
 T012 onward still includes required reservation API, simulated ticket workflow,
 UI/aging, state recovery and package work; T025 has not run. Consequently gates
