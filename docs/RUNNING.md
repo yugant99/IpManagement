@@ -241,8 +241,10 @@ scripts/ops/seed.sh                     # rich (default, accepted demo)
 scripts/ops/seed.sh --scenario baseline # older foundation scenario
 ```
 
-Refuses `ALREADY_INITIALIZED` on an initialized store. To rebuild a
-new empty demo, run `scripts/ops/reset.sh --confirm` first.
+Refuses `ALREADY_INITIALIZED` on an initialized store. Stop and inspect
+the recorded volume identity; never reset or reseed as a readiness fallback.
+A new candidate uses its own new disposable volume. Deliberate reset is
+a separate explicitly confirmed operation, described below.
 
 ### Migrate
 
@@ -250,9 +252,9 @@ new empty demo, run `scripts/ops/reset.sh --confirm` first.
 scripts/ops/migrate.sh
 ```
 
-Advances a recognized v1/v2/v3/v4 database to the current schema. The
-service never migrates implicitly; state operations never migrate at
-all.
+Advances a recognized schema 1–6 database to current schema 7. The
+service never migrates implicitly; backup/restore preserve the source
+schema until this explicit stopped-service migration.
 
 ### Backup
 
@@ -261,9 +263,14 @@ scripts/ops/backup.sh                    # ipam-backup-YYYYMMDDTHHMMSSZ.sqlite3
 scripts/ops/backup.sh my-snapshot.sqlite3
 ```
 
-Writes a standalone snapshot to `/data/snapshots/<name>` using
-SQLite's backup API. Existing files at that destination are refused
-(`OUTPUT_EXISTS`); the core command never overwrites a prior snapshot.
+Writes a standalone SQLite snapshot to `/data/snapshots/<name>` and
+a paired `<name>.recovery.json` manifest bound to its closed bytes, size
+and schema. The manifest records sanitized observed configuration identity
+or explicit unavailability; it contains no configuration file or credentials.
+Existing destinations are refused (`OUTPUT_EXISTS`), never overwritten.
+If publication fails, inspect `output_published` and `manifest_published`
+and retain any published files; do not report the pair complete or retry
+automatically.
 
 To copy a snapshot out of the volume (service still stopped; use a new
 host filename in an existing directory):
@@ -271,7 +278,12 @@ host filename in an existing directory):
 ```sh
 scripts/ops/snapshots.sh list
 scripts/ops/snapshots.sh export my-snapshot.sqlite3 /host/path/my-snapshot.sqlite3
+scripts/ops/snapshots.sh export my-snapshot.sqlite3.recovery.json /host/path/my-snapshot.sqlite3.recovery.json
+(cd /host/path && sha256sum my-snapshot.sqlite3 my-snapshot.sqlite3.recovery.json > snapshot-SHA256SUMS)
 ```
+
+Keep both files and their checksum record together. A partial transfer is
+incomplete; transfer and verify the missing member before ordinary restore.
 
 ### Restore
 
@@ -287,8 +299,19 @@ current database. The pre-restore database is preserved as
 inspect these fields before retrying. If `migration_required` is
 `true`, run `scripts/ops/migrate.sh` (still stopped) before starting.
 
-Restoring a v1/v2/v3/v4 snapshot keeps that snapshot's schema
-version; current v5 restore returns `migration_required: false`.
+Restoring a recognized schema 1–6 snapshot keeps that schema and requires
+explicit migration; current schema 7 returns `migration_required: false`.
+
+A present sidecar must be safe, well formed and match the snapshot hash,
+size and schema; otherwise restore refuses before replacement. An absent
+sidecar permits explicitly classified `unverified` legacy/data rescue. A
+valid sidecar yields `like_for_like` only when saved and current observed
+configuration identities are both known and equal; known unequal identities
+yield `changed_configuration`; unavailable identity yields `unverified`.
+These classify configuration evidence only. After start, require all six
+protected readiness booleans and a separate selected-domain business-state
+comparison, including schema 7 notice/receipt history; neither restore success
+nor equal digests is business recovery or human acknowledgement.
 
 ### Reset
 
@@ -304,9 +327,17 @@ Reset never reseeds; run `scripts/ops/seed.sh` or
 
 ### Bringing a snapshot back in
 
-`scripts/ops/snapshots.sh import /host/path/foo.sqlite3` copies a
-standalone snapshot from the host into `/data/snapshots/` inside the
-volume. Stop the service first. Transfer uses a one-shot container running
+Import both members of the verified pair into `/data/snapshots/` inside
+the volume while the service is stopped:
+
+```sh
+(cd /host/path && sha256sum -c snapshot-SHA256SUMS)
+scripts/ops/snapshots.sh import /host/path/my-snapshot.sqlite3
+scripts/ops/snapshots.sh import /host/path/my-snapshot.sqlite3.recovery.json
+```
+
+The transfer helper accepts each standalone regular file; manifest content
+and binding are validated by core restore. Stop if either transfer fails. Transfer uses a one-shot container running
 as the app user, so it works after `stop.sh` has removed the service
 container. All snapshot operations take the existing app-data lock.
 Import/export refuse symlinks, multi-link files and SQLite companion files;
@@ -317,8 +348,11 @@ interrupted import may leave a `.import-*` scratch file; it is not a usable
 snapshot and is never promoted automatically. This is file transport, not
 an additional SQLite implementation: core restore validates application
 identity, schema and integrity. Keep the source unchanged during transfer.
-Follow with `scripts/ops/restore.sh foo.sqlite3 --confirm` to bring it
-online.
+Only after both members are present, use
+`scripts/ops/restore.sh my-snapshot.sqlite3 --confirm`, inspect its result,
+then migrate if required and start. Verify readiness and business state
+separately. An intentionally absent legacy sidecar remains an explicitly
+recorded unverified data-rescue exception, not a complete paired transfer.
 
 ## Offline recipient handoff
 
@@ -352,9 +386,12 @@ docker image inspect ipam-demo:local --format '{{.Id}}'
 
 Use the extracted scripts. Skip `build.sh`: startup and one-shot wrappers
 use `--pull never` and require the loaded `ipam-demo:local` image. For a new
-demo follow seed → start → health → acquire. For saved state, transfer an
-exported standalone snapshot separately with its checksum, then import →
-restore (explicit confirmation) → migrate only if required → start → health.
+demo follow seed → start → protected readiness → coordinator acquisition,
+using the separate token files and explicit domain/pins described above.
+For saved state, transfer the exported SQLite snapshot AND its deterministic
+`.recovery.json` sidecar with both checksums. Verify and import both →
+restore (explicit confirmation) → migrate only if required → start →
+protected readiness → selected-domain business-state comparison.
 Do not seed a restored database. Snapshot restoration also restores schedule
 settings; an enabled overdue schedule may acquire on startup. Use a known
 disabled snapshot for the bounded manual demo; enabled-snapshot recovery
