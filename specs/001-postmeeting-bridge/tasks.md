@@ -245,7 +245,9 @@ Core path: T001 → T003 → T004 → T005/T006 → T007 → T008 → T009 → T
 T012/T013 → T014 → T015/T016 → T017/T018 → T023/T024 → T025 → T028.
 Full CSV includes operator/API/gap prerequisites. T019/T020 run alongside core. T022
 needs usable assessment/change contracts; final recipient values refresh at exact candidate.
-FABLE-DESIGN reviews the locked design/dispatch after T001. T027 waits for T024 and T025 on the exact candidate; both calls use authorized Claude Code Fable.
+FABLE-DESIGN is the historical locked-design/dispatch advisory after T001. T027 waits
+for T024 and T025 on the exact candidate and uses independent GPT-6 Sol high in the
+visible reviewer task; no Claude/Fable execution or completion is authorized.
 
 Parallel examples: T005 with T006; T009 API with T010 UI on frozen C-M; T012 routes with
 T013 ticket leaf; T016 aging with T015 UI; T019/T020 documents with core. Terra serializes
@@ -272,4 +274,8 @@ recipient acceptance. T024 remains unchecked and unstarted, held until the user
 resumes tomorrow. T025 remains unrun. See
 [the exact pickup](../../docs/handoffs/main-lead-5-t024-pickup.md).
 
-The latest user takeover/resume supersedes the historical sleep hold above. T024 is now dispatched to Spark Contributor high; T025 remains unrun and prerequisite-gated. See the Main Lead6 transfer and first-wave registry.
+The latest user takeover/resume supersedes the historical sleep hold above. T024
+was completed by Spark Contributor high and independently source reviewed. T025
+is in progress on frozen candidate `8eb3e231b7792fe8415455d2176e962b8f953d60`,
+including reviewed runtime-discovered author corrections. T025 has not passed;
+T027 and T028 remain gated. See the Main Lead6 transfer and first-wave registry.
