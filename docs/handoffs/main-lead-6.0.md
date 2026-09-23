@@ -4,11 +4,11 @@
 
 **T028 completed:** [PR98](https://github.com/yugant99/IpManagement/pull/98) merged to main at `78ebf156778085b616b0068196f4f28a8661b360`. Validated application `8eb3e231b7792fe8415455d2176e962b8f953d60`, final T025 evidence `75f213ea8934cb275a083724c1dc4d3ce79d2c42` and Sol closure `1f2d64ab9200733b459d2584be07f35b204917ed` are included. [Lead adjudication](../../specs/001-postmeeting-bridge/delivery/lead-adjudication.md) records the exact result and limits. Human rehearsal/recipient portability/business approvals remain pending or unproved; questionnaire unchanged and Tier B locked.
 
-**Source checkpoint:** T024 full source independently closed at Spark `7e50122ac6c7bc837bd89db6b9029035065b1b57`, initially integrated via PR99/100 at `68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8`. Reviewed runtime-discovered corrections and current candidate are above. [Source review and correction record](../../specs/001-postmeeting-bridge/delivery/operator-package-source-review.md). Main is unchanged; T028 gates remain controlling. Earlier unstarted/dispatch/route snapshots below are historical.
+**Source checkpoint:** T024 full source independently closed at Spark `7e50122ac6c7bc837bd89db6b9029035065b1b57`, initially integrated via PR99/100 at `68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8`. Reviewed runtime-discovered corrections and current candidate are above. [Source review and correction record](../../specs/001-postmeeting-bridge/delivery/operator-package-source-review.md). At that source checkpoint, main was unchanged and T028 gates remained controlling. Earlier unstarted/dispatch/route snapshots below are historical.
 
 The user requested a new lead and handover prompt, with a revised worker pool.
 Outgoing lead: Astra / Main Lead 5.0, task `01a0ccc7-6219-73c1-bd3b-1521bb71a837`.
-**Incoming actual task ID: `01a0cf70-c4e0-7ed2-b50b-834609e6d909`**, registered on 2026-09-23 from the active environment and app registry. The user authorized takeover and resumption of T024. Earlier outgoing publication holds below are historical; the nine-path lease and gates remain controlling. Astra remains lead; the pool below is for delegated work.
+**Incoming actual task ID: `01a0cf70-c4e0-7ed2-b50b-834609e6d909`**, registered on 2026-09-23 from the active environment and app registry. The user authorized takeover and resumption of T024. Earlier outgoing publication holds below are historical. At that takeover checkpoint, the nine-path lease and gates remained controlling. Astra remains lead; the pool below is for delegated work.
 No new task or worker was created by this handoff publication.
 
 ## Completed merge and next authorized step
