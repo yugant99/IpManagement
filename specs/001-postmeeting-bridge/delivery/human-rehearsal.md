@@ -7,7 +7,7 @@ adjudication must retain the actual technical result independently.
 | Field | Recorded fact |
 |---|---|
 | Lead | Astra / Main Lead6, task01a0cf70-c4e0-7ed2-b50b-834609e6d909 |
-| Current technical candidate reference | 0c20a7ba82c9802d20223d164efdc830e9ab1eac; T025 still unpassed |
+| Source snapshot when this pending record was prepared | 0c20a7ba82c9802d20223d164efdc830e9ab1eac; T025 still unpassed |
 | Technical verifier | Visible GPT-6 Luna high task01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f; agent evidence only |
 | Actual human participant | Not selected; no new assignment inferred |
 | Actual recipient Linux amd64 target | Unavailable/unselected; earlier disposable target was destroyed |
