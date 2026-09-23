@@ -349,7 +349,7 @@
       "sha256": "ba6fd35d4efa5a3b7de3043f997b5aa6f13ace2882d65c6faf46891b441d22e1",
       "bytes": 2135,
       "criteria": [
-        "actual service wrapper negative cases"
+        "actual-service wrapper negative cases; health_bad_mode_before_network is a non-loopback URL refusal before token-mode validation"
       ]
     },
     {
@@ -575,6 +575,14 @@
       "criteria": [
         "candidate1/candidate2 protected curl bootstrap reproduced HTTP 200 with headers contaminating JSON body"
       ]
+    },
+    {
+      "path": "candidate4/logs/health-wrapper-bad-mode.json",
+      "sha256": "9a739dba9839d64b7b6d39cf13d162b047230dff36fdfc5750473fa5cc5366c1",
+      "bytes": 300,
+      "criteria": [
+        "actual-service health wrapper valid-loopback bad token-mode refusal; failure occurred during token-file validation before service contact"
+      ]
     }
   ],
   "configuration_bindings": [
@@ -743,8 +751,8 @@
     },
     {
       "path": "specs/001-postmeeting-bridge/delivery/evidence/t025/wrapper-security.json",
-      "sha256": "b5fa425987242c5aa21a0efde1218ae6bcefb41f3f02c513c85cf5afd0773ce6",
-      "bytes": 1107
+      "sha256": "b280ea399e891c76aa5a2ea6c0c6f6d290520dd89013e10e0ee1c2fb2e1bbaff",
+      "bytes": 1522
     }
   ],
   "synthetic_fixture_binding": {

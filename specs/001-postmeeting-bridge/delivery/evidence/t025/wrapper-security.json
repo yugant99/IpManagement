@@ -1,6 +1,6 @@
 {
   "candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
-  "actual_service_negative_matrix": {"bad_host": 2, "world_readable_token_file": 2, "malformed_token_shape": 2, "symlink_token_file": 2, "non_coordinator_principal": 4, "expired_coordinator": 4, "health_wrong_domain": 4, "health_bad_mode": 2},
+  "actual_service_negative_matrix": {"bad_host": 2, "world_readable_token_file": 2, "malformed_token_shape": 2, "symlink_token_file": 2, "non_coordinator_principal": 4, "expired_coordinator": 4, "health_wrong_domain": 4, "health_bad_mode_valid_loopback": {"exit": 2, "refusal_stage": "token-file validation after valid loopback URL acceptance", "service_contacted": false, "evidence": "candidate4/logs/health-wrapper-bad-mode.json"}, "health_bad_mode_non_loopback_url": {"exit": 2, "refusal_stage": "loopback URL validation before token mode validation", "case": "health_bad_mode_before_network", "evidence": "candidate4/logs/wrapper-negative-matrix.json"}},
   "isolated_loopback_mock_matrix": {
     "bad_url_components": {"path": 2, "query": 2, "fragment": 2, "userinfo": 2, "control_or_header_injection": 2, "network_requests": 0},
     "fifo_token": {"exit": 2, "elapsed_ms": 43, "network_requests": 0},
