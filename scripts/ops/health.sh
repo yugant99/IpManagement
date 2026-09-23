@@ -143,7 +143,7 @@ BODY_OUT="${WORKDIR}/body.txt"
 chmod 600 "${CURL_CONFIG}" "${HEADERS_OUT}" "${BODY_OUT}"
 
 base_curl_config() {
-  printf '%s\n' "-silent" "-show-error" "max-time = 5" "noproxy = *" > "${CURL_CONFIG}"
+  printf '%s\n' "silent" "show-error" "max-time = 5" "noproxy = *" > "${CURL_CONFIG}"
   chmod 600 "${CURL_CONFIG}"
 }
 
@@ -208,7 +208,7 @@ fi
 # documented terminal newline. The Python reader writes the bearer line
 # straight into the 0600 curl config; the token never enters a shell
 # variable or expansion.
-printf '%s\n' "-silent" "-show-error" "max-time = 10" "noproxy = *" > "${CURL_CONFIG}"
+printf '%s\n' "silent" "show-error" "max-time = 10" "noproxy = *" > "${CURL_CONFIG}"
 chmod 600 "${CURL_CONFIG}"
 if ! python3 - "${TOKEN_FILE}" "${CURL_CONFIG}" <<'PY' 2>/dev/null; then
 import os, re, stat, sys

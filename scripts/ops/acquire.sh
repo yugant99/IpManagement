@@ -152,7 +152,7 @@ chmod 600 "${CURL_CONFIG}" "${HEADERS_OUT}" "${BODY_OUT}"
 # 0600 config file; the bearer line is appended by the Python reader below.
 # Proxies off, redirects never followed (--location is never passed, so the
 # default of zero redirects holds).
-printf '%s\n' "-silent" "-show-error" "max-time = 30" "noproxy = *" \
+printf '%s\n' "silent" "show-error" "max-time = 30" "noproxy = *" \
   "header = \"Content-Type: application/json\"" > "${CURL_CONFIG}"
 chmod 600 "${CURL_CONFIG}"
 
