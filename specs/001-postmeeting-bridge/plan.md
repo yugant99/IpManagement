@@ -20,7 +20,8 @@ ticket delivery. An uncertain ticket outcome remains uncertain until correlation
 **Language/Version**: Application Python >=3.12,<3.13; TypeScript 7.0.2, React 19.3.
 **Primary Dependencies**: Existing FastAPI 0.141.1, Uvicorn 0.50.1, Vite 8.3 locks; no upgrades.
 Node >=22.12,<23 or >=24,<25, npm 10.9.2, as inspected in repository manifests.
-**Storage**: Existing SQLite, schema 5 at base; one explicitly migrated schema 6 for Tier A,
+**Storage**: Existing SQLite, schema 5 at base; frozen schema6 Tier A foundation plus
+explicit schema7 for the user-approved configured-recipient amendment,
 single process and immediate write transactions. Single core schema owner reserves the
 number against main before implementation; rebase/reassign if main advanced.
 **Validation**: Existing repository tools plus exact scenario protocol in quickstart.md only
@@ -57,7 +58,7 @@ specs/001-postmeeting-bridge/
   quickstart.md, tasks.md, task-graph.csv, agent-routing.md
   three-day-roadmap.md, analysis.md, final-handoff.md
 backend/ipam_demo/
-  app.py, store.py, schema.sql, schema_v6.sql [future], state_ops.py
+  app.py, store.py, schema.sql, schema_v6.sql, schema_v7.sql, state_ops.py
   access.py [future], migration_compare.py [future]
   lifecycle.py [future], ticket_handoff.py [future]
   workflow.py, imports.py, inventory.py, reports.py, scheduler.py

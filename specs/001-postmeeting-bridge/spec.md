@@ -287,6 +287,13 @@ Permissions described for future behavior do not grant this task permission to e
 
 **Delivery disposition:** A: reservation notices and existing exception semantics; no external paging/licensing feature.
 
+**Approved FR006 recipient disposition — 2026-09-23:** Reviewed configuration assigns
+one Operator recipient per domain/scope, each notice notification version binds that
+recipient immutably, and their explicit in-app acknowledgement is receipt. Descriptive
+owner_reference is not authorization or proof of business-owner identity. Legacy
+Operator-only acknowledgements stay legacy. Source/runtime/human evidence and the
+external delivery limit stay distinct; see contracts/notice-recipient-wire.md.
+
 **Questionnaire IDs**: RFP-022, RFP-072.
 
 - **User outcome:** Owner sees an actionable warning and a distinct persistent condition requiring escalation.

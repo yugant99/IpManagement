@@ -2,7 +2,8 @@
 
 This is a runnable-path design guide for the future integrated implementation. It is not
 permission to build, test, start/stop a service, change state or contact a recipient now.
-The planning task ran no application commands. New auth/routes below do not exist yet.
+Source implementation/review is progressing separately. None of the observations below
+has been executed for this bridge; T025 prerequisites and exact-candidate pin still govern.
 
 ## Prerequisites and candidate
 Main Lead records implementation/validation authorization, exact candidate SHA and selected
@@ -48,6 +49,15 @@ Check all protected readiness booleans and compiled UI, not HTTP200 alone. The t
 4. Separately reserve another unused local address, request release and independently decide.
    Release checks no allocation/external effect; refused release leaves hold. Historical due
    fixture shows alert/alarm timing and acknowledgement without automatic free/clear.
+   Under the approved FR006 amendment, assign one reviewed synthetic Operator recipient
+   per domain/scope. Observe denied other-Operator acknowledgement, missing/disabled/
+   expired recipient, current-recipient exact replay and changed-reason conflict.
+   Change the reviewed route: GET must not reroute, ack refuses until explicit evaluate,
+   and combined alarm/route change creates only one new version. Retain the old own
+   receipt and recover an ambiguous ack through its exact original-version GET after
+   renewal. Confirm unrelated configuration revision with the same eligible recipient
+   does not renew. Legacy schema6 Operator acknowledgements remain legacy, never
+   recipient receipts; malformed legacy acknowledgement migration fails atomically.
 5. Observe local request plus ticket intent, then manual simulated attempt/readback. Cover
    success, definitive failure, effect-committed/response-lost, no-effect-response-lost and
    disabled connector. Use same correlation/digest; unknown never shown successful and
@@ -77,10 +87,16 @@ migrates: invoke scripts/ops/migrate.sh only for an explicitly recognized old sc
 the adopted upgrade protocol, still stopped. Retain rejected corrupt/nonstandalone/unsupported/
 busy cases without damaging the prior store. Compare allocation/reservation/request/intent/
 attempt/assessment/audit lineage and readiness plus representative business read afterward.
+Include schema7 recipient notification/history in the comparison. Retain the separate
+snapshot-bound sanitized recovery manifest and compare its source/config classification.
+Observe matching, changed and unavailable configuration evidence; missing manifest is
+unverified data rescue, while malformed/hash-mismatched present manifest refuses before
+replacement. Manifest publication failures retain and identify any published DB snapshot.
+All six readiness booleans are necessary but remain separate from business comparison.
 Measure full declared incident boundary; historical 4.427 seconds is not this changed candidate.
 
 ## Human and business gate
 One guided human rehearsal must have an actual participant/acknowledgement to claim handoff.
-Agent reproduction supplies technical evidence only. Missing human/Fable/commercial inputs
+Agent reproduction supplies technical evidence only. Missing human/final independent review/commercial inputs
 remain separately named gates. Main Lead accepts the evidence or returns bounded findings;
 workers report exact SHA/PR, evidence, gaps and draft next prompt, never global completion.

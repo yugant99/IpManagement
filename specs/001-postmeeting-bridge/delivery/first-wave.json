@@ -507,7 +507,28 @@
       "prohibited": "No tests/build/typecheck/lint/import/DB/SQL/runtime, private/untracked data, external model/delegation, unleased edits, selfacceptance/main merge. Existing T016 author retained; new isolated feature worktree.",
       "result_sha": "678cb8c118fc1baf0afeca0cbf775b2fe844e0eb",
       "pull_request": "https://github.com/yugant99/IpManagement/pull/90",
-      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md"
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md",
+      "integration_sha": "efb85125d02f713af8d7cebaa10e16a8b1a671ee"
+    },
+    {
+      "task": "T017A",
+      "status": "implementation_dispatched",
+      "base_sha": "efb85125d02f713af8d7cebaa10e16a8b1a671ee",
+      "branch": "codex/bridge-t017a-recipient-api",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t017a-opus/Ip_inventory",
+      "route": "Claude Code claude-opus-5-5 high",
+      "provider_session_id": "bffb72a3-8d3c-46ce-b337-910448c85ff1",
+      "retained_author_session": "695fa2f2-0540-45b1-9bd4-0a708a6e8137",
+      "owned_paths": [
+        "backend/ipam_demo/app.py",
+        "backend/ipam_demo/models.py"
+      ],
+      "prerequisites": [
+        "T016B source acceptance"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/builds/import/typecheck/lint/DB/SQL/runtime/shell/Git/network/private/untracked documents/extra agents/models/spend or unleased edits. Source tools only; lead publishes."
     }
   ],
   "muse_route": {
@@ -533,11 +554,11 @@
   },
   "current_handover_gate": {
     "milestone": "T011 source implementation and independent review closure",
-    "status": "T015_T016A_source_accepted_T016B_next",
+    "status": "T017A_recipient_API_implementation",
     "action": "Main Lead5 continues critical path with full Muse T015 and Opus T017 after exact common base pin",
-    "hold": "T025 remains prerequisite-gated; FR006 implementation/evidence and Spencer prerequisites open; recipient authority explicitly settled",
+    "hold": "T017A API wiring pending for reviewed recipient leaf; T025 prerequisites and Spencer work remain outstanding",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "04b03378c0779a3363920c0777466b59cab10131",
+    "application_source_sha": "efb85125d02f713af8d7cebaa10e16a8b1a671ee",
     "publication_branch": "codex/bridge-ticket-integration",
     "receiver_task_id": "01a0ccc7-6219-73c1-bd3b-1521bb71a837",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
@@ -572,7 +593,7 @@
       "T016B": "retained Luna T016 lifecycle author",
       "T017A": "retained Opus5.5 high T017 API author"
     },
-    "status": "T016B_dispatched_after_reviewed_T016A",
+    "status": "T016B_source_accepted_T017A_dispatched",
     "reviewer": "Independent GPT-6 Sol high",
     "gate": "T018/T023 now wait for T017A; T025/T028 unchanged, no runtime before prerequisites"
   }
