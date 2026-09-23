@@ -489,7 +489,7 @@
     },
     {
       "task": "T016B",
-      "status": "source_accepted_API_wiring_pending",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "b52c0f9bf2290b66a1f7d9ae554b39a3d85a29b7",
       "branch": "codex/bridge-t016b-recipient-lifecycle",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016b-luna/Ip_inventory",
@@ -512,7 +512,7 @@
     },
     {
       "task": "T017A",
-      "status": "implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "efb85125d02f713af8d7cebaa10e16a8b1a671ee",
       "branch": "codex/bridge-t017a-recipient-api",
       "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t017a-opus/Ip_inventory",
@@ -528,7 +528,10 @@
       ],
       "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
       "review_route": "Independent Codex GPT-6 Sol high",
-      "prohibited": "No tests/builds/import/typecheck/lint/DB/SQL/runtime/shell/Git/network/private/untracked documents/extra agents/models/spend or unleased edits. Source tools only; lead publishes."
+      "prohibited": "No tests/builds/import/typecheck/lint/DB/SQL/runtime/shell/Git/network/private/untracked documents/extra agents/models/spend or unleased edits. Source tools only; lead publishes.",
+      "result_sha": "cae954c67b72ec7456244c7cb68a2db2ccd6a224",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/91",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md"
     }
   ],
   "muse_route": {
@@ -593,7 +596,7 @@
       "T016B": "retained Luna T016 lifecycle author",
       "T017A": "retained Opus5.5 high T017 API author"
     },
-    "status": "T016B_source_accepted_T017A_dispatched",
+    "status": "recipient_core_and_API_source_accepted_T018_UI_and_T025_evidence_pending",
     "reviewer": "Independent GPT-6 Sol high",
     "gate": "T018/T023 now wait for T017A; T025/T028 unchanged, no runtime before prerequisites"
   }

@@ -47,3 +47,21 @@ and writes child receipt, parent summary and audit in the caller transaction.
 Resolution keeps history with acknowledgement_current=false. T017A required
 configuration keywords and strict nested DTO wiring are still pending; this leaf
 checkpoint is not a complete assembled API or runtime acceptance.
+
+## T017A API and combined source closure
+
+Retained Opus5.5 high author implemented app.py/models.py at
+cae954c67b72ec7456244c7cb68a2db2ccd6a224 (PR91), base
+efb85125d02f713af8d7cebaa10e16a8b1a671ee. Independent GPT-6 Sol high reviewed
+this complete API and included schema/lifecycle invariants; no blocking finding.
+All five notice leaf calls forward freshly reviewed configuration. The exact-version
+GET scopes the canonical notice and validates returned version and parent identity.
+Strict discriminated current/history DTOs retain redaction, legacy-versus-recipient
+receipt and resolved/current distinctions. Evaluate exposes renewed_count; ack
+validates the own exact requested receipt before committing or reporting replay.
+Existing write orchestration reauthenticates and pins configuration inside its
+transaction; no new external delivery or mutation-on-read path was added.
+
+Pydantic RootModel/multiple-inheritance and actual route behavior remain unexecuted,
+as do migration and concurrency. Source integration is suitable for T018/T023;
+T025 remains necessary and prerequisite-gated. No application checks ran.
