@@ -486,6 +486,25 @@
       "pull_request": "https://github.com/yugant99/IpManagement/pull/89",
       "review_report": "specs/001-postmeeting-bridge/delivery/notice-recipient-source-review.md",
       "integration_sha": "04b03378c0779a3363920c0777466b59cab10131"
+    },
+    {
+      "task": "T016B",
+      "status": "implementation_dispatched",
+      "base_sha": "b52c0f9bf2290b66a1f7d9ae554b39a3d85a29b7",
+      "branch": "codex/bridge-t016b-recipient-lifecycle",
+      "worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t016b-luna/Ip_inventory",
+      "route": "Codex gpt-6-luna high",
+      "worker": "/root/t016_reservation_notices",
+      "owned_paths": [
+        "backend/ipam_demo/lifecycle.py",
+        "backend/ipam_demo/workflow.py"
+      ],
+      "prerequisites": [
+        "T016A source acceptance"
+      ],
+      "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+      "review_route": "Independent Codex GPT-6 Sol high",
+      "prohibited": "No tests/build/typecheck/lint/import/DB/SQL/runtime, private/untracked data, external model/delegation, unleased edits, selfacceptance/main merge. Existing T016 author retained; new isolated feature worktree."
     }
   ],
   "muse_route": {
@@ -533,12 +552,13 @@
     "opencode_training": "existing paid-training consent enabled; unchanged; public tracked synthetic source only",
     "claude_route": "claude-opus-5-5 high; existing Max",
     "claude_usage_percent": {
-      "session": 4,
+      "session": 5,
       "weekly": 31,
       "fable": 24
     },
     "claude_credit": "balance CA$0; auto-reload off",
-    "boundary": "read-only refreshed before next dispatch; preserve20% reserve; no reset/purchase/settings changes; raw account identifiers/logs excluded"
+    "boundary": "2026-09-23 fresh UI refresh before next recipient API/UI/state dispatch: preserve20% reserve; no reset/purchase/settings changes; raw account identifiers/logs excluded",
+    "native_codex_weekly_used_percent": 26
   },
   "recipient_policy_amendment": {
     "authorization": "Explicit user selection: reviewed domain/scope Operator recipient; immutable notification-version binding; explicit in-app acknowledgement is receipt",
@@ -549,7 +569,7 @@
       "T016B": "retained Luna T016 lifecycle author",
       "T017A": "retained Opus5.5 high T017 API author"
     },
-    "status": "T016A_source_accepted_T016B_next",
+    "status": "T016B_dispatched_after_reviewed_T016A",
     "reviewer": "Independent GPT-6 Sol high",
     "gate": "T018/T023 now wait for T017A; T025/T028 unchanged, no runtime before prerequisites"
   }
