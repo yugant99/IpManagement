@@ -115,3 +115,12 @@ Tier A revision before it is executable. Separate synthetic DHCP fixture/provide
 must never share local-static authority. No Tier B tables are provisioned speculatively.
 
 Optional DHCP persistence has its own core-owned T035 gate after T034, independent of allocated release. Core reserves the actual next schema and updates recognized migration/fresh initialization/stopped recovery before the leaf. No optional tables are created in Tier A.
+
+## Authorized recipient-history amendment
+
+Schema7 is reserved for FR006 TierA per contracts/notice-recipient-wire.md: explicit
+reviewed scope recipient mapping and immutable notification-version binding/receipt.
+Frozen schema6 is unchanged. Recognized migration preserves only actual retained
+legacy acknowledgement facts as legacy_unbound/operator, never recipient receipts.
+Future optional TierB schema forecasts start at8 or the actual later next version.
+No optional TierB table is introduced by this amendment.

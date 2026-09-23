@@ -436,7 +436,7 @@
     },
     {
       "task": "T017",
-      "status": "source_implementation_dispatched",
+      "status": "source_accepted_runtime_unverified",
       "base_sha": "a4a57df4921fd60b66a923820d908ce8a7d2e865",
       "route": "Claude Code claude-opus-5-5 high",
       "branch": "codex/bridge-t017-notice-api",
@@ -452,7 +452,11 @@
       ],
       "wire_contract": "specs/001-postmeeting-bridge/contracts/notice-api-wire.md",
       "review_route": "Codex GPT-6 Sol high independent worker",
-      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git."
+      "prohibited": "No tests/builds/typechecks/lint/imports/DB/application runtime/private documents/credentials/untracked outputs/external directories/nested agents/unleased edits. No purchase/reset/Tier B/main merge. Lead handles Git.",
+      "result_sha": "f7e3c986d165f1f88a5d02d07a44a12d26f1461a",
+      "pull_request": "https://github.com/yugant99/IpManagement/pull/87",
+      "integration_sha": "11e6728317d9c2da5296975f3f2f1bbce516e785",
+      "review_report": "specs/001-postmeeting-bridge/delivery/notice-api-source-review.md"
     }
   ],
   "muse_route": {
@@ -492,7 +496,7 @@
   "latest_provider_preflight": {
     "opencode_route": "active opencode-go/muse-spark-1.3-contributor#high, high variant and source tools verified",
     "opencode_usage_percent": {
-      "rolling": 0,
+      "rolling": 1,
       "weekly": 40,
       "monthly": 20
     },
@@ -506,5 +510,18 @@
     },
     "claude_credit": "balance CA$0; auto-reload off",
     "boundary": "read-only refreshed before next dispatch; preserve20% reserve; no reset/purchase/settings changes; raw account identifiers/logs excluded"
+  },
+  "recipient_policy_amendment": {
+    "authorization": "Explicit user selection: reviewed domain/scope Operator recipient; immutable notification-version binding; explicit in-app acknowledgement is receipt",
+    "wire": "specs/001-postmeeting-bridge/contracts/notice-recipient-wire.md",
+    "schema": "7 reserved for TierA; frozen6 unchanged; futureTierB actualnext>=8",
+    "owners": {
+      "T016A": "Muse1.3 high configuration/schema foundation",
+      "T016B": "retained Luna T016 lifecycle author",
+      "T017A": "retained Opus5.5 high T017 API author"
+    },
+    "status": "contract_settled_implementation_pending",
+    "reviewer": "Independent GPT-6 Sol high",
+    "gate": "T018/T023 now wait for T017A; T025/T028 unchanged, no runtime before prerequisites"
   }
 }

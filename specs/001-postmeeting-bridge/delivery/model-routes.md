@@ -152,7 +152,7 @@ No autonomous second call, extra-usage activation or model substitution is autho
 
 The single Opus response completed successfully in71.333 seconds. Its bounded advice and lead disposition are in [opus-assessment-advisory.md](opus-assessment-advisory.md); no further call is queued.
 
-### Current user stop: no Claude usage
+### Historical user stop (superseded by explicit Main Lead5 grants)
 
 The user subsequently stopped Claude usage and prohibited further Claude assignments.
 This supersedes all earlier optional Fable/Opus routing, including future T027 calls.

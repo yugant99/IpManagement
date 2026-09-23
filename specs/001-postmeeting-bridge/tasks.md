@@ -18,7 +18,7 @@ migration never authorizes a local change. US4 prepares alongside core implement
 
 - [x] T001 Adopt contracts; record actual implementation/validation authority, model/staff availability, base SHA, schema reservation and file ownership. Files: `specs/001-postmeeting-bridge/delivery/authorization-and-ownership.md`.
 
-  Prerequisites: authority gate; owner: Astra / Main Lead 4.0; FR-001 FR-005 FR-015 FR-021. Completion: Explicit lead decision before dispatch; no inferred execution permission.
+  Prerequisites: authority gate; owner: Astra / Main Lead 5.0; FR-001 FR-005 FR-015 FR-021. Completion: Explicit lead decision before dispatch; no inferred execution permission.
 
 - [x] T002 [P] Inventory source/field authority and missing vendor/business facts; Cisco is future documentation priority, no invented product/endpoint. Files: `specs/001-postmeeting-bridge/delivery/source-authority.md`.
 
@@ -108,13 +108,23 @@ Goal/gate: exact current/saved metric identity and due conditions; arithmetic/ac
 
   Prerequisites: T013; owner: GPT-6 Luna high in Codex; FR-003 FR-006 FR-008. Completion: One due episode, ack not clearance, no forged finding IDs or saved-run rewriting.
 
-- [ ] T017 [US3] Integrate bounded evaluate/notice/current static occupancy endpoints with protected UTC/config context; timer default off, no new monitor/retry service. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
+- [x] T017 [US3] Integrate bounded evaluate/notice/current static occupancy endpoints with protected UTC/config context; timer default off, no new monitor/retry service. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`.
 
   Prerequisites: T014 T016; owner: Opus 5.5 high in Claude Code; FR-003 FR-006 FR-008. Completion: All new reads/actions scoped and authority bounded.
 
+### Authorized FR006 recipient amendment
+
+The user selected configured domain/scope Operator recipients and explicit in-app
+acknowledgement as receipt. See contracts/notice-recipient-wire.md. Schema7 is TierA;
+historical schema6 remains unchanged and no old Operator ack becomes a receipt.
+
+- [ ] T016A Implement complete reviewed recipient configuration and recognized schema7 notification history foundation. Files: `backend/ipam_demo/access.py`, `backend/ipam_demo/store.py`, `backend/ipam_demo/schema_v7.sql`. Prerequisites: T017 source acceptance; owner: Muse1.3 high in OpenCode. Independent Sol review, no application execution.
+- [ ] T016B Integrate immutable per-version binding, explicit evaluation renewal, recipient-only receipt and original-version readback into the notice lifecycle. Files: `backend/ipam_demo/lifecycle.py`, `backend/ipam_demo/workflow.py`. Prerequisites: T016A; owner: retained Luna T016 author. Independent Sol review; legacy facts and no-free-on-expiry preserved.
+- [ ] T017A Integrate reviewed configuration forwarding, strict current/history DTOs and scoped notification-version recovery endpoint. Files: `backend/ipam_demo/app.py`, `backend/ipam_demo/models.py`. Prerequisites: T016B; owner: retained Opus5.5 high T017 author. Independent Sol review; no external delivery claim.
+
 - [ ] T018 [P] [US3] Present alert/alarm, ack/resolution and current static versus saved DHCP with units/time/components; preserve safe child editing, unknown semantics and existing thresholds. Files: `frontend/src/Workflow.tsx`, `frontend/src/CapacityReports.tsx`, `frontend/src/workflowApi.ts`.
 
-  Prerequisites: T015 T017; owner: DeepSeek UI under Terra; FR-006 FR-008 FR-013 FR-019. Completion: No invented IPv6 delegation, hijack attribution or health monitoring; same metric identity across views.
+  Prerequisites: T015 T017A; owner: DeepSeek UI under Terra; FR-006 FR-008 FR-013 FR-019. Completion: No invented IPv6 delegation, hijack attribution or health monitoring; same metric identity across views.
 
 
 ## Phase 6 — US4 operator and truthful handoff (P1)
@@ -139,7 +149,7 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
 - [ ] T023 [US4] Integrate schema6 stopped backup/restore/readiness and supply protected configuration/application contract to Spencer; preserve one worker and global evidence coordinator boundary. No implicit migration/reseed; no packaging edits in core. Files: `backend/ipam_demo/state_ops.py`, `backend/ipam_demo/__main__.py`. Preserve historical revision references; record changed-configuration recovery distinctly, apply normal staleness, and require all six C-A readiness booleans plus separate business-state evidence.
 
-  Prerequisites: T003 T017; owner: Terra in Codex; FR-005 FR-016 FR-021. Completion: Supported history survives recognized state operations; code/UI/config/secrets not assumed in snapshots.
+  Prerequisites: T003 T017A; owner: Terra in Codex; FR-005 FR-016 FR-021. Completion: Supported history survives recognized state operations; code/UI/config/secrets not assumed in snapshots.
 
 - [ ] T024 [US4] Day3 operator/package preparation: Spencer owns Dockerfile/Compose liveness/config wiring, protected separate coordinator credential for acquisition and domain credential for readiness, stable keys and all-boolean readiness. Pin state/code/UI/config assets, stopped recovery, dependencies/licenses/presenter path. Record actual Compose plugin version, not inferred v2. Files: `scripts/ops/acquire.sh`, `scripts/ops/health.sh`, `scripts/ops/README.md`, `specs/001-postmeeting-bridge/delivery/operator-handoff.md`, `Dockerfile`, `compose.yaml`.
 
@@ -171,7 +181,7 @@ mark Fable completed. Historical task-graph role labels do not override this upd
 
 - [ ] T028 Adjudicate evidence/Fable/human/business gates, accept only proved clauses, coordinate PR merges and authorized next stage prompt; incomplete Tier A remains partial. Files: `specs/001-postmeeting-bridge/delivery/lead-adjudication.md`, `docs/STATUS.md`, `docs/QUESTIONNAIRE_ROW_MAP.md`.
 
-  Prerequisites: T025 T026 T027; owner: Astra / Main Lead 4.0; FR-001 FR-020 FR-021. Completion: Lead alone changes canonical ledger/status; no hidden external gate or92-completed claim.
+  Prerequisites: T025 T026 T027; owner: Astra / Main Lead 5.0; FR-001 FR-020 FR-021. Completion: Lead alone changes canonical ledger/status; no hidden external gate or92-completed claim.
 
 
 ## Optional Tier B — off the three-day critical path
@@ -180,7 +190,7 @@ mark Fable completed. Historical task-graph role labels do not override this upd
 
   Prerequisites: T025; owner: Grok 4.7 requirements/integration sublead; FR-003 FR-004. Completion: Accepted contract before optional code; no referenced allocation deletion.
 
-- [ ] T030 [US2] Reserve actual next schema; preserve allocation IDs/FKs, add versioned active/release history and active-only uniqueness; update all readers/export/recovery under settled optional contract. Files: `backend/ipam_demo/schema_v7.sql`, `backend/ipam_demo/schema.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/inventory.py`, `backend/ipam_demo/reports.py`, `backend/ipam_demo/state_ops.py`.
+- [ ] T030 [US2] Reserve actual next schema; preserve allocation IDs/FKs, add versioned active/release history and active-only uniqueness; update all readers/export/recovery under settled optional contract. Files: `backend/ipam_demo/schema_v8.sql`, `backend/ipam_demo/schema.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/inventory.py`, `backend/ipam_demo/reports.py`, `backend/ipam_demo/state_ops.py`.
 
   Prerequisites: T029; owner: Terra in Codex; FR-003 FR-004 FR-016. Completion: Historical requests remain valid; active uniqueness correct before reuse executable.
 
@@ -200,7 +210,7 @@ mark Fable completed. Historical task-graph role labels do not override this upd
 
   Prerequisites: T025; owner: Grok 4.7 requirements/integration sublead; FR-007 FR-009. Completion: Optional operation selected by lead; provider fixture distinct from local-static authority.
 
-- [ ] T035 [US2] Before optional DHCP leaf, core owner reserves the next actual schema and persists isolated provider reservation/effect/attempt/readback state with stopped backup compatibility. Use schema_v7.sql if no optional prior migration, schema_v8.sql only if release migration T030 already accepted; touch only selected file, record predecessor SHA/task. This task does not require selecting allocated release. Files: `backend/ipam_demo/schema_v7.sql`, `backend/ipam_demo/schema_v8.sql`, `backend/ipam_demo/schema.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/seed.py`, `backend/ipam_demo/state_ops.py`.
+- [ ] T035 [US2] Before optional DHCP leaf, core owner reserves the next actual schema and persists isolated provider reservation/effect/attempt/readback state with stopped backup compatibility. Use schema_v8.sql if no optional prior migration, schema_v9.sql only if release migration T030 already accepted; touch only selected file, record predecessor SHA/task. This task does not require selecting allocated release. Files: `backend/ipam_demo/schema_v8.sql`, `backend/ipam_demo/schema_v9.sql`, `backend/ipam_demo/schema.sql`, `backend/ipam_demo/store.py`, `backend/ipam_demo/seed.py`, `backend/ipam_demo/state_ops.py`.
 
   Prerequisites: T034; owner: Terra in Codex; FR-007 FR-011 FR-016. Completion: Explicit recognized migration/fresh initialization and recovery contract complete before leaf. If release is selected first, add T030 as a prerequisite; otherwise no release dependency.
 
