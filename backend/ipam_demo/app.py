@@ -875,15 +875,9 @@ def create_app() -> FastAPI:
             except ValidationError as exc:
                 raise handoff_receipt_integrity() from exc
             if action == "ticket.reassign":
-                saved = decode_handoff_receipt_result(receipt, ("intent_id", "assignment_version"))
-                validate_handoff_receipt_string(saved["intent_id"])
-                validate_handoff_receipt_version(saved["assignment_version"])
-                if saved["intent_id"] != handoff["id"]:
-                    raise handoff_receipt_integrity()
-                assignment = next((item for item in handoff["route_history"]
-                                   if item["assignment_version"] == saved["assignment_version"]), None)
-                if assignment is None or assignment["assigned_by"] != context.principal_id:
-                    raise handoff_receipt_integrity()
+                assignment = ticket_handoff.recover_reassignment(
+                    connection, receipt, context=context,
+                    configuration=request.state.access_configuration)
                 original = {"phase": "reassign", "assignment": assignment}
             else:
                 if action == "ticket.readback":
