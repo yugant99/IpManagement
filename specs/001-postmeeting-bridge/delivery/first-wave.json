@@ -196,9 +196,12 @@
           "backend/ipam_demo/app.py",
           "backend/ipam_demo/scheduler.py"
         ],
-        "status": "source_diagnosis_correction_in_progress",
+        "status": "source_closed_integrated_affected_runtime_pending",
         "finding": "Request database read transaction outlives separate scheduler writer; T025 timeout/STORE_BUSY, exact unknown key retained",
-        "boundary": "No journal/isolation/timeout workaround, no author runtime; Sol source review and separate Luna affected exact-candidate rerun required"
+        "boundary": "No journal/isolation/timeout workaround, no author runtime; Sol source review and separate Luna affected exact-candidate rerun required",
+        "result_sha": "7975307e4210083ba7ea6d34e6b80c652c15002c",
+        "pull_request": "https://github.com/yugant99/IpManagement/pull/103",
+        "source_integration_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60"
       }
     },
     {
@@ -732,7 +735,7 @@
     },
     {
       "task": "T025",
-      "status": "in_progress_acquisition_store_lock_blocker",
+      "status": "in_progress_candidate4_released",
       "route": "Codex gpt-6-luna high",
       "worker": "Visible Codex task01a0cf9b-6bef-7fd3-b0f5-9cd303053c8f",
       "base_sha": "68e0b4ed466c66ce73926ddfec8a79ad94d7d1c8",
@@ -745,10 +748,10 @@
       "scope": "Complete required Tier A evidence on new disposable synthetic native local target only; no application-source changes, Docker/cloud/VM/customer/live store, or invented portable/human evidence",
       "prerequisites": "T018/T019/T021/T022/T023/T024 and transitive source gates independently closed",
       "nonclaims": "Release is not pass; every required criterion needs observed evidence or explicit blocker",
-      "current_blocker": "Candidate3 liveness and all-six readiness passed; manual acquisition timed out30s with UNKNOWN, same-key retry503 STORE_BUSY; preserved failed store then separate fresh target for unaffected criteria. Retained T005 owner diagnosing read-dependency versus separate writer transaction.",
+      "current_blocker": "Earlier UI/wrapper/acquisition failures preserved. Original-author corrections source-reviewed/integrated; affected candidate4 acquisition/global-run runtime and full remaining T025 evidence pending. No passing gate.",
       "candidate2_sha": "996d0a8cadeb1d399eb780862055ccdc19211488",
-      "current_candidate_sha": "0c20a7ba82c9802d20223d164efdc830e9ab1eac",
-      "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate3/Ip_inventory"
+      "current_candidate_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
+      "current_source_worktree": "/Users/yuganthareshsoni/.codex/worktrees/ipam-bridge-t025-candidate4/Ip_inventory"
     }
   ],
   "muse_route": {
@@ -774,16 +777,16 @@
   },
   "current_handover_gate": {
     "milestone": "T024 independently source-closed and integrated",
-    "status": "T025_in_progress_acquisition_store_lock_blocker",
-    "action": "Retained visible T005 author fixes transaction lifetime; visible Sol independently reviews; independent visible Luna preserves failed run and continues safe unaffected criteria",
+    "status": "T025_in_progress_candidate4",
+    "action": "Visible Luna reruns corrected coordinator transaction paths and completes required workflow/recovery evidence; Sol T027 and T028 remain gated",
     "hold": "No main merge before T028; portable/human remain separate; Tier B locked",
     "existing_work": "T009/T010/T011 source accepted; original workers idle and retained for fixes",
-    "application_source_sha": "0c20a7ba82c9802d20223d164efdc830e9ab1eac",
+    "application_source_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
     "publication_branch": "codex/main-lead-6-bridge",
     "receiver_task_id": "01a0cf70-c4e0-7ed2-b50b-834609e6d909",
     "shared_base_sha": "b557137279f09abb6979618d6eea7ca24fc27ef7",
     "next_shared_base_sha": null,
-    "source_assembly_sha": "0c20a7ba82c9802d20223d164efdc830e9ab1eac",
+    "source_assembly_sha": "8eb3e231b7792fe8415455d2176e962b8f953d60",
     "pickup": "docs/handoffs/main-lead-6.0.md",
     "completed_preparation_base_sha": "cc4e281756b1847b1312d6b260b3f57bd7df0d98"
   },

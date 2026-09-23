@@ -187,3 +187,11 @@ corrections and independent GPT-6 Sol closure of all five reported findings.
 [Migration review](migration-source-review.md) retains exact history, findings and
 nonclaims. Draft PR75 remains unmerged. T009/T010 may proceed with a lead-frozen wire
 contract; runtime validation and all external gates remain open.
+
+## T005 coordinator transaction correction during T025
+
+Candidate3 `0c20a7b` passed protected readiness but manual acquisition timed out with an unknown outcome; same-key retry returned STORE_BUSY. The request-held `database()` read transaction outlived the endpoint's separate writer and blocked its commit in rollback-journal SQLite. The same source pattern existed in global reconciliation. The verifier preserves the original disposable failure store/journal and key.
+
+Retained T005 original author task `01a0cb1e-a711-70a3-a74d-5651989a0355` corrected only app.py at **`7975307e4210083ba7ea6d34e6b80c652c15002c`**. Both coordinator endpoints now use a brief closed preflight before the independent writer. Initialized state, trusted credentials/config pins/full feed grants and source-scope mappings remain checked; scheduler and reconciliation retain fresh in-transaction checks, denial/replay/lock/atomicity behavior. No schema/journal/timeout/isolation workaround was introduced. The author inventoried other writer call sites and found no other request-held read dependency spanning a separate writer.
+
+Visible independent GPT-6 Sol task `01a0cf9a-ce88-7f90-8556-1fa4b131bf26` source-reviewed the complete affected delta and shared callers with no blocking finding. No author/reviewer application execution occurred. PR103 integrated at **`8eb3e231b7792fe8415455d2176e962b8f953d60`**. Separate visible Luna owns the affected exact-candidate rerun and remaining T025 evidence; source closure does not claim runtime success or T028 eligibility.
