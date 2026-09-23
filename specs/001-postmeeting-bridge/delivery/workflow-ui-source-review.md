@@ -3,7 +3,7 @@
 Author: Muse1.3 high in OpenCode, retained session
 ses_f32fa18a3ffeyQNRKi43do4bPA. Independent reviewer: GPT-6 Sol high.
 Initial full candidate:06f9a15080fce5b860d5d5cd58c5de1d41f95432, draftPR88,
-basea4a57df4921fd60b66a923820d908ce8a7d2e865. Not source-accepted.
+basea4a57df4921fd60b66a923820d908ce8a7d2e865. Initial findings below are historical.
 
 Sol's whole-feature review returned this correction batch to the original author:
 
@@ -24,7 +24,11 @@ Sol's whole-feature review returned this correction batch to the original author
 The reviewed feature otherwise uses actual T012/T014 fields, persists minimal
 original-context pointers before writes, retains attempt pointer on every failed
 POST and gates new attempts using server availability. Exact author corrections
-and independent closure are still pending. Recipient/notice UI is T018.
+at adb7fc0a9d57544d6fd7c2d7db0edb4853c69a72 were independently source-closed
+by Sol: all six findings addressed, no new blocker in changed recovery/render
+paths. Lead also caught and returned a terminal-state comparison typo and
+hardcoded pending release outcome before that final candidate. Recipient/notice
+UI is T018; build/runtime behavior remains unverified.
 
 No application tests, builds, imports, typechecks, lint, DB or browser/runtime
 checks ran. No runtime/portable/human acceptance, row promotion or main merge.

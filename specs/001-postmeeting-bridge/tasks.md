@@ -95,7 +95,7 @@ T012/T013 are independently source-reviewed at `0e8fb4b`/`a5ce063`, with T014/T0
 
   Prerequisites: T012 T013; owner: GPT-6 Luna high in Codex; FR-004 FR-005 FR-009 FR-011. Completion: Unknown never success; no ticket approval grants local authority; old requests not tracked.
 
-- [ ] T015 [P] [US2] Show reservation/decisions and independent local/ticket states, correlation/attempt cap/unknown lookup/simulated receipt; provisioning unsupported/not requested. Files: `frontend/src/Workflow.tsx`, `frontend/src/workflowApi.ts`.
+- [x] T015 [P] [US2] Show reservation/decisions and independent local/ticket states, correlation/attempt cap/unknown lookup/simulated receipt; provisioning unsupported/not requested. Files: `frontend/src/Workflow.tsx`, `frontend/src/workflowApi.ts`.
 
   Prerequisites: T010 T014; owner: Muse 1.3 high in OpenCode; FR-003 FR-004 FR-019. Completion: Complete allocation and unused release path; downstream failure preserves visible local state.
 
@@ -124,7 +124,7 @@ historical schema6 remains unchanged and no old Operator ack becomes a receipt.
 
 - [ ] T018 [P] [US3] Present alert/alarm, ack/resolution and current static versus saved DHCP with units/time/components; preserve safe child editing, unknown semantics and existing thresholds. Files: `frontend/src/Workflow.tsx`, `frontend/src/CapacityReports.tsx`, `frontend/src/workflowApi.ts`.
 
-  Prerequisites: T015 T017A; owner: DeepSeek UI under Terra; FR-006 FR-008 FR-013 FR-019. Completion: No invented IPv6 delegation, hijack attribution or health monitoring; same metric identity across views.
+  Prerequisites: T015 T017A; owner: Muse1.3 high in OpenCode; FR-006 FR-008 FR-013 FR-019. Completion: No invented IPv6 delegation, hijack attribution or health monitoring; same metric identity across views.
 
 
 ## Phase 6 — US4 operator and truthful handoff (P1)
@@ -149,7 +149,7 @@ Goal/gate: same-candidate package with actual target/recovery observations and s
 
 - [ ] T023 [US4] Integrate current schema7 stopped backup/restore/readiness and supply protected configuration/application contract to Spencer; preserve one worker and global evidence coordinator boundary. No implicit migration/reseed; no packaging edits in core. Files: `backend/ipam_demo/state_ops.py`, `backend/ipam_demo/__main__.py`. Preserve historical revision references; record changed-configuration recovery distinctly, apply normal staleness, and require all six C-A readiness booleans plus separate business-state evidence.
 
-  Prerequisites: T003 T017A; owner: Terra in Codex; FR-005 FR-016 FR-021. Completion: Supported history survives recognized state operations; code/UI/config/secrets not assumed in snapshots.
+  Prerequisites: T003 T017A; owner: Muse1.3 high in OpenCode; FR-005 FR-016 FR-021. Completion: Supported history survives recognized state operations; code/UI/config/secrets not assumed in snapshots.
 
 - [ ] T024 [US4] Day3 operator/package preparation: Spencer owns Dockerfile/Compose liveness/config wiring, protected separate coordinator credential for acquisition and domain credential for readiness, stable keys and all-boolean readiness. Pin state/code/UI/config assets, stopped recovery, dependencies/licenses/presenter path. Record actual Compose plugin version, not inferred v2. Files: `scripts/ops/acquire.sh`, `scripts/ops/health.sh`, `scripts/ops/README.md`, `specs/001-postmeeting-bridge/delivery/operator-handoff.md`, `Dockerfile`, `compose.yaml`.
 
