@@ -6,7 +6,7 @@ export interface DemoActor {
   id: string;
   name: string;
   role: string;
-  team: string;
+  team: string | null;
   permissions: string[];
 }
 
@@ -328,8 +328,8 @@ export interface ExceptionRecord {
   id: string;
   run_id: string;
   finding_id: string;
-  owner_actor_id: string;
-  owner: DemoActor;
+  owner_actor_id: string | null;
+  owner: DemoActor | null;
   state: "open" | "acknowledged" | "escalated";
   version: number;
   created_at: string;

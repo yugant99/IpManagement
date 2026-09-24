@@ -10,7 +10,7 @@ import {
   loadReleaseRequest, loadReservation, loadStaticOccupancy, loadWorkflow, proposeRelease, readHandoffOperation, readReservationOperation,
   readbackHandoff, reassignHandoff,
 } from "./workflowApi";
-import type { AllocationDecision, AllocationRequest, AuditEvent, CreateAllocation, CurrentStaticOccupancy, ExceptionAction,
+import type { AllocationDecision, AllocationRequest, AuditEvent, CreateAllocation, CurrentStaticOccupancy, DemoActor, ExceptionAction,
   ExceptionFinding, ExceptionRecord, ReleaseRequest, ReservationDetail, ReservationNotice, ReservationNoticeEvaluation,
   ReservationNoticeNotification, ReservationNoticeNotificationVersion, ReservationOperationReadback,
   ReservationSummary, TicketHandoffDetail, TicketHandoffOriginalOperation, TicketHandoffSummary, TicketOperationAction, WorkflowStatus } from "./workflowApi";
@@ -43,6 +43,10 @@ const SCENARIOS = ["success", "definitive_failure", "committed_response_lost", "
 function readableError(error: unknown): string {
   if (error instanceof ApiError) return `${error.message} (${error.code}${error.requestId ? `; request ${error.requestId}` : ""})`;
   return error instanceof Error ? error.message : "The request failed.";
+}
+
+function exceptionOwnerLabel(owner: DemoActor | null): string {
+  return owner ? `${owner.name}${owner.team ? ` · ${owner.team}` : ""}` : "Unavailable to this principal";
 }
 
 function ambiguous(error: unknown) {
@@ -1058,7 +1062,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
     try {
       const updated = await actOnException(attemptValue.id, attemptValue.payload, new AbortController().signal);
       setSelectedException(updated); setExceptionReason(""); setExceptionAttempt(null);
-      setMessage(`${updated.replay ? "Previous exception action recovered. " : ""}Case ${updated.lifecycle_state}; disposition ${updated.state}; latest evidence ${updated.latest_evidence_state}, resolution ${updated.evidence_resolution}. Assigned to ${updated.owner.name}, ${updated.owner.team}. Original evidence is unchanged.`);
+      setMessage(`${updated.replay ? "Previous exception action recovered. " : ""}Case ${updated.lifecycle_state}; disposition ${updated.state}; latest evidence ${updated.latest_evidence_state}, resolution ${updated.evidence_resolution}. Owner: ${exceptionOwnerLabel(updated.owner)}. Original evidence is unchanged.`);
       history(updated.id); setRevision(value => value + 1);
     } catch (failure) {
       setError(readableError(failure));
@@ -1382,11 +1386,11 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           <div className="table-scroll"><table><thead><tr><th>Original finding / subject</th><th>Latest evidence / resolution</th><th>Owner</th><th>Case / disposition</th><th>Action</th></tr></thead><tbody>
             {exceptions.items.map(item => <tr key={item.id} data-selected={selectedException?.id === item.id}><td>{item.original_finding.rule_id}<div><code>{item.original_finding.subject.cidr}</code> · {item.original_finding.subject.scope_name}</div><div>Original: {item.original_finding.evidence_state} · {item.original_finding.severity}</div></td>
               <td>{item.latest_evidence_state}<div>{item.evidence_resolution === "resolved" ? "Resolved by healthy evidence" : item.evidence_resolution === "active" ? "Active discrepancy" : "Resolution unknown"}</div><div className="quiet">{item.latest_evidence_reason.replaceAll("_", " ")}</div></td>
-              <td>{item.owner.name} · {item.owner.team}</td><td>{item.lifecycle_state} · disposition {item.state}<div>Notification {item.notification_version}{item.notification_pending ? " · acknowledgement due" : " · none pending"}</div></td>
+              <td>{exceptionOwnerLabel(item.owner)}</td><td>{item.lifecycle_state} · disposition {item.state}<div>Notification {item.notification_version}{item.notification_pending ? " · acknowledgement due" : " · none pending"}</div></td>
               <td><button className="secondary" aria-expanded={selectedException?.id === item.id} aria-controls={selectedException?.id === item.id ? "exception-detail" : undefined} disabled={busy || !!exceptionAttempt} onClick={() => { setSelectedException(item); setExceptionOpenRevision(value => value + 1); setExceptionReason(""); history(item.id); }}>{selectedException?.id === item.id ? "Opened" : "Open exception"}</button></td></tr>)}
           </tbody></table></div>{!exceptions.total && <p>No permitted saved exceptions are available. The evidence operator manages reconciliation.</p>}<PageButtons page={exceptions} change={setExceptionOffset} /></>}
         {selectedException && <section className="notice exception-detail" id="exception-detail" aria-labelledby="exception-detail-heading"><h3 id="exception-detail-heading" ref={exceptionHeading} tabIndex={-1}>{selectedException.original_finding.rule_id} · {selectedException.original_finding.subject.cidr} · {selectedException.original_finding.subject.scope_name} · case {selectedException.lifecycle_state}</h3>
-          <p>Owner: {selectedException.owner.name}, {selectedException.owner.team}. Operational disposition: {selectedException.state}; reviewed version {selectedException.version}.</p>
+          <p>Owner: {exceptionOwnerLabel(selectedException.owner)}. Operational disposition: {selectedException.state}; reviewed version {selectedException.version}.</p>
           <dl className="facts"><dt>Latest evidence</dt><dd>{selectedException.latest_evidence_state}</dd>
             <dt>Latest evidence reason</dt><dd>{selectedException.latest_evidence_reason.replaceAll("_", " ")}</dd>
             <dt>Evidence resolution</dt><dd>{selectedException.evidence_resolution === "resolved" ? "Resolved by healthy comparable evidence" : selectedException.evidence_resolution === "active" ? "Active discrepancy in the latest evidence" : "Unknown — current evidence does not establish resolution"}</dd>
@@ -1404,7 +1408,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <section className="detail-section"><h4>Latest comparable finding unavailable</h4><p>{selectedException.latest_run_id ? "The latest run contains no comparable finding. Resolution remains unknown." : "No latest evaluation has been recorded for this case. Reconcile current inputs to refresh its evidence."}</p>
               {selectedException.latest_run_id && <p>Latest evaluated run: <button type="button" className="text-button" onClick={() => { void downloadProtected(`/api/runs/${encodeURIComponent(selectedException.latest_run_id!)}`, "saved-domain-run.json", new AbortController().signal).catch(failure => setError(readableError(failure))); }}>{selectedException.latest_run_id} · download JSON</button>.</p>}
             </section>}
-          {selectedException.handoff_at && <p>Handed off from {status.actors.find(item => item.id === selectedException.handoff_from_actor_id)?.name} at {selectedException.handoff_at}. Recipient acknowledgement: {selectedException.acknowledged_at ?? "pending"}.</p>}
+          {selectedException.handoff_at && <p>Handed off from {status.actors.find(item => item.id === selectedException.handoff_from_actor_id)?.name ?? "another principal (identity hidden)"} at {selectedException.handoff_at}. Recipient acknowledgement: {selectedException.acknowledged_at ?? "pending"}.</p>}
           <label>Action reason<input value={exceptionAttempt?.payload.reason ?? exceptionReason} maxLength={500} disabled={busy || !mayHandle || !!exceptionAttempt} onChange={event => setExceptionReason(event.target.value)} /></label>
           {!mayHandle && <p>The assigned Operator must authenticate independently to handle this exception.</p>}
           <fieldset disabled={busy || !mayHandle || !!exceptionAttempt}><legend>Owner actions · findings remain unchanged</legend>
