@@ -1,0 +1,158 @@
+[
+  {
+    "id": "ipam-rir-crm-baseline",
+    "name": "IPAM / RIR / CRM baseline",
+    "plane": ["assignment"],
+    "contributes": "Intended scopes, prefixes, pools and allocations with owner, purpose and route-announcement policy metadata.",
+    "unlocks": [
+      "capacity baseline",
+      "intended-vs-observed comparison",
+      "expected-announcement policy for route findings"
+    ],
+    "adapter_note": "Consumed as a versioned candidate batch; the seeded local ledger is the only active baseline today. A changed intended batch stays staged and cannot silently overwrite an approved local allocation.",
+    "access_note": "Read-only exported records. No live registry, RIR or CRM API is connected; the repository carries a synthetic baseline only."
+  },
+  {
+    "id": "dhcp-lease-events",
+    "name": "DHCP lease events",
+    "plane": ["assignment", "presence"],
+    "contributes": "Lease validity intervals that bind an address to an opaque client identity over time.",
+    "unlocks": [
+      "current occupancy and p95 sampling",
+      "conflicting or duplicate assignment findings",
+      "DHCP-managed pool pressure"
+    ],
+    "adapter_note": "A synthetic importer accepts versioned lease-interval batches. No live DHCP server, lease database or event stream is connected.",
+    "access_note": "Read-only import. A complete eligible window is required for absence-based candidates; an incomplete or stale batch cannot prove no usage."
+  },
+  {
+    "id": "bmp-routing-state",
+    "name": "BMP routing state",
+    "plane": ["presence"],
+    "contributes": "Observed route presence and validity intervals per scope, address family and prefix.",
+    "unlocks": [
+      "expected-announcement comparison",
+      "unregistered-announcement findings",
+      "positive route presence for zombie-style review"
+    ],
+    "adapter_note": "The routing fixture is a synthetic bounded route-state export, not a BMP collector and not an event/withdraw parser. A real adapter would subscribe to BMP and normalize messages into intervals; it does not exist.",
+    "access_note": "Read-only telemetry. A stale or incomplete routing view yields unknown, never unused or stranded."
+  },
+  {
+    "id": "cmts-bindings",
+    "name": "CMTS bindings",
+    "plane": ["presence"],
+    "contributes": "Access-edge subscriber/modem-to-address bindings as seen by the cable termination system.",
+    "unlocks": [
+      "subscriber-level presence at the access edge",
+      "cross-checking DHCP leases against edge bindings",
+      "active-versus-idle subscriber evidence"
+    ],
+    "adapter_note": "No adapter, fixture or import path exists. It would require CMTS management or export access and is not connected.",
+    "access_note": "Carries subscriber identity and is privacy-sensitive; read-only and synthetic-only in this repository."
+  },
+  {
+    "id": "radius-diameter-accounting",
+    "name": "RADIUS / Diameter accounting",
+    "plane": ["behavior"],
+    "contributes": "Session start/stop and usage-accounting records carrying a framed address and an opaque identity.",
+    "unlocks": [
+      "session-level usage corroboration",
+      "separating active from idle assignments",
+      "usage-derived investigation candidates"
+    ],
+    "adapter_note": "No adapter or fixture exists. It would require an accounting stream or export from the AAA platform and is not connected.",
+    "access_note": "Subscriber-identifying and sensitive; read-only and synthetic-only in this repository."
+  },
+  {
+    "id": "cgnat-translation-logs",
+    "name": "CGNAT translation logs",
+    "plane": ["behavior"],
+    "contributes": "Inside/outside address and port translation bindings observed by the carrier-grade NAT.",
+    "unlocks": [
+      "resolving shared outside addresses to subscribers",
+      "port-block usage not visible through DHCP",
+      "corroborating that an address is carrying traffic"
+    ],
+    "adapter_note": "No adapter or fixture exists. It would require CGNAT export or streaming and is not connected.",
+    "access_note": "Carries subscriber and port detail and is sensitive; read-only and synthetic-only in this repository."
+  },
+  {
+    "id": "arp-nd-caches",
+    "name": "ARP / ND caches",
+    "plane": ["presence"],
+    "contributes": "Point-in-time link-layer adjacency and last-seen presence for IPv4 (ARP) and IPv6 (ND).",
+    "unlocks": [
+      "presence corroboration for an address",
+      "stale-adjacency hints",
+      "detecting a device present on a link"
+    ],
+    "adapter_note": "No adapter exists. It would require polling device ARP/ND tables; caches are volatile and nothing is connected.",
+    "access_note": "Read-only per-device query. Caches are ephemeral, so only point-in-time presence is available."
+  },
+  {
+    "id": "external-bgp-rpki",
+    "name": "External BGP + RPKI",
+    "plane": ["presence"],
+    "contributes": "Externally visible BGP announcements plus RPKI route-origin validation state (an authorization signal, distinct from intended assignment).",
+    "unlocks": [
+      "unregistered external announcement findings",
+      "origin-validation and possible hijack indicators",
+      "comparing external visibility with intended prefixes"
+    ],
+    "adapter_note": "No adapter exists. It would require a BGP collector or session and a current RPKI VRP feed; neither is connected.",
+    "access_note": "Read-only. External routing data is generally public, but origin validation needs a current VRP view."
+  },
+  {
+    "id": "active-probing",
+    "name": "Active probing",
+    "plane": ["presence"],
+    "contributes": "Reachability responses from authorized probes (for example ICMP or TCP checks) at a probe time.",
+    "unlocks": [
+      "corroborating a reclaim candidate before any action",
+      "reducing inactive-address false positives",
+      "point-in-time reachability checks"
+    ],
+    "adapter_note": "No prober exists in this build, and the deck's longer probing-based reclaim rule is not implemented. Probing tests presence only, not usage.",
+    "access_note": "Sends active traffic to targets and needs explicit authorization and rate limits; synthetic-only here."
+  },
+  {
+    "id": "ipdr-usage-records",
+    "name": "IPDR usage records",
+    "plane": ["behavior"],
+    "contributes": "Per-flow or per-session usage detail records with volume and time.",
+    "unlocks": [
+      "usage-volume findings",
+      "idle-versus-heavy user evidence",
+      "consumption or quota views"
+    ],
+    "adapter_note": "No adapter or fixture exists. It would require an IPDR collector or export in an agreed format and is not connected.",
+    "access_note": "Subscriber usage data is sensitive; read-only and synthetic-only in this repository."
+  },
+  {
+    "id": "flow-export",
+    "name": "Flow export",
+    "plane": ["behavior"],
+    "contributes": "Sampled or aggregated flow records (for example NetFlow, IPFIX or sFlow) per address and prefix.",
+    "unlocks": [
+      "traffic presence and volume",
+      "separating routed from carrying-traffic facts",
+      "utilization-based capacity views"
+    ],
+    "adapter_note": "No adapter exists. It would require device exporters and a collector; sampling makes volume approximate, and nothing is connected.",
+    "access_note": "Read-only telemetry, sampled and aggregated rather than exact."
+  },
+  {
+    "id": "dns-resolver-logs",
+    "name": "DNS resolver logs",
+    "plane": ["behavior", "presence"],
+    "contributes": "Client query activity and name-to-address resolution observed by recursive resolvers.",
+    "unlocks": [
+      "activity-based presence hints",
+      "naming or purpose context for an address",
+      "corroborating client activity"
+    ],
+    "adapter_note": "No adapter or fixture exists. It would require resolver query logging or export and is not connected.",
+    "access_note": "Query logs are privacy-sensitive and read-only; synthetic-only in this repository."
+  }
+]
