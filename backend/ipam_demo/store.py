@@ -10,8 +10,8 @@ import sqlite3
 from .errors import AppError
 
 APPLICATION_ID = 0x4950414D
-SCHEMA_VERSION = 7
-MIGRATABLE_SCHEMA_VERSIONS = (1, 2, 3, 4, 5, 6)
+SCHEMA_VERSION = 8
+MIGRATABLE_SCHEMA_VERSIONS = (1, 2, 3, 4, 5, 6, 7)
 CONTRACT_REVISION = "demo-v2-questionnaire"
 DATABASE_NAME = "ipam_demo.sqlite3"
 
@@ -67,7 +67,7 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
     if identity != APPLICATION_ID:
         raise AppError("UNRECOGNIZED_DATABASE", "Database identity is not IPAM demo. Existing data was preserved.")
     if found_version != version:
-        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1 through 6, stop the service and run python -m ipam_demo migrate.",
+        raise AppError("UNSUPPORTED_SCHEMA", "Unsupported database schema. Existing data was preserved. For schema 1 through 7, stop the service and run python -m ipam_demo migrate.",
                        details={"found": found_version, "supported": version})
     expected = {"app_meta", "scopes", "prefixes", "pools", "allocations"}
     if version >= 2:
@@ -85,6 +85,8 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
                          "ticket_handoff_events", "tier_a_operation_receipts", "report_preset_quarantine", "report_presets"})
     if version >= 7:
         expected.add("reservation_notice_notifications")
+    if version >= 8:
+        expected.add("servicenow_incidents")
     tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     if not expected.issubset(tables) or connection.execute("SELECT singleton FROM app_meta WHERE singleton=1").fetchone() is None:
         raise AppError("INVALID_SCHEMA", "Required inventory tables or metadata are missing. Existing data was preserved.")
@@ -147,6 +149,15 @@ def require_schema(connection: sqlite3.Connection, *, version: int = SCHEMA_VERS
             if not required.issubset(columns):
                 raise AppError("INVALID_SCHEMA", "Required schema 7 fields are missing. Existing data was preserved.",
                                details={"table": table, "missing_columns": sorted(required - columns)})
+    if version >= 8:
+        required = {"intent_id", "correlation", "business_payload_digest", "instance_host", "version", "state",
+                    "state_reason", "send_count", "send_principal_id", "send_idempotency_key", "send_digest",
+                    "sent_at", "sys_id", "number", "assignment_group", "assigned_to", "external_state",
+                    "observed_at", "duplicate_numbers_json", "last_error_code", "last_error_at", "updated_at"}
+        columns = {row[1] for row in connection.execute("PRAGMA table_info(servicenow_incidents)")}
+        if not required.issubset(columns):
+            raise AppError("INVALID_SCHEMA", "Required schema 8 fields are missing. Existing data was preserved.",
+                           details={"table": "servicenow_incidents", "missing_columns": sorted(required - columns)})
 
 
 def initialize_schema(path: Path) -> None:
@@ -164,6 +175,7 @@ def initialize_schema(path: Path) -> None:
         schema += "\n" + files("ipam_demo").joinpath("schema_v5.sql").read_text(encoding="utf-8")
         schema += "\n" + files("ipam_demo").joinpath("schema_v6.sql").read_text(encoding="utf-8")
         schema += "\n" + files("ipam_demo").joinpath("schema_v7.sql").read_text(encoding="utf-8")
+        schema += "\n" + files("ipam_demo").joinpath("schema_v8.sql").read_text(encoding="utf-8")
         connection.execute("PRAGMA foreign_keys = OFF")
         connection.executescript(
             f"BEGIN IMMEDIATE;\nPRAGMA application_id = {APPLICATION_ID};\n"
@@ -180,7 +192,7 @@ def require_initialized(connection: sqlite3.Connection) -> None:
 
 
 def migrate_schema(directory: Path) -> dict:
-    """Explicit known-v1 through v6 migration, never an implicit startup side effect."""
+    """Explicit known-v1 through v7 migration, never an implicit startup side effect."""
     with exclusive_data_access(directory) as path:
         if path.is_symlink() or not path.is_file():
             raise AppError("UNSAFE_DATABASE_PATH", "Migration needs an existing regular app database; nothing was changed.")

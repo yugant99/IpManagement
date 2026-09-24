@@ -233,6 +233,64 @@ class TicketHandoffOperationReadback(StrictResponse):
     current_handoff: TicketHandoffDetail | None
 
 
+class ServiceNowConfigurationStatus(StrictResponse):
+    status: Literal["disabled", "invalid", "enabled"]
+    problems: list[str]
+    instance_host: str | None
+    domain_allowed: bool | None
+
+
+class ServiceNowIncidentRecord(StrictResponse):
+    version: int
+    state: Literal["unknown", "delivered", "failed", "absent", "duplicate_review"]
+    state_reason: str
+    send_count: int
+    instance_host: str
+    sent_at: str
+    sent_by: str | None
+    sys_id: str | None
+    number: str | None
+    assignment_group: str | None
+    assigned_to: str | None
+    assignment_matches_configuration: bool | None
+    external_state: str | None
+    external_state_label: str | None
+    observed_at: str | None
+    duplicate_numbers: list[str]
+    last_error_code: str | None
+    last_error_at: str | None
+    updated_at: str
+
+
+class ServiceNowIncidentEvent(StrictResponse):
+    action: str
+    outcome: str
+    result: str | None
+    occurred_at: str
+    actor_id: str | None
+
+
+class ServiceNowIncidentView(StrictResponse):
+    intent_id: str
+    domain: str
+    correlation: str
+    label: str
+    sandbox: bool
+    synthetic: bool
+    source_request_state: str
+    simulated_handoff_state: str
+    provisioning_status: Literal["not_requested"]
+    configuration: ServiceNowConfigurationStatus
+    record: ServiceNowIncidentRecord | None
+    send_allowed: bool
+    send_block_reason: str | None
+    lookup_allowed: bool
+    lookup_block_reason: str | None
+    refresh_allowed: bool
+    refresh_block_reason: str | None
+    events: list[ServiceNowIncidentEvent]
+
+
 class MigrationAssessmentCreateRequest(StrictRequest):
     source_batch_id: str
     expected_baseline_version: StrictInt

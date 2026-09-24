@@ -252,7 +252,7 @@ a separate explicitly confirmed operation, described below.
 scripts/ops/migrate.sh
 ```
 
-Advances a recognized schema 1–6 database to current schema 7. The
+Advances a recognized schema 1–7 database to current schema 8. The
 service never migrates implicitly; backup/restore preserve the source
 schema until this explicit stopped-service migration.
 

@@ -900,3 +900,65 @@ export async function acknowledgeNotice(reservationId: string, noticeId: string,
 export function loadStaticOccupancy(signal: AbortSignal) {
   return request<CurrentStaticOccupancy>("/api/current-static-occupancy", signal).then(confirmedOccupancy);
 }
+
+export interface ServiceNowIncidentRecord {
+  version: number;
+  state: "unknown" | "delivered" | "failed" | "absent" | "duplicate_review";
+  state_reason: string;
+  send_count: number;
+  instance_host: string;
+  sent_at: string;
+  sent_by: string | null;
+  sys_id: string | null;
+  number: string | null;
+  assignment_group: string | null;
+  assigned_to: string | null;
+  assignment_matches_configuration: boolean | null;
+  external_state: string | null;
+  external_state_label: string | null;
+  observed_at: string | null;
+  duplicate_numbers: string[];
+  last_error_code: string | null;
+  last_error_at: string | null;
+  updated_at: string;
+}
+
+export interface ServiceNowIncidentView {
+  intent_id: string;
+  domain: string;
+  correlation: string;
+  label: string;
+  sandbox: boolean;
+  synthetic: boolean;
+  source_request_state: string;
+  simulated_handoff_state: string;
+  provisioning_status: "not_requested";
+  configuration: { status: "disabled" | "invalid" | "enabled"; problems: string[]; instance_host: string | null; domain_allowed: boolean | null };
+  record: ServiceNowIncidentRecord | null;
+  send_allowed: boolean;
+  send_block_reason: string | null;
+  lookup_allowed: boolean;
+  lookup_block_reason: string | null;
+  refresh_allowed: boolean;
+  refresh_block_reason: string | null;
+  events: { action: string; outcome: string; result: string | null; occurred_at: string; actor_id: string | null }[];
+}
+
+function confirmedIncident(value: ServiceNowIncidentView, id: string): ServiceNowIncidentView {
+  if (!value || value.intent_id !== id || !value.configuration || !Array.isArray(value.events)) {
+    throw new ApiError("The sandbox Incident response is incomplete. Reload the handoff before acting.", "INVALID_RESPONSE");
+  }
+  return value;
+}
+
+export function loadServiceNowIncident(id: string, signal: AbortSignal) {
+  return request<ServiceNowIncidentView>(`/api/handoffs/${encodeURIComponent(id)}/servicenow`, signal)
+    .then(value => confirmedIncident(value, id));
+}
+
+export async function actOnServiceNowIncident(id: string, action: "send" | "lookup" | "refresh",
+  payload: { actor_id: string; expected_version: number; idempotency_key?: string }, signal: AbortSignal) {
+  const result = await request<ServiceNowIncidentView>(`/api/handoffs/${encodeURIComponent(id)}/servicenow/${action}`,
+    signal, false, { method: "POST", body: JSON.stringify(payload) });
+  return confirmedIncident(result, id);
+}

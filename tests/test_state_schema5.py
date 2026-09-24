@@ -22,7 +22,7 @@ from uuid import uuid4
 from ipam_demo.errors import AppError
 from ipam_demo.seed import seed_rich
 from ipam_demo.state_ops import backup_database, reset_database, restore_database
-from ipam_demo.store import DATABASE_NAME, connect, exclusive_data_access, migrate_schema, require_schema
+from ipam_demo.store import DATABASE_NAME, SCHEMA_VERSION, connect, exclusive_data_access, migrate_schema, require_schema
 
 REPO = Path(__file__).resolve().parents[1]
 LEGACY_SHA = "a279f32df0ac7d2147b580dbff36dd88772bdeb2"
@@ -119,12 +119,13 @@ class StateSchema5Tests(unittest.TestCase):
         self.assertEqual(snapshot(restored / DATABASE_NAME), self.before)
         with connect(restored / DATABASE_NAME) as connection:
             self.assert_error("UNSUPPORTED_SCHEMA", require_schema, connection)
-        self.assertEqual(migrate_schema(restored), {"schema_version": 5, "previous_schema_version": 4, "changed": True})
+        self.assertEqual(migrate_schema(restored), {"schema_version": SCHEMA_VERSION, "previous_schema_version": 4, "changed": True})
         after = snapshot(restored / DATABASE_NAME)
         self.assertEqual(after["application_id"], self.before["application_id"])
-        self.assertEqual(after["schema_version"], 5)
+        self.assertEqual(after["schema_version"], SCHEMA_VERSION)
         for name, old in self.before["tables"].items():
-            current = after["tables"][name]
+            # Schema 6 deliberately moved the unscoped singleton into quarantine.
+            current = after["tables"]["report_preset_quarantine" if name == "report_preset" else name]
             positions = [current["columns"].index(column) for column in old["columns"]]
             projected = sorted([[row[i] for i in positions] for row in current["rows"]], key=json.dumps)
             self.assertEqual(projected, old["rows"], name)
@@ -132,7 +133,8 @@ class StateSchema5Tests(unittest.TestCase):
         for name in ("scopes", "prefixes", "pools", "allocations", "allocation_requests", "source_batches",
                      "source_coverage", "source_records", "calculation_runs", "audit_events", "exceptions",
                      "report_preset", "schedule_status", "schedule_operations"):
-            self.assertTrue(after["tables"][name]["rows"], name)
+            target = "report_preset_quarantine" if name == "report_preset" else name
+            self.assertTrue(after["tables"][target]["rows"], name)
         with connect(restored / DATABASE_NAME) as connection:
             rows = connection.execute("SELECT pool_version,version,capacity_history_version FROM pools "
                                       "JOIN prefixes ON prefixes.id=pools.prefix_id").fetchall()

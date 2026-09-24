@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { ApiError, currentContext, downloadProtected, hasRole, request } from "./api";
+import ServiceNowIncident from "./ServiceNowIncident";
 import type { Page } from "./api";
 import {
   actOnException, acknowledgeHandoff, acknowledgeNotice, attemptHandoff, createAllocation, createReservation,
@@ -1298,6 +1299,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             {handoffDetail.reassignment_allowed !== true && <p className="quiet">Route reassignment is available only while pending or routing-blocked with zero attempts, and only to the current reviewed team.</p>}
           </fieldset>
           {!mayAttemptTicket && <p>An Operator must authenticate for manual ticket actions.</p>}
+          <ServiceNowIncident handoffId={handoffDetail.id} actorId={actorId} mayOperate={mayAttemptTicket} locked={locked} />
         </div>}
       </section>
 

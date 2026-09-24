@@ -18,7 +18,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
 from . import (__version__, feed_adapter, inventory, inventory_commands, lifecycle, migration_compare,
-               reconciliation, reports, source_catalog, ticket_handoff, workflow)
+               reconciliation, reports, servicenow_incident, source_catalog, ticket_handoff, workflow)
 from . import access
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
@@ -28,6 +28,7 @@ from .models import (Allocation, CurrentStaticOccupancy, MigrationAssessmentCrea
                      Page, Pool, Prefix, PrefixDetail, ReservationDetail, ReservationHistoryEntry,
                      ReservationNotice, ReservationNoticeEvaluation, ReservationNoticeNotificationVersion,
                      ReservationOperationReadback, ReservationReleaseRequest, ReservationSummary, Scope,
+                     ServiceNowIncidentView,
                      TicketHandoffDetail, TicketHandoffMutation, TicketHandoffOperationReadback,
                      TicketHandoffSummary)
 from .scheduler import SyntheticScheduler
@@ -789,6 +790,62 @@ def create_app() -> FastAPI:
             ticket_handoff.reassign_handoff(
                 connection, str(object_id), payload, context=request.state.access_context,
                 configuration=request.state.access_configuration))
+
+    @app.get("/api/handoffs/{object_id}/servicenow", response_model=ServiceNowIncidentView)
+    def get_servicenow_incident(object_id: UUID, request: Request, connection=Depends(database)):
+        ordinary_domain(request)
+        item = servicenow_incident.get_incident(
+            connection, str(object_id), context=request.state.access_context,
+            configuration=request.state.access_configuration, settings=servicenow_incident.load_settings())
+        return ServiceNowIncidentView.model_validate(item).model_dump()
+
+    def servicenow_mutation(request, payload, action, intent_id, prepare, external, record):
+        """Committed prepare, one external call outside any transaction, then a separately committed outcome."""
+        settings = servicenow_incident.load_settings()
+
+        def scoped(operation):
+            def execute(connection):
+                handoff_scope(connection, request, intent_id)
+                require_local_role(request, "operator")
+                return operation(connection)
+            return execute
+
+        def arguments():
+            return {"context": request.state.access_context, "configuration": request.state.access_configuration,
+                    "settings": settings}
+
+        view, replay, plan = audited_write(request, payload, action, scoped(
+            lambda connection: prepare(connection, intent_id, payload, **arguments())), intent_id)
+        if plan is not None:
+            outcome = external(plan, settings=settings)
+            try:
+                view = audited_write(request, payload, action, scoped(
+                    lambda connection: record(connection, plan, outcome, **arguments())), intent_id)
+            except AppError as exc:
+                if exc.status not in (401, 403, 404):
+                    exc.details = {**exc.details, "handoff_id": intent_id, "external_outcome_recorded": False,
+                                   "recovery_action": f"POST /api/handoffs/{intent_id}/servicenow/lookup"}
+                raise
+        safe = ServiceNowIncidentView.model_validate(view).model_dump()
+        return JSONResponse(safe, headers={"X-Request-Replay": str(replay).lower()})
+
+    @app.post("/api/handoffs/{object_id}/servicenow/send")
+    def send_servicenow_incident(object_id: UUID, request: Request, payload: dict):
+        return servicenow_mutation(request, payload, "servicenow.incident.send", str(object_id),
+                                   servicenow_incident.prepare_send, servicenow_incident.post_incident,
+                                   servicenow_incident.record_send)
+
+    @app.post("/api/handoffs/{object_id}/servicenow/lookup")
+    def lookup_servicenow_incident(object_id: UUID, request: Request, payload: dict):
+        return servicenow_mutation(request, payload, "servicenow.incident.lookup", str(object_id),
+                                   servicenow_incident.prepare_lookup, servicenow_incident.lookup_incident,
+                                   servicenow_incident.record_lookup)
+
+    @app.post("/api/handoffs/{object_id}/servicenow/refresh")
+    def refresh_servicenow_incident(object_id: UUID, request: Request, payload: dict):
+        return servicenow_mutation(request, payload, "servicenow.incident.refresh", str(object_id),
+                                   servicenow_incident.prepare_refresh, servicenow_incident.refresh_incident,
+                                   servicenow_incident.record_refresh)
 
     def handoff_receipt_integrity():
         return AppError("TICKET_HANDOFF_INTEGRITY", "The saved ticket handoff record is inconsistent.", 409)
