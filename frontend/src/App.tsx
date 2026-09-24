@@ -9,6 +9,7 @@ import InventoryEditor from "./InventoryEditor";
 import Workflow from "./Workflow";
 import Schedule from "./Schedule";
 import Corrections from "./Corrections";
+import dodonaLogo from "./assets/dodona-logo.png";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
 type Bootstrap =
@@ -258,7 +259,7 @@ function ProtectedApp({ context }: { context: AccessContext }) {
     <>
       <a className="skip-link" href="#inventory-main">Skip to main content</a>
       <header className="app-header">
-        <div className="brand"><span className="brand-mark" aria-hidden="true">IP</span><span>Pool Watch</span><span className="demo-label">Synthetic local workspace</span></div>
+        <div className="brand"><img className="brand-logo" src={dodonaLogo} alt="DodonaData.ai" /><span className="brand-product">Pool Watch</span><span className="demo-label">Synthetic local workspace</span></div>
         <span className="header-context">{context.principal_id} · {context.selected_domain} · scoped evidence</span>
       </header>
       <div className="atlas-body">
@@ -411,7 +412,7 @@ export default function App() {
     <button type="button" className="secondary" onClick={signOut}>Sign out</button></div>
     <ProtectedApp key={auth.epoch} context={auth.context} /></>;
 
-  return <main id="inventory-main" className="inventory-panel"><h1>Pool Watch access</h1>
+  return <main id="inventory-main" className="inventory-panel access-panel"><img className="brand-logo" src={dodonaLogo} alt="DodonaData.ai" /><h1>Pool Watch access</h1>
     {auth.status === "signed-out" ? <form onSubmit={event => void signIn(event)}><label>Access token
       <input type="password" autoComplete="off" value={entry} onChange={event => setEntry(event.target.value)} required /></label>
       <button disabled={busy}>Continue</button>{auth.error && <p className="notice error" role="alert">{auth.error}</p>}</form>
