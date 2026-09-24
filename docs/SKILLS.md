@@ -12,9 +12,9 @@ Use a skill to produce a concrete useful artifact within the feature budget. Thi
 | Part 3 rules | `review` once a coherent rule group works | `investigate` for a mismatched expected scenario | Critical false-positive/missing-evidence findings and smallest fixes. No test-count target or repeated review of unchanged rules |
 | Part 4 UI/capacity | `design-taste-frontend` for the shared dashboard shell and states | `browse` for an authorized changed browser flow; `review` for calculations | Readable tables, clear evidence/unknown states, consistent detail/overview. No decorative animation, landing-page effects or forced dependencies |
 | Part 5 workflow | `review` for the transaction and role boundaries | `investigate` for a broken transition | Confirm exact candidate/version handling, atomic allocation/audit and visible failure. No enterprise security program or generic workflow engine |
-| **Part 6 Spencer** | `review` as a bounded packaging/contract review; no special deploy skill is required | `browse` only for the packaged UI's authorized runtime evidence; `investigate` for a startup/persistence failure | Correct entrypoint, locks, volume, state commands and recipient instructions. No VM/deploy skill, source-rule rewrite or app-wide regression pipeline |
+| **Part 6 Spencer** | `review` as a bounded packaging/contract review; no special deploy skill is required | `browse` only for focused packaged-UI runtime evidence; `investigate` for a startup/persistence failure | Correct entrypoint, locks, volume, state commands and recipient instructions. No VM/deploy skill, source-rule rewrite or app-wide regression pipeline |
 | Independent integration reviewer | `review` | `browse` only when a claim needs visible evidence | A short list of actionable defects/limits, mapped to goals and files. Owning lane fixes; do not create competing edits |
-| Stage 4 scheduler / evolving-feed owners | `review` for clock, authority, atomic cycle and replay boundaries | `investigate` only for a concrete blocker; `browse` only after explicit authorization | Follow SCHEDULING_CONTRACT.md; source findings and pending evidence. No cron/deploy skill, setup ceremony or repeated architecture interview |
+| Stage 4 scheduler / evolving-feed owners | `review` for clock, authority, atomic cycle and replay boundaries | `investigate` only for a concrete blocker; `browse` only for a focused runtime check relevant to assigned work | Follow SCHEDULING_CONTRACT.md; source findings and pending evidence. No cron/deploy skill, setup ceremony or repeated architecture interview |
 | Source-document analyst, only if needed again | Presentation/document/spreadsheet skill matching the actual file type | None by default | Extract only missing facts with exact locators. Do not reopen the entire assessment during each feature |
 
 ## Timeboxes and invocation boundaries
@@ -41,7 +41,7 @@ Spencer's environment may differ. Optional skills are not a setup prerequisite: 
 - Grilling happens between agents. The user's correction overrides the upstream user-interview/confirmation defaults. Keep actual question/answer evidence; do not fabricate a debate.
 - Skip optional onboarding, upgrades, telemetry, analytics sync, persistent-learning writes, routing-file injection and skill shopping. None is part of the product deliverable.
 - No skill may change the chosen stack, introduce a service, widen file ownership, send external messages or bypass feature-branch/merge rules.
-- Preserve useful root-cause analysis and review, but do not execute automatic test creation or repeated full-suite runs from generic skills. Follow the user's test authorization and project lean-verification rules.
+- Preserve useful root-cause analysis and review, but do not execute automatic test creation or repeated full-suite runs from generic skills. Follow the project lean-verification rules.
 - UI skill defaults do not justify Next.js, an animation library, downloaded fonts or another component system. Use restrained operational UI and the selected dependencies.
 - Never describe a bounded method pass as completion of an entire upstream workflow with skipped steps.
 

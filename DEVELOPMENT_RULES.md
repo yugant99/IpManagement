@@ -10,6 +10,7 @@ These rules apply to every human and agent working on this repository. The goal 
 - Escalate only a genuine blocker that agents cannot resolve within the user's constraints, or an action outside existing authorization such as new infrastructure spending. Do not send routine tradeoffs back to the user.
 - If a genuine blocker requires user input, batch at most three material questions. Do not re-ask answered questions or request facts available in the repository. This is not a limit on the explicitly delegated agent-to-agent review.
 - Implement only authorized work. No cloud rental, public exposure, external writes or new ongoing cost follows automatically from a feature request.
+- Local app startup and shutdown, disposable synthetic state, and focused runtime checks are routine development work. Do them when they help resolve the current task without asking for a separate permission grant. Keep live external writes, deployment, customer access and infrastructure changes within their separately authorized scope.
 - Use the 111-row questionnaire as the primary coverage denominator. Read `docs/QUESTIONNAIRE_PRIORITIES.md` and the row map before selecting work. The older 30-goal manifest is an implementation reference, not the success headline. Report functional, deployment, design/documentary, partial and missing evidence separately; never count a roadmap promise as implemented capability.
 
 ## 2. Three changes, then push
@@ -43,11 +44,11 @@ These rules apply to every human and agent working on this repository. The goal 
 
 ## 4. Lean verification
 
-- Respect the user's instruction not to add or run application tests without explicit authorization. Documentation-only work does not need an application test run.
-- Once checks are authorized, choose the smallest checks that can falsify the claimed behavior. Use an existing focused test first. Do not run the full suite after every feature, commit or push.
+- Run focused application tests and runtime checks when they resolve a concrete implementation or demo risk; no separate permission request is needed. Documentation-only work does not need an application test run.
+- Choose the smallest checks that can falsify the claimed behavior. Use an existing focused test first. Do not run the full suite after every feature, commit or push.
 - Add regression coverage only when it protects meaningful logic or a real failure: address/time identity, lease transitions, missing-source handling, allocation atomicity, authorization or persistence. Do not test trivial wrappers or mirror implementation line by line.
 - Prefer a small scenario matrix with healthy, anomalous and insufficient-evidence cases over hundreds of cosmetic assertions.
-- Initial target: zero to three focused checks per small slice; a short build/type check when relevant; one agreed integrated demo pass at a milestone. These are defaults, not permission to skip a necessary safety or correctness check.
+- Initial target: zero to three focused checks per small slice; a short build/type check when relevant; one focused integrated demo pass at a milestone. These are defaults, not permission to skip a necessary safety or correctness check.
 - Timebox routine verification. If a planned check becomes slow or repeats unchanged work, report why and narrow it. Do not keep running a growing suite for reassurance.
 - Never rerun a passing check without a new relevant edit, failure or unresolved concern. Never call an interrupted or unrun check passed.
 - If a material issue remains unverified, say so. A timebox does not convert uncertainty into success. Fix a critical issue or reduce the claim/scope.
