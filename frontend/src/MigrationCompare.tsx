@@ -410,7 +410,6 @@ export default function MigrationCompare({ active = true, initialSourceBatchId =
   return <section aria-labelledby="migration-heading">
     <div className="page-heading"><div><p className="eyebrow">Domain {context.selected_domain} · immutable comparison</p><h1 id="migration-heading">Migration assessment</h1><p className="intro">Compare a successful staged intended-inventory receipt against the current selected-domain baseline, then obtain a separate authenticated review.</p></div>
       <button type="button" className="secondary" disabled={busy} onClick={() => { setError(""); setRevision(value => value + 1); }}>Reload assessments and receipts</button></div>
-    <div className="evidence-banner"><strong>Assessment only</strong><span>Creating or signing a comparison does not activate, promote, reconcile or delete inventory. Only separately authorized inventory workflows change active state.</span></div>
     {error && <div className="notice error" role="alert"><h2>Migration operation needs attention</h2><p>{error}</p></div>}
     {message && <div className="notice" role="status"><p>{message}</p></div>}
     {storageError && <div className="notice error" role="alert"><h2>Recovery storage unavailable</h2><p>{storageError}</p></div>}

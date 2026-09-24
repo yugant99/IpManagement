@@ -290,7 +290,6 @@ export default function Corrections({ active = true }: { active?: boolean }) {
     <div className="page-heading"><div><p className="eyebrow">Current workflow · reviewed intended inventory</p><h1 id="corrections-heading">Inventory corrections</h1>
       <p className="intro">Propose missing registered space, obtain an independent decision, then inspect later saved evidence.</p></div>
       <button type="button" className="secondary" disabled={busy || loading} onClick={() => { setError(""); setRevision(value => value + 1); }}>Refresh corrections</button></div>
-    <div className="evidence-banner"><strong>Local synthetic workflow</strong><span>Approval registers a prefix in this application's inventory. It does not change DHCP, routers or any external system. Resolution requires a subsequent comparable finding.</span></div>
     <p className="quiet">Evidence is a loaded snapshot. Returning to this view refreshes it; use Refresh corrections to include runs acquired while this view stays open.</p>
     {error && <div className="notice error" role="alert">{error}</div>}
     {message && <div className="notice" role="status">{message}</div>}

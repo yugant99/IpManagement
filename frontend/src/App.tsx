@@ -58,7 +58,6 @@ function OriginDetails({ origin }: { origin: Origin }) {
   return (
     <details className="provenance">
       <summary>Source references</summary>
-      <p className="quiet">Synthetic intended state. These records do not establish current network use.</p>
       <dl className="facts compact">
         <dt>Source</dt><dd><code>{origin.source_id}</code></dd>
         <dt>Source run</dt><dd><code>{origin.source_run_id}</code></dd>
@@ -112,7 +111,7 @@ function PrefixPanel({ id, onClose, onSelect }: { id: string; onClose: () => voi
 function PrefixContents({ prefix, onSelect }: { prefix: PrefixDetail; onSelect: (id: string) => void }) {
   return (
     <>
-      <p className="detail-subtitle">{prefix.scope_name} · IPv{prefix.family} · Synthetic intended state</p>
+      <p className="detail-subtitle">{prefix.scope_name} · IPv{prefix.family} · Intended state</p>
       <DetailSection title="Intended inventory">
         <dl className="facts">
           <dt>Owner</dt><dd>{prefix.owner || "Not specified"}</dd>
@@ -259,7 +258,7 @@ function ProtectedApp({ context }: { context: AccessContext }) {
     <>
       <a className="skip-link" href="#inventory-main">Skip to main content</a>
       <header className="app-header">
-        <div className="brand"><img className="brand-logo" src={dodonaLogo} alt="DodonaData.ai" /><span className="brand-product">Pool Watch</span><span className="demo-label">Synthetic local workspace</span></div>
+        <div className="brand"><img className="brand-logo" src={dodonaLogo} alt="DodonaData.ai" /><span className="brand-product">Pool Watch</span><span className="demo-label">Demo workspace</span></div>
         <span className="header-context">{context.principal_id} · {context.selected_domain} · scoped evidence</span>
       </header>
       <div className="atlas-body">
@@ -278,7 +277,6 @@ function ProtectedApp({ context }: { context: AccessContext }) {
           <div className="rail-group"><p className="rail-label">Observe</p>
             <button aria-current={view === "schedule" ? "page" : undefined} onClick={() => changeView("schedule")}><span className="rail-marker" aria-hidden="true" />Synthetic acquisition</button>
           </div>
-          <p className="rail-note">All records are synthetic and local. Saved evidence is separate from current intended state.</p>
         </nav>
         <main id="inventory-main">
         <div hidden={view !== "inventory"}>
@@ -286,7 +284,6 @@ function ProtectedApp({ context }: { context: AccessContext }) {
           <div><p className="eyebrow">Intended network state</p><h1>Scoped inventory</h1><p className="intro">Browse IPv4 and IPv6 prefixes, their owners, and intended assignments.</p></div>
           <button className="secondary" onClick={refresh} disabled={bootstrap.status === "loading"}>Refresh inventory</button>
         </div>
-        <div className="evidence-banner"><strong>Synthetic intended inventory</strong><span>Data comes from the local inventory API. No live discovery, traffic measurements, or current-use evidence is included.</span></div>
         </div>
 
         {bootstrap.status === "loading" && <div className="notice loading-line" role="status">Loading permitted network scopes…</div>}
@@ -315,7 +312,7 @@ function ProtectedApp({ context }: { context: AccessContext }) {
                 {inventory.status === "ready" && inventory.data.items.length > 0 && (
                   <>
                     <div className="table-scroll" tabIndex={0} role="region" aria-label="Prefix inventory table">
-                      <table><caption className="sr-only">Synthetic intended prefixes. Open a prefix to view its stored details.</caption><thead><tr><th scope="col">Prefix / scope</th><th scope="col">Owner / purpose</th><th scope="col">Tags</th></tr></thead><tbody>{inventory.data.items.map((prefix) => <tr key={prefix.id} data-selected={selectedId === prefix.id}><td><button className="prefix-link mono" onClick={(event) => { selectedButton.current = event.currentTarget; setSelectedId(prefix.id); }} aria-expanded={selectedId === prefix.id} aria-controls={selectedId === prefix.id ? "prefix-detail" : undefined}>{prefix.cidr}<span className="sr-only"> in {prefix.scope_name}, open details</span></button><div className="table-secondary">{prefix.scope_name}<span className="family-label">IPv{prefix.family}</span></div></td><td><span className="owner">{prefix.owner || "Not specified"}</span><div className="table-secondary">{prefix.purpose || "No purpose recorded"}</div></td><td>{prefix.tags.length ? <span className="tags">{prefix.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>)}</span> : <span className="quiet">None</span>}</td></tr>)}</tbody></table>
+                      <table><caption className="sr-only">Intended prefixes. Open a prefix to view its stored details.</caption><thead><tr><th scope="col">Prefix / scope</th><th scope="col">Owner / purpose</th><th scope="col">Tags</th></tr></thead><tbody>{inventory.data.items.map((prefix) => <tr key={prefix.id} data-selected={selectedId === prefix.id}><td><button className="prefix-link mono" onClick={(event) => { selectedButton.current = event.currentTarget; setSelectedId(prefix.id); }} aria-expanded={selectedId === prefix.id} aria-controls={selectedId === prefix.id ? "prefix-detail" : undefined}>{prefix.cidr}<span className="sr-only"> in {prefix.scope_name}, open details</span></button><div className="table-secondary">{prefix.scope_name}<span className="family-label">IPv{prefix.family}</span></div></td><td><span className="owner">{prefix.owner || "Not specified"}</span><div className="table-secondary">{prefix.purpose || "No purpose recorded"}</div></td><td>{prefix.tags.length ? <span className="tags">{prefix.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>)}</span> : <span className="quiet">None</span>}</td></tr>)}</tbody></table>
                     </div>
                     <nav className="pagination" aria-label="Inventory pages"><span className="quiet">{inventory.data.offset + 1}–{inventory.data.offset + inventory.data.items.length} of {inventory.data.total}</span><div><button className="secondary" disabled={offset === 0} onClick={() => changePage(Math.max(0, offset - PAGE_SIZE))}>Previous</button><button className="secondary" disabled={offset + inventory.data.items.length >= inventory.data.total} onClick={() => changePage(offset + PAGE_SIZE)}>Next</button></div></nav>
                   </>
@@ -336,7 +333,6 @@ function ProtectedApp({ context }: { context: AccessContext }) {
           <div hidden={view !== "capacity"}><CapacityReports scopes={bootstrap.scopes} /></div>
         </>}
         {context.roles.includes("operator") && <Readiness />}
-        <footer className="page-footer">Synthetic inventory and evidence · Saved calculations are pinned to their run · Domain {context.selected_domain}</footer>
         </main>
       </div>
     </>

@@ -175,7 +175,7 @@ function FindingDetail({ runId, findingId, scopes, onClose }: { runId: string; f
   return <aside className="detail-panel" id="finding-detail" aria-labelledby="finding-heading" aria-busy={finding.status === "loading"}>
     <div className="section-heading"><p className="eyebrow">Saved evidence detail</p><button className="text-button" onClick={onClose}>Close detail</button></div>
     <h3 id="finding-heading" ref={heading} tabIndex={-1} className="detail-title">{finding.status === "ready" ? finding.data.subject.cidr : "Selected finding"}</h3>
-    <p className="detail-subtitle">Pinned run <code>{runId}</code> · Synthetic calculation</p>
+    <p className="detail-subtitle">Pinned run <code>{runId}</code></p>
     {finding.status === "loading" && <p className="loading-line" role="status">Loading saved finding…</p>}
     {finding.status === "error" && <ErrorNotice error={finding.error} retry={() => setRevision((value) => value + 1)} />}
     {downloadError && <p className="notice error" role="alert">{downloadError}</p>}
@@ -214,7 +214,7 @@ function RunResults({ run, scopes }: { run: SavedRun; scopes: Scope[] }) {
   const findings = useApiResource<Page<Finding>>(`/api/runs/${encodeURIComponent(run.id)}/findings?${params}`, revision);
   function changePage(next: number) { setSelectedId(null); setOffset(next); }
   return <section className="run-results" aria-labelledby="run-heading">
-    <div className="section-heading"><h3 id="run-heading">Saved calculation result</h3><span className="quiet">Synthetic · {run.rule_id}</span></div>
+    <div className="section-heading"><h3 id="run-heading">Saved calculation result</h3><span className="quiet">{run.rule_id}</span></div>
     <dl className="run-identity facts"><dt>Pinned run</dt><dd><code>{run.id}</code></dd><dt>Created at</dt><dd><time>{run.created_at}</time></dd><dt>Fixed demo clock</dt><dd><time>{run.demo_clock_at}</time></dd>{run.ledger_version !== undefined && <><dt>Ledger version</dt><dd>{run.ledger_version}</dd></>}<dt>Rule version</dt><dd>{run.rule_version}</dd></dl>
     <p className="quiet run-help">Totals come from this saved run's selected-domain projection. Filters narrow the list only. New imports do not change this result.</p>
     <dl className="overview-counts"><div><dt>Evaluations in {currentContext().selected_domain} projection</dt><dd>{run.overview.total}</dd></div>{(Object.keys(stateLabels) as EvidenceState[]).map((key) => <div key={key}><dt><EvidenceBadge state={key} /></dt><dd>{run.overview[key]}</dd></div>)}</dl>
@@ -300,7 +300,6 @@ export default function FirstPath({ scopes, onAssess }: { scopes: Scope[]; onAss
 
   return <div className="first-path">
     <div className="page-heading"><div><p className="eyebrow">Domain {currentContext().selected_domain} · saved projection</p><h1>Source evidence and findings</h1><p className="intro">Inspect permitted saved imports, calculations and findings.</p></div></div>
-    <div className="evidence-banner"><strong>Synthetic inputs · Fixed demo clock</strong><span>Scope, policy and fresh complete coverage determine whether absence can be established. Missing evidence stays unknown.</span></div>
     <section className="path-step" aria-labelledby="import-heading"><div className="step-heading"><span className="step-number" aria-hidden="true">1</span><div><h2 id="import-heading">Saved source receipts</h2><p className="quiet">Global observations, callbacks and reconciliation are managed by the evidence operator.</p></div></div>
       {mayImport && <><form className="source-upload" onSubmit={(event) => { void importFile(event); }}><label className="field-label">Staged intended-inventory JSON<input type="file" accept=".json,application/json" disabled={importing || runBusy !== null} onChange={(event) => { setFile(event.target.files?.[0] ?? null); setImportError(null); }} aria-describedby="source-help" /></label><button disabled={!file || importing || runBusy !== null} type="submit">{importing ? "Importing…" : "Import staged candidate"}</button></form>
       <p className="filter-help" id="source-help">Staged intended inventory only · Up to 10 MiB / 10,000 records · No automatic reconciliation.</p></>}

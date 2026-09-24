@@ -1097,7 +1097,6 @@ export default function Workflow({ active = true }: { active?: boolean }) {
     <div className="page-heading"><div><p className="eyebrow">Current workflow · saved evidence boundary</p><h1 id="workflow-heading">Allocation and review</h1>
       <p className="intro">Reserve an exact IPv4 hold, request its conversion, obtain independent decisions, and track the separate simulated ticket handoff.</p></div>
       <button className="secondary" disabled={loading || busy} onClick={refresh}>Refresh workflow</button></div>
-    <div className="evidence-banner"><strong>Synthetic workflow</strong><span>The local ledger is real: reservations and allocations are database changes. Ticket handoff is simulated. External provisioning is unsupported and not requested; any stored legacy simulated status is historical only. Queue actions leave calculated findings unchanged.</span></div>
     <p className="quiet">The queue shows evidence from its last refresh. Returning to this view refreshes it; use Refresh workflow to include runs acquired while this view stays open.</p>
     {error && <div className="notice" role="alert"><strong>Action or refresh failed</strong><p>{error}</p></div>}
     {message && <div className="notice" role="status">{message}</div>}
@@ -1226,7 +1225,6 @@ export default function Workflow({ active = true }: { active?: boolean }) {
           {selectedRequest.decision_reason && <p>Decision reason: {selectedRequest.decision_reason}</p>}
           <p>Ticket tracking: {trackingResolved ? requestHandoff ? <><strong>{requestHandoff.state}</strong> · correlation <code>{requestHandoff.correlation}</code> · attempts {requestHandoff.attempts_used}/{requestHandoff.attempt_limit}</> : "Confirmed absent — legacy request, not tracked by ticketing" : "Unknown — resolving ticket tracking…"}</p>
           {!trackingResolved && selectedRequest.state === "pending" && <p className="notice">Ticket tracking is unknown for this request, so decisions are unavailable until tracking resolves to a handoff or a confirmed absence. No tracked-versus-legacy guess will be used. <button type="button" className="secondary" disabled={locked} onClick={() => setRevision(value => value + 1)}>Retry ticket tracking lookup</button></p>}
-          {trackedRequest && <p className="quiet">Tracked requests use the separate simulated ticket handoff. The local decision never simulates delivery or provisioning; provisioning is not requested and unsupported.</p>}
           {((selectedRequest.state === "pending" && trackingResolved) || attempt?.action === "allocation.decision") && <>
             {!mayDecide && attempt?.action !== "allocation.decision" && <p>A different actor with approval permission must decide this request.</p>}
             <label>Decision reason<input value={decisionReason} maxLength={500} disabled={locked} onChange={event => setDecisionReason(event.target.value)} /></label>
@@ -1243,7 +1241,6 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       </section>
 
       <section className="inventory-panel" aria-labelledby="handoffs-heading"><div className="section-heading"><h2 id="handoffs-heading">Simulated ticket handoffs</h2></div>
-        <p className="quiet">Simulated ticketing handoff — ServiceNow mapping pending. Local approval affects only the local ledger; delivery is simulated separately and provisioning is unsupported and not requested.</p>
         <form onSubmit={event => { event.preventDefault(); setHandoffOffset(0); setAppliedHandoffSource(handoffSourceFilter.trim()); }}>
           <label>Filter by source request ID (optional)<input value={handoffSourceFilter} disabled={locked} onChange={event => setHandoffSourceFilter(event.target.value)} placeholder="Allocation request ID" /></label>
           <button className="secondary" disabled={locked} type="submit">Apply source filter</button>
@@ -1292,7 +1289,6 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <label>Synthetic scenario for the next manual attempt<select value={attemptScenario} disabled={locked} onChange={event => setAttemptScenario(event.target.value as (typeof SCENARIOS)[number])}>
               {SCENARIOS.map(scenario => <option key={scenario} value={scenario}>{scenario}</option>)}
             </select></label>
-            <p className="quiet">One attempt spans three committed transactions: reserve the ordinal, commit the synthetic effect, then observe the response. Any failure preserves the pointer; check the saved receipt by its exact key and run a separate manual readback.</p>
             <div className="pagination">
               <button disabled={locked || !mayAttemptTicket || handoffDetail.attempt_allowed === false} onClick={submitAttempt}>Run manual attempt</button>
               <button className="secondary" disabled={locked || !mayAttemptTicket} onClick={submitReadback}>Run manual readback (exact correlation and digest)</button>

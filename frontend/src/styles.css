@@ -56,8 +56,6 @@ main { max-width: 1480px; margin: 0 auto; padding: 36px 32px 20px; }
 .secondary:hover { background: #edf3e9; }
 .text-button { color: var(--accent); background: transparent; border-color: transparent; min-height: 36px; padding: 6px 4px; text-decoration: underline; text-underline-offset: 3px; }
 .text-button:hover { background: #f4f0df; }
-.evidence-banner { border-left: 3px solid var(--gold); background: #fff7e5; padding: 13px 16px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: #55491f; margin-bottom: 26px; }
-.evidence-banner strong { font-weight: 650; }
 .filters { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 .filters label { display: grid; gap: 7px; font-weight: 600; font-size: 12px; flex: 1 1 200px; }
 .filters label.search-field { flex: 2 1 280px; }
@@ -129,7 +127,6 @@ tr[data-selected="true"] { background: #f3f4df; }
 .readiness { margin-top: 22px; color: var(--muted); font-size: 12px; }
 .readiness summary { width: fit-content; }
 .readiness .facts { max-width: 530px; padding: 14px 0; }
-.page-footer { font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 24px; padding-top: 16px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .skip-link { position: fixed; top: -80px; left: 16px; padding: 10px 14px; background: #fff; border: 2px solid var(--accent); border-radius: 4px; z-index: 1; }
 .skip-link:focus { top: 12px; }
@@ -235,7 +232,6 @@ tr[data-selected="true"] { background: #f3f4df; }
   main { padding: 25px 16px 18px; }
   .page-heading { align-items: flex-start; flex-direction: column; gap: 16px; }
   .page-heading button { width: 100%; }
-  .evidence-banner { display: grid; gap: 5px; }
   .filters { display: grid; grid-template-columns: minmax(0, 1fr); }
   .filters label { min-width: 0; }
   .section-heading, td, th { padding-left: 14px; padding-right: 14px; }
@@ -273,13 +269,11 @@ body { background: var(--paper); color: #27372d; }
 .atlas-rail button[aria-current="page"] { background: #eef3e5; color: #294a30; border-color: #c4d4b5; }
 .rail-marker { width: 5px; height: 5px; flex: 0 0 5px; border: 1px solid currentColor; border-radius: 50%; opacity: 0.75; }
 .atlas-rail button[aria-current="page"] .rail-marker { background: var(--gold); border-color: var(--gold); }
-.rail-note { margin: auto 10px 0; padding-top: 16px; border-top: 1px solid var(--line); color: #697765; font-size: 11px; line-height: 1.55; }
 .atlas-body > main { min-width: 0; max-width: none; margin: 0; padding: 34px clamp(22px, 4vw, 56px) 24px; background: var(--paper); }
 .view-navigation + .page-heading { border-top: 0; }
 .page-heading { margin-bottom: 22px; }
 .page-heading h1 { color: #294a30; }
 .page-heading .intro { max-width: 620px; }
-.evidence-banner { background: #fff7e5; border-left-color: var(--gold); color: #55491f; }
 .filters { padding: 15px 0 4px; border-top: 1px solid var(--line); }
 .filters label { color: #365b3b; }
 .filters select, .filters input { border-color: #b6c3ad; background: #fffefa; border-radius: 3px; }
@@ -293,8 +287,7 @@ tr[data-selected="true"] { background: #f3f4df; }
 .detail-section { border-top-color: var(--line); }
 .secondary { color: #365b3b; background: var(--surface); border-color: #aebea8; }
 .secondary:hover { background: #edf3e9; }
-.readiness, .page-footer { color: #697765; }
-.page-footer { border-top-color: var(--line); }
+.readiness { color: #697765; }
 section[aria-labelledby="workflow-heading"] .inventory-panel > :is(p, form, .notice),
 section[aria-labelledby="corrections-heading"] .inventory-panel > :is(h2, p, form, label, .notice) { margin-left: 20px; margin-right: 20px; }
 
@@ -303,7 +296,6 @@ section[aria-labelledby="corrections-heading"] .inventory-panel > :is(h2, p, for
   .atlas-rail { position: static; height: auto; flex-direction: row; align-items: flex-start; gap: 18px; overflow-x: auto; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
   .rail-group { min-width: max-content; }
   .rail-label { margin-bottom: 4px; }
-  .rail-note { display: none; }
   .atlas-rail button { min-height: 34px; white-space: nowrap; }
   .atlas-body > main { padding-top: 26px; }
 }

@@ -183,7 +183,7 @@ export default function InventoryEditor({ scopes, onChanged }: { scopes: Scope[]
   function changeScope(id: string) { setScopeId(id); setPrefixId(""); setSaved(null); }
 
   return <section className="panel" aria-labelledby="inventory-editor-heading">
-    <div className="section-heading"><div><p className="eyebrow">Local intended inventory</p><h2 id="inventory-editor-heading">Prefix editing and IPv6 planning</h2><p className="quiet">Real local writes with server validation and audit. Domain and region labels organize scoped synthetic inventory; they do not provide tenant isolation or network provisioning.</p></div><button className="secondary" onClick={() => setRevision((value) => value + 1)}>Reload saved inventory</button></div>
+    <div className="section-heading"><div><p className="eyebrow">Local intended inventory</p><h2 id="inventory-editor-heading">Prefix editing and IPv6 planning</h2><p className="quiet">Edit intended prefixes with server validation and audit.</p></div><button className="secondary" onClick={() => setRevision((value) => value + 1)}>Reload saved inventory</button></div>
     <div className="filters">
       <span className="filter-help">Selected domain: {currentContext().selected_domain}</span>
       <label className="field-label">Region<select value={region} onChange={(event) => changeScope(scopes.find((scope) => scope.domain === domain && scope.region === event.target.value)?.id ?? "")}>{regions.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
