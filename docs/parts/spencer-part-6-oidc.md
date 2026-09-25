@@ -9,13 +9,13 @@ A deployment can enable OpenID Connect sign-in as a second, independent path int
 ## Owned files
 
 - `backend/ipam_demo/oidc.py` — configuration loader, PKCE authorization, state/nonce store, callback, id_token verification (via `pyjwt[crypto]`), single-use exchange code, in-memory session store, claim→principal mapping.
-- `tests/test_oidc_signin.py` — 20 focused unit tests. All pass. No network. PyJWT/JWKS calls are exercised only through injected stubs.
+- `tests/test_oidc_signin.py` — 23 focused unit tests. All pass. Callback state binding and keyword-only token transport have regression coverage.
 - `frontend/src/ssoAuth.ts` — thin client for `/api/auth/sso/*`.
 - `frontend/src/App.tsx` — one small block added inside the existing sign-in card: SSO button, config probe, fragment-code exchange, logout hook. No changes to navigation, Sources default view or protected UI.
 - `frontend/src/styles.css` — five lines for the SSO separator and button.
 - `sample-config/oidc-mapping.example.json` — schema example, no real secrets.
-- `pyproject.toml` — adds `pyjwt[crypto]==2.10.1` (soft-imported inside `oidc.py`).
-- `backend/ipam_demo/app.py` — three small edits: import `oidc`, one line to `oidc.mount(app)`, and a middleware branch that consults `oidc.try_authenticate_sso` before falling through to `access.authenticate_bearer`.
+- `pyproject.toml` and `uv.lock` — pin `pyjwt[crypto]==2.10.1` for production and `httpx2==2.13.1` for Starlette's TestClient in development.
+- `backend/ipam_demo/app.py` — mount OIDC and share one authentication path across middleware, coordinator checks, and protected writes. A reviewed bearer is checked first; a live SSO session is checked when that bearer is rejected.
 
 ## Output contract
 
@@ -60,26 +60,28 @@ A deployment can enable OpenID Connect sign-in as a second, independent path int
 | POST | `/api/auth/sso/exchange` | Public. Redeems the exchange code and returns `{token: <64-hex>}`. |
 | POST | `/api/auth/sso/logout` | Public. Best-effort session revocation. Unknown tokens are silently ignored. |
 
-Session tokens minted by SSO share the shape of the reviewed bearer (64-hex). They authenticate the same way against the same `AccessContext`. `oidc.try_authenticate_sso` runs before `access.authenticate_bearer` in the middleware; unknown tokens fall through, so no reviewed-token behavior changes.
+Session tokens minted by SSO share the shape of the reviewed bearer (64-hex). They map to the same reviewed `AccessContext`. Unknown SSO tokens are rejected; the existing reviewed-token path remains available. The callback also checks that the returned state matches a short-lived HTTP-only browser cookie.
 
 ## Acceptance and limits
 
 **Verified locally (separate store and port, not the recorded demo on 18841).**
 
 - The frontend typechecks cleanly (`npx tsc --noEmit`).
-- 20 backend unit tests pass with `PYTHONPATH="backend:fixtures/evolving" python -m unittest tests.test_oidc_signin`. No regression against the base branch — the pre-existing 25 errors and 1 failure in the wider suite reproduce identically on `origin/codex/part-4-sources-polling`.
+- 23 backend unit tests pass with `PYTHONPATH="backend:fixtures/evolving" .venv/bin/python -m unittest tests.test_oidc_signin`. The focused OIDC and ServiceNow checks pass together (31 tests). The wider legacy suite still has the previously reproduced 25 errors and 1 failure unrelated to OIDC.
 - Backend imports and creates the FastAPI app; all five SSO routes register.
 - Configuration gating: missing env → `is_configured()` False, `/api/auth/sso/config` returns `{enabled:false}`, other SSO endpoints return 404 `SSO_UNAVAILABLE`.
 - Claim resolution rejects unverified email, unknown mapping, disabled principals and case-mismatched `sub` values.
-- Single-use exchange code, session revocation and unknown-bearer fall-through are covered by tests.
+- Single-use exchange code, session revocation, browser-bound state, and reviewed-bearer fallback are covered by tests and/or the local browser pass.
+- A fresh `uv sync --frozen --no-dev` installs PyJWT and cryptography; the frontend build passes on the combined UI + OIDC candidate.
+- In an isolated copied store on port 18853, a local simulated OIDC provider completed authorization, PKCE token exchange, RS256 JWKS verification, reviewed-principal mapping and domain selection. Sources, Inventory, Reconciliation, Capacity, report-preset save, sign-out, reviewed-token fallback and the 15-second source refresh worked in the browser. No console errors or warnings were observed.
 
-**Not verified.** No end-to-end run against a real identity provider. Provider discovery, HTTP token exchange and RS256 JWKS verification are exercised only through injected stubs. Fixing this needs a real IdP (or a mock like Keycloak in a container) and a runtime pass with a mapped principal.
+**Not verified.** No end-to-end run against a real deployment identity provider. The local provider is simulated and cannot establish Rogers connectivity or production SSO configuration.
 
 **Out of scope for this slice.** Refresh tokens, back-channel logout, session persistence across process restarts, per-user rate limits, and any change to the reviewed access-configuration schema.
 
 ## Coordination with Opus
 
-This branch is based on `codex/part-4-sources-polling` (23aa12a), which already contains Opus's R1 slice for Evidence Sources. My edits to `App.tsx` and `app.py` live in distinct regions from R1 (the sign-in card at the bottom of `App.tsx`; a middleware branch and one mount line near the top of `app.py`). If Opus makes further changes to those files after this branch is cut, the lead should coordinate the merge; this PR must not be merged independently.
+This branch is based on `codex/part-4-sources-polling` (23aa12a), which contains the Evidence Sources slice. Its merge is coordinated with the later UI work; the combined candidate was tested in a separate integration worktree.
 
 ## Next visible result after R1
 

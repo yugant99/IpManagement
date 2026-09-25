@@ -9,11 +9,10 @@ Design constraints:
 - If any required deployment variable is missing, `is_configured()` returns
   False. The frontend renders the SSO button visibly disabled and every OIDC
   endpoint returns 404 so the surface is invisible.
-- The existing bearer-token path is unchanged. This module runs before the
-  bearer check in the middleware and only produces an AccessContext when the
-  presented bearer matches an active SSO session.
-- Nothing here is verified against a real identity provider yet; the exchange,
-  discovery and JWKS calls are exercised only through stubbed tests.
+- The existing bearer-token path is unchanged. The application checks a live
+  SSO session only when the reviewed bearer check rejects a presented token.
+- The callback and JWKS path has been exercised with a local simulated OIDC
+  provider; a production identity provider remains unverified.
 """
 
 from __future__ import annotations
