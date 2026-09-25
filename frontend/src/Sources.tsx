@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ApiError, onSessionInvalidated } from "./api";
 import { loadEvidenceSources } from "./sourcesApi";
 import type { EvidenceRow, EvidenceSources, IntegrationProfile, Mechanism, MechanismScope } from "./sourcesApi";
+import "./SourcesView.css";
 
 type Load = { data: EvidenceSources | null; error: ApiError | null; loading: boolean };
 const asError = (error: unknown) => error instanceof ApiError ? error : new ApiError("The evidence-source response could not be read. Refresh to request it again.", "INVALID_RESPONSE");
@@ -40,12 +41,19 @@ function ScopeRow({ mechanism, scope }: { mechanism: Mechanism; scope: Mechanism
 function MechanismTile({ mechanism, profile }: { mechanism: Mechanism; profile?: IntegrationProfile }) {
   const summary = mechanism.summary;
   return <article className={`source-tile status-${mechanism.status}`} aria-labelledby={`source-${mechanism.id}`}>
-    <span className="source-status">{mechanism.status_label}</span>
-    <h3 id={`source-${mechanism.id}`}>{mechanism.name}</h3>
-    <p className="source-establishes">{mechanism.establishes}</p>
+    <div className="source-tile-main">
+      <div className="source-tile-description">
+        <h3 id={`source-${mechanism.id}`}>{mechanism.name}</h3>
+        <p className="source-establishes">{mechanism.establishes}</p>
+      </div>
+      <div className="source-tile-state"><span className="source-status">{mechanism.status_label}</span></div>
+      <div className="source-tile-coverage">
+        {summary && mechanism.implementation === "seeded_inventory" && <p className="source-summary">{summary.loaded} of {summary.scopes} scopes loaded</p>}
+        {summary && mechanism.implementation !== "seeded_inventory" && <p className="source-summary">{summary.scopes - (summary.missing ?? 0)} of {summary.scopes} scopes covered · {summary.fresh} fresh · {summary.stale} stale · {summary.complete} complete · {summary.partial} partial</p>}
+        {!summary && <p className="source-summary">{mechanism.status === "no_permitted_evidence" ? "No permitted source rows" : "No connected source"}</p>}
+      </div>
+    </div>
     {mechanism.implementation_note && <p className="source-note">{mechanism.implementation_note}</p>}
-    {summary && mechanism.implementation === "seeded_inventory" && <p className="source-summary">{summary.loaded} of {summary.scopes} scopes loaded</p>}
-    {summary && mechanism.implementation !== "seeded_inventory" && <p className="source-summary">{summary.scopes - (summary.missing ?? 0)} of {summary.scopes} scopes covered · {summary.fresh} fresh · {summary.stale} stale · {summary.complete} complete · {summary.partial} partial</p>}
     {mechanism.scopes.length > 0 && <details className="source-scopes"><summary>Per-scope evidence ({mechanism.scopes.length})</summary><ul className="plain-list">{mechanism.scopes.map(scope => <ScopeRow key={scope.scope_id} mechanism={mechanism} scope={scope} />)}</ul></details>}
     {mechanism.status === "not_connected" && <p className="source-unlocks"><span>Would unlock</span> {mechanism.unlocks}</p>}
     {profile && <p className="source-note">DEMO-ONLY sample integration profile: <strong>{profile.profile}</strong> ({profile.version}) — {profile.status}.</p>}
@@ -160,10 +168,12 @@ export default function Sources({ active, onNavigate }: { active: boolean; onNav
     {!data && state.loading && <div className="notice loading-line" role="status">Loading evidence sources…</div>}
     {data && <>
       <section className="sources-strip" aria-label="Evidence source status">
-        <div className="strip-count status-loaded_synthetic_baseline"><span>{count("loaded_synthetic_baseline")}</span>Loaded synthetic baseline</div>
-        <div className="strip-count status-imported_synthetic_evidence"><span>{count("imported_synthetic_evidence")}</span>Imported synthetic evidence</div>
-        <div className="strip-count status-not_connected"><span>{count("not_connected")}</span>Not connected</div>
-        {count("no_permitted_evidence") > 0 && <div className="strip-count status-no_permitted_evidence"><span>{count("no_permitted_evidence")}</span>No permitted rows in this domain</div>}
+        <div className="strip-counts">
+          <div className="strip-count status-loaded_synthetic_baseline"><span>{count("loaded_synthetic_baseline")}</span>Loaded synthetic baseline</div>
+          <div className="strip-count status-imported_synthetic_evidence"><span>{count("imported_synthetic_evidence")}</span>Imported synthetic evidence</div>
+          <div className="strip-count status-not_connected"><span>{count("not_connected")}</span>Not connected</div>
+          {count("no_permitted_evidence") > 0 && <div className="strip-count status-no_permitted_evidence"><span>{count("no_permitted_evidence")}</span>No permitted rows in this domain</div>}
+        </div>
         <div className="strip-run">
           <p className="eyebrow">Latest saved run</p>
           {run ? <>
@@ -179,7 +189,7 @@ export default function Sources({ active, onNavigate }: { active: boolean; onNav
       <div className="source-planes">
         {data.planes.map(plane => <section className="source-plane" key={plane.id} aria-labelledby={`plane-${plane.id}`}>
           <div className="source-plane-head"><h2 id={`plane-${plane.id}`}>{plane.name}</h2><p className="quiet">{plane.question}</p></div>
-          <div className="source-tiles">{data.mechanisms.filter(item => item.plane === plane.id).map(item =>
+          <div className="source-tiles"><div className="source-table-heading" aria-hidden="true"><span>Evidence mechanism</span><span>Evidence state</span><span>Scope coverage</span></div>{data.mechanisms.filter(item => item.plane === plane.id).map(item =>
             <MechanismTile key={item.id} mechanism={item} profile={data.integration_profiles.find(profile => profile.mechanism_id === item.id)} />)}</div>
         </section>)}
       </div>
