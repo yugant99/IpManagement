@@ -162,7 +162,6 @@ export default function CapacityReports({ scopes }: { scopes: Scope[] }) {
   const exportParams = new URLSearchParams(Object.entries(filters).filter(([, value]) => value));
   return <section aria-labelledby="capacity-heading">
     <div className="page-heading"><div><p className="eyebrow">Saved calculations</p><h1 id="capacity-heading">Capacity and reports</h1><p className="intro">Inspect saved occupancy, compare two runs, and export the evidence you reviewed.</p></div><button className="secondary" disabled={busy} onClick={() => { void loadRuns(); }}>Reload run list</button></div>
-    <div className="evidence-banner"><strong>Synthetic lease occupancy</strong><span>Hourly samples approximate the source history. Lease counts do not measure traffic, and candidate space is not proven reclaimable.</span></div>
     <section className="inventory-panel" aria-labelledby="current-occupancy-heading"><h2 id="current-occupancy-heading">Current static IPv4 occupancy</h2>
       <p className="quiet">Current ledger occupancy only — metric current_static_ipv4_occupancy in IPv4 addresses. Separate from the immutable saved DHCP runs below and their run time, p95, forecast and unknowns. Saved runs are never modified.</p>
       {occupancyError && <p className="notice error" role="alert">{occupancyError}</p>}

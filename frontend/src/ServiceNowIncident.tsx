@@ -64,7 +64,7 @@ export default function ServiceNowIncident({ handoffId, actorId, mayOperate, loc
     <h3>External ServiceNow sandbox Incident{record ? ` · ${record.state}` : " · not sent"}</h3>
     {!view && !error && <p className="quiet">Loading sandbox Incident…</p>}
     {view && <>
-      <p className="quiet">{view.label} Local request {view.source_request_state}; simulated handoff {view.simulated_handoff_state}; provisioning {view.provisioning_status.replace("_", " ")}. The external Incident never decides the local ledger or the simulated outcome.</p>
+      <p className="quiet">{view.label} Local request {view.source_request_state}; simulated handoff {view.simulated_handoff_state}; provisioning {view.provisioning_status.replace("_", " ")}.</p>
       <dl className="facts">
         <dt>Sandbox configuration</dt><dd>{view.configuration.status}{view.configuration.instance_host ? ` · ${view.configuration.instance_host}` : ""}
           {view.configuration.domain_allowed === false ? " · this domain is not the configured sandbox domain" : ""}
