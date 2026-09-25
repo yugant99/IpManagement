@@ -1286,7 +1286,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <ul className="plain-list">{handoffDetail.route_history.map(entry => <li key={`${handoffDetail.id}-${entry.assignment_version}`}>v{entry.assignment_version} · {entry.team ?? "unassigned"} · route {entry.route_revision} · {entry.assigned_at}</li>)}</ul>
           </details>}
           <fieldset disabled={locked || !mayAttemptTicket}><legend>Manual ticket actions · no automatic retry</legend>
-            <label>Synthetic scenario for the next manual attempt<select value={attemptScenario} disabled={locked} onChange={event => setAttemptScenario(event.target.value as (typeof SCENARIOS)[number])}>
+            <label>Demo scenario for the next manual attempt<select value={attemptScenario} disabled={locked} onChange={event => setAttemptScenario(event.target.value as (typeof SCENARIOS)[number])}>
               {SCENARIOS.map(scenario => <option key={scenario} value={scenario}>{scenario}</option>)}
             </select></label>
             <div className="pagination">

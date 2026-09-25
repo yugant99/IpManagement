@@ -279,7 +279,7 @@ function ProtectedApp({ context }: { context: AccessContext }) {
             <button aria-current={view === "planning" ? "page" : undefined} onClick={() => changeView("planning")}><span className="rail-marker" aria-hidden="true" />Prefix planning</button>
           </div>
           <div className="rail-group"><p className="rail-label">Observe</p>
-            <button aria-current={view === "schedule" ? "page" : undefined} onClick={() => changeView("schedule")}><span className="rail-marker" aria-hidden="true" />Synthetic acquisition</button>
+            <button aria-current={view === "schedule" ? "page" : undefined} onClick={() => changeView("schedule")}><span className="rail-marker" aria-hidden="true" />Evidence acquisition</button>
           </div>
         </nav>
         <main id="inventory-main">
