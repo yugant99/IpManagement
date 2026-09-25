@@ -1,0 +1,7 @@
+{
+  "claim": "email",
+  "entries": [
+    {"value": "alice@example.com", "principal_id": "operator-alice"},
+    {"value": "bob@example.com", "principal_id": "requester-bob"}
+  ]
+}

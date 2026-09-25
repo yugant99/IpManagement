@@ -8,10 +8,15 @@ version = "0.1.0"
 description = "Scoped synthetic IPAM inventory foundation"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
-dependencies = ["fastapi==0.141.1", "uvicorn==0.50.1"]
+dependencies = ["fastapi==0.141.1", "uvicorn==0.50.1", "pyjwt[crypto]==2.10.1"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["backend/ipam_demo", "fixtures/evolving/ipam_synthetic_feed"]
 
 [tool.uv]
 package = true
+
+[dependency-groups]
+dev = [
+    "httpx2==2.13.1",
+]

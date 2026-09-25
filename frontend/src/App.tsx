@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { accessContext, ApiError, clearSession, installSession, loadScopes, onSessionInvalidated, request } from "./api";
 import type { AccessContext, Origin, Page, Prefix, PrefixDetail, ReadinessStatus, Scope } from "./api";
+import { beginSsoRedirect, clearSsoFragment, exchangeSsoCode, loadSsoConfig, readSsoFragmentCode, ssoLogout } from "./ssoAuth";
+import type { SsoConfig } from "./ssoAuth";
 import FirstPath from "./FirstPath";
 import MigrationCompare from "./MigrationCompare";
 import CapacityReports from "./CapacityReports";
@@ -351,6 +353,7 @@ export default function App() {
   const [entry, setEntry] = useState("");
   const [auth, setAuth] = useState<AuthState>({ status: "signed-out", error: "" });
   const [busy, setBusy] = useState(false);
+  const [sso, setSso] = useState<SsoConfig | null>(null);
 
   useEffect(() => onSessionInvalidated(reason => {
     authAttempt.current += 1;
@@ -361,6 +364,43 @@ export default function App() {
       setAuth({ status: "signed-out", error: "Access configuration changed. Revalidate your token and select a domain." });
     }
   }), []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    loadSsoConfig(controller.signal).then(config => {
+      if (!controller.signal.aborted) setSso(config);
+    }).catch(() => {
+      if (!controller.signal.aborted) setSso({ enabled: false, provider_name: null });
+    });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const code = readSsoFragmentCode();
+    if (!code) return;
+    clearSsoFragment();
+    const controller = new AbortController();
+    const attempt = ++authAttempt.current;
+    setBusy(true);
+    clearSession();
+    (async () => {
+      try {
+        const issued = await exchangeSsoCode(code, controller.signal);
+        if (attempt !== authAttempt.current) return;
+        token.current = issued;
+        const context = await accessContext(issued, controller.signal);
+        if (attempt !== authAttempt.current || token.current !== issued) return;
+        setAuth({ status: "select-domain", context, error: "" });
+      } catch (error) {
+        if (attempt !== authAttempt.current) return;
+        token.current = "";
+        setAuth({ status: "signed-out", error: error instanceof Error ? error.message : "SSO sign-in failed." });
+      } finally {
+        if (attempt === authAttempt.current) setBusy(false);
+      }
+    })();
+    return () => controller.abort();
+  }, []);
 
   async function signIn(event: FormEvent) {
     event.preventDefault();
@@ -402,8 +442,10 @@ export default function App() {
 
   function signOut() {
     authAttempt.current += 1;
+    const outgoing = token.current;
     clearSession(); token.current = ""; setEntry("");
     setAuth({ status: "signed-out", error: "" });
+    if (outgoing) void ssoLogout(outgoing);
   }
 
   if (auth.status === "active") return <><div className="auth-bar"><span>{auth.context.principal_id} · {auth.context.selected_domain}</span>
@@ -411,10 +453,21 @@ export default function App() {
     <button type="button" className="secondary" onClick={signOut}>Sign out</button></div>
     <ProtectedApp key={auth.epoch} context={auth.context} /></>;
 
+  const ssoLabel = sso?.provider_name || "Single sign-on";
+  const ssoReady = sso?.enabled === true;
+  const ssoTitle = sso === null ? "Checking SSO availability…"
+    : ssoReady ? `Sign in with ${ssoLabel}` : "SSO is not configured on this deployment.";
+
   return <main id="inventory-main" className="inventory-panel access-panel"><img className="brand-logo" src={dodonaLogo} alt="DodonaData.ai" /><h1>Pool Watch access</h1>
     {auth.status === "signed-out" ? <form onSubmit={event => void signIn(event)}><label>Access token
       <input type="password" autoComplete="off" value={entry} onChange={event => setEntry(event.target.value)} required /></label>
-      <button disabled={busy}>Continue</button>{auth.error && <p className="notice error" role="alert">{auth.error}</p>}</form>
+      <button disabled={busy}>Continue</button>
+      <div className="sso-separator" role="separator" aria-orientation="horizontal"><span>or</span></div>
+      <button type="button" className="secondary sso-button" disabled={!ssoReady || busy} title={ssoTitle}
+        onClick={() => { if (ssoReady) beginSsoRedirect(); }}>
+        {ssoReady ? `Sign in with ${ssoLabel}` : "SSO — Not configured"}
+      </button>
+      {auth.error && <p className="notice error" role="alert">{auth.error}</p>}</form>
       : <section><h2>Select a permitted domain</h2><p>Principal: {auth.context.principal_id}</p>
         {auth.context.domains.map(domain => <button type="button" className="secondary" key={domain} disabled={busy} onClick={() => void selectDomain(domain)}>{domain}</button>)}
         {!auth.context.domains.length && <p>No ordinary domain is granted to this principal.</p>}
