@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import (__version__, feed_adapter, inventory, inventory_commands, lifecycle, migration_compare,
+from . import (__version__, evidence_sources, feed_adapter, inventory, inventory_commands, lifecycle, migration_compare,
                reconciliation, reports, servicenow_incident, source_catalog, ticket_handoff, workflow)
 from . import access
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
@@ -1764,6 +1764,40 @@ def create_app() -> FastAPI:
         return {**page, "evaluated_at": evaluated_at,
                 "limitations": ["Receipt-derived synthetic source catalog; this is not automatic discovery.",
                                 "Declared authority does not prove unique or live system authority."]}
+
+    @app.get("/api/evidence-sources")
+    def evidence_source_overview(request: Request, connection=Depends(database)):
+        """Read-only selected-domain overview built from existing catalog, receipt and saved-run projections."""
+        domain = ordinary_domain(request)
+        source_domains = request.state.access_configuration.source_domains
+        allowed = allowed_scope_ids(connection, request)
+        scopes = [scope for scope in inventory.scopes(connection, domain=domain) if scope["id"] in allowed]
+        catalog_rows = [item for item in source_catalog.catalog(connection)
+                        if item.get("scope_id") in allowed
+                        and source_domains.get((item.get("source_id"), item.get("scope_id"))) == domain]
+        receipts = {}
+        for batch_id in {item["batch_id"] for item in catalog_rows}:
+            try:
+                authorized_batch(connection, request, batch_id)
+            except AppError:
+                continue
+            receipts[batch_id] = import_receipt(connection, batch_id)
+        inventory_rows = {group: safe_inventory_rows(getter(connection, domain=domain), request) for group, getter in
+                          (("prefixes", inventory.prefixes), ("pools", inventory.pools), ("allocations", inventory.allocations))}
+        latest_run = None
+        for row in connection.execute("SELECT result_json FROM calculation_runs ORDER BY created_at DESC,id"):
+            try:
+                projected = reports.project_run(json.loads(row[0]), allowed, domain=domain,
+                                                source_pairs=source_domains.keys())
+            except (TypeError, KeyError):
+                continue
+            if projected["selected_batches"] or projected["findings"] or projected["calculations"]:
+                latest_run = projected
+                break
+        evaluated_at = connection.execute("SELECT demo_clock_at FROM app_meta WHERE singleton=1").fetchone()[0]
+        return evidence_sources.overview(domain=domain, evaluated_at=evaluated_at, scopes=scopes,
+                                         inventory_rows=inventory_rows, catalog_rows=catalog_rows,
+                                         receipts=receipts, latest_run=latest_run)
 
     @app.get("/api/imports/{batch_id}")
     def get_import(batch_id: UUID, request: Request, connection=Depends(database)):

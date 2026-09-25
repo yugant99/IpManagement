@@ -9,6 +9,7 @@ import InventoryEditor from "./InventoryEditor";
 import Workflow from "./Workflow";
 import Schedule from "./Schedule";
 import Corrections from "./Corrections";
+import Sources from "./Sources";
 import dodonaLogo from "./assets/dodona-logo.png";
 
 type Resource<T> = { status: "loading" } | { status: "ready"; data: T } | { status: "error"; error: ApiError };
@@ -168,7 +169,7 @@ function PrefixContents({ prefix, onSelect }: { prefix: PrefixDetail; onSelect: 
 }
 
 function ProtectedApp({ context }: { context: AccessContext }) {
-  const [view, setView] = useState<"inventory" | "first-path" | "migration" | "planning" | "capacity" | "workflow" | "corrections" | "schedule">("inventory");
+  const [view, setView] = useState<"sources" | "inventory" | "first-path" | "migration" | "planning" | "capacity" | "workflow" | "corrections" | "schedule">("sources");
   const [migrationSourceBatchId, setMigrationSourceBatchId] = useState("");
   const [bootstrap, setBootstrap] = useState<Bootstrap>({ status: "loading" });
   const [evidenceScopes, setEvidenceScopes] = useState<Scope[] | null>(null);
@@ -264,6 +265,7 @@ function ProtectedApp({ context }: { context: AccessContext }) {
       <div className="atlas-body">
         <nav className="view-navigation atlas-rail" aria-label="Inventory views">
           <div className="rail-group"><p className="rail-label">Operate</p>
+            <button aria-current={view === "sources" ? "page" : undefined} onClick={() => changeView("sources")}><span className="rail-marker" aria-hidden="true" />Evidence sources</button>
             <button aria-current={view === "inventory" ? "page" : undefined} onClick={() => changeView("inventory")}><span className="rail-marker" aria-hidden="true" />Inventory</button>
             <button aria-current={view === "first-path" ? "page" : undefined} onClick={() => changeView("first-path")}><span className="rail-marker" aria-hidden="true" />Reconciliation</button>
             <button aria-current={view === "capacity" ? "page" : undefined} onClick={() => changeView("capacity")}><span className="rail-marker" aria-hidden="true" />Capacity</button>
@@ -279,6 +281,7 @@ function ProtectedApp({ context }: { context: AccessContext }) {
           </div>
         </nav>
         <main id="inventory-main">
+        <div hidden={view !== "sources"}><Sources active={view === "sources"} onNavigate={changeView} /></div>
         <div hidden={view !== "inventory"}>
         <div className="page-heading">
           <div><p className="eyebrow">Intended network state</p><h1>Scoped inventory</h1><p className="intro">Browse IPv4 and IPv6 prefixes, their owners, and intended assignments.</p></div>
