@@ -27,11 +27,12 @@ function ScopeRow({ mechanism, scope }: { mechanism: Mechanism; scope: Mechanism
       {scope.counts && <div className="table-secondary">{scope.counts.prefixes} prefixes · {scope.counts.pools} pools · {scope.counts.allocations} intended assignments</div>}
       {scope.origins?.map(origin => <div className="table-secondary" key={`${origin.source_id}-${origin.source_run_id}`}><code>{origin.source_id ?? "unrecorded source"}</code> · {origin.rows} rows{origin.latest_ingested_at && <> · loaded <time dateTime={origin.latest_ingested_at}>{origin.latest_ingested_at}</time></>}</div>)}
       {scope.evidence.length > 0 && <ul className="plain-list">{scope.evidence.map(item => <li key={item.batch_id} className="table-secondary">Intended route policy <code>{item.source_id}</code> · {item.completeness} · {item.in_latest_run ? "used by the latest saved run" : "not in the latest saved run"}</li>)}</ul>}
+      {scope.route_policy && !scope.evidence.length && <div className="table-secondary">Intended route policy: {scope.route_policy.in_latest_run ? `selected by the latest saved run (${scope.route_policy.latest_run_effective_complete ? "complete" : "incomplete"} for this scope)` : "not shown for this scope"}</div>}
     </li>;
   }
   return <li className={`source-scope scope-${scope.state}`}>
     <div className="source-scope-head"><strong>{scope.scope_name}</strong>{scope.state === "missing" && <Chip value="unknown" label="no selected source" />}</div>
-    {scope.state === "missing" ? <p className="table-secondary">No synthetic source covers this scope. Findings that need it stay unknown; no telemetry does not prove no usage.</p>
+    {scope.state === "missing" ? <p className="table-secondary">No selected synthetic source for this scope can be shown in this domain. No telemetry does not prove no usage.</p>
       : <ul className="plain-list">{scope.evidence.map(item => <EvidenceLine key={`${item.batch_id}-${item.scope_id}`} item={item} />)}</ul>}
   </li>;
 }
@@ -152,7 +153,7 @@ export default function Sources({ active, onNavigate }: { active: boolean; onNav
     <div className="page-heading">
       <div><p className="eyebrow">Dodona IPAM · domain {data?.domain ?? "selected"} · synthetic demo data</p><h1>Evidence sources</h1>
         <p className="intro">Dodona IPAM can be configured around up to twelve evidence mechanisms. It also works with fewer feeds, with correspondingly fewer evidence-backed functions.</p>
-        {data && <p className="intro sources-now" role="status">In this domain, {evidenced} of {data.mechanisms.length} mechanisms have synthetic evidence ({count("loaded_synthetic_baseline")} loaded synthetic baseline, {count("imported_synthetic_evidence")} imported synthetic evidence); {count("not_connected")} not connected{count("no_permitted_evidence") > 0 && `; ${count("no_permitted_evidence")} with no permitted rows`}. {functionsPresent} of {data.functions.available_now.length} functions have their evidence present. No operator system is connected.</p>}</div>
+        {data && <p className="intro sources-now" role="status">In this domain, {evidenced} of {data.mechanisms.length} mechanisms have synthetic evidence ({count("loaded_synthetic_baseline")} loaded synthetic baseline, {count("imported_synthetic_evidence")} imported synthetic evidence); {count("not_connected")} not connected{count("no_permitted_evidence") > 0 && `; ${count("no_permitted_evidence")} with no permitted rows`}. {functionsPresent} of {data.functions.available_now.length} functions have their required sources present. No operator system is connected.</p>}</div>
       <button className="secondary" onClick={() => refreshSources.current()} disabled={state.loading}>{state.loading ? "Refreshing…" : "Refresh sources"}</button>
     </div>
     {state.error && <div className="notice error" role="alert"><h2>Evidence sources unavailable</h2><p>{state.error.message}</p><p className="diagnostic"><code>{state.error.code}</code>{state.error.requestId && <> · Request <code>{state.error.requestId}</code></>}</p>{data && <p>The last loaded overview remains below.</p>}<button className="secondary" onClick={() => refreshSources.current()}>Retry request</button></div>}
@@ -186,9 +187,10 @@ export default function Sources({ active, onNavigate }: { active: boolean; onNav
       <section className="source-functions" aria-labelledby="source-functions-heading">
         <h2 id="source-functions-heading">What this evidence supports</h2>
         <div className="source-functions-grid">
-          <div><h3>Functions available now</h3><ul className="plain-list">{data.functions.available_now.map(item => <li key={item.id} className="source-function">
-            <Chip value={item.evidence_present ? "complete" : "unknown"} label={item.evidence_present ? "evidence present" : "evidence missing"} /> <strong>{item.name}</strong>
-            <div className="table-secondary">Rules {item.rule_ids.join(", ")} · needs {item.requires.map(id => data.mechanisms.find(mechanism => mechanism.id === id)?.name ?? id).join(" + ")}</div>
+          <div><h3>Checks and source requirements</h3><ul className="plain-list">{data.functions.available_now.map(item => <li key={item.id} className="source-function">
+            <Chip value={item.evidence_present ? "complete" : "unknown"} label={item.evidence_present ? "sources present" : "sources missing"} /> <strong>{item.name}</strong>
+            <div className="table-secondary">Rules {item.rule_ids.join(", ")} · needs {item.requires.map(id => data.mechanisms.find(mechanism => mechanism.id === id)?.name ?? id).join(" + ")}{item.requires_route_policy && " + intended route policy"}</div>
+            {item.route_policy_scopes && <div className="table-secondary">Intended route policy present for {item.route_policy_scopes.present} of {item.route_policy_scopes.scopes} scopes</div>}
           </li>)}</ul><button className="text-button" onClick={() => onNavigate("inventory")}>Open inventory</button></div>
           <div><h3>Next unlocks</h3><ul className="plain-list">{data.functions.next_unlocks.map(item => <li key={item.mechanism_id} className="source-function"><strong>{item.name}</strong><div className="table-secondary">{item.unlocks}</div></li>)}</ul></div>
         </div>
