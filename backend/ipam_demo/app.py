@@ -19,7 +19,7 @@ from starlette.exceptions import HTTPException
 
 from . import (__version__, evidence_sources, feed_adapter, inventory, inventory_commands, lifecycle, migration_compare,
                reconciliation, reports, servicenow_incident, source_catalog, ticket_handoff, workflow)
-from . import access
+from . import access, oidc
 from .imports import MAX_IMPORT_BYTES, import_envelope, record_payload
 from .errors import AppError, store_error
 from .models import (Allocation, CurrentStaticOccupancy, MigrationAssessmentCreateRequest, MigrationAssessmentDetail,
@@ -94,20 +94,25 @@ def create_app() -> FastAPI:
 
     app = FastAPI(title="Synthetic IPAM inventory", version=__version__, lifespan=lifespan,
                   docs_url="/api/docs", redoc_url=None, openapi_url="/api/openapi.json")
+    oidc.mount(app)
 
     @app.middleware("http")
     async def request_identity(request: Request, call_next):
         request.state.request_id = str(uuid4())
         context_token = None
         path = request.url.path
-        authenticated_api = path.startswith("/api/") or path == "/api"
+        # SSO sign-in surface must be reachable without a prior bearer.
+        sso_public_paths = {"/api/auth/sso/config", "/api/auth/sso/authorize", "/api/auth/sso/callback",
+                            "/api/auth/sso/exchange", "/api/auth/sso/logout"}
+        authenticated_api = (path.startswith("/api/") or path == "/api") and path not in sso_public_paths
         if authenticated_api:
             try:
-                config, context = access.authenticate_request(
-                    request.headers.get("authorization"),
-                    request.headers.get("x-ipam-domain"),
-                    path=os.environ.get("IPAM_ACCESS_CONFIG"),
-                )
+                config = access.load_reviewed_configuration(path=os.environ.get("IPAM_ACCESS_CONFIG"))
+                context = oidc.try_authenticate_sso(request.headers.get("authorization"), config)
+                if context is None:
+                    context = access.authenticate_bearer(request.headers.get("authorization"), config)
+                if request.headers.get("x-ipam-domain") is not None:
+                    context = access.require_selected_domain(context, request.headers.get("x-ipam-domain"))
                 request.state.access_configuration = config
                 request.state.access_context = context
                 _require_complete_feed_authority(config)
