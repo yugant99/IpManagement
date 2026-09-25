@@ -284,9 +284,9 @@ function ProtectedApp({ context }: { context: AccessContext }) {
         </nav>
         <main id="inventory-main">
         <div hidden={view !== "sources"}><Sources active={view === "sources"} onNavigate={changeView} /></div>
-        <div hidden={view !== "inventory"}>
+        <div className="inventory-view" hidden={view !== "inventory"}>
         <div className="page-heading">
-          <div><p className="eyebrow">Intended network state</p><h1>Scoped inventory</h1><p className="intro">Browse IPv4 and IPv6 prefixes, their owners, and intended assignments.</p></div>
+          <div><p className="eyebrow">Intended network state · {context.selected_domain}</p><h1>Scoped inventory</h1><p className="intro">Intended prefixes, owners, and source references for the selected domain.</p></div>
           <button className="secondary" onClick={refresh} disabled={bootstrap.status === "loading"}>Refresh inventory</button>
         </div>
         </div>
@@ -295,17 +295,16 @@ function ProtectedApp({ context }: { context: AccessContext }) {
         {bootstrap.status === "error" && <ErrorState error={bootstrap.error} onRetry={refresh} />}
 
         {bootstrap.status === "ready" && (
-          <div hidden={view !== "inventory"}>
-            <form className="filters" onSubmit={search} aria-label="Filter intended prefixes">
+          <div className="inventory-view" hidden={view !== "inventory"}>
+            <form className="filters inventory-filters" onSubmit={search} aria-label="Filter intended prefixes">
               <label>Network scope<select value={filters.scope} onChange={(event) => updateFilters({ ...filters, scope: event.target.value })}><option value="">All network scopes</option>{bootstrap.scopes.map((scope) => <option value={scope.id} key={scope.id}>{scope.name} · {scope.namespace}</option>)}</select></label>
-              <span className="filter-help">Selected domain: {context.selected_domain}</span>
               <label>Region<select value={filters.region} onChange={(event) => updateFilters({ ...filters, region: event.target.value })}><option value="">All regions</option>{regions.map((region) => <option value={region} key={region}>{region}</option>)}</select></label>
               <label>Address family<select value={filters.family} onChange={(event) => updateFilters({ ...filters, family: event.target.value })}><option value="">IPv4 and IPv6</option><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
-              <label className="search-field">Prefix, IP, owner, purpose or tag<input type="search" placeholder="Search inventory" value={queryInput} onChange={(event) => setQueryInput(event.target.value)} aria-describedby="search-help" /></label>
+              <label className="search-field">Prefix / owner / purpose<input type="search" placeholder="Search prefixes, owners, purpose…" value={queryInput} onChange={(event) => setQueryInput(event.target.value)} aria-describedby="search-help" /></label>
               <button type="submit">Search</button>
               {hasFilters && <button className="text-button" type="button" onClick={clearFilters}>Clear filters</button>}
             </form>
-            <p className="filter-help" id="search-help">IP search returns containing prefixes; CIDR search returns intersecting prefixes. Matching is scoped.</p>
+            <p className="filter-help" id="search-help">Search also accepts IP addresses and tags. IP search returns containing prefixes; CIDR search returns intersecting prefixes. Matching is scoped.</p>
             {activeScope ? <div className="scope-context"><strong>{activeScope.name}</strong><span>Namespace: <code>{activeScope.namespace}</code></span><span>Domain: {activeScope.domain}</span><span>Region: {activeScope.region}</span><span className="scope-perimeter">Managed space: {activeScope.managed_cidrs.map((cidr, index) => <span key={cidr}>{index > 0 && ", "}<code>{cidr}</code></span>)}</span></div> : <p className="scope-context">The same private address may be valid in separate network scopes. Scope identifies the isolated network; it does not establish tenant security.</p>}
             {filters.query && <p className="applied-query">Applied search: <strong>{filters.query}</strong></p>}
             <div className={`inventory-layout${selectedId ? " has-detail" : ""}`}>
