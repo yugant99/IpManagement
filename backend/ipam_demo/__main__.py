@@ -30,6 +30,11 @@ def main() -> int:
     restore.add_argument("--confirm", action="store_true")
     reset = commands.add_parser("reset", help="Remove only the recognized application store; stop the service first")
     reset.add_argument("--confirm", action="store_true")
+    convert = commands.add_parser("convert-kea", help="Sample-only Kea CSV to synthetic dhcp envelope; never labels real exports")
+    convert.add_argument("--input", required=True)
+    convert.add_argument("--scope-map", required=True)
+    convert.add_argument("--output", required=True)
+    convert.add_argument("--synthetic-sample", action="store_true")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
     try:
@@ -51,6 +56,9 @@ def main() -> int:
             print(json.dumps(restore_database(data_directory(), args.input, confirm=args.confirm), indent=2))
         elif args.command == "reset":
             print(json.dumps(reset_database(data_directory(), confirm=args.confirm), indent=2))
+        elif args.command == "convert-kea":
+            from .convert_kea import convert_kea
+            print(json.dumps(convert_kea(args.input, args.scope_map, args.output, args.synthetic_sample), indent=2))
         else:
             if not 1 <= args.port <= 65535:
                 raise AppError("INVALID_PORT", "Port must be between 1 and 65535.", 422)

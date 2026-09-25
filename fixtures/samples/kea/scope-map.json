@@ -1,0 +1,23 @@
+{
+  "synthetic_sample": true,
+  "sample_provenance": "Tracked synthetic Kea memfile sample for converter R4; all addresses, MACs and client IDs are fictional and local-file only.",
+  "demo_clock_at": "2026-09-01T00:00:00.000Z",
+  "export_observed_at": "2026-08-31T23:55:00.000Z",
+  "source_id": "synthetic-dhcp-kea-coastal-sample",
+  "source_run_id": "kea-sample-v1-snapshot",
+  "expected_input_filename": "kea-leases4-sample.csv",
+  "expected_input_sha256": "70d7f38d6686666cd01c97b4245ea26273c75ffa3df8e4da1e3b233c73325707",
+  "coverage": [
+    {
+      "scope_id": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+      "kind": "interval",
+      "window_start_at": "2026-08-31T23:25:00.000Z",
+      "window_end_at": "2026-08-31T23:55:00.000Z",
+      "declared_complete": false
+    }
+  ],
+  "subnet_scope_map": {
+    "11": "6d3bb4b0-ce20-5d83-b609-c09e3468d891",
+    "12": "6d3bb4b0-ce20-5d83-b609-c09e3468d891"
+  }
+}
