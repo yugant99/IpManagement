@@ -1112,8 +1112,6 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       <button disabled={busy} onClick={() => void exceptionAction(exceptionAttempt.payload.action)}>Retry exact exception action</button></div>}
     {loading && <p role="status">Loading saved workflow records…</p>}
     {status && <>
-      <p className="filter-help">Authenticated principal: {actorId}. Requests require Requester; independent decisions require Approver; reservation, extension, release proposal and ticket actions require Operator.</p>
-
       <section className="inventory-panel" aria-labelledby="reservation-heading"><div className="section-heading"><h2 id="reservation-heading">Reserve from {status.pool.name}</h2></div>
         <p>Ranges: {status.pool.ranges.map(range => `${range.start}–${range.end}`).join(", ")}. Exclusions: {status.pool.exclusions.map(range => `${range.start}–${range.end}`).join(", ") || "none"}.</p>
         <p className="quiet">Reviewed pool version {status.pool.pool_version}; intended ledger version {status.baseline_version}. Current DHCP contradictions are rechecked at demo clock {status.demo_clock_at}.</p>
@@ -1286,7 +1284,7 @@ export default function Workflow({ active = true }: { active?: boolean }) {
             <ul className="plain-list">{handoffDetail.route_history.map(entry => <li key={`${handoffDetail.id}-${entry.assignment_version}`}>v{entry.assignment_version} · {entry.team ?? "unassigned"} · route {entry.route_revision} · {entry.assigned_at}</li>)}</ul>
           </details>}
           <fieldset disabled={locked || !mayAttemptTicket}><legend>Manual ticket actions · no automatic retry</legend>
-            <label>Synthetic scenario for the next manual attempt<select value={attemptScenario} disabled={locked} onChange={event => setAttemptScenario(event.target.value as (typeof SCENARIOS)[number])}>
+            <label>Demo scenario for the next manual attempt<select value={attemptScenario} disabled={locked} onChange={event => setAttemptScenario(event.target.value as (typeof SCENARIOS)[number])}>
               {SCENARIOS.map(scenario => <option key={scenario} value={scenario}>{scenario}</option>)}
             </select></label>
             <div className="pagination">

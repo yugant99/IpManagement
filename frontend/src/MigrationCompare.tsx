@@ -124,7 +124,6 @@ function AssessmentDetailView({ assessment, onExport }: { assessment: MigrationA
     <Counts assessment={assessment} />
     <section className="detail-section" aria-labelledby="active-only-heading">
       <h3 id="active-only-heading">Active-only objects ({assessment.active_only_count} recorded; {assessment.active_only.length} shown)</h3>
-      <p className="notice">These active objects were not present in the candidate. They are listed for acknowledgement only and are never deletion proposals. An empty list does not propose deletion.</p>
       {assessment.active_only.length !== assessment.active_only_count && <p className="notice error" role="alert">The active-only detail rows do not match the saved count. Do not sign this assessment.</p>}
       {!assessment.active_only.length && <p>No active-only objects were returned.</p>}
       {!!assessment.active_only.length && <ul className="plain-list">{assessment.active_only.map((row, index) => <li key={`${row.matching_key}-${index}`}><strong><code>{row.matching_key}</code></strong><p>{row.reason}</p><details><summary>Active value and provenance</summary><pre className="source-json">{JSON.stringify(row.active, null, 2)}</pre></details></li>)}</ul>}
