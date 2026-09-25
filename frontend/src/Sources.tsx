@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ApiError } from "./api";
+import { useEffect, useRef, useState } from "react";
+import { ApiError, onSessionInvalidated } from "./api";
 import { loadEvidenceSources } from "./sourcesApi";
 import type { EvidenceRow, EvidenceSources, IntegrationProfile, Mechanism, MechanismScope } from "./sourcesApi";
 
@@ -54,17 +54,88 @@ function MechanismTile({ mechanism, profile }: { mechanism: Mechanism; profile?:
 
 export default function Sources({ active, onNavigate }: { active: boolean; onNavigate: (view: "inventory" | "first-path") => void }) {
   const [state, setState] = useState<Load>({ data: null, error: null, loading: true });
-  const [revision, setRevision] = useState(0);
+  const refreshSources = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     if (!active) return;
-    const controller = new AbortController();
-    setState(current => ({ ...current, loading: true }));
-    loadEvidenceSources(controller.signal)
-      .then(data => { if (!controller.signal.aborted) setState({ data, error: null, loading: false }); })
-      .catch((error: unknown) => { if (!controller.signal.aborted) setState(current => ({ data: current.data, error: asError(error), loading: false })); });
-    return () => controller.abort();
-  }, [active, revision]);
+
+    let disposed = false;
+    let sessionValid = true;
+    let inFlight = false;
+    let refreshQueued = false;
+    let manualRefreshQueued = false;
+    let controller: AbortController | undefined;
+    const canFetch = () => !disposed && sessionValid && document.visibilityState === "visible";
+
+    const fetchSources = (manual = false) => {
+      if (!canFetch()) return;
+      if (inFlight) {
+        if (manual) {
+          manualRefreshQueued = true;
+          setState(current => ({ ...current, loading: true }));
+        }
+        return;
+      }
+
+      inFlight = true;
+      const requestController = new AbortController();
+      controller = requestController;
+      setState(current => ({ ...current, loading: manual || current.data === null ? true : false }));
+      loadEvidenceSources(requestController.signal)
+        .then(data => {
+          if (!disposed && sessionValid && !requestController.signal.aborted) setState({ data, error: null, loading: false });
+        })
+        .catch((error: unknown) => {
+          if (disposed || !sessionValid || requestController.signal.aborted) return;
+          const failure = asError(error);
+          if (["AUTH_REQUIRED", "ACCESS_CONTEXT_STALE", "SESSION_CHANGED"].includes(failure.code)) {
+            sessionValid = false;
+            return;
+          }
+          setState(current => ({ data: current.data, error: failure, loading: false }));
+        })
+        .finally(() => {
+          if (controller === requestController) controller = undefined;
+          inFlight = false;
+          const runQueuedManual = manualRefreshQueued;
+          const runQueuedRefresh = refreshQueued;
+          manualRefreshQueued = false;
+          refreshQueued = false;
+          if (canFetch() && (runQueuedManual || runQueuedRefresh)) fetchSources(runQueuedManual);
+        });
+    };
+
+    refreshSources.current = () => fetchSources(true);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        refreshQueued = false;
+        manualRefreshQueued = false;
+        controller?.abort();
+      } else if (inFlight) {
+        refreshQueued = true;
+      } else {
+        fetchSources();
+      }
+    };
+    const unsubscribe = onSessionInvalidated(() => {
+      sessionValid = false;
+      refreshQueued = false;
+      manualRefreshQueued = false;
+      controller?.abort();
+    });
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    fetchSources();
+    const interval = window.setInterval(() => fetchSources(), 15000);
+    return () => {
+      disposed = true;
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.clearInterval(interval);
+      unsubscribe();
+      controller?.abort();
+      refreshSources.current = () => undefined;
+    };
+  }, [active]);
 
   const data = state.data;
   const count = (status: string) => data?.mechanisms.filter(item => item.status === status).length ?? 0;
@@ -83,9 +154,9 @@ export default function Sources({ active, onNavigate }: { active: boolean; onNav
       <div><p className="eyebrow">Dodona IPAM · domain {data?.domain ?? "selected"} · synthetic demo data</p><h1>Evidence sources</h1>
         <p className="intro">Dodona IPAM can be configured around up to twelve evidence mechanisms. It also works with fewer feeds, with correspondingly fewer evidence-backed functions.</p>
         {data && <p className="intro sources-now" role="status">In this domain, {evidenced} of {data.mechanisms.length} mechanisms have synthetic evidence ({count("loaded_synthetic_baseline")} loaded synthetic baseline, {count("imported_synthetic_evidence")} imported synthetic evidence); {count("not_connected")} not connected{count("no_permitted_evidence") > 0 && `; ${count("no_permitted_evidence")} with no permitted rows`}. {functionsPresent} of {data.functions.available_now.length} functions have their required sources present. No operator system is connected.</p>}</div>
-      <button className="secondary" onClick={() => setRevision(value => value + 1)} disabled={state.loading}>{state.loading ? "Refreshing…" : "Refresh sources"}</button>
+      <button className="secondary" onClick={() => refreshSources.current()} disabled={state.loading}>{state.loading ? "Refreshing…" : "Refresh sources"}</button>
     </div>
-    {state.error && <div className="notice error" role="alert"><h2>Evidence sources unavailable</h2><p>{state.error.message}</p><p className="diagnostic"><code>{state.error.code}</code>{state.error.requestId && <> · Request <code>{state.error.requestId}</code></>}</p>{data && <p>The last loaded overview remains below.</p>}<button className="secondary" onClick={() => setRevision(value => value + 1)}>Retry request</button></div>}
+    {state.error && <div className="notice error" role="alert"><h2>Evidence sources unavailable</h2><p>{state.error.message}</p><p className="diagnostic"><code>{state.error.code}</code>{state.error.requestId && <> · Request <code>{state.error.requestId}</code></>}</p>{data && <p>The last loaded overview remains below.</p>}<button className="secondary" onClick={() => refreshSources.current()}>Retry request</button></div>}
     {!data && state.loading && <div className="notice loading-line" role="status">Loading evidence sources…</div>}
     {data && <>
       <section className="sources-strip" aria-label="Evidence source status">
