@@ -22,6 +22,8 @@ export interface MechanismScope {
   evidence: EvidenceRow[];
   counts?: { prefixes: number; pools: number; allocations: number };
   origins?: BaselineOrigin[];
+  // Presence of intended route policy for this scope; not a per-scope eligibility decision.
+  route_policy?: { catalog_selected: boolean; in_latest_run: boolean; latest_run_effective_complete: boolean | null };
 }
 
 export interface Mechanism {
@@ -38,7 +40,16 @@ export interface Mechanism {
   summary: null | { scopes: number; loaded?: number; empty?: number; missing?: number; fresh?: number; stale?: number; complete?: number; partial?: number };
 }
 
-export interface SourceFunction { id: string; name: string; rule_ids: string[]; requires: string[]; evidence_present: boolean }
+export interface SourceFunction {
+  id: string;
+  name: string;
+  rule_ids: string[];
+  requires: string[];
+  requires_route_policy?: boolean;
+  route_policy_scopes?: { present: number; scopes: number };
+  evidence_basis: "source_presence";
+  evidence_present: boolean;
+}
 
 export interface IntegrationProfile {
   id: string;
