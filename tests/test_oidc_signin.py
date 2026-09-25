@@ -100,6 +100,23 @@ class OidcConfigurationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"enabled": True, "provider_name": "Corp SSO"})
 
+    def test_callback_and_authorize_return_404_when_unconfigured(self):
+        # Regression: request objects must resolve to Starlette Request, not query params.
+        from fastapi.testclient import TestClient
+        from fastapi import FastAPI
+        from fastapi.responses import JSONResponse
+        app = FastAPI()
+
+        @app.exception_handler(AppError)
+        async def _(request, exc):
+            return JSONResponse(exc.body("test"), status_code=exc.status)
+
+        oidc.mount(app)
+        with patch.dict("os.environ", {}, clear=True):
+            client = TestClient(app)
+            self.assertEqual(client.get("/api/auth/sso/authorize", follow_redirects=False).status_code, 404)
+            self.assertEqual(client.get("/api/auth/sso/callback?code=x&state=y", follow_redirects=False).status_code, 404)
+
 
 class ClaimMappingTests(unittest.TestCase):
     def setUp(self):

@@ -34,6 +34,9 @@ from typing import Callable
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request as UrllibRequest, urlopen
 
+from fastapi import Request
+from fastapi.responses import JSONResponse, RedirectResponse
+
 from .access import ReviewedConfiguration, effective_roles, load_reviewed_configuration
 from .errors import AppError
 from .models import AccessContext
@@ -497,9 +500,6 @@ def _reset_stores_for_tests() -> None:
 
 def mount(app, *, load_reviewed: Callable[[], ReviewedConfiguration] | None = None) -> None:
     """Attach the SSO endpoints. Safe to call whether or not OIDC is configured."""
-    from fastapi import Request
-    from fastapi.responses import JSONResponse, RedirectResponse
-
     read_reviewed = load_reviewed or load_reviewed_configuration
 
     @app.get("/api/auth/sso/config")
