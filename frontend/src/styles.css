@@ -47,6 +47,10 @@ code { color: inherit; }
 .access-panel form { display: grid; gap: 18px; }
 .access-panel form label { display: grid; gap: 8px; }
 .access-panel input { width: 100%; min-height: 42px; border: 1px solid #aab9a6; border-radius: 4px; padding: 8px 10px; background: #fff; color: #27372d; }
+.access-panel .sso-separator { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
+.access-panel .sso-separator::before, .access-panel .sso-separator::after { content: ""; flex: 1; height: 1px; background: #d3ded1; }
+.access-panel .sso-button { width: 100%; }
+.access-panel .sso-button[disabled] { cursor: not-allowed; opacity: 0.55; }
 main { max-width: 1480px; margin: 0 auto; padding: 36px 32px 20px; }
 .page-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 24px; }
 .page-heading button { flex-shrink: 0; }
