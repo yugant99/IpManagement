@@ -7,7 +7,7 @@ Do not substitute a real operator export here.
 ## Format reference
 
 Kea memfile lease files are append-only journals before LFC cleanup; the
-most recent row for each lease wins. DHCPv4 CSV columns are
+most recent row for each address wins. DHCPv4 CSV columns are
 `address,hwaddr,client_id,valid_lifetime,expire,subnet_id,fqdn_fwd,fqdn_rev,hostname,state,user_context,pool_id`,
 with `expire` as epoch seconds (`cltt + valid_lifetime`), `state`
 `0 = assigned, 1 = declined, 2 = expired-reclaimed, 3 = released`.
@@ -48,9 +48,11 @@ python -m ipam_demo convert-kea \
 
 ## Skipped-row rules
 
-- Append-log duplicates collapse by last row per `(subnet_id, address)`.
+- Append-log duplicates collapse by last row per address; the latest
+  row's `subnet_id` determines the explicit scope mapping.
 - Only `state 0` rows unexpired at the demo clock (`expire > clock`)
-  are emitted. Counts for `duplicate_rows_collapsed`, `skipped_state`
+  are emitted. Counts for `input_rows`, `unique_addresses`,
+  `duplicate_rows_collapsed`, `skipped_state`
   and `skipped_expired` print in the CLI summary; they are converter
   diagnostics, not importer receipts.
 - Malformed header, address, epoch/lifetime, unmapped `subnet_id`,
@@ -74,9 +76,16 @@ Kea API, connection, full lease history, p95 or forecast. Coverage is a
 bounded 30-minute incomplete snapshot window from the scope-map sender
 assertion, not history and not inferred from present leases.
 
-## Separate-store warning
+## Converter-only integration limit
 
-The emitted envelope uses a foreign sample source ID
-(`synthetic-dhcp-kea-coastal-sample`). Adding a foreign source ID to the
-main scheduler store can halt its next synthetic cycle; import the sample
-into an isolated store only.
+This iteration is converter-only: output format mapping is
+source-inspected, but core importer compatibility and any ingestion are
+unverified, and no current supported API/CLI import path exists for source
+ID `synthetic-dhcp-kea-coastal-sample`. That source ID is absent from
+`feed_adapter.REGISTERED_SOURCE_SCOPE_GRANTS`, the authenticated
+`/api/imports` route requires that exact grant, and startup requires the
+configured grants to equal the frozen registered set exactly. A separate
+store alone does not permit import. If future import is authorized, it
+needs a separately reviewed isolated-store ingestion path and must never
+use the recorded demo store. The emitted envelope must not be described as
+accepted.

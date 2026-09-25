@@ -8,7 +8,8 @@ requires an explicit sample flag plus a scope-map declaring
 A renamed real export fails the hash gate and is never labeled synthetic.
 A real operator export needs a reviewed non-synthetic contract, authority,
 privacy and access gate before ingestion. No live API, connection or full
-lease history is claimed.
+lease history is claimed. Converter-only in this iteration: no supported
+import path exists for the emitted source ID (see integration memo).
 """
 
 import csv
@@ -140,6 +141,14 @@ def convert_kea(input_path: str, scope_map_path: str, output_path: str, syntheti
             "A real operator export needs a reviewed non-synthetic contract and access gate.",
             422,
         )
+    try:
+        resolved_output = Path(output_path).expanduser().resolve()
+        resolved_input = raw_input.expanduser().resolve()
+        resolved_map = Path(scope_map_path).expanduser().resolve()
+    except OSError as exc:
+        raise AppError("KEA_SAMPLE_INVALID", f"Cannot resolve output path: {exc}.", 422) from exc
+    if resolved_output in (resolved_input, resolved_map):
+        raise AppError("KEA_SAMPLE_INVALID", "--output must not equal --input or --scope-map.", 422)
 
     lines = text.splitlines()
     if not lines:
@@ -162,7 +171,7 @@ def convert_kea(input_path: str, scope_map_path: str, output_path: str, syntheti
     if len(rows) > MAX_IMPORT_ROWS:
         raise AppError("KEA_SAMPLE_TOO_LARGE", "Kea sample CSV exceeds the 10,000 row limit.", 413)
 
-    parsed: dict[tuple[str, str], dict] = {}
+    parsed: dict[str, dict] = {}
     input_rows = 0
     for line_number, row in enumerate(rows, start=2):
         if not row or all(cell == "" for cell in row):
@@ -224,7 +233,7 @@ def convert_kea(input_path: str, scope_map_path: str, output_path: str, syntheti
             raise AppError("KEA_SAMPLE_INVALID", f"Row {line_number}: state must be an integer.", 422) from exc
         if state not in (0, 1, 2, 3):
             raise AppError("KEA_SAMPLE_INVALID", f"Row {line_number}: state must be 0, 1, 2 or 3.", 422)
-        key = (str(subnet_id), address)
+        key = address
         parsed[key] = {
             "line_number": line_number,
             "address": address,
@@ -242,14 +251,15 @@ def convert_kea(input_path: str, scope_map_path: str, output_path: str, syntheti
     skipped_expired = 0
     observed_at = export_observed.isoformat(timespec="milliseconds").replace("+00:00", "Z")
     records = []
-    for (subnet_key, address) in sorted(parsed, key=lambda item: (int(item[0]), item[1])):
-        item = parsed[(subnet_key, address)]
+    for address in sorted(parsed, key=lambda item: int(ip_address(item))):
+        item = parsed[address]
         if item["state"] != 0:
             skipped_state += 1
             continue
         if item["expire"] <= demo_epoch:
             skipped_expired += 1
             continue
+        subnet_key = item["subnet_id"]
         scope_id = str(subnet_scope_map[subnet_key])
         start_epoch = item["expire"] - item["valid"]
         if start_epoch > demo_epoch:
@@ -349,7 +359,7 @@ def convert_kea(input_path: str, scope_map_path: str, output_path: str, syntheti
         "status": "converted",
         "synthetic_sample": True,
         "input_rows": input_rows,
-        "unique_scoped_addresses": unique_keys,
+        "unique_addresses": unique_keys,
         "duplicate_rows_collapsed": duplicate_rows_collapsed,
         "skipped_state": skipped_state,
         "skipped_expired": skipped_expired,
@@ -360,8 +370,9 @@ def convert_kea(input_path: str, scope_map_path: str, output_path: str, syntheti
         "demo_clock_at": envelope["demo_clock_at"],
         "observed_at": observed_at,
         "limitations": [
+            "Converter-only: no current supported API/CLI import path exists for this source ID; core importer compatibility and any ingestion are unverified.",
             "Sample-only synthetic conversion; not a live Kea API, connection or full lease history.",
-            "Coverage is a sender assertion from the sample scope-map, not inferred from present leases.",
+            "Coverage is a bounded snapshot window from the sample scope-map, not history and not inferred from present leases.",
             "Counts above are converter skips; they are not importer receipts.",
         ],
     }

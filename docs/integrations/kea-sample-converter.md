@@ -1,15 +1,17 @@
-# Kea sample converter (R4, sample-only)
+# Kea sample converter (R4, converter-only)
 
 Bounded converter from a tracked synthetic Kea DHCPv4 memfile CSV to one
-valid `source_kind: dhcp` envelope at the seeded synthetic demo clock
-(`2026-09-01T00:00:00.000Z`). Source review only; no command or test run
-was requested or performed.
+`source_kind: dhcp`-shaped envelope at the seeded synthetic demo clock
+(`2026-09-01T00:00:00.000Z`). Output format mapping is source-inspected;
+core importer compatibility and any ingestion are unverified, and no
+current supported API/CLI import path exists for the emitted source ID.
+Source review only; no command or test run was requested or performed.
 
 ## Official behavior used
 
 - Memfile files are plain CSV journals; changes append at the end and LFC
   periodically rewrites a cleaned file. Before cleanup the most recent row
-  for each lease wins. DHCPv4 entry order is `address, hwaddr, client_id,
+  for each address wins. DHCPv4 entry order is `address, hwaddr, client_id,
   valid_lifetime, expire, subnet_id, fqdn_fwd, fqdn_rev, hostname, state,
   user_context, pool_id`, where `expire` is epoch seconds
   (`cltt + valid_lifetime`) and `state` is `0 = assigned, 1 = declined,
@@ -46,8 +48,9 @@ was requested or performed.
   bounds. Infinite lifetime (`0xffffffff`) fails because it cannot be a
   bounded lease interval.
 - Collapses append-log duplicates by last row per
-  `(subnet_id, address)`, emits only `state 0` with `expire` after the
-  demo clock, and reports `input_rows`, `unique_scoped_addresses`,
+  address (the latest row's `subnet_id` determines the explicit scope
+  mapping), emits only `state 0` with `expire` after the
+  demo clock, and reports `input_rows`, `unique_addresses`,
   `duplicate_rows_collapsed`, `skipped_state`, `skipped_expired` and
   `emitted_records` in stdout JSON. These are converter diagnostics, not
   importer receipts, and no receipt is fabricated.
@@ -66,6 +69,8 @@ was requested or performed.
   the scope-map `source_run_id` for idempotent repeats. Writes the output
   atomically (temp file plus rename) so no partial envelope remains. CSV
   parse errors and malformed map types fail as `AppError`, not traceback.
+  `--output` resolving to `--input` or `--scope-map` is rejected before
+  any temp file is created.
 
 ## Sample fixture
 
@@ -78,11 +83,19 @@ Coastal scope `6d3bb4b0-ce20-5d83-b609-c09e3468d891`, pins the demo clock,
 export time, a bounded 30-minute incomplete snapshot window (not history)
 and provenance.
 
-## Truth boundary and store warning
+## Truth boundary and integration limit
 
-Sample-only: no live Kea API, connection, full lease history, p95 or
-forecast. Coverage is a bounded snapshot window asserted by the scope-map
-sender, never history and never inferred from present leases. The sample source ID
-(`synthetic-dhcp-kea-coastal-sample`) is foreign to the main scheduler
-store; importing it there can halt the next synthetic cycle, so use an
-isolated store.
+Converter-only: output format mapping is source-inspected, but core
+importer compatibility and any ingestion are unverified. No current
+supported API/CLI import path exists for
+`synthetic-dhcp-kea-coastal-sample`: that source ID is absent from
+`feed_adapter.REGISTERED_SOURCE_SCOPE_GRANTS`, the authenticated
+`/api/imports` route requires that exact grant, and startup requires the
+configured grants to equal the frozen registered set exactly. A separate
+store alone does not permit import. Sample-only otherwise: no live Kea
+API, connection, full lease history, p95 or forecast. Coverage is a
+bounded snapshot window asserted by the scope-map sender, never history
+and never inferred from present leases. If future import is authorized, it
+needs a separately reviewed isolated-store ingestion path and must never
+use the recorded demo store. Do not describe the emitted envelope as
+accepted.
