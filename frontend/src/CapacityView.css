@@ -1,0 +1,461 @@
+.capacity-reports {
+  color: #27372d;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.capacity-reports .page-heading {
+  margin-bottom: 22px;
+}
+
+.capacity-reports .page-heading h1 {
+  margin-bottom: 6px;
+  font-size: clamp(27px, 2.4vw, 30px);
+  line-height: 1.18;
+}
+
+.capacity-reports h2 {
+  margin-bottom: 0;
+  color: #294a30;
+  font-size: 18px;
+}
+
+.capacity-reports h3 {
+  font-size: 16px;
+}
+
+.capacity-reports .eyebrow {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.capacity-reports .quiet,
+.capacity-reports .table-secondary,
+.capacity-reports .panel-message,
+.capacity-reports .notice {
+  font-size: 13px;
+}
+
+.capacity-reports .inventory-panel {
+  box-shadow: none;
+}
+
+.capacity-reports .facts {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.capacity-reports .facts dt {
+  color: #526358;
+}
+
+.capacity-reports code {
+  font-size: 0.96em;
+}
+
+.capacity-reports .section-heading {
+  padding: 16px 20px;
+}
+
+.capacity-reports .section-heading > span,
+.capacity-section-line > span {
+  color: #59685c;
+  font-size: 13px;
+}
+
+.capacity-live {
+  margin-bottom: 28px;
+}
+
+.capacity-live .capacity-explainer {
+  max-width: 85ch;
+  margin: 16px 20px;
+}
+
+.capacity-live .facts {
+  max-width: 900px;
+  padding: 0 20px 20px;
+  grid-template-columns: minmax(170px, 0.65fr) minmax(0, 1.35fr);
+  gap: 9px 24px;
+}
+
+.capacity-live > [role="status"] {
+  margin: 0 20px 20px;
+}
+
+.capacity-section-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.capacity-run-picker {
+  padding: 18px 20px;
+  border: 1px solid #d9dfd1;
+  background: #eef2e5;
+  margin-bottom: 18px;
+}
+
+.capacity-run-picker .capacity-section-line {
+  align-items: center;
+}
+
+.capacity-run-picker .report-run-select {
+  max-width: 720px;
+  margin: 14px 0 0;
+  color: #365b3b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.capacity-run-picker select {
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #aebea8;
+  border-radius: 3px;
+  background: #fffefa;
+  color: #27372d;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.capacity-run-picker .text-button {
+  margin-top: 10px;
+}
+
+.capacity-run-identity {
+  padding: 14px 20px 16px;
+  border: 1px solid #d9dfd1;
+  border-left: 3px solid #9a7428;
+  background: #fffefa;
+  margin-bottom: 18px;
+}
+
+.capacity-run-identity h2 {
+  margin-bottom: 12px;
+}
+
+.capacity-run-identity .facts {
+  max-width: none;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px 16px;
+}
+
+.capacity-run-identity .facts dt {
+  grid-row: 1;
+  font-size: 12px;
+}
+
+.capacity-run-identity .facts dd {
+  grid-row: 2;
+  font-size: 14px;
+}
+
+.capacity-filter-panel {
+  margin: 0 0 24px;
+}
+
+.capacity-filter-panel h2 {
+  margin-bottom: 10px;
+}
+
+.capacity-reports .filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+  gap: 14px;
+  padding: 16px 0 0;
+}
+
+.capacity-reports .filters label {
+  font-size: 13px;
+}
+
+.capacity-reports .filters input,
+.capacity-reports .filters select {
+  min-height: 42px;
+  font-size: 14px;
+}
+
+.capacity-filter-panel > .quiet {
+  margin: 12px 0 0;
+}
+
+.capacity-summary {
+  margin-bottom: 24px;
+  border-top: 1px solid #d9dfd1;
+  border-bottom: 1px solid #d9dfd1;
+  padding: 16px 0 14px;
+}
+
+.capacity-summary-values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 14px 0 12px;
+}
+
+.capacity-summary-values > div {
+  padding: 0 20px;
+  border-left: 1px solid #d9dfd1;
+}
+
+.capacity-summary-values > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.capacity-summary-values dt {
+  color: #59685c;
+  font-size: 13px;
+}
+
+.capacity-summary-values dd {
+  margin: 2px 0 0;
+  color: #294a30;
+  font-size: 23px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.capacity-summary > .quiet {
+  margin: 0;
+}
+
+.capacity-results,
+.capacity-reports .report-findings {
+  margin: 0 0 22px;
+}
+
+.capacity-reports .section-heading p {
+  margin-top: 4px;
+}
+
+.capacity-reports table {
+  min-width: 760px;
+  font-size: 14px;
+}
+
+.capacity-reports th {
+  padding: 10px 16px;
+  background: #f5f7f0;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.capacity-reports td {
+  padding: 14px 16px;
+  line-height: 1.4;
+}
+
+.capacity-reports td strong {
+  font-weight: 650;
+}
+
+.capacity-reports td .table-secondary {
+  display: block;
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+
+.capacity-reports .table-scroll:focus-visible {
+  outline-offset: -3px;
+}
+
+.capacity-detail-list {
+  margin: 0 0 24px;
+}
+
+.capacity-detail-list > h3 {
+  margin: 0 0 10px;
+  color: #294a30;
+}
+
+.capacity-reports .capacity-card {
+  margin: 0;
+  padding: 0;
+}
+
+.capacity-reports .capacity-card + .capacity-card {
+  margin-top: 8px;
+}
+
+.capacity-card > summary {
+  padding: 14px 18px;
+  color: #365b3b;
+  font-weight: 650;
+}
+
+.capacity-card[open] > summary {
+  border-bottom: 1px solid #d9dfd1;
+}
+
+.capacity-card > :not(summary) {
+  margin-left: 18px;
+  margin-right: 18px;
+}
+
+.capacity-card > p {
+  margin-top: 16px;
+}
+
+.capacity-card > .facts {
+  max-width: 950px;
+  gap: 10px 22px;
+}
+
+.capacity-card > details {
+  padding-top: 10px;
+  border-top: 1px solid #d9dfd1;
+}
+
+.capacity-card > details summary {
+  color: #365b3b;
+  font-weight: 600;
+}
+
+.capacity-card > ul {
+  padding-left: 20px;
+  padding-bottom: 12px;
+}
+
+.capacity-reports .capacity-history {
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.capacity-history svg {
+  min-width: 440px;
+}
+
+.capacity-reports .capacity-history figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.capacity-candidates {
+  padding: 14px 18px;
+  margin: 0 0 18px;
+}
+
+.capacity-candidates > summary {
+  color: #365b3b;
+  font-weight: 650;
+}
+
+.capacity-candidates[open] > summary {
+  margin-bottom: 14px;
+}
+
+.capacity-export {
+  margin-bottom: 26px;
+}
+
+.capacity-reports .report-preset,
+.capacity-reports .path-step {
+  margin: 22px 0;
+  padding: 20px;
+  border: 1px solid #d9dfd1;
+  background: #fffefa;
+}
+
+.capacity-reports .report-preset .filters {
+  grid-template-columns: minmax(150px, 0.6fr) repeat(2, minmax(180px, 1fr));
+  align-items: end;
+}
+
+.capacity-reports .report-preset .filters > span {
+  align-self: center;
+  overflow-wrap: anywhere;
+  color: #59685c;
+  font-size: 13px;
+}
+
+.capacity-reports .report-preset fieldset {
+  margin: 20px 0;
+}
+
+.capacity-reports .column-options label {
+  font-size: 13px;
+}
+
+.capacity-reports .path-step h2 {
+  margin-bottom: 12px;
+}
+
+.capacity-reports .path-step .filters {
+  grid-template-columns: repeat(2, minmax(180px, 1fr)) auto;
+}
+
+.capacity-reports .path-step .table-scroll {
+  margin-top: 16px;
+  border: 1px solid #d9dfd1;
+}
+
+@media (max-width: 900px) {
+  .capacity-run-identity .facts {
+    grid-template-columns: minmax(130px, 0.35fr) minmax(0, 1fr);
+    gap: 8px 12px;
+  }
+
+  .capacity-run-identity .facts dt,
+  .capacity-run-identity .facts dd {
+    grid-row: auto;
+  }
+
+  .capacity-reports .report-preset .filters,
+  .capacity-reports .path-step .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .capacity-reports .page-heading h1 {
+    font-size: 27px;
+  }
+
+  .capacity-run-picker,
+  .capacity-reports .report-preset,
+  .capacity-reports .path-step {
+    padding: 16px;
+  }
+
+  .capacity-run-picker .capacity-section-line button {
+    width: 100%;
+  }
+
+  .capacity-live .facts,
+  .capacity-card > .facts,
+  .capacity-run-identity .facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .capacity-live .facts dt:not(:first-child),
+  .capacity-card > .facts dt:not(:first-child),
+  .capacity-run-identity .facts dt:not(:first-child) {
+    margin-top: 8px;
+  }
+
+  .capacity-summary-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 0;
+  }
+
+  .capacity-summary-values > div:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .capacity-reports .filters,
+  .capacity-reports .report-preset .filters,
+  .capacity-reports .path-step .filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .capacity-reports .path-step .filters button {
+    width: 100%;
+  }
+}
