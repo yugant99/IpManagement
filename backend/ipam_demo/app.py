@@ -1560,6 +1560,17 @@ def create_app() -> FastAPI:
             raise AppError("NOT_FOUND", "Source import does not exist.", 404)
         return kind, source_id, scope_ids
 
+    def openable_batch_ids(connection, request, batch_ids):
+        """Batch IDs this request may open via /api/imports; checked once per batch, mixed-domain batches omitted."""
+        permitted = set()
+        for batch_id in set(batch_ids):
+            try:
+                authorized_batch(connection, request, batch_id)
+            except AppError:
+                continue
+            permitted.add(batch_id)
+        return permitted
+
     def record_scope_id(row):
         raw = json.loads(row["raw_json"])
         typed = json.loads(row["typed_json"]) if row["typed_json"] else None
@@ -1759,6 +1770,9 @@ def create_app() -> FastAPI:
                  request.state.access_configuration.source_domains.get((item.get("source_id"), item.get("scope_id"))) is not None
                  and (request.state.access_context.is_evidence_coordinator or
                       request.state.access_configuration.source_domains.get((item.get("source_id"), item.get("scope_id"))) == domain)]
+        if not request.state.access_context.is_evidence_coordinator:
+            permitted = openable_batch_ids(connection, request, [item["batch_id"] for item in items])
+            items = [item for item in items if item["batch_id"] in permitted]
         evaluated_at = connection.execute("SELECT demo_clock_at FROM app_meta WHERE singleton=1").fetchone()[0]
         page = inventory.page(items, limit, offset)
         return {**page, "evaluated_at": evaluated_at,
@@ -1775,13 +1789,9 @@ def create_app() -> FastAPI:
         catalog_rows = [item for item in source_catalog.catalog(connection)
                         if item.get("scope_id") in allowed
                         and source_domains.get((item.get("source_id"), item.get("scope_id"))) == domain]
-        receipts = {}
-        for batch_id in {item["batch_id"] for item in catalog_rows}:
-            try:
-                authorized_batch(connection, request, batch_id)
-            except AppError:
-                continue
-            receipts[batch_id] = import_receipt(connection, batch_id)
+        permitted = openable_batch_ids(connection, request, [item["batch_id"] for item in catalog_rows])
+        catalog_rows = [item for item in catalog_rows if item["batch_id"] in permitted]
+        receipts = {batch_id: import_receipt(connection, batch_id) for batch_id in permitted}
         inventory_rows = {group: safe_inventory_rows(getter(connection, domain=domain), request) for group, getter in
                           (("prefixes", inventory.prefixes), ("pools", inventory.pools), ("allocations", inventory.allocations))}
         latest_run = None

@@ -26,7 +26,7 @@ def manifest() -> dict:
 def overview(*, domain, evaluated_at, scopes, inventory_rows, catalog_rows, receipts, latest_run) -> dict:
     """Assemble the overview from inputs already restricted to ``domain``."""
     data = manifest()
-    run = _run_summary(latest_run)
+    run = _run_summary(latest_run, set(receipts))
     run_batches = set(run["selected_batch_ids"]) if run else set()
 
     def evidence_row(item):
@@ -40,12 +40,14 @@ def overview(*, domain, evaluated_at, scopes, inventory_rows, catalog_rows, rece
         return [evidence_row(item) for item in catalog_rows
                 if item["source_kind"] == kind and item["scope_id"] == scope["id"]]
 
+    policy = _route_policy_presence(scopes, catalog_rows, latest_run)
     mechanisms = []
     for mechanism in data["mechanisms"]:
         implementation = mechanism["implementation"]
         result = {**mechanism, "scopes": [], "summary": None}
         if implementation == "seeded_inventory":
-            rows = [_baseline_scope(scope, inventory_rows, scoped("route_policy", scope)) for scope in scopes]
+            rows = [{**_baseline_scope(scope, inventory_rows, scoped("route_policy", scope)),
+                     "route_policy": policy[scope["id"]]} for scope in scopes]
             loaded = sum(row["state"] == "loaded" for row in rows)
             result.update(status="loaded_synthetic_baseline" if loaded else "no_permitted_evidence", scopes=rows,
                           summary={"scopes": len(rows), "loaded": loaded, "empty": len(rows) - loaded})
@@ -67,8 +69,16 @@ def overview(*, domain, evaluated_at, scopes, inventory_rows, catalog_rows, rece
         mechanisms.append(result)
 
     status = {item["id"]: item["status"] for item in mechanisms}
-    functions = [{**item, "evidence_present": all(status[required] in _PRESENT for required in item["requires"])}
-                 for item in data["functions"]]
+    policy_present = sum(value["catalog_selected"] or value["in_latest_run"] for value in policy.values())
+    functions = []
+    for item in data["functions"]:
+        # Source presence only; per-scope freshness and completeness still govern each finding.
+        entry = {**item, "evidence_basis": "source_presence",
+                 "evidence_present": all(status[required] in _PRESENT for required in item["requires"])}
+        if item.get("requires_route_policy"):
+            entry["route_policy_scopes"] = {"present": policy_present, "scopes": len(scopes)}
+            entry["evidence_present"] = entry["evidence_present"] and policy_present > 0
+        functions.append(entry)
     next_unlocks = [{"mechanism_id": item["id"], "name": item["name"], "plane": item["plane"], "unlocks": item["unlocks"]}
                     for item in mechanisms if item["status"] == "not_connected"]
     return {"domain": domain, "evaluated_at": evaluated_at, "synthetic": True,
@@ -99,10 +109,30 @@ def _baseline_scope(scope, inventory_rows, policy):
             "evidence": policy}
 
 
-def _run_summary(run):
+def _route_policy_presence(scopes, catalog_rows, latest_run):
+    """Per-scope intended-policy presence from openable catalog rows and the domain-projected saved run.
+
+    The run projection already limits coverage to this domain's scopes, so a mixed-domain
+    policy batch contributes scope-local coverage only, never batch-wide counts.
+    """
+    catalog = {item["scope_id"] for item in catalog_rows if item["source_kind"] == "route_policy"}
+    in_run = {}
+    for batch in (latest_run or {}).get("selected_batches", []):
+        if batch.get("source_kind") != "route_policy":
+            continue
+        for coverage in batch.get("coverage", []):
+            scope_id = coverage.get("scope_id")
+            in_run[scope_id] = in_run.get(scope_id, True) and bool(coverage.get("effective_complete"))
+    return {scope["id"]: {"catalog_selected": scope["id"] in catalog, "in_latest_run": scope["id"] in in_run,
+                          "latest_run_effective_complete": in_run.get(scope["id"])} for scope in scopes}
+
+
+def _run_summary(run, openable):
     if run is None:
         return None
+    # Only batch IDs this domain can open; mixed-domain batches are omitted here.
     return {"id": run["id"], "created_at": run["created_at"], "demo_clock_at": run["demo_clock_at"],
             "rule_id": run.get("rule_id"), "rule_version": run.get("rule_version"),
-            "overview": run["overview"], "selected_batch_ids": [batch["id"] for batch in run["selected_batches"]],
+            "overview": run["overview"],
+            "selected_batch_ids": [batch["id"] for batch in run["selected_batches"] if batch["id"] in openable],
             "projection": run["projection"]}

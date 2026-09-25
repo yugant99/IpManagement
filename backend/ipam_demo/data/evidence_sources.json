@@ -67,9 +67,11 @@
     {"id": "lease_discrepancies", "name": "Ghost scopes, assignment conflicts and pool-assignment discrepancies",
      "rule_ids": ["ghost_scope", "assignment_conflict", "pool_assignment_discrepancy"],
      "requires": ["ipam_baseline", "dhcp_lease_events"]},
-    {"id": "route_discrepancies", "name": "Unregistered managed routes and missing expected routes",
-     "rule_ids": ["unregistered_managed_route", "missing_expected_route"],
-     "requires": ["ipam_baseline", "bmp_routing_state"]},
+    {"id": "unregistered_routes", "name": "Unregistered managed routes",
+     "rule_ids": ["unregistered_managed_route"], "requires": ["ipam_baseline", "bmp_routing_state"]},
+    {"id": "missing_routes", "name": "Missing expected routes against intended route policy",
+     "rule_ids": ["missing_expected_route"], "requires": ["ipam_baseline", "bmp_routing_state"],
+     "requires_route_policy": true},
     {"id": "zombie_review", "name": "Zombie candidates: announced space with no lease overlap",
      "rule_ids": ["zombie_candidate"], "requires": ["ipam_baseline", "dhcp_lease_events", "bmp_routing_state"]}
   ],
@@ -83,6 +85,8 @@
   "limitations": [
     "Twelve potential evidence mechanisms; only the seeded inventory and synthetic DHCP and routing imports exist in this demo.",
     "Not connected means no data from that mechanism reaches any calculation. No telemetry does not prove no usage.",
-    "Freshness and completeness are per source and scope at the seeded demo clock; declared authority does not prove live system authority."
+    "Freshness and completeness are per source and scope at the seeded demo clock; declared authority does not prove live system authority.",
+    "Function status reports source presence only. Per-scope freshness and completeness still decide whether each finding is healthy, anomalous or unknown.",
+    "Source rows whose saved batch also covers another domain are omitted here, as they are from saved-import detail."
   ]
 }
