@@ -1112,8 +1112,6 @@ export default function Workflow({ active = true }: { active?: boolean }) {
       <button disabled={busy} onClick={() => void exceptionAction(exceptionAttempt.payload.action)}>Retry exact exception action</button></div>}
     {loading && <p role="status">Loading saved workflow records…</p>}
     {status && <>
-      <p className="filter-help">Authenticated principal: {actorId}. Requests require Requester; independent decisions require Approver; reservation, extension, release proposal and ticket actions require Operator.</p>
-
       <section className="inventory-panel" aria-labelledby="reservation-heading"><div className="section-heading"><h2 id="reservation-heading">Reserve from {status.pool.name}</h2></div>
         <p>Ranges: {status.pool.ranges.map(range => `${range.start}–${range.end}`).join(", ")}. Exclusions: {status.pool.exclusions.map(range => `${range.start}–${range.end}`).join(", ") || "none"}.</p>
         <p className="quiet">Reviewed pool version {status.pool.pool_version}; intended ledger version {status.baseline_version}. Current DHCP contradictions are rechecked at demo clock {status.demo_clock_at}.</p>
