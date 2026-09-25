@@ -2,10 +2,12 @@
 
 Bounded converter from a tracked synthetic Kea DHCPv4 memfile CSV to one
 `source_kind: dhcp`-shaped envelope at the seeded synthetic demo clock
-(`2026-09-01T00:00:00.000Z`). Output format mapping is source-inspected;
-core importer compatibility and any ingestion are unverified, and no
-current supported API/CLI import path exists for the emitted source ID.
-Source review only; no command or test run was requested or performed.
+(`2026-09-01T00:00:00.000Z`). The tracked sample was converted locally
+and its envelope was passed to `import_envelope` in a disposable
+rich-seeded store. The core importer returned `partial` with 11 accepted,
+0 rejected and 0 duplicate rows; that transaction was rolled back. This
+bypassed authorization and is not a supported API/CLI import path for
+the emitted source ID.
 
 ## Official behavior used
 
@@ -83,19 +85,40 @@ Coastal scope `6d3bb4b0-ce20-5d83-b609-c09e3468d891`, pins the demo clock,
 export time, a bounded 30-minute incomplete snapshot window (not history)
 and provenance.
 
+## Focused local validation
+
+With `PYTHONPATH=backend`, the `python -m ipam_demo convert-kea` command
+using the two tracked sample files above and a disposable `/tmp` output
+completed: 17 input rows, 15 unique addresses, 2 collapsed duplicates,
+3 non-assigned skips, 1 expired skip and 11 emitted records. The envelope
+had 11 unique active leases, the released supersede was absent, every
+record mapped to the Coastal scope, and coverage stayed incomplete.
+Missing `--synthetic-sample`, changed CSV bytes and `--output` equal to
+`--input` each returned nonzero and left no new output file.
+
+A direct `import_envelope` call with the emitted bytes and a disposable
+rich-seeded SQLite store returned `application_status: partial`, 11
+accepted, 0 rejected and 0 duplicate records. One batch existed inside
+the transaction; zero batches remained after rollback. This checks the
+core data contract only. A focused `require_coordinator(...,
+operation="acquire")` call using the frozen registered grants returned
+`FORBIDDEN` (403) for this sample source.
+
 ## Truth boundary and integration limit
 
-Converter-only: output format mapping is source-inspected, but core
-importer compatibility and any ingestion are unverified. No current
-supported API/CLI import path exists for
+Converter-only: the direct core importer call above accepted the envelope
+in a rolled-back disposable transaction, but no current supported
+authenticated API/CLI import path exists for
 `synthetic-dhcp-kea-coastal-sample`: that source ID is absent from
 `feed_adapter.REGISTERED_SOURCE_SCOPE_GRANTS`, the authenticated
 `/api/imports` route requires that exact grant, and startup requires the
 configured grants to equal the frozen registered set exactly. A separate
-store alone does not permit import. Sample-only otherwise: no live Kea
+store alone does not permit import. The frozen coordinator grant set denied
+the sample source with `FORBIDDEN` (403) in a focused authorization check.
+Sample-only otherwise: no live Kea
 API, connection, full lease history, p95 or forecast. Coverage is a
 bounded snapshot window asserted by the scope-map sender, never history
 and never inferred from present leases. If future import is authorized, it
 needs a separately reviewed isolated-store ingestion path and must never
-use the recorded demo store. Do not describe the emitted envelope as
-accepted.
+use the recorded demo store. Do not describe the emitted envelope as an
+accepted authenticated import.

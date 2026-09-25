@@ -370,7 +370,7 @@ def convert_kea(input_path: str, scope_map_path: str, output_path: str, syntheti
         "demo_clock_at": envelope["demo_clock_at"],
         "observed_at": observed_at,
         "limitations": [
-            "Converter-only: no current supported API/CLI import path exists for this source ID; core importer compatibility and any ingestion are unverified.",
+            "Converter-only: no current supported authenticated API/CLI import path exists for this source ID; this conversion is not an import receipt.",
             "Sample-only synthetic conversion; not a live Kea API, connection or full lease history.",
             "Coverage is a bounded snapshot window from the sample scope-map, not history and not inferred from present leases.",
             "Counts above are converter skips; they are not importer receipts.",
