@@ -50,6 +50,23 @@ def _require_complete_feed_authority(config):
         raise AppError("ACCESS_CONFIGURATION_INVALID", "Reviewed access configuration does not cover the registered synthetic feed.", 503)
 
 
+def _authenticate_request(authorization, selected_domain):
+    """Reload reviewed authority and accept either a live SSO session or reviewed token."""
+    try:
+        return access.authenticate_request(
+            authorization, selected_domain, path=os.environ.get("IPAM_ACCESS_CONFIG"))
+    except AppError as exc:
+        if exc.code != "AUTHENTICATION_REQUIRED":
+            raise
+    config = access.load_reviewed_configuration(path=os.environ.get("IPAM_ACCESS_CONFIG"))
+    context = oidc.try_authenticate_sso(authorization, config)
+    if context is None:
+        raise AppError("AUTHENTICATION_REQUIRED", "A valid bearer credential is required.", 401)
+    if selected_domain is not None:
+        context = access.require_selected_domain(context, selected_domain)
+    return config, context
+
+
 def create_app() -> FastAPI:
     directory = data_directory()
     static = static_directory()
@@ -107,12 +124,8 @@ def create_app() -> FastAPI:
         authenticated_api = (path.startswith("/api/") or path == "/api") and path not in sso_public_paths
         if authenticated_api:
             try:
-                config = access.load_reviewed_configuration(path=os.environ.get("IPAM_ACCESS_CONFIG"))
-                context = oidc.try_authenticate_sso(request.headers.get("authorization"), config)
-                if context is None:
-                    context = access.authenticate_bearer(request.headers.get("authorization"), config)
-                if request.headers.get("x-ipam-domain") is not None:
-                    context = access.require_selected_domain(context, request.headers.get("x-ipam-domain"))
+                config, context = _authenticate_request(
+                    request.headers.get("authorization"), request.headers.get("x-ipam-domain"))
                 request.state.access_configuration = config
                 request.state.access_context = context
                 _require_complete_feed_authority(config)
@@ -210,9 +223,8 @@ def create_app() -> FastAPI:
         return context
 
     def require_coordinator(request, operation, connection=None):
-        config, context = access.authenticate_request(
-            request.headers.get("authorization"), request.headers.get("x-ipam-domain"),
-            path=os.environ.get("IPAM_ACCESS_CONFIG"))
+        config, context = _authenticate_request(
+            request.headers.get("authorization"), request.headers.get("x-ipam-domain"))
         request.state.access_configuration = config
         request.state.access_context = context
         if (request.url.path not in {"/api/access-context", "/api/docs", "/api/openapi.json"}
@@ -440,9 +452,8 @@ def create_app() -> FastAPI:
         with connect(request.app.state.database) as connection, connection:
             connection.execute("BEGIN IMMEDIATE")
             require_initialized(connection)
-            config, context = access.authenticate_request(
-                request.headers.get("authorization"), request.headers.get("x-ipam-domain"),
-                path=os.environ.get("IPAM_ACCESS_CONFIG"))
+            config, context = _authenticate_request(
+                request.headers.get("authorization"), request.headers.get("x-ipam-domain"))
             request.state.access_configuration = config
             request.state.access_context = context
             if request.url.path not in {"/api/access-context", "/api/docs", "/api/openapi.json"}:

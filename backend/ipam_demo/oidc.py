@@ -51,6 +51,7 @@ _SESSION_TTL = timedelta(hours=8)
 _HTTP_TIMEOUT_SECONDS = 6
 _MAX_HTTP_BYTES = 512 * 1024
 _HEX64 = 64
+_STATE_COOKIE = "ipam_sso_state"
 
 
 @dataclass(frozen=True)
@@ -335,7 +336,7 @@ def _exchange_code(config: OidcConfiguration, code: str, code_verifier: str,
         "client_id": config.client_id,
     }
     request = transport or _http_post_form
-    return request(endpoints["token_endpoint"], form, (config.client_id, config.client_secret))
+    return request(endpoints["token_endpoint"], form, auth=(config.client_id, config.client_secret))
 
 
 def _verify_id_token(id_token: str, config: OidcConfiguration, nonce: str,
@@ -514,8 +515,12 @@ def mount(app, *, load_reviewed: Callable[[], ReviewedConfiguration] | None = No
         configuration = get_configuration()
         if configuration is None:
             raise AppError("SSO_UNAVAILABLE", "OIDC sign-in is not configured on this deployment.", 404)
-        url, _ = begin_authorization(configuration)
-        return RedirectResponse(url=url, status_code=HTTPStatus.SEE_OTHER)
+        url, state = begin_authorization(configuration)
+        response = RedirectResponse(url=url, status_code=HTTPStatus.SEE_OTHER)
+        response.set_cookie(_STATE_COOKIE, state, max_age=int(_STATE_TTL.total_seconds()),
+                            httponly=True, secure=urlparse(configuration.redirect_uri).scheme == "https",
+                            samesite="lax", path="/api/auth/sso")
+        return response
 
     @app.get("/api/auth/sso/callback")
     def sso_callback(request: Request):
@@ -526,6 +531,9 @@ def mount(app, *, load_reviewed: Callable[[], ReviewedConfiguration] | None = No
         state = request.query_params.get("state")
         if not code or not state:
             raise AppError("SSO_CALLBACK_INVALID", "The SSO callback is missing required parameters.", 400)
+        browser_state = request.cookies.get(_STATE_COOKIE)
+        if not browser_state or not hmac.compare_digest(browser_state, state):
+            raise AppError("SSO_STATE_UNKNOWN", "The SSO sign-in attempt was not started in this browser.", 400)
         record = _pop_authorization(state)
         try:
             token_response = _exchange_code(configuration, code, record.code_verifier, None, None)
@@ -539,7 +547,9 @@ def mount(app, *, load_reviewed: Callable[[], ReviewedConfiguration] | None = No
         reviewed = read_reviewed()
         principal_id = resolve_principal(claims, mapping, reviewed)
         exchange = mint_exchange_code(principal_id)
-        return RedirectResponse(url=f"/#sso={exchange}", status_code=HTTPStatus.SEE_OTHER)
+        response = RedirectResponse(url=f"/#sso={exchange}", status_code=HTTPStatus.SEE_OTHER)
+        response.delete_cookie(_STATE_COOKIE, path="/api/auth/sso")
+        return response
 
     @app.post("/api/auth/sso/exchange")
     async def sso_exchange(request: Request) -> JSONResponse:

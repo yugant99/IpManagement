@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from urllib.parse import parse_qs, urlparse
 from unittest.mock import patch
 
 from ipam_demo import oidc
@@ -175,6 +176,55 @@ class AuthorizationFlowTests(unittest.TestCase):
         self.assertIn(f"state={state}", url)
         self.assertIn("nonce=", url)
         self.assertIn(state, oidc._authorization_store)
+
+    def test_token_exchange_passes_client_auth_to_keyword_only_transport(self):
+        with patch.dict("os.environ", self.env, clear=True):
+            config = oidc.get_configuration()
+        calls = []
+
+        def transport(url, form, *, auth):
+            calls.append((url, form, auth))
+            return {"id_token": "signed-token"}
+
+        result = oidc._exchange_code(config, "provider-code", "pkce-verifier", None, transport)
+        self.assertEqual(result, {"id_token": "signed-token"})
+        self.assertEqual(calls[0][0], "https://idp.example.com/token")
+        self.assertEqual(calls[0][1]["code_verifier"], "pkce-verifier")
+        self.assertEqual(calls[0][2], ("ipam-demo", "s3cr3t"))
+
+    def test_callback_requires_state_cookie_from_same_browser(self):
+        from fastapi import FastAPI
+        from fastapi.responses import JSONResponse
+        from fastapi.testclient import TestClient
+
+        app = FastAPI()
+
+        @app.exception_handler(AppError)
+        async def handle_error(request, exc):
+            return JSONResponse(exc.body("test"), status_code=exc.status)
+
+        oidc.mount(app, load_reviewed=lambda: _reviewed())
+        with patch.dict("os.environ", self.env, clear=True):
+            first_browser = TestClient(app)
+            response = first_browser.get("/api/auth/sso/authorize", follow_redirects=False)
+            self.assertEqual(response.status_code, 303)
+            state = parse_qs(urlparse(response.headers["location"]).query)["state"][0]
+            self.assertIn("httponly", response.headers["set-cookie"].lower())
+            self.assertIn("samesite=lax", response.headers["set-cookie"].lower())
+            callback = f"/api/auth/sso/callback?code=provider-code&state={state}"
+            other_browser = TestClient(app)
+            refused = other_browser.get(callback, follow_redirects=False)
+            self.assertEqual(refused.status_code, 400)
+            self.assertEqual(refused.json()["error"]["code"], "SSO_STATE_UNKNOWN")
+            self.assertIn(state, oidc._authorization_store)
+
+            with patch.object(oidc, "_exchange_code", return_value={"id_token": "signed-token"}), \
+                 patch.object(oidc, "_verify_id_token", return_value={"email": "alice@example.com", "email_verified": True}):
+                accepted = first_browser.get(callback, follow_redirects=False)
+            self.assertEqual(accepted.status_code, 303)
+            self.assertTrue(accepted.headers["location"].startswith("/#sso="))
+            self.assertIn("max-age=0", accepted.headers["set-cookie"].lower())
+            self.assertNotIn(state, oidc._authorization_store)
 
 
 class ResolvePrincipalTests(unittest.TestCase):

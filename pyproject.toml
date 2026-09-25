@@ -15,3 +15,8 @@ packages = ["backend/ipam_demo", "fixtures/evolving/ipam_synthetic_feed"]
 
 [tool.uv]
 package = true
+
+[dependency-groups]
+dev = [
+    "httpx2==2.13.1",
+]
