@@ -313,9 +313,10 @@ section[aria-labelledby="corrections-heading"] .inventory-panel > :is(h2, p, for
   .brand-product { font-size: 18px; }
   .header-context { display: none; }
   .atlas-body { grid-template-columns: 1fr; }
-  .atlas-rail { position: static; height: auto; flex-direction: row; align-items: flex-start; gap: 18px; overflow-x: auto; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
-  .rail-group { min-width: max-content; }
-  .rail-label { margin-bottom: 4px; }
+  .atlas-rail { position: static; height: auto; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 18px; overflow-x: auto; padding: 12px 16px; margin-bottom: 0; border-right: 0; border-bottom: 1px solid var(--line); }
+  .rail-group { display: flex; align-items: center; min-width: max-content; }
+  .rail-group + .rail-group { border-top: 0; border-left: 1px solid var(--line); padding-top: 0; padding-left: 18px; }
+  .rail-label { margin: 0 8px 0 0; }
   .atlas-rail button { min-height: 34px; white-space: nowrap; }
   .atlas-body > main { padding-top: 26px; }
 }

@@ -152,20 +152,18 @@
 .sources .source-supporting li { padding: 5px 0; }
 .sources .limitation-list { margin: 0 0 20px; padding: 15px 18px 15px 36px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .sources .sources-strip { grid-template-columns: minmax(0, 1fr); }
   .sources .strip-run { border-top: 1px solid var(--line); border-left: 0; }
-  .sources .source-table-heading,
-  .sources .source-tile-main { grid-template-columns: minmax(190px, 1fr) minmax(140px, 0.7fr) minmax(210px, 1fr); gap: 12px; }
-}
-
-@media (max-width: 700px) {
-  .sources .page-heading button { margin-top: 0; }
   .sources .source-table-heading { display: none; }
   .sources .source-tile-main { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
   .sources .source-tile-description { grid-column: 1; }
   .sources .source-tile-state { grid-column: 2; grid-row: 1; max-width: 150px; text-align: right; }
   .sources .source-tile-coverage { grid-column: 1 / -1; }
+}
+
+@media (max-width: 700px) {
+  .sources .page-heading button { margin-top: 0; }
   .sources .source-plane-head { display: block; }
   .sources .source-plane-head p { margin-top: 4px; }
   .sources .source-functions-grid { grid-template-columns: minmax(0, 1fr); }
